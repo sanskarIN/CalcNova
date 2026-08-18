@@ -1,0 +1,48 @@
+# Build outputs
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+coverage/
+
+# IDEs
+.vs/
+.vscode/*.log
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS
+.DS_Store
+Thumbs.db
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Signing and secrets
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.mobileprovision
+*.cer
+*.key
+*.pem
+secrets.json
+appsettings.*.local.json
+.env
+.env.*
+!.env.example
+
+# Avalonia / web generated output
+wwwroot/_framework/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
