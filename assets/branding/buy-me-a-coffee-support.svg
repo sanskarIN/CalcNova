@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 180" role="img" aria-labelledby="title desc">
+  <title id="title">Buy Me a Coffee — @sanskarIN</title>
+  <desc id="desc">An original neutral coffee cup support badge for CalcNova.</desc>
+  <rect width="680" height="180" rx="44" fill="#182033"/>
+  <g transform="translate(42 38)" fill="none" stroke="#ffce4b" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 26h82v48c0 27-18 42-41 42S18 101 18 74z"/>
+    <path d="M100 38h18c18 0 28 11 28 25s-10 25-28 25h-14"/>
+    <path d="M36 2c0 10 8 10 8 20M62 2c0 10 8 10 8 20M88 2c0 10 8 10 8 20"/>
+  </g>
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" fill="#f8fafc">
+    <text x="226" y="79" font-size="33" font-weight="700">Buy Me a Coffee</text>
+    <text x="226" y="124" font-size="26" opacity="0.78">@sanskarIN</text>
+  </g>
+</svg>
