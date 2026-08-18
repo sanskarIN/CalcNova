@@ -1,0 +1,26 @@
+{
+  "name": "CalcNova",
+  "short_name": "CalcNova",
+  "description": "Fast. Precise. Private. Everywhere. A local-first open-source calculator.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7f8fc",
+  "theme_color": "#182033",
+  "categories": ["utilities", "productivity", "education"],
+  "icons": [
+    {
+      "src": "./icons/calcnova.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/calcnova-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
