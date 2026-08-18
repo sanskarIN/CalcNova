@@ -59,7 +59,7 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache
         var tempPath = path + ".tmp";
         var model = new StoredSnapshot(
             snapshot.BaseCurrency,
-            new Dictionary<string, decimal>(snapshot.Rates, StringComparer.OrdinalIgnoreCase),
+            snapshot.Rates.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase),
             snapshot.RetrievedAt,
             snapshot.Source);
 
