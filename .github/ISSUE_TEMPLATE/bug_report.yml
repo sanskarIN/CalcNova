@@ -1,0 +1,75 @@
+name: Bug report
+description: Report a reproducible CalcNova defect
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve CalcNova. Do not include passwords, signing credentials, private keys, or other secrets.
+  - type: input
+    id: version
+    attributes:
+      label: CalcNova version
+      placeholder: e.g. 0.1.0-dev or commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - Android
+        - iOS
+        - Browser/WebAssembly
+        - Core library / tests
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS version / environment
+      placeholder: e.g. Windows 11 24H2, Ubuntu 26.04
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the calculation expression only when it is safe to share.
+      placeholder: |
+        1. Open ...
+        2. Enter ...
+        3. Press ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or non-sensitive logs
+      description: Remove personal information before attaching screenshots or logs.
+  - type: dropdown
+    id: reproducibility
+    attributes:
+      label: Reproducibility
+      options:
+        - Every time
+        - Often
+        - Sometimes
+        - Once
+    validations:
+      required: true
