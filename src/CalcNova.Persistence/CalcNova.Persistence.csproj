@@ -7,4 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../CalcNova.Platform/CalcNova.Platform.csproj" />
+  </ItemGroup>
 </Project>
