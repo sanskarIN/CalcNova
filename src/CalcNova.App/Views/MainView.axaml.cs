@@ -4,7 +4,6 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using Avalonia.VisualTree;
 using CalcNova.App.Services;
 using CalcNova.App.ViewModels;
 using CalcNova.Core.Evaluation;
