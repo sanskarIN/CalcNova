@@ -301,6 +301,18 @@ public readonly struct NumberValue : IEquatable<NumberValue>, IComparable<Number
         return HashCode.Combine(value.Numerator, value.Denominator);
     }
 
+    public static bool operator ==(NumberValue left, NumberValue right) => left.Equals(right);
+
+    public static bool operator !=(NumberValue left, NumberValue right) => !left.Equals(right);
+
+    public static bool operator <(NumberValue left, NumberValue right) => left.CompareTo(right) < 0;
+
+    public static bool operator <=(NumberValue left, NumberValue right) => left.CompareTo(right) <= 0;
+
+    public static bool operator >(NumberValue left, NumberValue right) => left.CompareTo(right) > 0;
+
+    public static bool operator >=(NumberValue left, NumberValue right) => left.CompareTo(right) >= 0;
+
     private bool TryToDecimal(out decimal value)
     {
         switch (Kind)
