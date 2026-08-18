@@ -4,20 +4,14 @@ on:
   push:
     branches: [main]
     paths:
-      - "src/CalcNova.Browser/**"
-      - "src/CalcNova.App/**"
-      - "src/CalcNova.Core/**"
-      - "src/CalcNova.Platform/**"
+      - "src/**"
       - "Directory.*.props"
       - "global.json"
       - ".github/workflows/build-browser.yml"
   pull_request:
     branches: [main]
     paths:
-      - "src/CalcNova.Browser/**"
-      - "src/CalcNova.App/**"
-      - "src/CalcNova.Core/**"
-      - "src/CalcNova.Platform/**"
+      - "src/**"
       - "Directory.*.props"
       - "global.json"
       - ".github/workflows/build-browser.yml"
