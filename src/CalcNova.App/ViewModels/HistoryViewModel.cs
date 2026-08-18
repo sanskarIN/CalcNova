@@ -150,6 +150,8 @@ public sealed class HistoryViewModel : ViewModelBase
         }
     }
 
+    public void ReportStatus(string message) => StatusMessage = message ?? string.Empty;
+
     private void RequestClear()
     {
         if (_repository is null)
