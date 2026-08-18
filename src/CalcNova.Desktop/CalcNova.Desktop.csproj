@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../CalcNova.App/CalcNova.App.csproj" />
+    <ProjectReference Include="../CalcNova.Persistence/CalcNova.Persistence.csproj" />
   </ItemGroup>
 </Project>
