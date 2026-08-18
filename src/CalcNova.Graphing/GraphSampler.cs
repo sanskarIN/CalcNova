@@ -83,7 +83,7 @@ public sealed class GraphSampler
         return GraphSamplingResult.Completed(segments, invalidSamples);
     }
 
-    private static void CloseCurrentSegment(ICollection<GraphSegment> segments, List<GraphPoint> current)
+    private static void CloseCurrentSegment(List<GraphSegment> segments, List<GraphPoint> current)
     {
         if (current.Count > 0)
         {
