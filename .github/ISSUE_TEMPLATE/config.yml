@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: mailto:supportramsandesh@gmail.com
+    about: Please report suspected security vulnerabilities privately. Do not post sensitive vulnerability details in a public issue.
+  - name: Buy Me a Coffee
+    url: https://buymeacoffee.com/sanskarIN
+    about: Optional support for CalcNova development.
