@@ -1,58 +1,61 @@
 # CalcNova Keyboard Shortcuts
 
-CalcNova is intended to support efficient keyboard-first use on desktop and browser targets. This file distinguishes currently implemented shortcuts from planned mappings.
+CalcNova supports keyboard-first use on desktop and Browser targets through the shared Avalonia application layer. Text boxes still receive normal platform text editing; calculator-level shortcuts are routed only when CalcNova's calculator surface owns the key event.
 
-## Current desktop key handling
+## Calculator shortcuts
 
-| Key | Current action |
+| Key | Action |
 |---|---|
-| Enter / Return | Evaluate current expression |
+| Enter / Return | Evaluate the current expression; repeated Enter uses repeated-equals semantics when available |
 | Escape | Clear expression/result state |
-| Backspace | Remove the final expression character |
-
-The expression text box also receives ordinary text entry according to Avalonia/platform text-input behavior.
-
-## Planned calculator mappings
-
-The following mappings are intended but must be tested before being marked implemented:
-
-| Key | Intended action |
-|---|---|
-| `0`–`9` | Insert digit |
-| Numpad `0`–`9` | Insert digit |
-| `.` / locale-aware decimal input | Insert decimal separator safely |
+| Backspace | Remove the final expression character when a text editor does not already own the key |
+| F9 | Toggle the sign of the evaluated current value |
+| `0`–`9` | Insert digits outside an active text editor |
+| Numpad `0`–`9` | Insert digits |
+| `.` | Insert decimal point |
 | `+` | Addition |
 | `-` | Subtraction |
 | `*` | Multiplication |
 | `/` | Division |
-| `%` | Percentage/modulo according to active context |
+| `%` | Insert the explicit modulo operator when typed; the on-screen `%` button uses calculator-style contextual percentage semantics |
 | `^` | Power |
 | `(` / `)` | Parentheses |
-| Delete | Clear selected/input content where appropriate |
-| Ctrl/Cmd+C | Copy selected/result content |
-| Ctrl/Cmd+V | Paste sanitized expression text |
-| Ctrl/Cmd+K | Command palette if implemented |
-| Ctrl/Cmd+L | Focus expression input if adopted without platform conflict |
+| Ctrl+C / Cmd+C | Copy the current result, or the expression when the result is an error, when a text editor does not own the shortcut |
+| Ctrl+V / Cmd+V | Paste a length-bounded expression from the system clipboard when a text editor does not own the shortcut |
+
+The calculator's touch UI also includes explicit **Copy result**, **Copy expression**, and **Paste expression** actions for platforms where keyboard shortcuts are not convenient.
+
+## Numpad behavior
+
+CalcNova handles physical numpad digits plus Add, Subtract, Multiply, Divide, and Decimal through the shared key router. This behavior is platform/framework dependent and remains subject to CI/manual validation on supported desktop environments.
+
+## Text editing behavior
+
+When a `TextBox` owns keyboard focus, CalcNova intentionally lets the platform text editor handle ordinary typing, selection, copy, paste, cursor movement, and deletion. This avoids duplicate input and preserves expected accessibility/IME behavior.
+
+Pasted calculator expressions are capped at the same maximum expression length as direct calculator input. Pasted text is treated strictly as calculator expression text and is never executed as arbitrary code.
 
 ## Mode shortcuts
 
-Mode-switch shortcuts are not finalized. They should avoid conflicts with OS/browser conventions and remain discoverable in an in-app shortcut dialog.
+Dedicated mode-switch shortcuts are not yet assigned. They should avoid conflicts with operating-system/browser conventions and remain discoverable if introduced later.
 
 ## Focus and accessibility requirements
 
-Keyboard support is not complete merely because key events exist. Each interactive control must also support:
+Keyboard support also depends on:
 
 - logical Tab/Shift+Tab order;
 - visible focus indication;
-- activation using expected platform keys;
-- no keyboard trap;
-- dialogs that return focus predictably;
-- screen-reader labels that describe function, not only visual glyphs.
+- expected button activation keys;
+- no keyboard traps;
+- predictable focus after dialogs/confirmation flows;
+- screen-reader labels that describe the function rather than only a visual glyph.
+
+The shared UI uses standard Avalonia controls wherever possible so platform accessibility and keyboard semantics are preserved.
 
 ## Browser considerations
 
-Browser builds must avoid hijacking important browser/system shortcuts. Any shortcut that conflicts with navigation, developer tools, tabs, or accessibility software should be changed or made configurable.
+Browser builds deliberately avoid overriding important browser/system shortcuts beyond normal copy/paste handling when CalcNova owns the surface. Browser navigation, developer-tool, tab-management, and accessibility shortcuts should remain under browser control.
 
-## Custom shortcuts
+## Later power-user work
 
-Configurable shortcuts are a later power-user feature. If implemented, the settings UI must detect duplicates/conflicts and provide a reset-to-default option.
+Potential future additions include a searchable command palette, configurable shortcuts, direct mode switching, and a dedicated in-app shortcut reference dialog. Configurable shortcuts must detect duplicates/conflicts and offer reset-to-default behavior before they are considered complete.
