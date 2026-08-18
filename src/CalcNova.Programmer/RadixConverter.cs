@@ -11,7 +11,13 @@ public static class RadixConverter
         ArgumentException.ThrowIfNullOrWhiteSpace(text);
         ValidateRadix(radix);
 
-        var span = text.Trim().Replace("_", string.Empty, StringComparison.Ordinal).AsSpan();
+        var normalized = text.Trim().Replace("_", string.Empty, StringComparison.Ordinal);
+        if (normalized.Length == 0)
+        {
+            throw new FormatException("A radix value must contain at least one digit.");
+        }
+
+        var span = normalized.AsSpan();
         var sign = BigInteger.One;
         if (span[0] is '+' or '-')
         {
