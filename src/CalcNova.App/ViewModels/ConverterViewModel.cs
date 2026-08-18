@@ -7,12 +7,15 @@ namespace CalcNova.App.ViewModels;
 
 public sealed class ConverterViewModel : ViewModelBase
 {
+    private const int MinimumPrecision = 3;
+    private const int MaximumPrecision = 15;
     private readonly UnitConverter _converter = new();
     private UnitCategory _selectedCategory = UnitCategory.Length;
     private IReadOnlyList<UnitDefinition> _availableUnits;
     private UnitDefinition _fromUnit;
     private UnitDefinition _toUnit;
     private string _input = "1";
+    private int _precision = MaximumPrecision;
     private string _result = string.Empty;
     private string _errorMessage = string.Empty;
 
@@ -27,6 +30,8 @@ public sealed class ConverterViewModel : ViewModelBase
     }
 
     public IReadOnlyList<UnitCategory> Categories { get; } = Enum.GetValues<UnitCategory>();
+
+    public IReadOnlyList<int> PrecisionOptions { get; } = Enumerable.Range(MinimumPrecision, MaximumPrecision - MinimumPrecision + 1).ToArray();
 
     public UnitCategory SelectedCategory
     {
@@ -78,6 +83,23 @@ public sealed class ConverterViewModel : ViewModelBase
         set => SetField(ref _input, value ?? string.Empty);
     }
 
+    public int Precision
+    {
+        get => _precision;
+        set
+        {
+            if (value is < MinimumPrecision or > MaximumPrecision)
+            {
+                return;
+            }
+
+            if (SetField(ref _precision, value))
+            {
+                Convert();
+            }
+        }
+    }
+
     public string Result
     {
         get => _result;
@@ -106,7 +128,7 @@ public sealed class ConverterViewModel : ViewModelBase
         try
         {
             var converted = _converter.Convert(input, FromUnit.Id, ToUnit.Id);
-            Result = $"{converted.ToString("G15", CultureInfo.InvariantCulture)} {ToUnit.Symbol}";
+            Result = $"{converted.ToString($"G{Precision}", CultureInfo.InvariantCulture)} {ToUnit.Symbol}";
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is InvalidOperationException or ArgumentException or OverflowException)
