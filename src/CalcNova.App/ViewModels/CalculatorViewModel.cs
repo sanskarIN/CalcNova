@@ -78,6 +78,10 @@ public sealed class CalculatorViewModel : ViewModelBase
 
     public string DisplayResult => CalculatorResultFormatter.Format(Result, _decimalPrecision, _useGroupingSeparators);
 
+    public int DecimalPrecision => _decimalPrecision;
+
+    public bool UseGroupingSeparators => _useGroupingSeparators;
+
     public string StatusMessage
     {
         get => _statusMessage;
@@ -184,6 +188,8 @@ public sealed class CalculatorViewModel : ViewModelBase
 
         _decimalPrecision = decimalPrecision;
         _useGroupingSeparators = useGroupingSeparators;
+        OnPropertyChanged(nameof(DecimalPrecision));
+        OnPropertyChanged(nameof(UseGroupingSeparators));
         OnPropertyChanged(nameof(DisplayResult));
     }
 
