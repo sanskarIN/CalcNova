@@ -1,6 +1,8 @@
 using Avalonia;
 using CalcNova.App;
 using CalcNova.App.Services;
+using CalcNova.Desktop.Services;
+using CalcNova.Persistence.Currency;
 using CalcNova.Persistence.History;
 using CalcNova.Persistence.Settings;
 
@@ -32,6 +34,10 @@ internal static class Program
         var appDataDirectory = Path.Combine(localData, "CalcNova");
         return new AppDependencies(
             new SqliteCalculationHistoryRepository(Path.Combine(appDataDirectory, "history.db")),
-            new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json")));
+            new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json")))
+        {
+            ExternalLinkService = new DesktopExternalLinkService(),
+            CurrencyRateCache = new JsonCurrencyRateCache(Path.Combine(appDataDirectory, "currency"))
+        };
     }
 }
