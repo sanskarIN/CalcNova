@@ -5,6 +5,7 @@ using Avalonia.Android;
 using CalcNova.App;
 using CalcNova.App.Services;
 using CalcNova.Android.Services;
+using CalcNova.Persistence.Currency;
 using CalcNova.Persistence.History;
 using CalcNova.Persistence.Settings;
 
@@ -31,8 +32,11 @@ public sealed class MainActivity : AvaloniaMainActivity<SingleViewApp>
 
         AppComposition.Configure(new AppDependencies(
             new SqliteCalculationHistoryRepository(Path.Combine(appDataDirectory, "history.db")),
-            new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json")),
-            new AndroidExternalLinkService(this)));
+            new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json")))
+        {
+            ExternalLinkService = new AndroidExternalLinkService(this),
+            CurrencyRateCache = new JsonCurrencyRateCache(Path.Combine(appDataDirectory, "currency"))
+        });
 
         return base.CustomizeAppBuilder(builder).WithInterFont();
     }
