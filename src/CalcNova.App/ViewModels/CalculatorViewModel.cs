@@ -1,31 +1,34 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
 using CalcNova.Core.Evaluation;
 
 namespace CalcNova.App.ViewModels;
 
-public sealed class CalculatorViewModel : INotifyPropertyChanged
+public sealed class CalculatorViewModel : ViewModelBase
 {
     private readonly ExpressionEvaluator _evaluator;
+    private readonly Func<string, string, Task>? _recordCalculationAsync;
+    private readonly Func<bool> _historyEnabledProvider;
     private string _expression = string.Empty;
     private string _result = "0";
     private string _statusMessage = string.Empty;
     private AngleUnit _angleUnit = AngleUnit.Degrees;
 
-    public CalculatorViewModel(ExpressionEvaluator? evaluator = null)
+    public CalculatorViewModel(
+        ExpressionEvaluator? evaluator = null,
+        Func<string, string, Task>? recordCalculationAsync = null,
+        Func<bool>? historyEnabledProvider = null)
     {
         _evaluator = evaluator ?? new ExpressionEvaluator();
+        _recordCalculationAsync = recordCalculationAsync;
+        _historyEnabledProvider = historyEnabledProvider ?? (() => true);
         AppendCommand = new RelayCommand(Append);
-        EvaluateCommand = new RelayCommand(_ => Evaluate());
+        EvaluateCommand = new AsyncRelayCommand(_ => EvaluateAsync());
         ClearCommand = new RelayCommand(_ => Clear());
         BackspaceCommand = new RelayCommand(_ => Backspace());
         SetAngleUnitCommand = new RelayCommand(SetAngleUnit);
         UseResultCommand = new RelayCommand(_ => UseResult());
     }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     public string Expression
     {
@@ -77,19 +80,27 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
 
     public ICommand UseResultCommand { get; }
 
-    public void Evaluate()
+    public async Task EvaluateAsync()
     {
-        var result = _evaluator.Evaluate(Expression, new EvaluationOptions { AngleUnit = AngleUnit });
-        if (result.Success)
+        var expression = Expression;
+        var result = _evaluator.Evaluate(expression, new EvaluationOptions { AngleUnit = AngleUnit });
+        if (!result.Success)
         {
-            Result = result.Value.ToDisplayString();
-            StatusMessage = string.Empty;
+            Result = "Error";
+            StatusMessage = result.ErrorMessage ?? "Calculation failed.";
             return;
         }
 
-        Result = "Error";
-        StatusMessage = result.ErrorMessage ?? "Calculation failed.";
+        Result = result.Value.ToDisplayString();
+        StatusMessage = string.Empty;
+
+        if (_recordCalculationAsync is not null && _historyEnabledProvider() && !string.IsNullOrWhiteSpace(expression))
+        {
+            await _recordCalculationAsync(expression, Result);
+        }
     }
+
+    public void ApplyAngleUnit(AngleUnit angleUnit) => AngleUnit = angleUnit;
 
     public void Clear()
     {
@@ -130,13 +141,13 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
     {
         if (parameter is AngleUnit unit)
         {
-            AngleUnit = unit;
+            ApplyAngleUnit(unit);
             return;
         }
 
         if (parameter is string text && Enum.TryParse<AngleUnit>(text, true, out var parsed))
         {
-            AngleUnit = parsed;
+            ApplyAngleUnit(parsed);
         }
     }
 
@@ -150,19 +161,4 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
         Expression = Result;
         StatusMessage = string.Empty;
     }
-
-    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value))
-        {
-            return false;
-        }
-
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
-
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
