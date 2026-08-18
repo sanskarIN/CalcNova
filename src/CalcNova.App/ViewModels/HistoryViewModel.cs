@@ -9,6 +9,7 @@ public sealed class HistoryViewModel : ViewModelBase
     private readonly ICalculationHistoryRepository? _repository;
     private readonly Func<int> _historyLimitProvider;
     private IReadOnlyList<HistoryEntry> _entries = Array.Empty<HistoryEntry>();
+    private HistoryEntry? _selectedEntry;
     private string _searchQuery = string.Empty;
     private string _statusMessage = string.Empty;
     private bool _isInitialized;
@@ -27,6 +28,12 @@ public sealed class HistoryViewModel : ViewModelBase
     {
         get => _entries;
         private set => SetField(ref _entries, value);
+    }
+
+    public HistoryEntry? SelectedEntry
+    {
+        get => _selectedEntry;
+        set => SetField(ref _selectedEntry, value);
     }
 
     public string SearchQuery
@@ -108,6 +115,7 @@ public sealed class HistoryViewModel : ViewModelBase
         if (_repository is null)
         {
             Entries = Array.Empty<HistoryEntry>();
+            SelectedEntry = null;
             StatusMessage = "History storage is not configured for this platform yet.";
             return;
         }
@@ -116,6 +124,11 @@ public sealed class HistoryViewModel : ViewModelBase
         {
             var limit = Math.Clamp(_historyLimitProvider(), 1, 5000);
             Entries = await _repository.GetRecentAsync(limit, SearchQuery, cancellationToken);
+            if (SelectedEntry is not null && Entries.All(entry => entry.Id != SelectedEntry.Id))
+            {
+                SelectedEntry = null;
+            }
+
             StatusMessage = Entries.Count == 0 ? "No matching history entries." : string.Empty;
         }
         catch (Exception exception)
@@ -135,6 +148,7 @@ public sealed class HistoryViewModel : ViewModelBase
         {
             await _repository.ClearAsync(cancellationToken);
             Entries = Array.Empty<HistoryEntry>();
+            SelectedEntry = null;
             StatusMessage = "History cleared.";
         }
         catch (Exception exception)
@@ -145,14 +159,22 @@ public sealed class HistoryViewModel : ViewModelBase
 
     private async Task DeleteAsync(object? parameter)
     {
-        if (_repository is null || parameter is not HistoryEntry entry)
+        if (_repository is null)
         {
+            return;
+        }
+
+        var entry = parameter as HistoryEntry ?? SelectedEntry;
+        if (entry is null)
+        {
+            StatusMessage = "Select a history entry to delete.";
             return;
         }
 
         try
         {
             await _repository.DeleteAsync(entry.Id);
+            SelectedEntry = null;
             await RefreshAsync();
         }
         catch (Exception exception)
@@ -163,8 +185,15 @@ public sealed class HistoryViewModel : ViewModelBase
 
     private async Task ToggleFavoriteAsync(object? parameter)
     {
-        if (_repository is null || parameter is not HistoryEntry entry)
+        if (_repository is null)
         {
+            return;
+        }
+
+        var entry = parameter as HistoryEntry ?? SelectedEntry;
+        if (entry is null)
+        {
+            StatusMessage = "Select a history entry to change its favorite state.";
             return;
         }
 
@@ -172,6 +201,7 @@ public sealed class HistoryViewModel : ViewModelBase
         {
             await _repository.SetFavoriteAsync(entry.Id, !entry.IsFavorite);
             await RefreshAsync();
+            SelectedEntry = Entries.FirstOrDefault(item => item.Id == entry.Id);
         }
         catch (Exception exception)
         {
