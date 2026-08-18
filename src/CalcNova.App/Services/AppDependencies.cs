@@ -1,4 +1,5 @@
 using CalcNova.Currency;
+using CalcNova.Platform.External;
 using CalcNova.Platform.History;
 using CalcNova.Platform.Settings;
 
@@ -8,6 +9,8 @@ public sealed record AppDependencies(
     ICalculationHistoryRepository? HistoryRepository,
     ISettingsRepository? SettingsRepository)
 {
+    public IExternalLinkService? ExternalLinkService { get; init; }
+
     public ICurrencyRateCache? CurrencyRateCache { get; init; }
 
     public ICurrencyRateProvider? CurrencyRateProvider { get; init; }
