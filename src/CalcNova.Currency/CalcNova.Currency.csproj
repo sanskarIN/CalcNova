@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>CalcNova.Currency</AssemblyName>
+    <RootNamespace>CalcNova.Currency</RootNamespace>
+  </PropertyGroup>
+</Project>
