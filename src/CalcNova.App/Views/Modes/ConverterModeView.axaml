@@ -9,11 +9,21 @@
       <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
       <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="6">
         <ComboBox ItemsSource="{Binding AvailableUnits}" SelectedItem="{Binding FromUnit, Mode=TwoWay}" />
-        <Button Grid.Column="1" Content="⇄" Command="{Binding SwapCommand}" />
+        <Button Grid.Column="1" Content="⇄" Command="{Binding SwapCommand}" ToolTip.Tip="Swap source and target units" />
         <ComboBox Grid.Column="2" ItemsSource="{Binding AvailableUnits}" SelectedItem="{Binding ToUnit, Mode=TwoWay}" />
       </Grid>
       <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Input value" />
-      <Button Content="Convert" Command="{Binding ConvertCommand}" HorizontalAlignment="Left" />
+      <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8">
+        <Button Content="Convert" Command="{Binding ConvertCommand}" />
+        <Button Grid.Column="1" Content="Copy result" Click="CopyResult" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+          <TextBlock Text="Precision" VerticalAlignment="Center" />
+          <ComboBox Width="84"
+                    ItemsSource="{Binding PrecisionOptions}"
+                    SelectedItem="{Binding Precision, Mode=TwoWay}"
+                    ToolTip.Tip="Significant digits used to display the converted result" />
+        </StackPanel>
+      </Grid>
       <Border Padding="12" CornerRadius="12">
         <StackPanel>
           <TextBlock Text="Result" Opacity="0.6" />
