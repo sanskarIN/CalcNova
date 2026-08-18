@@ -5,6 +5,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using CalcNova.App.Services;
 using CalcNova.App.ViewModels;
 using CalcNova.Core.Evaluation;
 using CalcNova.Platform.Settings;
@@ -52,6 +53,19 @@ public partial class MainView : UserControl
 
         _subscribedViewModel.SettingsChanged -= ApplySettings;
         _subscribedViewModel = null;
+    }
+
+    private void OnPointerPressed(object? sender, PointerPressedEventArgs eventArgs)
+    {
+        if (DataContext is not MainViewModel { Settings.HapticsEnabled: true })
+        {
+            return;
+        }
+
+        if (eventArgs.Source is Button)
+        {
+            AppComposition.Dependencies.HapticFeedbackService?.PerformClick();
+        }
     }
 
     private async void OnKeyDown(object? sender, KeyEventArgs eventArgs)
