@@ -21,7 +21,7 @@
                   Background="Transparent"
                   BorderThickness="0"
                   HorizontalContentAlignment="Right">
-            <TextBlock Text="{Binding Result}" FontSize="32" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding DisplayResult}" FontSize="32" FontWeight="SemiBold" TextWrapping="Wrap" />
           </Button>
           <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Opacity="0.75" />
         </StackPanel>
