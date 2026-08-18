@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CalcNova.DateTime/CalcNova.DateTime.csproj" />
+    <Project Path="src/CalcNova.Currency/CalcNova.Currency.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CalcNova.DateTime.Tests/CalcNova.DateTime.Tests.csproj" />
+    <Project Path="tests/CalcNova.Currency.Tests/CalcNova.Currency.Tests.csproj" />
+  </Folder>
+</Solution>
