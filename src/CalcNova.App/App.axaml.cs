@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using CalcNova.App.Services;
 using CalcNova.App.ViewModels;
 using CalcNova.App.Views;
 
@@ -16,7 +17,7 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel()
+                DataContext = new MainViewModel(AppComposition.Dependencies)
             };
         }
 
