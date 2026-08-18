@@ -1,0 +1,49 @@
+name: Documentation Check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Verify mandatory repository documents
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            README.md LICENSE CHANGELOG.md CONTRIBUTING.md CODE_OF_CONDUCT.md
+            SECURITY.md SUPPORT.md PROJECT_STATE.md what_changed.md
+            docs/ARCHITECTURE.md docs/BUILDING.md docs/CALCULATION_ENGINE.md
+            docs/FEATURES.md docs/KEYBOARD_SHORTCUTS.md docs/ACCESSIBILITY.md
+            docs/PRIVACY.md docs/SECURITY.md docs/TESTING.md docs/RELEASE.md
+            docs/PLATFORM_SUPPORT.md docs/TROUBLESHOOTING.md docs/DESIGN_SYSTEM.md
+            docs/LOCALIZATION.md docs/ROADMAP.md
+          )
+          missing=0
+          for file in "${required[@]}"; do
+            if [[ ! -s "$file" ]]; then
+              echo "Missing or empty required file: $file"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Reject common unresolved release placeholders in docs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE '(^|[^A-Za-z])(TBD|FIXME|HACK|XXX)([^A-Za-z]|$)' README.md docs --include='*.md'; then
+            echo "Documentation contains unresolved placeholder markers."
+            exit 1
+          fi
