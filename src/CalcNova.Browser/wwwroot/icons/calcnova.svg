@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">CalcNova</title>
+  <desc id="desc">A geometric calculator with a small nova spark.</desc>
+  <rect width="512" height="512" rx="120" fill="#182033"/>
+  <rect x="112" y="88" width="284" height="340" rx="62" fill="#f8fafc"/>
+  <rect x="148" y="130" width="212" height="82" rx="22" fill="#182033"/>
+  <g fill="#182033">
+    <rect x="148" y="250" width="58" height="58" rx="17"/>
+    <rect x="228" y="250" width="58" height="58" rx="17"/>
+    <rect x="308" y="250" width="58" height="58" rx="17"/>
+    <rect x="148" y="330" width="58" height="58" rx="17"/>
+    <rect x="228" y="330" width="58" height="58" rx="17"/>
+  </g>
+  <g fill="#ffce4b">
+    <path d="M393 45l14 39 39 14-39 14-14 39-14-39-39-14 39-14z"/>
+    <path d="M326 334h18v24h24v18h-24v24h-18v-24h-24v-18h24z"/>
+  </g>
+</svg>
