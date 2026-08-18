@@ -288,7 +288,7 @@ public readonly struct NumberValue : IEquatable<NumberValue>, IComparable<Number
 
     public override bool Equals(object? obj) => obj is NumberValue other && Equals(other);
 
-    public override int GetHashCode() => ToDisplayString().GetHashCode(StringComparison.Ordinal);
+    public override int GetHashCode() => NormalizeNegativeZero(ToDouble()).GetHashCode();
 
     private bool TryToDecimal(out decimal value)
     {
