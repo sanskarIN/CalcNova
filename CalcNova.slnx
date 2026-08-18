@@ -8,6 +8,7 @@
     <Project Path="src/CalcNova.Equations/CalcNova.Equations.csproj" />
     <Project Path="src/CalcNova.Matrices/CalcNova.Matrices.csproj" />
     <Project Path="src/CalcNova.Graphing/CalcNova.Graphing.csproj" />
+    <Project Path="src/CalcNova.Platform/CalcNova.Platform.csproj" />
     <Project Path="src/CalcNova.Persistence/CalcNova.Persistence.csproj" />
     <Project Path="src/CalcNova.App/CalcNova.App.csproj" />
     <Project Path="src/CalcNova.Desktop/CalcNova.Desktop.csproj" />
