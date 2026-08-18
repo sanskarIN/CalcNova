@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Services;
 using CalcNova.Core.Errors;
 using CalcNova.Core.Evaluation;
 using CalcNova.Core.Memory;
@@ -20,6 +21,8 @@ public sealed class CalculatorViewModel : ViewModelBase
     private string _result = "0";
     private string _statusMessage = string.Empty;
     private AngleUnit _angleUnit = AngleUnit.Degrees;
+    private int _decimalPrecision = 15;
+    private bool _useGroupingSeparators = true;
 
     public CalculatorViewModel(
         ExpressionEvaluator? evaluator = null,
@@ -64,8 +67,16 @@ public sealed class CalculatorViewModel : ViewModelBase
     public string Result
     {
         get => _result;
-        private set => SetField(ref _result, value);
+        private set
+        {
+            if (SetField(ref _result, value))
+            {
+                OnPropertyChanged(nameof(DisplayResult));
+            }
+        }
     }
+
+    public string DisplayResult => CalculatorResultFormatter.Format(Result, _decimalPrecision, _useGroupingSeparators);
 
     public string StatusMessage
     {
@@ -163,6 +174,18 @@ public sealed class CalculatorViewModel : ViewModelBase
     }
 
     public void ApplyAngleUnit(AngleUnit angleUnit) => AngleUnit = angleUnit;
+
+    public void ApplyFormatting(int decimalPrecision, bool useGroupingSeparators)
+    {
+        if (decimalPrecision is < 1 or > 29)
+        {
+            throw new ArgumentOutOfRangeException(nameof(decimalPrecision), "Decimal precision must be between 1 and 29.");
+        }
+
+        _decimalPrecision = decimalPrecision;
+        _useGroupingSeparators = useGroupingSeparators;
+        OnPropertyChanged(nameof(DisplayResult));
+    }
 
     public void Clear()
     {
