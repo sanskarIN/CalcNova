@@ -26,7 +26,7 @@ public sealed class ConverterViewModelTests
 
         viewModel.Convert();
 
-        var recent = Assert.Single(viewModel.RecentPairs.Where(pair => pair.From.Id == from.Id && pair.To.Id == to.Id));
+        var recent = Assert.Single(viewModel.RecentPairs, pair => pair.From.Id == from.Id && pair.To.Id == to.Id);
         Assert.Equal(recent, viewModel.SelectedRecentPair);
     }
 
@@ -87,5 +87,42 @@ public sealed class ConverterViewModelTests
         Assert.Equal(
             viewModel.RecentPairs.Count,
             viewModel.RecentPairs.Select(pair => (pair.From.Id, pair.To.Id)).Distinct().Count());
+    }
+
+    [Fact]
+    public void PrecisionOptions_CoverSupportedDisplayRange()
+    {
+        var viewModel = new ConverterViewModel();
+
+        Assert.Equal(3, viewModel.PrecisionOptions[0]);
+        Assert.Equal(15, viewModel.PrecisionOptions[^1]);
+        Assert.Equal(13, viewModel.PrecisionOptions.Count);
+    }
+
+    [Fact]
+    public void Precision_ChangingValueReformatsCurrentConversion()
+    {
+        var viewModel = new ConverterViewModel
+        {
+            Input = "1.23456789"
+        };
+        viewModel.ToUnit = viewModel.FromUnit;
+        viewModel.Precision = 4;
+
+        Assert.StartsWith("1.235 ", viewModel.Result, StringComparison.Ordinal);
+        Assert.Empty(viewModel.ErrorMessage);
+    }
+
+    [Theory]
+    [InlineData(2)]
+    [InlineData(16)]
+    public void Precision_OutOfRangeValueIsIgnored(int invalidPrecision)
+    {
+        var viewModel = new ConverterViewModel();
+        var originalPrecision = viewModel.Precision;
+
+        viewModel.Precision = invalidPrecision;
+
+        Assert.Equal(originalPrecision, viewModel.Precision);
     }
 }
