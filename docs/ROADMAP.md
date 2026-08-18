@@ -15,7 +15,6 @@ This roadmap tracks remaining work without promising fixed release dates. Comple
 ### Standard/scientific polish
 
 - Finish cursor-aware calculator editing beyond ordinary `TextBox` editing where it improves usability without creating ambiguity.
-- Add an in-app keyboard-shortcut reference dialog.
 - Apply global precision/formatting preferences consistently to advanced modes where appropriate.
 - Review localization-safe number display/parser interactions before adding localized decimal entry.
 - Add optional auto-copy only if it remains non-intrusive.
@@ -33,14 +32,12 @@ This roadmap tracks remaining work without promising fixed release dates. Comple
 - Test large text, screen-reader labels, keyboard-only use, focus order, high contrast, and reduced-motion behavior.
 - Review compact phone, landscape phone, tablet/foldable, desktop, and Browser breakpoints.
 - Replace any glyph-only control whose accessible purpose is unclear.
-- Wire stored high-contrast/reduced-motion preferences into concrete visual/motion behavior where Avalonia/platform capabilities allow it.
+- Extend reduced-motion behavior if motion/animation is introduced; the persisted high-contrast preference is already applied through shared Avalonia styles.
 
 ## Next
 
 ### Programmer experience
 
-- Add an interactive bit-toggle grid tied to the selected word size.
-- Expose custom base 2–36 selection in the shared UI rather than only common bases.
 - Add an optional Unicode/code-point helper after accessibility review.
 
 ### Converter experience
