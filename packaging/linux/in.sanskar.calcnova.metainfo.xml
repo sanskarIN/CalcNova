@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>in.sanskar.calcnova</id>
+  <name>CalcNova</name>
+  <summary>Fast, precise, privacy-first cross-platform calculator</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+  <description>
+    <p>CalcNova is an open-source local-first calculator with standard, scientific, programmer, conversion, statistics, equations, matrices, graphing, history, settings, keyboard support, and accessibility-oriented workflows.</p>
+  </description>
+  <launchable type="desktop-id">in.sanskar.calcnova.desktop</launchable>
+  <url type="homepage">https://github.com/sanskarIN/CalcNova</url>
+  <url type="bugtracker">https://github.com/sanskarIN/CalcNova/issues</url>
+  <url type="donation">https://buymeacoffee.com/sanskarIN</url>
+  <categories>
+    <category>Utility</category>
+    <category>Education</category>
+  </categories>
+  <provides>
+    <binary>CalcNova.Desktop</binary>
+  </provides>
+</component>
