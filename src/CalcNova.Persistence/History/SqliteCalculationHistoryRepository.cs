@@ -1,4 +1,5 @@
 using System.Globalization;
+using CalcNova.Platform.History;
 using Microsoft.Data.Sqlite;
 
 namespace CalcNova.Persistence.History;
