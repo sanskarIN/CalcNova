@@ -7,25 +7,52 @@ namespace CalcNova.Core.Evaluation;
 
 public sealed class ExpressionEvaluator
 {
-    public EvaluationResult Evaluate(string expression, EvaluationOptions? options = null)
+    public CompiledExpression Compile(string expression, EvaluationOptions? options = null)
     {
         options ??= EvaluationOptions.Default;
 
         if (string.IsNullOrWhiteSpace(expression))
         {
-            return EvaluationResult.FromError(CalculationErrorCode.EmptyExpression, "Enter an expression to calculate.");
+            throw new CalculationException(CalculationErrorCode.EmptyExpression, "Enter an expression to calculate.");
         }
 
         if (expression.Length > options.MaximumExpressionLength)
         {
-            return EvaluationResult.FromError(CalculationErrorCode.InputTooLong, "The expression exceeds CalcNova's configured input limit.");
+            throw new CalculationException(CalculationErrorCode.InputTooLong, "The expression exceeds CalcNova's configured input limit.");
         }
+
+        var tokens = new Tokenizer(expression).Tokenize();
+        var syntaxTree = new Parser(tokens).Parse();
+        return new CompiledExpression(expression, syntaxTree);
+    }
+
+    public EvaluationResult Evaluate(string expression, EvaluationOptions? options = null)
+    {
+        options ??= EvaluationOptions.Default;
 
         try
         {
-            var tokens = new Tokenizer(expression).Tokenize();
-            var syntaxTree = new Parser(tokens).Parse();
-            return EvaluationResult.FromValue(EvaluateExpression(syntaxTree, options));
+            var compiled = Compile(expression, options);
+            return EvaluationResult.FromValue(EvaluateExpression(compiled.SyntaxTree, options));
+        }
+        catch (CalculationException exception)
+        {
+            return EvaluationResult.FromError(exception.Code, exception.Message);
+        }
+        catch (OverflowException)
+        {
+            return EvaluationResult.FromError(CalculationErrorCode.NumericOverflow, "The result is outside the supported numeric range.");
+        }
+    }
+
+    public EvaluationResult Evaluate(CompiledExpression expression, EvaluationOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(expression);
+        options ??= EvaluationOptions.Default;
+
+        try
+        {
+            return EvaluationResult.FromValue(EvaluateExpression(expression.SyntaxTree, options));
         }
         catch (CalculationException exception)
         {
@@ -40,7 +67,7 @@ public sealed class ExpressionEvaluator
     private NumberValue EvaluateExpression(Expression expression, EvaluationOptions options) => expression switch
     {
         NumberExpression number => NumberValue.Parse(number.Literal),
-        ConstantExpression constant => EvaluateConstant(constant.Name),
+        ConstantExpression constant => EvaluateConstant(constant.Name, options),
         UnaryExpression unary => EvaluateUnary(unary, options),
         BinaryExpression binary => EvaluateBinary(binary, options),
         CallExpression call => EvaluateCall(call, options),
@@ -125,13 +152,40 @@ public sealed class ExpressionEvaluator
         };
     }
 
-    private static NumberValue EvaluateConstant(string name) => name.ToLowerInvariant() switch
+    private static NumberValue EvaluateConstant(string name, EvaluationOptions options)
     {
-        "pi" or "π" => NumberValue.FromDouble(Math.PI),
-        "e" => NumberValue.FromDouble(Math.E),
-        "tau" or "τ" => NumberValue.FromDouble(Math.Tau),
-        _ => throw new CalculationException(CalculationErrorCode.InvalidArgument, $"Unknown constant '{name}'.")
-    };
+        var normalized = name.ToLowerInvariant();
+        var constant = normalized switch
+        {
+            "pi" or "π" => NumberValue.FromDouble(Math.PI),
+            "e" => NumberValue.FromDouble(Math.E),
+            "tau" or "τ" => NumberValue.FromDouble(Math.Tau),
+            _ => (NumberValue?)null
+        };
+
+        if (constant is not null)
+        {
+            return constant.Value;
+        }
+
+        if (options.Variables is not null)
+        {
+            if (options.Variables.TryGetValue(name, out var exact))
+            {
+                return exact;
+            }
+
+            foreach (var variable in options.Variables)
+            {
+                if (string.Equals(variable.Key, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return variable.Value;
+                }
+            }
+        }
+
+        throw new CalculationException(CalculationErrorCode.InvalidArgument, $"Unknown constant or variable '{name}'.");
+    }
 
     private static NumberValue UnaryExact(string name, IReadOnlyList<NumberValue> arguments, Func<NumberValue, NumberValue> operation)
     {
