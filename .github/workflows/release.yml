@@ -1,0 +1,174 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Semantic version tag, for example v0.1.0"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore core solution
+        run: dotnet restore CalcNova.slnx
+      - name: Verify formatting
+        run: dotnet format CalcNova.slnx --verify-no-changes --no-restore
+      - name: Build core solution
+        run: dotnet build CalcNova.slnx --configuration Release --no-restore
+      - name: Test core solution
+        run: dotnet test CalcNova.slnx --configuration Release --no-build
+
+  desktop:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-latest
+            rid: osx-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Publish desktop
+        run: dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true --output publish/${{ matrix.rid }}
+      - name: Archive desktop artifact
+        shell: pwsh
+        run: Compress-Archive -Path "publish/${{ matrix.rid }}/*" -DestinationPath "CalcNova-${{ matrix.rid }}.zip"
+      - name: Upload desktop artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.rid }}
+          path: CalcNova-${{ matrix.rid }}.zip
+          if-no-files-found: error
+
+  browser:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Install WebAssembly workload
+        run: dotnet workload install wasm-tools
+      - name: Publish Browser
+        run: dotnet publish src/CalcNova.Browser/CalcNova.Browser.csproj --configuration Release --output publish/browser
+      - name: Archive Browser artifact
+        shell: pwsh
+        run: Compress-Archive -Path "publish/browser/*" -DestinationPath "CalcNova-browser.zip"
+      - name: Upload Browser artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser
+          path: CalcNova-browser.zip
+          if-no-files-found: error
+
+  android:
+    needs: validate
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.CALCNOVA_ANDROID_KEYSTORE_BASE64 }}
+      KEY_ALIAS: ${{ secrets.CALCNOVA_ANDROID_KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.CALCNOVA_ANDROID_KEY_PASSWORD }}
+      STORE_PASSWORD: ${{ secrets.CALCNOVA_ANDROID_STORE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install Android workload
+        run: dotnet workload install android
+      - name: Check signing configuration
+        id: signing
+        shell: bash
+        run: |
+          if [[ -n "$KEYSTORE_BASE64" && -n "$KEY_ALIAS" && -n "$KEY_PASSWORD" && -n "$STORE_PASSWORD" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "Android release artifact skipped because signing secrets are not configured."
+          fi
+      - name: Decode temporary keystore
+        if: steps.signing.outputs.configured == 'true'
+        shell: bash
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/calcnova-release.keystore"
+      - name: Publish signed Android App Bundle
+        if: steps.signing.outputs.configured == 'true'
+        shell: bash
+        run: |
+          TAG="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
+          VERSION="${TAG#v}"
+          dotnet publish src/CalcNova.Android/CalcNova.Android.csproj \
+            --configuration Release \
+            -p:AndroidPackageFormats=aab \
+            -p:AndroidKeyStore=true \
+            -p:AndroidSigningKeyStore="$RUNNER_TEMP/calcnova-release.keystore" \
+            -p:AndroidSigningKeyAlias="$KEY_ALIAS" \
+            -p:AndroidSigningKeyPass="$KEY_PASSWORD" \
+            -p:AndroidSigningStorePass="$STORE_PASSWORD" \
+            -p:ApplicationDisplayVersion="$VERSION" \
+            -p:ApplicationVersion="${{ github.run_number }}"
+          AAB="$(find src/CalcNova.Android/bin/Release -type f -name '*.aab' | head -n 1)"
+          test -n "$AAB"
+          cp "$AAB" CalcNova-android.aab
+      - name: Upload Android artifact
+        if: steps.signing.outputs.configured == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: CalcNova-android.aab
+          if-no-files-found: error
+      - name: Remove temporary keystore
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/calcnova-release.keystore"
+
+  publish-release:
+    needs: [desktop, browser, android]
+    if: always() && needs.desktop.result == 'success' && needs.browser.result == 'success' && (needs.android.result == 'success' || needs.android.result == 'skipped')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download packaged artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+      - name: Generate checksums
+        shell: bash
+        run: |
+          find release-assets -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+          cp SHA256SUMS.txt release-assets/SHA256SUMS.txt
+      - name: Create GitHub Release
+        shell: bash
+        run: |
+          gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --verify-tag --generate-notes
+          while IFS= read -r -d '' file; do
+            gh release upload "$RELEASE_TAG" "$file" --clobber
+          done < <(find release-assets -type f -print0)
