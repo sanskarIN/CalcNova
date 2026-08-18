@@ -11,7 +11,6 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache
     };
 
     private readonly string _directory;
-    private readonly SemaphoreSlim _gate = new(1, 1);
 
     public JsonCurrencyRateCache(string directory)
     {
@@ -23,15 +22,13 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache
     {
         var code = CurrencyCode.Normalize(baseCurrency);
         var path = GetPath(code);
+        if (!File.Exists(path))
+        {
+            return null;
+        }
 
-        await _gate.WaitAsync(cancellationToken);
         try
         {
-            if (!File.Exists(path))
-            {
-                return null;
-            }
-
             await using var stream = File.OpenRead(path);
             var model = await JsonSerializer.DeserializeAsync<StoredSnapshot>(stream, JsonOptions, cancellationToken);
             if (model is null)
@@ -45,10 +42,6 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache
         {
             return null;
         }
-        finally
-        {
-            _gate.Release();
-        }
     }
 
     public async Task SaveAsync(CurrencyRateSnapshot snapshot, CancellationToken cancellationToken = default)
@@ -56,14 +49,13 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache
         ArgumentNullException.ThrowIfNull(snapshot);
         Directory.CreateDirectory(_directory);
         var path = GetPath(snapshot.BaseCurrency);
-        var tempPath = path + ".tmp";
+        var tempPath = $"{path}.{Guid.NewGuid():N}.tmp";
         var model = new StoredSnapshot(
             snapshot.BaseCurrency,
             snapshot.Rates.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase),
             snapshot.RetrievedAt,
             snapshot.Source);
 
-        await _gate.WaitAsync(cancellationToken);
         try
         {
             await using (var stream = File.Create(tempPath))
@@ -76,7 +68,6 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache
         finally
         {
             TryDeleteTemp(tempPath);
-            _gate.Release();
         }
     }
 
