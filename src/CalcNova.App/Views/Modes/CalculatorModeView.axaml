@@ -14,7 +14,7 @@
       <Border Padding="12" CornerRadius="14">
         <StackPanel Spacing="6">
           <TextBox Text="{Binding Expression, Mode=TwoWay}"
-                   Watermark="Enter an expression"
+                   PlaceholderText="Enter an expression"
                    FontSize="19"
                    HorizontalContentAlignment="Right" />
           <Button Command="{Binding UseResultCommand}"
