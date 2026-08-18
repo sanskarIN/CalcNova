@@ -9,11 +9,11 @@
                  TextWrapping="Wrap"
                  Opacity="0.62" />
 
-      <TextBox Text="{Binding Expression, Mode=TwoWay}" Watermark="y = f(x), for example sin(x)" />
+      <TextBox Text="{Binding Expression, Mode=TwoWay}" PlaceholderText="y = f(x), for example sin(x)" />
       <Grid ColumnDefinitions="*,*,*">
-        <TextBox Text="{Binding MinimumX, Mode=TwoWay}" Watermark="Minimum x" Margin="2" />
-        <TextBox Grid.Column="1" Text="{Binding MaximumX, Mode=TwoWay}" Watermark="Maximum x" Margin="2" />
-        <TextBox Grid.Column="2" Text="{Binding SampleCount, Mode=TwoWay}" Watermark="Samples" Margin="2" />
+        <TextBox Text="{Binding MinimumX, Mode=TwoWay}" PlaceholderText="Minimum x" Margin="2" />
+        <TextBox Grid.Column="1" Text="{Binding MaximumX, Mode=TwoWay}" PlaceholderText="Maximum x" Margin="2" />
+        <TextBox Grid.Column="2" Text="{Binding SampleCount, Mode=TwoWay}" PlaceholderText="Samples" Margin="2" />
       </Grid>
       <WrapPanel>
         <Button Content="Plot / sample" Command="{Binding PlotCommand}" Margin="0,0,6,6" />
