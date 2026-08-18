@@ -4,7 +4,8 @@
              x:Class="CalcNova.App.Views.MainView"
              AttachedToVisualTree="OnAttachedToVisualTree"
              DetachedFromVisualTree="OnDetachedFromVisualTree"
-             KeyDown="OnKeyDown">
+             KeyDown="OnKeyDown"
+             PointerPressed="OnPointerPressed">
   <Grid Margin="12" RowDefinitions="Auto,*,Auto">
     <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,10">
       <StackPanel>
