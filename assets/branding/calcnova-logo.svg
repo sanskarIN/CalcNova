@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 360" role="img" aria-labelledby="title desc">
+  <title id="title">CalcNova logo</title>
+  <desc id="desc">A geometric calculator and nova spark beside the CalcNova wordmark.</desc>
+  <g transform="translate(34 26)">
+    <rect width="304" height="304" rx="76" fill="#182033"/>
+    <rect x="68" y="52" width="180" height="216" rx="42" fill="#f8fafc"/>
+    <rect x="92" y="82" width="132" height="54" rx="15" fill="#182033"/>
+    <g fill="#182033">
+      <rect x="92" y="162" width="38" height="38" rx="11"/>
+      <rect x="141" y="162" width="38" height="38" rx="11"/>
+      <rect x="190" y="162" width="38" height="38" rx="11"/>
+      <rect x="92" y="211" width="38" height="38" rx="11"/>
+      <rect x="141" y="211" width="38" height="38" rx="11"/>
+    </g>
+    <g fill="#ffce4b">
+      <path d="M246 21l13 36 36 13-36 13-13 36-13-36-36-13 36-13z"/>
+      <path d="M198 205h14v18h18v14h-18v18h-14v-18h-18v-14h18z"/>
+    </g>
+  </g>
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" fill="#182033">
+    <text x="392" y="190" font-size="118" font-weight="720" letter-spacing="-5">CalcNova</text>
+    <text x="398" y="252" font-size="34" opacity="0.72">Fast. Precise. Private. Everywhere.</text>
+  </g>
+</svg>
