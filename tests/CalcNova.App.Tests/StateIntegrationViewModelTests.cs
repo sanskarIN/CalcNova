@@ -20,7 +20,7 @@ public sealed class StateIntegrationViewModelTests
         var historyRepository = new MemoryHistoryRepository();
         var viewModel = new MainViewModel(new AppDependencies(historyRepository, settingsRepository));
 
-        await viewModel.InitializeAsync();
+        await viewModel.InitializeAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(AngleUnit.Radians, viewModel.Calculator.AngleUnit);
         Assert.Equal(25, viewModel.Settings.HistoryLimit);
@@ -34,7 +34,7 @@ public sealed class StateIntegrationViewModelTests
         var viewModel = new MainViewModel(new AppDependencies(
             historyRepository,
             new MemorySettingsRepository(new AppSettings { HistoryEnabled = true })));
-        await viewModel.InitializeAsync();
+        await viewModel.InitializeAsync(TestContext.Current.CancellationToken);
         viewModel.Calculator.Expression = "2 + 3";
 
         await viewModel.Calculator.EvaluateAsync();
@@ -51,7 +51,7 @@ public sealed class StateIntegrationViewModelTests
         var viewModel = new MainViewModel(new AppDependencies(
             historyRepository,
             new MemorySettingsRepository(new AppSettings { HistoryEnabled = false })));
-        await viewModel.InitializeAsync();
+        await viewModel.InitializeAsync(TestContext.Current.CancellationToken);
         viewModel.Calculator.Expression = "9 * 9";
 
         await viewModel.Calculator.EvaluateAsync();
@@ -64,13 +64,13 @@ public sealed class StateIntegrationViewModelTests
     {
         var settingsRepository = new MemorySettingsRepository(new AppSettings());
         var viewModel = new MainViewModel(new AppDependencies(new MemoryHistoryRepository(), settingsRepository));
-        await viewModel.InitializeAsync();
+        await viewModel.InitializeAsync(TestContext.Current.CancellationToken);
         AppSettings? observed = null;
         viewModel.SettingsChanged += settings => observed = settings;
         viewModel.Settings.Theme = ThemePreference.Dark;
         viewModel.Settings.AngleUnit = AngleUnit.Gradians;
 
-        await viewModel.Settings.SaveAsync();
+        await viewModel.Settings.SaveAsync(TestContext.Current.CancellationToken);
 
         Assert.NotNull(observed);
         Assert.Equal(ThemePreference.Dark, observed!.Theme);

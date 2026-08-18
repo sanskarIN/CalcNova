@@ -17,6 +17,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: security-audit-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   dependency-audit:
     runs-on: ubuntu-latest

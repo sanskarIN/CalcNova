@@ -89,7 +89,7 @@ public sealed class AdvancedUtilityViewModelTests
             ToCurrency = "inr"
         };
 
-        await viewModel.ConvertAsync();
+        await viewModel.ConvertAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.True(decimal.TryParse(viewModel.Result, NumberStyles.Number, CultureInfo.InvariantCulture, out var converted));
         Assert.Equal(168.50m, converted);
@@ -107,7 +107,7 @@ public sealed class AdvancedUtilityViewModelTests
             ToCurrency = "EUR"
         };
 
-        await viewModel.ConvertAsync();
+        await viewModel.ConvertAsync(cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Empty(viewModel.Result);
         Assert.Contains("No currency-rate provider", viewModel.ErrorMessage, StringComparison.Ordinal);

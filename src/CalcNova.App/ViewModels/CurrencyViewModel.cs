@@ -62,7 +62,7 @@ public sealed class CurrencyViewModel : ViewModelBase
 
     public ICommand RefreshCommand { get; }
 
-    public async Task ConvertAsync(bool forceRefresh = false)
+    public async Task ConvertAsync(bool forceRefresh = false, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -71,7 +71,12 @@ public sealed class CurrencyViewModel : ViewModelBase
                 throw new FormatException("Amount must be a decimal number using '.' as the decimal separator.");
             }
 
-            var conversion = await _service.ConvertAsync(amount, FromCurrency, ToCurrency, forceRefresh);
+            var conversion = await _service.ConvertAsync(
+                amount,
+                FromCurrency,
+                ToCurrency,
+                forceRefresh,
+                cancellationToken);
             Result = conversion.ConvertedAmount.ToString("G29", CultureInfo.InvariantCulture);
             var freshness = conversion.IsStale ? "stale cached rate" : "current cached/provided rate";
             var fallback = conversion.UsedCachedFallback ? "; provider unavailable, cached fallback used" : string.Empty;

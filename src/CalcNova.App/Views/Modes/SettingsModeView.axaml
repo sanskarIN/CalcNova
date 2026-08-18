@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.Modes.SettingsModeView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="8" Spacing="10">
+      <TextBlock Text="Settings" FontSize="21" FontWeight="SemiBold" />
+
+      <TextBlock Text="Appearance" FontWeight="SemiBold" />
+      <TextBlock Text="Theme" />
+      <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme, Mode=TwoWay}" />
+      <CheckBox Content="Reduced motion preference" IsChecked="{Binding ReducedMotion, Mode=TwoWay}" />
+      <CheckBox Content="High contrast preference" IsChecked="{Binding HighContrast, Mode=TwoWay}" />
+
+      <TextBlock Text="Calculator" FontWeight="SemiBold" />
+      <TextBlock Text="Angle unit" />
+      <ComboBox ItemsSource="{Binding AngleUnits}" SelectedItem="{Binding AngleUnit, Mode=TwoWay}" />
+      <TextBlock Text="Decimal precision (1–29)" />
+      <TextBox Text="{Binding DecimalPrecision, Mode=TwoWay}" />
+      <CheckBox Content="Grouping separators" IsChecked="{Binding UseGroupingSeparators, Mode=TwoWay}" />
+      <CheckBox Content="Haptics on supported mobile targets" IsChecked="{Binding HapticsEnabled, Mode=TwoWay}" />
+
+      <TextBlock Text="History" FontWeight="SemiBold" />
+      <CheckBox Content="Enable local calculation history" IsChecked="{Binding HistoryEnabled, Mode=TwoWay}" />
+      <TextBlock Text="History limit (1–5000)" />
+      <TextBox Text="{Binding HistoryLimit, Mode=TwoWay}" />
+
+      <WrapPanel>
+        <Button Content="Save settings" Command="{Binding SaveCommand}" Margin="0,0,6,6" />
+        <Button Content="Reset defaults" Command="{Binding ResetCommand}" Margin="0,0,6,6" />
+      </WrapPanel>
+      <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

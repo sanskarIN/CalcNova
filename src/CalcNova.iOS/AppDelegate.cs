@@ -27,6 +27,7 @@ public sealed class AppDelegate : AvaloniaAppDelegate<SingleViewApp>
             new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json")))
         {
             ExternalLinkService = new IosExternalLinkService(),
+            HapticFeedbackService = new IosHapticFeedbackService(),
             CurrencyRateCache = new JsonCurrencyRateCache(Path.Combine(appDataDirectory, "currency"))
         });
 

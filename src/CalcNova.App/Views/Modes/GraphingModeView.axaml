@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CalcNova.App.Controls"
+             x:Class="CalcNova.App.Views.Modes.GraphingModeView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="8" Spacing="10">
+      <TextBlock Text="Graphing" FontSize="21" FontWeight="SemiBold" />
+      <TextBlock Text="Plot y = f(x). Drag to pan, use the wheel/pinch surface to zoom where supported, and double-tap the plot to fit sampled data."
+                 TextWrapping="Wrap"
+                 Opacity="0.62" />
+
+      <TextBox Text="{Binding Expression, Mode=TwoWay}" PlaceholderText="y = f(x), for example sin(x)" />
+      <Grid ColumnDefinitions="*,*,*">
+        <TextBox Text="{Binding MinimumX, Mode=TwoWay}" PlaceholderText="Minimum x" Margin="2" />
+        <TextBox Grid.Column="1" Text="{Binding MaximumX, Mode=TwoWay}" PlaceholderText="Maximum x" Margin="2" />
+        <TextBox Grid.Column="2" Text="{Binding SampleCount, Mode=TwoWay}" PlaceholderText="Samples" Margin="2" />
+      </Grid>
+      <WrapPanel>
+        <Button Content="Plot / sample" Command="{Binding PlotCommand}" Margin="0,0,6,6" />
+        <Button Content="Fit data" Click="FitData" Margin="0,0,6,6" />
+        <Button Content="Reset view" Click="ResetViewport" Margin="0,0,6,6" />
+      </WrapPanel>
+
+      <Border Padding="4" CornerRadius="12" MinHeight="320">
+        <controls:GraphPlotControl x:Name="PlotControl" Segments="{Binding Segments}" MinHeight="320" />
+      </Border>
+      <TextBlock Text="{Binding CoordinateText, ElementName=PlotControl}" HorizontalAlignment="Right" Opacity="0.62" />
+
+      <TextBlock Text="{Binding Summary}" FontWeight="SemiBold" TextWrapping="Wrap" />
+      <Border Padding="10" CornerRadius="10">
+        <TextBlock Text="{Binding Preview}" TextWrapping="Wrap" />
+      </Border>
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

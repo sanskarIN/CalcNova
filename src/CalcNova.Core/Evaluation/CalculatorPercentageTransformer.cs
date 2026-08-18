@@ -45,7 +45,10 @@ public sealed class CalculatorPercentageTransformer
         var value = _evaluator.Evaluate(compiled, options);
         if (!value.Success)
         {
-            throw new CalculationException(value.ErrorCode ?? CalculationErrorCode.InvalidArgument, value.ErrorMessage ?? "Percentage conversion failed.");
+            var errorCode = value.ErrorCode == CalculationErrorCode.None
+                ? CalculationErrorCode.InvalidArgument
+                : value.ErrorCode;
+            throw new CalculationException(errorCode, value.ErrorMessage ?? "Percentage conversion failed.");
         }
 
         var standalonePercentage = value.Value.Divide(OneHundred);
@@ -57,7 +60,10 @@ public sealed class CalculatorPercentageTransformer
         var result = _evaluator.Evaluate(new CompiledExpression("<percentage>", expression), options);
         if (!result.Success)
         {
-            throw new CalculationException(result.ErrorCode ?? CalculationErrorCode.InvalidArgument, result.ErrorMessage ?? "Percentage conversion failed.");
+            var errorCode = result.ErrorCode == CalculationErrorCode.None
+                ? CalculationErrorCode.InvalidArgument
+                : result.ErrorCode;
+            throw new CalculationException(errorCode, result.ErrorMessage ?? "Percentage conversion failed.");
         }
 
         return result.Value;

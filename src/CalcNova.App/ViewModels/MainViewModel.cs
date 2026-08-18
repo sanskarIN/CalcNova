@@ -63,14 +63,25 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         await Settings.LoadAsync(cancellationToken);
-        Calculator.ApplyAngleUnit(Settings.AngleUnit);
+        ApplyCalculatorSettings(new AppSettings
+        {
+            AngleUnit = Settings.AngleUnit,
+            DecimalPrecision = Settings.DecimalPrecision,
+            UseGroupingSeparators = Settings.UseGroupingSeparators
+        });
         await History.InitializeAsync(cancellationToken);
         _isInitialized = true;
     }
 
     private void HandleSettingsChanged(AppSettings settings)
     {
-        Calculator.ApplyAngleUnit(settings.AngleUnit);
+        ApplyCalculatorSettings(settings);
         SettingsChanged?.Invoke(settings);
+    }
+
+    private void ApplyCalculatorSettings(AppSettings settings)
+    {
+        Calculator.ApplyAngleUnit(settings.AngleUnit);
+        Calculator.ApplyFormatting(settings.DecimalPrecision, settings.UseGroupingSeparators);
     }
 }

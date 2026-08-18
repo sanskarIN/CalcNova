@@ -1,10 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using Avalonia.VisualTree;
+using CalcNova.App.Services;
 using CalcNova.App.ViewModels;
+using CalcNova.Core.Evaluation;
 using CalcNova.Platform.Settings;
 
 namespace CalcNova.App.Views;
@@ -52,6 +54,19 @@ public partial class MainView : UserControl
         _subscribedViewModel = null;
     }
 
+    private void OnPointerPressed(object? sender, PointerPressedEventArgs eventArgs)
+    {
+        if (DataContext is not MainViewModel { Settings.HapticsEnabled: true })
+        {
+            return;
+        }
+
+        if (eventArgs.Source is Button)
+        {
+            AppComposition.Dependencies.HapticFeedbackService?.PerformClick();
+        }
+    }
+
     private async void OnKeyDown(object? sender, KeyEventArgs eventArgs)
     {
         if (DataContext is not MainViewModel viewModel || viewModel.SelectedModeIndex != 0)
@@ -59,35 +74,134 @@ public partial class MainView : UserControl
             return;
         }
 
+        var calculator = viewModel.Calculator;
+        var shortcutModifier = (eventArgs.KeyModifiers & (KeyModifiers.Control | KeyModifiers.Meta)) != 0;
+        if (shortcutModifier && eventArgs.Source is not TextBox)
+        {
+            if (eventArgs.Key == Key.C)
+            {
+                var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+                if (clipboard is not null)
+                {
+                    var text = calculator.Result == "Error" ? calculator.Expression : calculator.Result;
+                    await clipboard.SetTextAsync(text);
+                    eventArgs.Handled = true;
+                }
+
+                return;
+            }
+
+            if (eventArgs.Key == Key.V)
+            {
+                var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+                if (clipboard is not null)
+                {
+                    var text = await clipboard.TryGetTextAsync();
+                    if (!string.IsNullOrWhiteSpace(text) && text.Length <= EvaluationOptions.Default.MaximumExpressionLength)
+                    {
+                        calculator.Expression = text.Trim();
+                        eventArgs.Handled = true;
+                    }
+                }
+
+                return;
+            }
+        }
+
         switch (eventArgs.Key)
         {
             case Key.Enter:
-                await viewModel.Calculator.EvaluateAsync();
+                await calculator.EvaluateAsync();
                 eventArgs.Handled = true;
-                break;
+                return;
             case Key.Escape:
-                viewModel.Calculator.Clear();
+                calculator.Clear();
                 eventArgs.Handled = true;
-                break;
-            case Key.Back:
-                viewModel.Calculator.Backspace();
+                return;
+            case Key.F9:
+                calculator.ToggleSignCommand.Execute(null);
                 eventArgs.Handled = true;
-                break;
+                return;
         }
-    }
 
-    private static void ApplySettings(AppSettings settings)
-    {
-        if (Application.Current is null)
+        if (eventArgs.Source is TextBox)
         {
             return;
         }
 
-        Application.Current.RequestedThemeVariant = settings.Theme switch
+        if (eventArgs.Key == Key.Back)
         {
-            ThemePreference.Light => ThemeVariant.Light,
-            ThemePreference.Dark => ThemeVariant.Dark,
-            _ => ThemeVariant.Default
+            calculator.Backspace();
+            eventArgs.Handled = true;
+            return;
+        }
+
+        var token = GetCalculatorToken(eventArgs);
+        if (token is null)
+        {
+            return;
+        }
+
+        calculator.AppendCommand.Execute(token);
+        eventArgs.Handled = true;
+    }
+
+    private static string? GetCalculatorToken(KeyEventArgs eventArgs)
+    {
+        if (eventArgs.KeySymbol is { Length: 1 } symbol && "0123456789.+-*/^()%".Contains(symbol, StringComparison.Ordinal))
+        {
+            return symbol;
+        }
+
+        return eventArgs.Key switch
+        {
+            Key.NumPad0 => "0",
+            Key.NumPad1 => "1",
+            Key.NumPad2 => "2",
+            Key.NumPad3 => "3",
+            Key.NumPad4 => "4",
+            Key.NumPad5 => "5",
+            Key.NumPad6 => "6",
+            Key.NumPad7 => "7",
+            Key.NumPad8 => "8",
+            Key.NumPad9 => "9",
+            Key.Add => "+",
+            Key.Subtract => "-",
+            Key.Multiply => "*",
+            Key.Divide => "/",
+            Key.Decimal => ".",
+            _ => null
         };
+    }
+
+    private void ApplySettings(AppSettings settings)
+    {
+        if (Application.Current is not null)
+        {
+            Application.Current.RequestedThemeVariant = settings.Theme switch
+            {
+                ThemePreference.Light => ThemeVariant.Light,
+                ThemePreference.Dark => ThemeVariant.Dark,
+                _ => ThemeVariant.Default
+            };
+        }
+
+        SetStyleClass("high-contrast", settings.HighContrast);
+        SetStyleClass("reduced-motion", settings.ReducedMotion);
+    }
+
+    private void SetStyleClass(string className, bool enabled)
+    {
+        if (enabled)
+        {
+            if (!Classes.Contains(className))
+            {
+                Classes.Add(className);
+            }
+        }
+        else
+        {
+            Classes.Remove(className);
+        }
     }
 }

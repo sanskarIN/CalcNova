@@ -25,7 +25,7 @@ public sealed class StatisticsCalculator
         var minimum = data[0];
         var maximum = data[^1];
         var populationVariance = Variance(data, mean, sample: false);
-        var sampleVariance = data.Length > 1 ? Variance(data, mean, sample: true) : null;
+        double? sampleVariance = data.Length > 1 ? Variance(data, mean, sample: true) : null;
         var modes = CalculateModes(data);
 
         return new StatisticsSummary(
@@ -68,14 +68,14 @@ public sealed class StatisticsCalculator
         return PercentileSorted(data, percentile);
     }
 
-    private static double PercentileSorted(IReadOnlyList<double> sorted, double percentile)
+    private static double PercentileSorted(double[] sorted, double percentile)
     {
-        if (sorted.Count == 1)
+        if (sorted.Length == 1)
         {
             return sorted[0];
         }
 
-        var position = (sorted.Count - 1) * percentile;
+        var position = (sorted.Length - 1) * percentile;
         var lower = (int)Math.Floor(position);
         var upper = (int)Math.Ceiling(position);
         if (lower == upper)
@@ -87,15 +87,15 @@ public sealed class StatisticsCalculator
         return sorted[lower] + ((sorted[upper] - sorted[lower]) * fraction);
     }
 
-    private static IReadOnlyList<double> CalculateModes(IReadOnlyList<double> sorted)
+    private static List<double> CalculateModes(double[] sorted)
     {
         var modes = new List<double>();
         var bestCount = 1;
         var currentCount = 1;
 
-        for (var index = 1; index <= sorted.Count; index++)
+        for (var index = 1; index <= sorted.Length; index++)
         {
-            if (index < sorted.Count && sorted[index].Equals(sorted[index - 1]))
+            if (index < sorted.Length && sorted[index].Equals(sorted[index - 1]))
             {
                 currentCount++;
                 continue;
@@ -118,7 +118,7 @@ public sealed class StatisticsCalculator
         return modes;
     }
 
-    private static double Variance(IReadOnlyList<double> values, double mean, bool sample)
+    private static double Variance(double[] values, double mean, bool sample)
     {
         var sum = 0d;
         var compensation = 0d;
@@ -132,11 +132,11 @@ public sealed class StatisticsCalculator
             sum = next;
         }
 
-        var denominator = sample ? values.Count - 1 : values.Count;
+        var denominator = sample ? values.Length - 1 : values.Length;
         return sum / denominator;
     }
 
-    private static double CompensatedSum(IEnumerable<double> values)
+    private static double CompensatedSum(double[] values)
     {
         var sum = 0d;
         var compensation = 0d;

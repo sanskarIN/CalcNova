@@ -1,6 +1,6 @@
 # CalcNova Testing Strategy
 
-CalcNova treats mathematical correctness and regression protection as primary engineering requirements.
+CalcNova treats mathematical correctness, persistence integrity, cross-platform behavior, and bug-regression protection as release requirements.
 
 ## Baseline commands
 
@@ -13,7 +13,9 @@ dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
-A check is only PASS when it actually completes successfully. If a required platform/environment is unavailable, record `NOT RUN` with the reason.
+A check is only **PASS** when it actually completes successfully. If the required SDK/workload/platform is unavailable, record **NOT RUN** and the reason.
+
+The all-target graph is recorded in `CalcNova.All.slnx`, but Android/iOS/Browser workload builds are intentionally run in dedicated CI workflows.
 
 ## Current test projects
 
@@ -21,7 +23,7 @@ A check is only PASS when it actually completes successfully. If a required plat
 
 Protects:
 
-- precedence and associativity;
+- tokenizer/parser precedence and associativity;
 - unary operators;
 - decimal arithmetic;
 - arbitrary-precision integer arithmetic;
@@ -30,17 +32,22 @@ Protects:
 - angle modes;
 - scientific functions;
 - workload limits;
-- numeric equality/hash invariants.
+- numeric equality/hash invariants;
+- compiled expressions and scoped variables;
+- classic memory operations;
+- repeated-equals sessions;
+- contextual calculator percentage behavior.
 
 ### CalcNova.Programmer.Tests
 
 Protects:
 
-- base conversion;
+- bases 2–36;
 - large integer round trips;
-- signed/two's-complement interpretation;
+- signed/unsigned and two's-complement interpretation;
 - fixed-width bitwise operations;
-- invalid radix input.
+- shift behavior;
+- separator/invalid radix input edge cases.
 
 ### CalcNova.Converter.Tests
 
@@ -49,48 +56,141 @@ Protects:
 - known fixed-unit identities;
 - affine temperature conversion;
 - cross-category rejection;
-- search.
+- unit search;
+- conversion round trips where appropriate.
+
+### CalcNova.Statistics.Tests
+
+Protects:
+
+- compensated sum;
+- mean/median/mode;
+- min/max/range;
+- sample/population variance and standard deviation;
+- quartiles/percentiles;
+- sorted data behavior;
+- invalid/empty data cases.
+
+### CalcNova.Equations.Tests
+
+Protects:
+
+- unique/no/infinite linear solutions;
+- two real quadratic roots;
+- repeated roots;
+- complex roots;
+- degenerate quadratic-to-linear behavior;
+- bounded bisection convergence/error cases.
+
+### CalcNova.Matrices.Tests
+
+Protects:
+
+- matrix arithmetic and dimensions;
+- transpose;
+- determinant;
+- inverse;
+- rank;
+- singularity handling;
+- linear-system solving;
+- vector magnitude/dot/cross operations.
+
+### CalcNova.Graphing.Tests
+
+Protects:
+
+- smooth-function sampling;
+- divide-by-zero/domain discontinuities;
+- invalid syntax;
+- sample workload limits;
+- viewport behavior;
+- SVG export.
+
+### CalcNova.DateTime.Tests
+
+Protects:
+
+- signed/reversed date ranges;
+- leap-year behavior;
+- month-end calendar addition;
+- business-day direction;
+- fixed-duration conversions;
+- unsupported/ambiguous duration assumptions.
+
+### CalcNova.Currency.Tests
+
+Uses mocked providers/caches to protect:
+
+- fresh provider rates;
+- cache reuse;
+- forced refresh;
+- stale cached fallback;
+- provider/base mismatch rejection;
+- no-provider/no-cache failure behavior;
+- timestamp/source semantics.
+
+No live external rate service is required for the unit suite.
 
 ### CalcNova.Persistence.Tests
 
-Protects native SQLite history behavior:
+Protects native local persistence:
 
-- schema initialization;
-- add/read;
-- search;
-- favorites;
-- delete;
-- clear.
+- SQLite history schema initialization;
+- add/read/search;
+- favorite/delete/clear lifecycle;
+- native JSON settings persistence;
+- native JSON currency-rate cache round trips;
+- corrupt/missing cache handling.
+
+Tests use isolated temporary storage.
+
+### CalcNova.App.Tests
+
+Protects application/MVVM behavior without requiring a full visual UI runner for every case:
+
+- Programmer/Converter/Statistics/Equations/Matrices/Graphing view-model workflows;
+- calculator percentage/repeated-equals/memory/sign-toggle behavior;
+- history recording enable/disable;
+- settings load/save propagation;
+- result-formatting preference propagation;
+- Date/Duration view-model validation;
+- Currency view-model cached-rate behavior;
+- History clear confirmation;
+- deterministic History CSV formatting;
+- display precision/grouping including Indian grouping semantics.
 
 ## Unit-test expectations
 
-Every domain feature should test:
+Every domain feature should cover:
 
 1. representative valid cases;
-2. boundaries;
+2. boundary values;
 3. invalid input;
-4. previous bug regressions;
-5. deterministic semantics.
+4. deterministic failure behavior;
+5. previous confirmed bug regressions;
+6. workload-limit behavior where a calculation can become expensive.
 
-Mathematical code should avoid assertion tolerances that are so broad they would hide a real correctness failure.
+Floating/numerical tests should use tolerances justified by the algorithm rather than tolerances broad enough to hide a defect.
 
-## Property / invariant tests
+## Property / invariant coverage
 
-Planned invariant coverage includes properties such as:
+Useful invariants include:
 
 - `a + 0 = a`;
 - `a * 1 = a`;
-- radix format/parse round trip;
+- radix format/parse round trips;
 - fixed-unit round trips within justified tolerance;
 - deterministic parse/evaluate output;
-- formatter/parser round trips for supported forms;
-- programmer signed/unsigned conversion invariants.
+- numeric equality/hash consistency;
+- formatting leaves canonical calculator result state untouched;
+- history persistence round trips;
+- matrix identity relationships for supported dimensions.
 
-Property-based tooling should only be added if its dependency cost is justified; deterministic generated test loops are also acceptable.
+A dedicated property-testing dependency is optional; deterministic generated loops are acceptable when they provide equivalent value with less dependency cost.
 
 ## Parser regression matrix
 
-Maintain tests for:
+Maintain coverage for:
 
 ```text
 1 + 1
@@ -110,17 +210,29 @@ Maintain tests for:
 999999999999999999 + 1
 ```
 
-Also test malformed parentheses, invalid function calls, invalid scientific notation, input-length limits, and unsupported identifiers.
+Also test malformed parentheses, invalid functions, invalid scientific notation, input limits, unsupported identifiers, unary/exponent boundaries, and scoped graph variables.
+
+## Calculator-session tests
+
+Session-level tests should keep explicit semantics for:
+
+- repeated equals;
+- editing resets repeat state;
+- percentage context differs from explicit modulo syntax;
+- MC/MR/MS/M+/M−;
+- sign toggle;
+- history labels for repeated operations;
+- canonical result vs localized/formatted display result.
 
 ## Scientific tests
 
 Use known reference inputs for:
 
-- trigonometric angles in each mode;
+- trig values in each angle mode;
 - inverse functions;
 - logarithm domains;
 - roots;
-- factorial boundaries;
+- factorial limits;
 - power overflow/workload limits;
 - combination/permutation edge cases.
 
@@ -128,68 +240,94 @@ Use known reference inputs for:
 
 Include:
 
-- decimal/binary/octal/hex conversions;
+- binary/octal/decimal/hex;
 - bases 2–36;
 - negative values;
 - word-size boundaries;
-- shift behavior;
-- two's-complement min/max;
-- bit grid/string state.
+- logical/arithmetic shifts;
+- signed min/max boundaries;
+- format/parse round trips;
+- invalid digits and separator-only input.
 
 ## Converter tests
 
-Prefer exact published physical-unit identities where possible. Temperature conversions must test offsets as well as scale.
+Prefer exact physical-unit identities where possible. Affine conversions such as temperature require both offset and scale tests.
 
-Every newly added unit category needs at least one known identity and one round-trip test.
+Every new unit category needs at least one known identity, validation case, and justified round-trip test.
 
 ## Persistence tests
 
-Tests should use isolated temporary storage and remove it after execution. Migration tests must be added before persisted schema-breaking changes.
+Native tests use temporary paths and remove them after execution. Migration tests must be added before a persisted schema change ships.
 
-Browser storage requires a separate browser-compatible test strategy.
+Browser storage is implemented separately behind the same contracts; Browser publish/runtime smoke tests are therefore required in addition to native repository tests.
 
-## UI tests
+## UI/headless testing
 
-Planned Avalonia UI/headless tests should cover:
+Current source has strong view-model/domain coverage, but release work should expand Avalonia headless/UI tests for:
 
-- keypad input;
-- expression display;
-- result/error state;
+- modular mode view creation;
+- keypad commands;
 - mode switching;
-- history;
-- settings;
-- dialogs;
+- history selection/confirmation;
+- settings controls;
+- graph custom-control rendering/interaction;
 - theme switching;
-- accessibility labels/focus where tooling allows it.
+- keyboard focus order;
+- accessibility labels and automation properties where tooling allows.
 
-## Integration tests
+## Integration flows
 
 Important end-to-end flows include:
 
-- calculate -> store history -> recall expression;
-- scientific function with angle mode;
+- calculate -> save local history -> search/favorite/export;
+- scientific calculation -> angle preference save -> restore;
+- result precision/grouping preference -> visible formatting without canonical mutation;
 - programmer base conversion;
 - unit conversion;
-- preference persistence;
-- offline startup.
+- graph expression -> sample -> render -> pan/zoom/fit;
+- native settings/history persistence across restart;
+- Browser settings/history persistence across reload;
+- offline startup with no currency provider;
+- cached currency conversion with explicit timestamp/staleness state.
+
+## CI validation
+
+Independent workflows cover:
+
+- formatting;
+- core build/test matrix;
+- code coverage;
+- repository/docs checks;
+- security/dependency checks;
+- Desktop build;
+- Android build;
+- Browser/WebAssembly publish;
+- iOS simulator build.
+
+Platform workflow path filters include shared `src/**` changes so a change in domain/application code triggers the heads that consume it.
 
 ## Visual regression
 
-Stable major layouts can use screenshot/snapshot tests after the design system settles. Visual snapshots should not replace semantic/assertion-based interaction tests.
+Stable major layouts can gain screenshot/snapshot tests after the shared modular UI stabilizes. Visual snapshots supplement rather than replace semantic interaction tests.
 
-## Manual testing
+## Manual release testing
 
-Before release, smoke-test:
+Before a stable release, smoke-test at minimum:
 
-- compact phone-like size;
-- landscape/medium layout;
+- compact phone size;
+- landscape phone;
+- tablet/expanded layout;
 - desktop resizing;
-- keyboard-only input;
-- high-DPI/text scaling;
-- dark/light themes;
-- offline behavior;
+- Browser resize/install/offline behavior;
+- keyboard-only/numpad input;
+- clipboard copy/paste;
+- high-DPI and text scaling;
+- dark/light/system themes;
+- local persistence;
 - long expressions/results;
-- error recovery.
+- error recovery;
+- graph pan/zoom/fit;
+- save-file History export where the platform storage provider supports it.
 
 ## Bug-fix rule
 
@@ -198,7 +336,7 @@ For a confirmed deterministic bug:
 1. reproduce it;
 2. add a regression test when practical;
 3. fix the root cause;
-4. run relevant tests/analyzers;
+4. run relevant formatter/analyzers/tests;
 5. inspect adjacent behavior;
-6. document user-visible impact;
-7. commit the fix as a focused change.
+6. update user-visible documentation/state when needed;
+7. commit the fix as a focused atomic change.

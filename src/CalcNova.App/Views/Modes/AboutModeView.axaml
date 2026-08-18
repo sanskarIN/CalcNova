@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.Modes.AboutModeView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="8" Spacing="10">
+      <TextBlock Text="{Binding ProjectName}" FontSize="26" FontWeight="SemiBold" />
+      <TextBlock Text="{Binding Tagline}" Opacity="0.68" />
+      <TextBlock Text="Open-source • Privacy-first • Apache-2.0" />
+
+      <TextBlock Text="Project" FontWeight="SemiBold" />
+      <Button Content="Open CalcNova repository" Command="{Binding OpenRepositoryCommand}" HorizontalAlignment="Left" />
+      <TextBlock Text="{Binding Repository}" TextWrapping="Wrap" />
+      <Button Content="Open GitHub profile" Command="{Binding OpenGitHubProfileCommand}" HorizontalAlignment="Left" />
+      <TextBlock Text="{Binding GitHubProfile}" TextWrapping="Wrap" />
+
+      <TextBlock Text="Support development" FontWeight="SemiBold" />
+      <Button Content="Buy Me a Coffee — @sanskarIN" Command="{Binding OpenBuyMeACoffeeCommand}" HorizontalAlignment="Left" />
+      <TextBlock Text="{Binding BuyMeACoffee}" TextWrapping="Wrap" />
+      <TextBlock Text="Support is optional and never required to use CalcNova core features." TextWrapping="Wrap" Opacity="0.62" />
+
+      <TextBlock Text="Business" FontWeight="SemiBold" />
+      <Button Content="sanskarin@outlook.in" Command="{Binding EmailBusinessCommand}" HorizontalAlignment="Left" />
+      <Button Content="sanskarin.business@gmail.com" Command="{Binding EmailSecondaryBusinessCommand}" HorizontalAlignment="Left" />
+
+      <TextBlock Text="Support" FontWeight="SemiBold" />
+      <Button Content="supportramsandesh@gmail.com" Command="{Binding EmailSupportCommand}" HorizontalAlignment="Left" />
+
+      <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

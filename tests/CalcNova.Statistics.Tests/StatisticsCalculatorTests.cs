@@ -1,4 +1,3 @@
-using CalcNova.Statistics;
 using Xunit;
 
 namespace CalcNova.Statistics.Tests;

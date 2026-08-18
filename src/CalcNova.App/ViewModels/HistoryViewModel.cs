@@ -13,13 +13,16 @@ public sealed class HistoryViewModel : ViewModelBase
     private string _searchQuery = string.Empty;
     private string _statusMessage = string.Empty;
     private bool _isInitialized;
+    private bool _clearConfirmationRequired;
 
     public HistoryViewModel(ICalculationHistoryRepository? repository, Func<int>? historyLimitProvider = null)
     {
         _repository = repository;
         _historyLimitProvider = historyLimitProvider ?? (() => 500);
         RefreshCommand = new AsyncRelayCommand(_ => RefreshAsync());
-        ClearCommand = new AsyncRelayCommand(_ => ClearAsync());
+        ClearCommand = new RelayCommand(_ => RequestClear());
+        ConfirmClearCommand = new AsyncRelayCommand(_ => ConfirmClearAsync());
+        CancelClearCommand = new RelayCommand(_ => CancelClear());
         DeleteCommand = new AsyncRelayCommand(DeleteAsync);
         ToggleFavoriteCommand = new AsyncRelayCommand(ToggleFavoriteAsync);
     }
@@ -50,9 +53,19 @@ public sealed class HistoryViewModel : ViewModelBase
 
     public bool IsAvailable => _repository is not null;
 
+    public bool ClearConfirmationRequired
+    {
+        get => _clearConfirmationRequired;
+        private set => SetField(ref _clearConfirmationRequired, value);
+    }
+
     public ICommand RefreshCommand { get; }
 
     public ICommand ClearCommand { get; }
+
+    public ICommand ConfirmClearCommand { get; }
+
+    public ICommand CancelClearCommand { get; }
 
     public ICommand DeleteCommand { get; }
 
@@ -137,24 +150,45 @@ public sealed class HistoryViewModel : ViewModelBase
         }
     }
 
-    private async Task ClearAsync(CancellationToken cancellationToken = default)
+    public void ReportStatus(string message) => StatusMessage = message ?? string.Empty;
+
+    private void RequestClear()
     {
         if (_repository is null)
+        {
+            StatusMessage = "History storage is not configured for this platform yet.";
+            return;
+        }
+
+        ClearConfirmationRequired = true;
+        StatusMessage = "Clear all local calculation history? Confirm to permanently remove every stored entry.";
+    }
+
+    private async Task ConfirmClearAsync()
+    {
+        if (_repository is null || !ClearConfirmationRequired)
         {
             return;
         }
 
         try
         {
-            await _repository.ClearAsync(cancellationToken);
+            await _repository.ClearAsync();
             Entries = Array.Empty<HistoryEntry>();
             SelectedEntry = null;
+            ClearConfirmationRequired = false;
             StatusMessage = "History cleared.";
         }
         catch (Exception exception)
         {
             StatusMessage = $"History could not be cleared: {exception.Message}";
         }
+    }
+
+    private void CancelClear()
+    {
+        ClearConfirmationRequired = false;
+        StatusMessage = string.Empty;
     }
 
     private async Task DeleteAsync(object? parameter)

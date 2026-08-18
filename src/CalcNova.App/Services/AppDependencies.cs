@@ -1,5 +1,6 @@
 using CalcNova.Currency;
 using CalcNova.Platform.External;
+using CalcNova.Platform.Haptics;
 using CalcNova.Platform.History;
 using CalcNova.Platform.Settings;
 
@@ -10,6 +11,8 @@ public sealed record AppDependencies(
     ISettingsRepository? SettingsRepository)
 {
     public IExternalLinkService? ExternalLinkService { get; init; }
+
+    public IHapticFeedbackService? HapticFeedbackService { get; init; }
 
     public ICurrencyRateCache? CurrencyRateCache { get; init; }
 

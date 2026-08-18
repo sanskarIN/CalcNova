@@ -31,7 +31,7 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
     {
         var repository = new JsonSettingsRepository(_filePath);
 
-        var settings = await repository.LoadAsync();
+        var settings = await repository.LoadAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(ThemePreference.System, settings.Theme);
         Assert.Equal(AngleUnit.Degrees, settings.AngleUnit);
@@ -55,8 +55,8 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
             HighContrast = true
         };
 
-        await repository.SaveAsync(expected);
-        var actual = await repository.LoadAsync();
+        await repository.SaveAsync(expected, TestContext.Current.CancellationToken);
+        var actual = await repository.LoadAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(expected, actual);
     }
@@ -67,6 +67,7 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
         var repository = new JsonSettingsRepository(_filePath);
         var invalid = new AppSettings { HistoryLimit = 0 };
 
-        await Assert.ThrowsAsync<InvalidDataException>(() => repository.SaveAsync(invalid));
+        await Assert.ThrowsAsync<InvalidDataException>(() =>
+            repository.SaveAsync(invalid, TestContext.Current.CancellationToken));
     }
 }

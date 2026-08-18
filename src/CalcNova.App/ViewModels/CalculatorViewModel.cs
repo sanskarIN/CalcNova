@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Services;
 using CalcNova.Core.Errors;
 using CalcNova.Core.Evaluation;
 using CalcNova.Core.Memory;
@@ -20,6 +21,8 @@ public sealed class CalculatorViewModel : ViewModelBase
     private string _result = "0";
     private string _statusMessage = string.Empty;
     private AngleUnit _angleUnit = AngleUnit.Degrees;
+    private int _decimalPrecision = 15;
+    private bool _useGroupingSeparators = true;
 
     public CalculatorViewModel(
         ExpressionEvaluator? evaluator = null,
@@ -39,6 +42,7 @@ public sealed class CalculatorViewModel : ViewModelBase
         SetAngleUnitCommand = new RelayCommand(SetAngleUnit);
         UseResultCommand = new RelayCommand(_ => UseResult());
         PercentageCommand = new RelayCommand(_ => ApplyPercentage());
+        ToggleSignCommand = new RelayCommand(_ => ToggleSign());
         MemoryClearCommand = new RelayCommand(_ => MemoryClear());
         MemoryRecallCommand = new RelayCommand(_ => MemoryRecall());
         MemoryStoreCommand = new RelayCommand(_ => MemoryStore());
@@ -63,8 +67,20 @@ public sealed class CalculatorViewModel : ViewModelBase
     public string Result
     {
         get => _result;
-        private set => SetField(ref _result, value);
+        private set
+        {
+            if (SetField(ref _result, value))
+            {
+                OnPropertyChanged(nameof(DisplayResult));
+            }
+        }
     }
+
+    public string DisplayResult => CalculatorResultFormatter.Format(Result, _decimalPrecision, _useGroupingSeparators);
+
+    public int DecimalPrecision => _decimalPrecision;
+
+    public bool UseGroupingSeparators => _useGroupingSeparators;
 
     public string StatusMessage
     {
@@ -110,6 +126,8 @@ public sealed class CalculatorViewModel : ViewModelBase
     public ICommand UseResultCommand { get; }
 
     public ICommand PercentageCommand { get; }
+
+    public ICommand ToggleSignCommand { get; }
 
     public ICommand MemoryClearCommand { get; }
 
@@ -160,6 +178,20 @@ public sealed class CalculatorViewModel : ViewModelBase
     }
 
     public void ApplyAngleUnit(AngleUnit angleUnit) => AngleUnit = angleUnit;
+
+    public void ApplyFormatting(int decimalPrecision, bool useGroupingSeparators)
+    {
+        if (decimalPrecision is < 1 or > 29)
+        {
+            throw new ArgumentOutOfRangeException(nameof(decimalPrecision), "Decimal precision must be between 1 and 29.");
+        }
+
+        _decimalPrecision = decimalPrecision;
+        _useGroupingSeparators = useGroupingSeparators;
+        OnPropertyChanged(nameof(DecimalPrecision));
+        OnPropertyChanged(nameof(UseGroupingSeparators));
+        OnPropertyChanged(nameof(DisplayResult));
+    }
 
     public void Clear()
     {
@@ -241,6 +273,30 @@ public sealed class CalculatorViewModel : ViewModelBase
         {
             StatusMessage = exception.Message;
         }
+    }
+
+    private void ToggleSign()
+    {
+        NumberValue value;
+        if (!string.IsNullOrWhiteSpace(Expression))
+        {
+            var evaluation = _evaluator.Evaluate(Expression, CreateOptions());
+            if (!evaluation.Success)
+            {
+                StatusMessage = evaluation.ErrorMessage ?? "The current expression cannot be negated.";
+                return;
+            }
+
+            value = evaluation.Value;
+        }
+        else if (!TryParseResult(out value))
+        {
+            StatusMessage = "There is no valid value to negate.";
+            return;
+        }
+
+        Expression = value.Negate().ToDisplayString();
+        StatusMessage = string.Empty;
     }
 
     private void MemoryClear()

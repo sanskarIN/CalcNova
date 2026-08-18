@@ -85,7 +85,7 @@ public static class UnitCatalog
         new("grad", "Gradian", "gon", UnitCategory.Angle, Math.PI / 200d)
     ];
 
-    private static readonly IReadOnlyDictionary<string, UnitDefinition> ById =
+    private static readonly Dictionary<string, UnitDefinition> ById =
         AllUnits.ToDictionary(unit => unit.Id, StringComparer.OrdinalIgnoreCase);
 
     public static IReadOnlyList<UnitDefinition> Units => AllUnits;

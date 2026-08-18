@@ -1,4 +1,3 @@
-using CalcNova.Currency;
 using Xunit;
 
 namespace CalcNova.Currency.Tests;
@@ -17,7 +16,11 @@ public sealed class CurrencyConversionServiceTests
         var cache = new MemoryCache();
         var service = new CurrencyConversionService(cache, provider, timeProvider: new FixedTimeProvider(now));
 
-        var result = await service.ConvertAsync(2m, "usd", "inr");
+        var result = await service.ConvertAsync(
+            2m,
+            "usd",
+            "inr",
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(168.50m, result.ConvertedAmount);
         Assert.Equal(84.25m, result.ExchangeRate);
@@ -52,7 +55,11 @@ public sealed class CurrencyConversionServiceTests
             staleAfter: TimeSpan.FromHours(12),
             timeProvider: new FixedTimeProvider(now));
 
-        var result = await service.ConvertAsync(100m, "EUR", "GBP");
+        var result = await service.ConvertAsync(
+            100m,
+            "EUR",
+            "GBP",
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(86m, result.ConvertedAmount);
         Assert.Equal(0, provider.CallCount);
@@ -79,7 +86,11 @@ public sealed class CurrencyConversionServiceTests
             staleAfter: TimeSpan.FromHours(12),
             timeProvider: new FixedTimeProvider(now));
 
-        var result = await service.ConvertAsync(10m, "USD", "JPY");
+        var result = await service.ConvertAsync(
+            10m,
+            "USD",
+            "JPY",
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(1480m, result.ConvertedAmount);
         Assert.True(result.IsStale);
@@ -94,7 +105,11 @@ public sealed class CurrencyConversionServiceTests
         var service = new CurrencyConversionService(new MemoryCache());
 
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            service.ConvertAsync(10m, "USD", "INR"));
+            service.ConvertAsync(
+                10m,
+                "USD",
+                "INR",
+                cancellationToken: TestContext.Current.CancellationToken));
 
         Assert.Contains("No currency-rate provider", exception.Message, StringComparison.Ordinal);
     }
@@ -105,7 +120,11 @@ public sealed class CurrencyConversionServiceTests
         var provider = new StubProvider(new IOException("Should not be called"));
         var service = new CurrencyConversionService(new MemoryCache(), provider);
 
-        var result = await service.ConvertAsync(123.45m, "inr", "INR");
+        var result = await service.ConvertAsync(
+            123.45m,
+            "inr",
+            "INR",
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(123.45m, result.ConvertedAmount);
         Assert.Equal(1m, result.ExchangeRate);
@@ -132,7 +151,12 @@ public sealed class CurrencyConversionServiceTests
             "Provider"));
         var service = new CurrencyConversionService(cache, provider, timeProvider: new FixedTimeProvider(now));
 
-        var result = await service.ConvertAsync(10m, "USD", "CAD", forceRefresh: true);
+        var result = await service.ConvertAsync(
+            10m,
+            "USD",
+            "CAD",
+            forceRefresh: true,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(13.5m, result.ConvertedAmount);
         Assert.Equal("Provider", result.Source);
@@ -150,7 +174,11 @@ public sealed class CurrencyConversionServiceTests
         var service = new CurrencyConversionService(new MemoryCache(), provider);
 
         await Assert.ThrowsAsync<InvalidDataException>(() =>
-            service.ConvertAsync(1m, "USD", "INR"));
+            service.ConvertAsync(
+                1m,
+                "USD",
+                "INR",
+                cancellationToken: TestContext.Current.CancellationToken));
     }
 
     private sealed class MemoryCache : ICurrencyRateCache

@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.Modes.MatricesModeView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="8" Spacing="10">
+      <TextBlock Text="Matrix Utilities" FontSize="21" FontWeight="SemiBold" />
+      <TextBlock Text="Enter matrix rows on separate lines. Separate values with spaces or commas." TextWrapping="Wrap" Opacity="0.62" />
+      <TextBlock Text="Matrix A" FontWeight="SemiBold" />
+      <TextBox Text="{Binding MatrixText, Mode=TwoWay}" AcceptsReturn="True" MinHeight="150" />
+      <TextBlock Text="Right-hand side b" FontWeight="SemiBold" />
+      <TextBox Text="{Binding RightHandSideText, Mode=TwoWay}" AcceptsReturn="True" MinHeight="90" />
+      <WrapPanel>
+        <Button Content="Determinant" Command="{Binding DeterminantCommand}" Margin="0,0,6,6" />
+        <Button Content="Inverse" Command="{Binding InverseCommand}" Margin="0,0,6,6" />
+        <Button Content="Rank" Command="{Binding RankCommand}" Margin="0,0,6,6" />
+        <Button Content="Solve Ax = b" Command="{Binding SolveCommand}" Margin="0,0,6,6" />
+      </WrapPanel>
+      <Border Padding="12" CornerRadius="12">
+        <TextBlock Text="{Binding Result}" TextWrapping="Wrap" />
+      </Border>
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -23,6 +23,34 @@ dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
 dotnet_diagnostic.IDE0005.severity = warning
 dotnet_diagnostic.CA2007.severity = none
 
+# xUnit test names intentionally use Method_Scenario_Expectation readability.
+[tests/**/*.cs]
+dotnet_diagnostic.CA1707.severity = none
+
+# These service types intentionally expose instance-oriented APIs for composition/injection.
+[src/CalcNova.Core/Evaluation/ExpressionEvaluator.cs]
+dotnet_diagnostic.CA1822.severity = none
+dotnet_diagnostic.CA1859.severity = none
+
+[src/CalcNova.Converter/UnitConverter.cs]
+dotnet_diagnostic.CA1822.severity = none
+
+[src/CalcNova.Equations/EquationSolver.cs]
+dotnet_diagnostic.CA1822.severity = none
+
+[src/CalcNova.Graphing/SvgGraphExporter.cs]
+dotnet_diagnostic.CA1822.severity = none
+
+[src/CalcNova.Platform/History/HistoryExportService.cs]
+dotnet_diagnostic.CA1822.severity = none
+
+[src/CalcNova.Statistics/StatisticsCalculator.cs]
+dotnet_diagnostic.CA1822.severity = none
+
+# NumberKind names describe numeric representations; type-word names are intentional here.
+[src/CalcNova.Core/Numerics/NumberValue.cs]
+dotnet_diagnostic.CA1720.severity = none
+
 [*.{axaml,xml,props,targets,csproj,slnx}]
 indent_style = space
 indent_size = 2

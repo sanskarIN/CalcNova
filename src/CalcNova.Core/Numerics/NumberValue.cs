@@ -267,12 +267,19 @@ public readonly struct NumberValue : IEquatable<NumberValue>, IComparable<Number
             return _integer.CompareTo(other._integer);
         }
 
-        if (TryToDecimal(out var left) && other.TryToDecimal(out var right))
+        if (Kind == NumberKind.Decimal && other.Kind == NumberKind.Decimal)
         {
-            return left.CompareTo(right);
+            return _decimal.CompareTo(other._decimal);
         }
 
-        return ToDouble().CompareTo(other.ToDouble());
+        if (Kind == NumberKind.Floating && other.Kind == NumberKind.Floating)
+        {
+            return NormalizeNegativeZero(_floating).CompareTo(NormalizeNegativeZero(other._floating));
+        }
+
+        var left = ToExactRational();
+        var right = other.ToExactRational();
+        return (left.Numerator * right.Denominator).CompareTo(right.Numerator * left.Denominator);
     }
 
     public string ToDisplayString() => Kind switch
@@ -288,7 +295,23 @@ public readonly struct NumberValue : IEquatable<NumberValue>, IComparable<Number
 
     public override bool Equals(object? obj) => obj is NumberValue other && Equals(other);
 
-    public override int GetHashCode() => NormalizeNegativeZero(ToDouble()).GetHashCode();
+    public override int GetHashCode()
+    {
+        var value = ToExactRational();
+        return HashCode.Combine(value.Numerator, value.Denominator);
+    }
+
+    public static bool operator ==(NumberValue left, NumberValue right) => left.Equals(right);
+
+    public static bool operator !=(NumberValue left, NumberValue right) => !left.Equals(right);
+
+    public static bool operator <(NumberValue left, NumberValue right) => left.CompareTo(right) < 0;
+
+    public static bool operator <=(NumberValue left, NumberValue right) => left.CompareTo(right) <= 0;
+
+    public static bool operator >(NumberValue left, NumberValue right) => left.CompareTo(right) > 0;
+
+    public static bool operator >=(NumberValue left, NumberValue right) => left.CompareTo(right) >= 0;
 
     private bool TryToDecimal(out decimal value)
     {
@@ -304,6 +327,65 @@ public readonly struct NumberValue : IEquatable<NumberValue>, IComparable<Number
                 value = default;
                 return false;
         }
+    }
+
+    private ExactRational ToExactRational() => Kind switch
+    {
+        NumberKind.Integer => ExactRational.Create(_integer, BigInteger.One),
+        NumberKind.Decimal => DecimalToExactRational(_decimal),
+        _ => DoubleToExactRational(_floating)
+    };
+
+    private static ExactRational DecimalToExactRational(decimal value)
+    {
+        var bits = decimal.GetBits(value);
+        var significand = ((BigInteger)(uint)bits[2] << 64) |
+                          ((BigInteger)(uint)bits[1] << 32) |
+                          (uint)bits[0];
+
+        if ((bits[3] & unchecked((int)0x80000000)) != 0)
+        {
+            significand = BigInteger.Negate(significand);
+        }
+
+        var scale = (bits[3] >> 16) & 0xFF;
+        return ExactRational.Create(significand, BigInteger.Pow(10, scale));
+    }
+
+    private static ExactRational DoubleToExactRational(double value)
+    {
+        var bits = (ulong)BitConverter.DoubleToInt64Bits(value);
+        var isNegative = (bits & 0x8000000000000000UL) != 0;
+        var exponentBits = (int)((bits >> 52) & 0x7FFUL);
+        var fractionBits = bits & 0x000FFFFFFFFFFFFFUL;
+
+        if (exponentBits == 0 && fractionBits == 0)
+        {
+            return ExactRational.Zero;
+        }
+
+        BigInteger significand;
+        int binaryExponent;
+
+        if (exponentBits == 0)
+        {
+            significand = fractionBits;
+            binaryExponent = -1074;
+        }
+        else
+        {
+            significand = (1UL << 52) | fractionBits;
+            binaryExponent = exponentBits - 1075;
+        }
+
+        if (isNegative)
+        {
+            significand = BigInteger.Negate(significand);
+        }
+
+        return binaryExponent >= 0
+            ? ExactRational.Create(significand << binaryExponent, BigInteger.One)
+            : ExactRational.Create(significand, BigInteger.One << -binaryExponent);
     }
 
     private static decimal PowDecimal(decimal value, int exponent)
@@ -342,4 +424,20 @@ public readonly struct NumberValue : IEquatable<NumberValue>, IComparable<Number
     private static decimal NormalizeNegativeZero(decimal value) => value == 0m ? 0m : value;
 
     private static double NormalizeNegativeZero(double value) => value == 0d ? 0d : value;
+
+    private readonly record struct ExactRational(BigInteger Numerator, BigInteger Denominator)
+    {
+        public static ExactRational Zero { get; } = new(BigInteger.Zero, BigInteger.One);
+
+        public static ExactRational Create(BigInteger numerator, BigInteger denominator)
+        {
+            if (numerator.IsZero)
+            {
+                return Zero;
+            }
+
+            var divisor = BigInteger.GreatestCommonDivisor(BigInteger.Abs(numerator), denominator);
+            return new ExactRational(numerator / divisor, denominator / divisor);
+        }
+    }
 }

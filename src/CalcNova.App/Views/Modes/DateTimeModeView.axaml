@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.Modes.DateTimeModeView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="8" Spacing="10">
+      <TextBlock Text="Date &amp; Duration Utilities" FontSize="21" FontWeight="SemiBold" />
+      <TextBlock Text="Dates use yyyy-MM-dd. Calendar arithmetic is timezone-free and fixed-duration conversion never assumes month lengths." TextWrapping="Wrap" Opacity="0.62" />
+
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+        <StackPanel>
+          <TextBlock Text="Start date" />
+          <TextBox Text="{Binding StartDate, Mode=TwoWay}" PlaceholderText="yyyy-MM-dd" />
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+          <TextBlock Text="End date" />
+          <TextBox Text="{Binding EndDate, Mode=TwoWay}" PlaceholderText="yyyy-MM-dd" />
+        </StackPanel>
+      </Grid>
+      <Button Content="Calculate difference" Command="{Binding CalculateDifferenceCommand}" HorizontalAlignment="Left" />
+      <Border Padding="10" CornerRadius="10"><TextBlock Text="{Binding DifferenceResult}" TextWrapping="Wrap" /></Border>
+
+      <TextBlock Text="Add to start date" FontWeight="SemiBold" />
+      <Grid ColumnDefinitions="*,*,*,*">
+        <TextBox Text="{Binding Years, Mode=TwoWay}" PlaceholderText="Years" Margin="2" />
+        <TextBox Grid.Column="1" Text="{Binding Months, Mode=TwoWay}" PlaceholderText="Months" Margin="2" />
+        <TextBox Grid.Column="2" Text="{Binding Weeks, Mode=TwoWay}" PlaceholderText="Weeks" Margin="2" />
+        <TextBox Grid.Column="3" Text="{Binding Days, Mode=TwoWay}" PlaceholderText="Days" Margin="2" />
+      </Grid>
+      <Button Content="Add calendar components" Command="{Binding AddToDateCommand}" HorizontalAlignment="Left" />
+      <TextBlock Text="{Binding AddResult}" FontSize="20" FontWeight="SemiBold" />
+
+      <TextBlock Text="Fixed duration conversion" FontWeight="SemiBold" />
+      <TextBox Text="{Binding DurationValue, Mode=TwoWay}" PlaceholderText="Duration value" />
+      <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="6">
+        <ComboBox ItemsSource="{Binding DurationUnits}" SelectedItem="{Binding DurationFrom, Mode=TwoWay}" />
+        <Button Grid.Column="1" Content="⇄" Command="{Binding SwapDurationUnitsCommand}" />
+        <ComboBox Grid.Column="2" ItemsSource="{Binding DurationUnits}" SelectedItem="{Binding DurationTo, Mode=TwoWay}" />
+      </Grid>
+      <Button Content="Convert duration" Command="{Binding ConvertDurationCommand}" HorizontalAlignment="Left" />
+      <TextBlock Text="{Binding DurationResult}" FontSize="24" FontWeight="SemiBold" />
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

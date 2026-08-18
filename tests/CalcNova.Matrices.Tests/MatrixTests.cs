@@ -1,4 +1,3 @@
-using CalcNova.Matrices;
 using Xunit;
 
 namespace CalcNova.Matrices.Tests;
