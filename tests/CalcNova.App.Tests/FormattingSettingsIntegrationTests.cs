@@ -20,7 +20,7 @@ public sealed class FormattingSettingsIntegrationTests
             new EmptyHistoryRepository(),
             new MemorySettingsRepository(settings)));
 
-        await viewModel.InitializeAsync();
+        await viewModel.InitializeAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(8, viewModel.Calculator.DecimalPrecision);
         Assert.False(viewModel.Calculator.UseGroupingSeparators);
@@ -31,11 +31,11 @@ public sealed class FormattingSettingsIntegrationTests
     {
         var repository = new MemorySettingsRepository(new AppSettings());
         var viewModel = new MainViewModel(new AppDependencies(new EmptyHistoryRepository(), repository));
-        await viewModel.InitializeAsync();
+        await viewModel.InitializeAsync(TestContext.Current.CancellationToken);
         viewModel.Settings.DecimalPrecision = 6;
         viewModel.Settings.UseGroupingSeparators = false;
 
-        await viewModel.Settings.SaveAsync();
+        await viewModel.Settings.SaveAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(6, viewModel.Calculator.DecimalPrecision);
         Assert.False(viewModel.Calculator.UseGroupingSeparators);
