@@ -1,118 +1,153 @@
 # CalcNova Platform Support
 
-This document records source/validation status separately. A target is not considered supported merely because Avalonia or .NET can theoretically target it.
+This document separates **source availability** from **validated release support**. A target is never marked PASS merely because Avalonia/.NET can theoretically target it.
 
-## Current repository status
+## Current source matrix
 
-| Target | Source status | Validation status |
-|---|---|---|
-| Shared domain libraries | Implemented baseline | NOT RUN in current execution environment |
-| Windows desktop | Shared desktop host source present | NOT RUN in current execution environment |
-| Linux desktop | Shared desktop host source present | NOT RUN in current execution environment |
-| macOS desktop | Shared desktop host source present | NOT RUN; macOS validation environment not used here |
-| Android | Platform head not yet implemented | NOT RUN |
-| iOS | Platform head not yet implemented | NOT RUN |
-| Browser/WebAssembly | Platform head not yet implemented | NOT RUN |
+| Target | Source status | Persistence/composition | Validation policy |
+|---|---|---|---|
+| Shared domain/application libraries | Implemented modular baseline | Platform-neutral contracts | Build/test on Linux, Windows, and macOS CI |
+| Windows desktop | `CalcNova.Desktop` host present | SQLite history + JSON settings/currency cache | Desktop workflow + manual packaging smoke test |
+| Linux desktop | `CalcNova.Desktop` host present | SQLite history + JSON settings/currency cache | Desktop workflow + representative distro smoke test |
+| macOS desktop | `CalcNova.Desktop` host present | SQLite history + JSON settings/currency cache | Desktop workflow + bundle/sign/notarization checks when credentials/environment exist |
+| Android | `CalcNova.Android` head present | Native local storage + safe link service | Android workload build + APK/AAB checks |
+| iOS | `CalcNova.iOS` head present | Native local storage + safe link service | macOS/iOS simulator build; device/archive signing separately |
+| Browser/WebAssembly | `CalcNova.Browser` head present | `localStorage` history/settings/currency cache | Browser publish + PWA/offline smoke test |
 
-`PROJECT_STATE.md` is the latest continuation source if this table becomes stale during active development.
+The shared modular Avalonia view is reused across Desktop, Android, iOS, and Browser so mathematical/user-mode behavior does not fork by platform unnecessarily.
 
-## Shared desktop target
+## Validation status rules
 
-`src/CalcNova.Desktop` is the current Avalonia desktop entry point. The intended desktop behavior includes:
+Use only these interpretations in release/state files:
 
-- resizable window;
-- high-DPI support through the framework/platform;
-- keyboard-first calculation;
-- minimum usable window size;
-- adaptive content as the design system evolves.
+- **PASS** — the stated command/check actually completed successfully;
+- **FAIL** — the stated command/check ran and failed;
+- **QUEUED / IN PROGRESS** — CI has been triggered but has not concluded;
+- **NOT RUN** — the required SDK/workload/platform/signing environment was unavailable.
 
-Windows/Linux/macOS packaging should remain separate from shared calculation logic.
+The active ChatGPT execution container used during the August 18, 2026 development segment does not include the .NET SDK, so local `dotnet` build/test commands remain **NOT RUN** there. GitHub Actions PR validation is used as an independent build environment.
+
+## Shared UI and application behavior
+
+The shared application currently includes modular views for:
+
+- Standard/Scientific calculator;
+- Programmer calculator;
+- Unit converter;
+- Statistics;
+- Equations;
+- Matrices;
+- interactive Graphing;
+- Date/Duration utilities;
+- optional Currency converter architecture/UI;
+- History;
+- Settings;
+- About/Support.
+
+Desktop `MainWindow` hosts the same `MainView` used by the single-view Android/iOS/Browser application lifetime.
 
 ## Windows
 
-Planned release concerns:
+Source/build support includes:
 
-- x64/arm64 target decisions;
-- icon/version metadata;
-- optional MSIX packaging;
-- high-DPI behavior;
-- keyboard/numpad coverage;
-- installer/update strategy if adopted.
+- shared Avalonia desktop executable;
+- resizable desktop window;
+- keyboard/numpad routing;
+- clipboard shortcuts/actions;
+- deterministic project-owned icon generation;
+- Windows portable ZIP packaging helper;
+- Windows packaging metadata/templates;
+- optional signing hooks that do not store credentials in Git.
+
+MSIX can remain optional unless a maintained packaging path is adopted and validated.
 
 ## Linux
 
-Planned release concerns:
+Source/build support includes:
 
-- supported desktop runtime dependencies;
-- x64/arm64 decisions;
-- desktop entry/icon metadata;
-- maintainable package format selection.
+- shared Avalonia desktop executable;
+- generated Linux PNG icon assets;
+- `.desktop`/packaging metadata;
+- Linux bundle helper script;
+- no claim of universal distro compatibility.
 
-Do not claim universal distro support without testing.
+Representative runtime dependency and desktop integration testing is still required before a stable release claim.
 
 ## macOS
 
-Planned release concerns:
+Source/build support includes:
 
-- Intel/Apple Silicon target policy;
-- app bundle metadata;
-- signing;
-- notarization;
-- native menu/keyboard conventions where appropriate.
+- shared Avalonia desktop executable;
+- generated ICNS/iconset assets;
+- `.app` bundle helper script;
+- bundle metadata;
+- optional external signing identity hook.
 
-Signing/notarization require Apple tooling/credentials that must remain outside Git.
+Notarization and trusted release signing require Apple tools/credentials outside the repository and must be reported separately from ordinary macOS compilation.
 
 ## Android
 
-The Android head must eventually provide:
+The Android head includes:
 
-- package/application ID;
-- minimum/target Android SDK rationale;
-- portrait/landscape adaptive layouts;
-- tablet/foldable behavior;
-- adaptive icon;
-- platform splash screen;
-- haptics setting;
-- clipboard/share integration;
-- debug APK;
-- release APK/AAB configuration;
-- secure signing placeholders/documentation.
+- application/package identifier based on `in.sanskar.calcnova`;
+- Avalonia Android startup using the shared `SingleViewApp`;
+- local SQLite history;
+- local JSON settings and currency-rate cache;
+- Android-safe external-link service;
+- permission-minimal manifest baseline;
+- adaptive launcher icon resources using original CalcNova artwork;
+- platform splash/theme resources;
+- CI workflow installing the Android workload;
+- release workflow support for signing through repository secrets rather than committed keystores/passwords.
 
-The app should request no unrelated permissions.
+Remaining release validation includes actual APK/AAB installation/smoke tests, orientation/tablet accessibility review, and store metadata/privacy-policy checks.
 
 ## iOS
 
-The iOS head must eventually provide:
+The iOS head includes:
 
-- bundle identifier;
-- simulator/device configuration;
-- safe-area handling;
-- app icon/launch screen;
-- clipboard/share integration;
-- appropriate haptics behavior;
-- accessibility/text scaling validation;
-- signing/archive documentation.
+- Avalonia iOS startup using the shared `SingleViewApp`;
+- local SQLite history;
+- local JSON settings and currency cache;
+- iOS-safe external-link service;
+- launch-screen metadata;
+- generated AppIcon asset-catalog inputs from project-owned artwork;
+- simulator CI workflow.
 
-Real device/archive validation requires a supported macOS/Xcode environment.
+Real device/archive/App Store validation still requires a supported macOS/Xcode environment, Apple signing identity, provisioning, and store credentials that are intentionally not stored in the repository.
 
-## Browser/WebAssembly
+## Browser/WebAssembly + PWA
 
-The Browser target must:
+The Browser head includes:
 
-- reuse shared calculation/domain logic;
-- support keyboard input responsibly;
-- use browser-compatible local persistence;
-- avoid native SQLite dependencies;
-- keep ordinary calculations client-side;
-- include responsive layout;
-- support installable/PWA behavior where implemented;
-- provide offline core app shell where practical;
-- handle browser base paths/hosting correctly.
+- Avalonia Browser/WebAssembly startup;
+- shared calculation/application logic;
+- Browser-specific `localStorage` history repository;
+- Browser settings repository;
+- Browser currency cache;
+- safe external-link bridge;
+- PWA manifest;
+- service worker/offline app-shell baseline;
+- favicon/icon/social assets;
+- client-side ordinary calculations with no server requirement;
+- Browser publish CI workflow.
 
-## Feature consistency
+Remaining validation includes supported-browser smoke testing, install/offline behavior, base-path hosting behavior, keyboard/accessibility review, and cache-update behavior across releases.
 
-Core mathematical semantics should stay consistent across targets. Platform-specific UI behavior may differ where native conventions require it, but a calculation should not produce a different result solely because it ran on another platform unless the difference is a documented numeric/platform limitation.
+## Feature consistency requirement
 
-## Validation policy
+Core mathematical semantics must remain platform-independent. Platform heads may differ in lifecycle, packaging, storage implementation, external-link handling, clipboard/haptics behavior, and native conventions, but the same expression should not produce a different result simply because it ran on another supported target unless a documented numeric/platform limitation explains the difference.
 
-For each release, record the exact targets actually built/tested. Use `NOT RUN` for unavailable environments instead of inferring success from another target.
+## Release acceptance
+
+Before a platform is listed as stable for a release:
+
+1. build it using the documented toolchain;
+2. record the exact runtime/OS/workload used;
+3. run relevant automated tests;
+4. perform representative manual launch/navigation/calculation smoke tests;
+5. verify local persistence behavior;
+6. verify icon/splash/metadata;
+7. verify accessibility basics;
+8. verify no secrets or private signing material are tracked;
+9. record any target-specific limitations in `PROJECT_STATE.md` and release notes.
