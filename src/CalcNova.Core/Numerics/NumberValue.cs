@@ -69,7 +69,7 @@ public readonly struct NumberValue : IEquatable<NumberValue>, IComparable<Number
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(text);
 
-        if (!text.Contains('.') && !text.Contains('e', StringComparison.OrdinalIgnoreCase) &&
+        if (!text.Contains('.') && !text.Contains('e') && !text.Contains('E') &&
             BigInteger.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integer))
         {
             return FromInteger(integer);
