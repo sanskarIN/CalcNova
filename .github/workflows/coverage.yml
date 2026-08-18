@@ -1,0 +1,66 @@
+name: Code Coverage
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "*.slnx"
+      - "Directory.*.props"
+      - ".github/workflows/coverage.yml"
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install dotnet-coverage
+        run: dotnet tool install --global dotnet-coverage
+
+      - name: Restore and build core solution
+        run: |
+          dotnet restore CalcNova.slnx
+          dotnet build CalcNova.slnx --configuration Release --no-restore
+
+      - name: Collect core coverage
+        shell: bash
+        run: |
+          dotnet-coverage collect \
+            "dotnet test CalcNova.slnx --configuration Release --no-build" \
+            --output core-coverage.cobertura.xml \
+            --output-format cobertura
+
+      - name: Restore and build advanced utilities
+        run: |
+          dotnet restore CalcNova.Advanced.slnx
+          dotnet build CalcNova.Advanced.slnx --configuration Release --no-restore
+
+      - name: Collect advanced coverage
+        shell: bash
+        run: |
+          dotnet-coverage collect \
+            "dotnet test CalcNova.Advanced.slnx --configuration Release --no-build" \
+            --output advanced-coverage.cobertura.xml \
+            --output-format cobertura
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-cobertura
+          path: |
+            core-coverage.cobertura.xml
+            advanced-coverage.cobertura.xml
+          if-no-files-found: error
