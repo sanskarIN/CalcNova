@@ -39,6 +39,7 @@ public sealed class CalculatorViewModel : ViewModelBase
         SetAngleUnitCommand = new RelayCommand(SetAngleUnit);
         UseResultCommand = new RelayCommand(_ => UseResult());
         PercentageCommand = new RelayCommand(_ => ApplyPercentage());
+        ToggleSignCommand = new RelayCommand(_ => ToggleSign());
         MemoryClearCommand = new RelayCommand(_ => MemoryClear());
         MemoryRecallCommand = new RelayCommand(_ => MemoryRecall());
         MemoryStoreCommand = new RelayCommand(_ => MemoryStore());
@@ -110,6 +111,8 @@ public sealed class CalculatorViewModel : ViewModelBase
     public ICommand UseResultCommand { get; }
 
     public ICommand PercentageCommand { get; }
+
+    public ICommand ToggleSignCommand { get; }
 
     public ICommand MemoryClearCommand { get; }
 
@@ -241,6 +244,30 @@ public sealed class CalculatorViewModel : ViewModelBase
         {
             StatusMessage = exception.Message;
         }
+    }
+
+    private void ToggleSign()
+    {
+        NumberValue value;
+        if (!string.IsNullOrWhiteSpace(Expression))
+        {
+            var evaluation = _evaluator.Evaluate(Expression, CreateOptions());
+            if (!evaluation.Success)
+            {
+                StatusMessage = evaluation.ErrorMessage ?? "The current expression cannot be negated.";
+                return;
+            }
+
+            value = evaluation.Value;
+        }
+        else if (!TryParseResult(out value))
+        {
+            StatusMessage = "There is no valid value to negate.";
+            return;
+        }
+
+        Expression = value.Negate().ToDisplayString();
+        StatusMessage = string.Empty;
     }
 
     private void MemoryClear()
