@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using CalcNova.Core.Numerics;
 using Xunit;
@@ -53,8 +54,8 @@ public sealed class NumberValueEqualityTests
     [Fact]
     public void AdjacentLargeIntegers_DoNotCollapseThroughDoubleRounding()
     {
-        var exactlyRepresentable = NumberValue.FromInteger(BigInteger.Parse("9007199254740992"));
-        var adjacentInteger = NumberValue.FromInteger(BigInteger.Parse("9007199254740993"));
+        var exactlyRepresentable = NumberValue.FromInteger(BigInteger.Parse("9007199254740992", CultureInfo.InvariantCulture));
+        var adjacentInteger = NumberValue.FromInteger(BigInteger.Parse("9007199254740993", CultureInfo.InvariantCulture));
         var floating = NumberValue.FromDouble(9007199254740992d);
 
         Assert.Equal(exactlyRepresentable, floating);
