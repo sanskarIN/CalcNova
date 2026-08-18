@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.Modes.EquationsModeView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="8" Spacing="10">
+      <TextBlock Text="Equation Solver" FontSize="21" FontWeight="SemiBold" />
+      <TextBlock Text="Solve ax² + bx + c = 0, including degenerate and complex-root cases." TextWrapping="Wrap" Opacity="0.62" />
+      <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6">
+        <TextBox Text="{Binding A, Mode=TwoWay}" Watermark="a" />
+        <TextBox Grid.Column="1" Text="{Binding B, Mode=TwoWay}" Watermark="b" />
+        <TextBox Grid.Column="2" Text="{Binding C, Mode=TwoWay}" Watermark="c" />
+      </Grid>
+      <Button Content="Solve" Command="{Binding SolveCommand}" HorizontalAlignment="Left" />
+      <Border Padding="12" CornerRadius="12">
+        <TextBlock Text="{Binding Result}" FontSize="20" TextWrapping="Wrap" />
+      </Border>
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
