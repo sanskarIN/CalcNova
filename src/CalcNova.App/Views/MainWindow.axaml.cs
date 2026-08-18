@@ -16,23 +16,24 @@ public partial class MainWindow : Window
 
     private void OnKeyDown(object? sender, KeyEventArgs eventArgs)
     {
-        if (DataContext is not CalculatorViewModel viewModel)
+        if (DataContext is not MainViewModel viewModel || viewModel.SelectedModeIndex != 0)
         {
             return;
         }
 
+        var calculator = viewModel.Calculator;
         switch (eventArgs.Key)
         {
             case Key.Enter:
-                viewModel.Evaluate();
+                calculator.Evaluate();
                 eventArgs.Handled = true;
                 break;
             case Key.Escape:
-                viewModel.Clear();
+                calculator.Clear();
                 eventArgs.Handled = true;
                 break;
             case Key.Back:
-                viewModel.Backspace();
+                calculator.Backspace();
                 eventArgs.Handled = true;
                 break;
         }
