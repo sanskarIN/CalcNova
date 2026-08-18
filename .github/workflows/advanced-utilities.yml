@@ -1,0 +1,52 @@
+name: Advanced Utilities
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.DateTime/**"
+      - "src/CalcNova.Currency/**"
+      - "tests/CalcNova.DateTime.Tests/**"
+      - "tests/CalcNova.Currency.Tests/**"
+      - "CalcNova.Advanced.slnx"
+      - "Directory.*.props"
+      - "global.json"
+      - ".github/workflows/advanced-utilities.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/CalcNova.DateTime/**"
+      - "src/CalcNova.Currency/**"
+      - "tests/CalcNova.DateTime.Tests/**"
+      - "tests/CalcNova.Currency.Tests/**"
+      - "CalcNova.Advanced.slnx"
+      - "Directory.*.props"
+      - "global.json"
+      - ".github/workflows/advanced-utilities.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  advanced:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore CalcNova.Advanced.slnx
+
+      - name: Verify formatting
+        run: dotnet format CalcNova.Advanced.slnx --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build CalcNova.Advanced.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test CalcNova.Advanced.slnx --configuration Release --no-build
