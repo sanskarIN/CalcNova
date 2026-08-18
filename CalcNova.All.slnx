@@ -1,0 +1,34 @@
+<Solution>
+  <Folder Name="/src/domain/">
+    <Project Path="src/CalcNova.Core/CalcNova.Core.csproj" />
+    <Project Path="src/CalcNova.Scientific/CalcNova.Scientific.csproj" />
+    <Project Path="src/CalcNova.Programmer/CalcNova.Programmer.csproj" />
+    <Project Path="src/CalcNova.Converter/CalcNova.Converter.csproj" />
+    <Project Path="src/CalcNova.Statistics/CalcNova.Statistics.csproj" />
+    <Project Path="src/CalcNova.Equations/CalcNova.Equations.csproj" />
+    <Project Path="src/CalcNova.Matrices/CalcNova.Matrices.csproj" />
+    <Project Path="src/CalcNova.Graphing/CalcNova.Graphing.csproj" />
+  </Folder>
+  <Folder Name="/src/application/">
+    <Project Path="src/CalcNova.Platform/CalcNova.Platform.csproj" />
+    <Project Path="src/CalcNova.Persistence/CalcNova.Persistence.csproj" />
+    <Project Path="src/CalcNova.App/CalcNova.App.csproj" />
+  </Folder>
+  <Folder Name="/src/platforms/">
+    <Project Path="src/CalcNova.Desktop/CalcNova.Desktop.csproj" />
+    <Project Path="src/CalcNova.Android/CalcNova.Android.csproj" />
+    <Project Path="src/CalcNova.iOS/CalcNova.iOS.csproj" />
+    <Project Path="src/CalcNova.Browser/CalcNova.Browser.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CalcNova.Core.Tests/CalcNova.Core.Tests.csproj" />
+    <Project Path="tests/CalcNova.Programmer.Tests/CalcNova.Programmer.Tests.csproj" />
+    <Project Path="tests/CalcNova.Converter.Tests/CalcNova.Converter.Tests.csproj" />
+    <Project Path="tests/CalcNova.Statistics.Tests/CalcNova.Statistics.Tests.csproj" />
+    <Project Path="tests/CalcNova.Equations.Tests/CalcNova.Equations.Tests.csproj" />
+    <Project Path="tests/CalcNova.Matrices.Tests/CalcNova.Matrices.Tests.csproj" />
+    <Project Path="tests/CalcNova.Graphing.Tests/CalcNova.Graphing.Tests.csproj" />
+    <Project Path="tests/CalcNova.Persistence.Tests/CalcNova.Persistence.Tests.csproj" />
+    <Project Path="tests/CalcNova.App.Tests/CalcNova.App.Tests.csproj" />
+  </Folder>
+</Solution>
