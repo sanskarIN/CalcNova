@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <_CalcNovaBrandGenerator>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../tools/scripts/generate_brand_assets.py'))</_CalcNovaBrandGenerator>
+    <_CalcNovaDesktopIconMarker>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../assets/generated/linux/calcnova-256.png'))</_CalcNovaDesktopIconMarker>
+    <_CalcNovaPython Condition="'$(OS)' == 'Windows_NT'">python</_CalcNovaPython>
+    <_CalcNovaPython Condition="'$(OS)' != 'Windows_NT'">python3</_CalcNovaPython>
+    <ApplicationIcon Condition="'$(OS)' == 'Windows_NT'">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../assets/generated/windows/CalcNova.ico'))</ApplicationIcon>
+  </PropertyGroup>
+
+  <Target Name="GenerateCalcNovaDesktopBrandAssets"
+          BeforeTargets="PrepareForBuild"
+          Condition="!Exists('$(_CalcNovaDesktopIconMarker)')">
+    <Message Importance="High" Text="Generating CalcNova desktop brand assets from repository-owned artwork." />
+    <Exec Command="$(_CalcNovaPython) &quot;$(_CalcNovaBrandGenerator)&quot;" />
+  </Target>
+</Project>
