@@ -533,3 +533,64 @@ This is useful but does **not** replace compiler/analyzer/tests/manual platform 
 10. Wire persisted high-contrast/reduced-motion/haptics preferences into concrete target behavior.
 11. Continue remaining non-release-blocking roadmap items such as programmer bit-toggle grid, converter favorites, multiple graph expressions, richer matrix/vector UI, and command palette only after baseline stability.
 12. Update this file, `PROJECT_STATE.md`, and `CHANGELOG.md` with real CI/manual results before creating `v0.1.0`.
+
+## Continuation Validation Fixes — 2026-08-18
+
+### CI blockers corrected
+
+- Removed the Desktop `Avalonia.Diagnostics` reference because the repository was requesting version `12.1.1`, which is unavailable and caused NuGet restore failure before compilation could begin.
+- Removed the matching central `Avalonia.Diagnostics` package version entry.
+- Added a central transitive pin for `SQLitePCLRaw.bundle_e_sqlite3` version `2.1.12` so `Microsoft.Data.Sqlite` no longer restores the vulnerable `2.1.11` native SQLite bundle under warnings-as-errors.
+- Added the missing `assets/ASSET_LICENSES.md` file referenced by `README.md`, correcting the concrete local-link failure reported by Repository Validation.
+
+### Numeric correctness hardening
+
+- Reworked mixed-kind `NumberValue` comparison so integer/decimal/floating equality no longer falls back to lossy `double` conversion.
+- Added canonical exact-rational conversion for mixed-kind comparisons:
+  - `BigInteger` values remain exact integers;
+  - `decimal` values are decoded from their 96-bit significand and decimal scale;
+  - finite `double` values are decoded from their IEEE-754 significand/exponent representation.
+- Added canonical rational hashing so `Equals` and `GetHashCode` remain compatible across exact cross-kind values.
+- Preserved signed-zero equality while preventing adjacent large integers around the IEEE-754 exact-integer boundary from collapsing into the same value.
+- Explicitly treat a binary floating approximation such as `0.1d` as distinct from the exact decimal value `0.1m`, while exact binary fractions such as `0.5d` remain equal to `0.5m`.
+
+### Regression coverage added
+
+- Added equality/hash regression tests for integer/decimal/floating exact values.
+- Added signed-zero hash/equality coverage.
+- Added exact binary-fraction coverage.
+- Added decimal-versus-binary-floating boundary coverage.
+- Added adjacent-large-integer regression coverage around `2^53`.
+- Added pairwise ordering antisymmetry and equality-consistency invariants.
+- Added representative mixed-kind ordering transitivity coverage.
+
+### Integration branch cleanup
+
+- Confirmed the real accumulated continuation is PR `#6` on `ci/full-baseline-validation`; it is substantially ahead of `main` and carries the complete integration batch.
+- Reapplied the correctness/dependency/test fixes from temporary PR `#7` onto PR `#6`.
+- Closed PR `#7` as superseded so validation and eventual merge happen against the complete accumulated project state.
+- Updated PR `#6` title/body to describe its actual integration scope and release-gate policy rather than presenting it as a validation-only change.
+
+### Latest automated-validation state
+
+At the last confirmed query before this documentation update, the current PR-triggered workflow set was **QUEUED** and had not produced a new post-fix compiler/test conclusion. The triggered validation set included:
+
+- Build and Test
+- Formatting
+- Code Coverage
+- Security Audit
+- Repository Validation
+- Documentation Check
+- Advanced Utilities
+- Desktop Build
+- Android Build
+- Browser Build
+- iOS Simulator Build
+
+The earlier concrete restore/link failures have been corrected in source, but they are **not** being recorded as CI PASS until GitHub Actions actually completes the refreshed runs. Local `dotnet` validation remains **NOT RUN** because the active execution container does not include the .NET SDK.
+
+### Audit status
+
+- PR diff inspection found no added `NotImplementedException` implementation path.
+- `TODO`/`FIXME` matches in the PR diff are documentation statements describing the repository audit, not hidden source placeholders.
+- No merge/release should be performed solely because GitHub reports the PR as mergeable; the required automated validation remains the release gate.
