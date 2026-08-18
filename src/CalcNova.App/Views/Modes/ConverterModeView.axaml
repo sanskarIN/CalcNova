@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.Modes.ConverterModeView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="8" Spacing="10">
+      <TextBlock Text="Offline Unit Converter" FontSize="21" FontWeight="SemiBold" />
+      <TextBlock Text="Fixed physical conversions run locally without network access." TextWrapping="Wrap" Opacity="0.62" />
+      <TextBlock Text="Category" />
+      <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
+      <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="6">
+        <ComboBox ItemsSource="{Binding AvailableUnits}" SelectedItem="{Binding FromUnit, Mode=TwoWay}" />
+        <Button Grid.Column="1" Content="⇄" Command="{Binding SwapCommand}" />
+        <ComboBox Grid.Column="2" ItemsSource="{Binding AvailableUnits}" SelectedItem="{Binding ToUnit, Mode=TwoWay}" />
+      </Grid>
+      <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Input value" />
+      <Button Content="Convert" Command="{Binding ConvertCommand}" HorizontalAlignment="Left" />
+      <Border Padding="12" CornerRadius="12">
+        <StackPanel>
+          <TextBlock Text="Result" Opacity="0.6" />
+          <TextBlock Text="{Binding Result}" FontSize="28" FontWeight="SemiBold" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
