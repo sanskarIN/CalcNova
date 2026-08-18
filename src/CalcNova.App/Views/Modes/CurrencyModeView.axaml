@@ -5,15 +5,15 @@
     <StackPanel Margin="8" Spacing="10">
       <TextBlock Text="Currency Converter" FontSize="21" FontWeight="SemiBold" />
       <TextBlock Text="Optional network-enhanced module. CalcNova never embeds API keys; the most recent successful rate can remain usable from local cache." TextWrapping="Wrap" Opacity="0.62" />
-      <TextBox Text="{Binding Amount, Mode=TwoWay}" Watermark="Amount" />
+      <TextBox Text="{Binding Amount, Mode=TwoWay}" PlaceholderText="Amount" />
       <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
         <StackPanel>
           <TextBlock Text="From" />
-          <TextBox Text="{Binding FromCurrency, Mode=TwoWay}" Watermark="USD" MaxLength="3" />
+          <TextBox Text="{Binding FromCurrency, Mode=TwoWay}" PlaceholderText="USD" MaxLength="3" />
         </StackPanel>
         <StackPanel Grid.Column="1">
           <TextBlock Text="To" />
-          <TextBox Text="{Binding ToCurrency, Mode=TwoWay}" Watermark="INR" MaxLength="3" />
+          <TextBox Text="{Binding ToCurrency, Mode=TwoWay}" PlaceholderText="INR" MaxLength="3" />
         </StackPanel>
       </Grid>
       <WrapPanel>
