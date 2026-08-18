@@ -23,8 +23,8 @@ public sealed class JsonCurrencyRateCacheTests : IDisposable
             retrievedAt,
             "Test rates");
 
-        await cache.SaveAsync(snapshot);
-        var loaded = await cache.LoadAsync("usd");
+        await cache.SaveAsync(snapshot, TestContext.Current.CancellationToken);
+        var loaded = await cache.LoadAsync("usd", TestContext.Current.CancellationToken);
 
         Assert.NotNull(loaded);
         Assert.Equal("USD", loaded.BaseCurrency);
@@ -39,7 +39,7 @@ public sealed class JsonCurrencyRateCacheTests : IDisposable
     {
         var cache = new JsonCurrencyRateCache(_directory);
 
-        var result = await cache.LoadAsync("GBP");
+        var result = await cache.LoadAsync("GBP", TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }
@@ -48,10 +48,13 @@ public sealed class JsonCurrencyRateCacheTests : IDisposable
     public async Task LoadAsync_CorruptCacheReturnsNullInsteadOfCrashing()
     {
         Directory.CreateDirectory(_directory);
-        await File.WriteAllTextAsync(Path.Combine(_directory, "USD.json"), "{not valid json");
+        await File.WriteAllTextAsync(
+            Path.Combine(_directory, "USD.json"),
+            "{not valid json",
+            TestContext.Current.CancellationToken);
         var cache = new JsonCurrencyRateCache(_directory);
 
-        var result = await cache.LoadAsync("USD");
+        var result = await cache.LoadAsync("USD", TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }
