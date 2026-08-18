@@ -14,5 +14,9 @@
     <ProjectReference Include="../CalcNova.Scientific/CalcNova.Scientific.csproj" />
     <ProjectReference Include="../CalcNova.Programmer/CalcNova.Programmer.csproj" />
     <ProjectReference Include="../CalcNova.Converter/CalcNova.Converter.csproj" />
+    <ProjectReference Include="../CalcNova.Statistics/CalcNova.Statistics.csproj" />
+    <ProjectReference Include="../CalcNova.Equations/CalcNova.Equations.csproj" />
+    <ProjectReference Include="../CalcNova.Matrices/CalcNova.Matrices.csproj" />
+    <ProjectReference Include="../CalcNova.Graphing/CalcNova.Graphing.csproj" />
   </ItemGroup>
 </Project>
