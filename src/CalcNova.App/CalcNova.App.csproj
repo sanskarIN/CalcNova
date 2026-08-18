@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>CalcNova.App</AssemblyName>
+    <RootNamespace>CalcNova.App</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../CalcNova.Core/CalcNova.Core.csproj" />
+    <ProjectReference Include="../CalcNova.Scientific/CalcNova.Scientific.csproj" />
+    <ProjectReference Include="../CalcNova.Programmer/CalcNova.Programmer.csproj" />
+    <ProjectReference Include="../CalcNova.Converter/CalcNova.Converter.csproj" />
+  </ItemGroup>
+</Project>
