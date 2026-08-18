@@ -71,4 +71,27 @@ public sealed class CalculatorViewModelTests
 
         Assert.Equal("9", viewModel.Result);
     }
+
+    [Fact]
+    public async Task ToggleSign_NegatesEvaluatedExpression()
+    {
+        var viewModel = new CalculatorViewModel { Expression = "2 + 3" };
+
+        viewModel.ToggleSignCommand.Execute(null);
+        await viewModel.EvaluateAsync();
+
+        Assert.Equal("-5", viewModel.Result);
+    }
+
+    [Fact]
+    public async Task ToggleSign_TwiceRestoresOriginalValue()
+    {
+        var viewModel = new CalculatorViewModel { Expression = "12.5" };
+
+        viewModel.ToggleSignCommand.Execute(null);
+        viewModel.ToggleSignCommand.Execute(null);
+        await viewModel.EvaluateAsync();
+
+        Assert.Equal("12.5", viewModel.Result);
+    }
 }
