@@ -35,7 +35,7 @@ public sealed class ProgrammerViewModelTests
             Signed = false
         };
         viewModel.Convert();
-        var leastSignificant = Assert.Single(viewModel.BitCells.Where(cell => cell.BitIndex == 0));
+        var leastSignificant = Assert.Single(viewModel.BitCells, cell => cell.BitIndex == 0);
 
         viewModel.ToggleBitCommand.Execute(leastSignificant);
 
@@ -55,7 +55,7 @@ public sealed class ProgrammerViewModelTests
             Signed = true
         };
         viewModel.Convert();
-        var signBit = Assert.Single(viewModel.BitCells.Where(cell => cell.BitIndex == 7));
+        var signBit = Assert.Single(viewModel.BitCells, cell => cell.BitIndex == 7);
 
         viewModel.ToggleBitCommand.Execute(signBit);
 
