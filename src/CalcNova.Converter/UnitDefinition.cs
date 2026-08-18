@@ -11,4 +11,6 @@ public sealed record UnitDefinition(
     public double ToBase(double value) => (value * ToBaseFactor) + ToBaseOffset;
 
     public double FromBase(double baseValue) => (baseValue - ToBaseOffset) / ToBaseFactor;
+
+    public override string ToString() => $"{Name} ({Symbol})";
 }
