@@ -59,21 +59,67 @@ public partial class MainView : UserControl
             return;
         }
 
+        var calculator = viewModel.Calculator;
         switch (eventArgs.Key)
         {
             case Key.Enter:
-                await viewModel.Calculator.EvaluateAsync();
+                await calculator.EvaluateAsync();
                 eventArgs.Handled = true;
-                break;
+                return;
             case Key.Escape:
-                viewModel.Calculator.Clear();
+                calculator.Clear();
                 eventArgs.Handled = true;
-                break;
-            case Key.Back:
-                viewModel.Calculator.Backspace();
-                eventArgs.Handled = true;
-                break;
+                return;
         }
+
+        if (eventArgs.Source is TextBox)
+        {
+            return;
+        }
+
+        if (eventArgs.Key == Key.Back)
+        {
+            calculator.Backspace();
+            eventArgs.Handled = true;
+            return;
+        }
+
+        var token = GetCalculatorToken(eventArgs);
+        if (token is null)
+        {
+            return;
+        }
+
+        calculator.AppendCommand.Execute(token);
+        eventArgs.Handled = true;
+    }
+
+    private static string? GetCalculatorToken(KeyEventArgs eventArgs)
+    {
+        if (eventArgs.KeySymbol is { Length: 1 } symbol && "0123456789.+-*/^()%".Contains(symbol, StringComparison.Ordinal))
+        {
+            return symbol;
+        }
+
+        return eventArgs.Key switch
+        {
+            Key.NumPad0 => "0",
+            Key.NumPad1 => "1",
+            Key.NumPad2 => "2",
+            Key.NumPad3 => "3",
+            Key.NumPad4 => "4",
+            Key.NumPad5 => "5",
+            Key.NumPad6 => "6",
+            Key.NumPad7 => "7",
+            Key.NumPad8 => "8",
+            Key.NumPad9 => "9",
+            Key.Add => "+",
+            Key.Subtract => "-",
+            Key.Multiply => "*",
+            Key.Divide => "/",
+            Key.Decimal => ".",
+            _ => null
+        };
     }
 
     private static void ApplySettings(AppSettings settings)
