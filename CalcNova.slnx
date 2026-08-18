@@ -7,6 +7,7 @@
     <Project Path="src/CalcNova.Statistics/CalcNova.Statistics.csproj" />
     <Project Path="src/CalcNova.Equations/CalcNova.Equations.csproj" />
     <Project Path="src/CalcNova.Matrices/CalcNova.Matrices.csproj" />
+    <Project Path="src/CalcNova.Graphing/CalcNova.Graphing.csproj" />
     <Project Path="src/CalcNova.Persistence/CalcNova.Persistence.csproj" />
     <Project Path="src/CalcNova.App/CalcNova.App.csproj" />
     <Project Path="src/CalcNova.Desktop/CalcNova.Desktop.csproj" />
@@ -18,6 +19,7 @@
     <Project Path="tests/CalcNova.Statistics.Tests/CalcNova.Statistics.Tests.csproj" />
     <Project Path="tests/CalcNova.Equations.Tests/CalcNova.Equations.Tests.csproj" />
     <Project Path="tests/CalcNova.Matrices.Tests/CalcNova.Matrices.Tests.csproj" />
+    <Project Path="tests/CalcNova.Graphing.Tests/CalcNova.Graphing.Tests.csproj" />
     <Project Path="tests/CalcNova.Persistence.Tests/CalcNova.Persistence.Tests.csproj" />
   </Folder>
 </Solution>
