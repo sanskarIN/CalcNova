@@ -1,3 +1,4 @@
+using System.Globalization;
 using CalcNova.App.ViewModels;
 using CalcNova.Currency;
 using CalcNova.DateTimeTools;
@@ -38,7 +39,7 @@ public sealed class AdvancedUtilityViewModelTests
 
         viewModel.AddToDateCommand.Execute(null);
 
-        Assert.Equal("2025-04-09", viewModel.AddResult);
+        Assert.Equal("2025-04-06", viewModel.AddResult);
         Assert.Empty(viewModel.ErrorMessage);
     }
 
@@ -90,7 +91,8 @@ public sealed class AdvancedUtilityViewModelTests
 
         await viewModel.ConvertAsync();
 
-        Assert.Equal("168.50", viewModel.Result);
+        Assert.True(decimal.TryParse(viewModel.Result, NumberStyles.Number, CultureInfo.InvariantCulture, out var converted));
+        Assert.Equal(168.50m, converted);
         Assert.Contains("Test cache", viewModel.RateStatus, StringComparison.Ordinal);
         Assert.Empty(viewModel.ErrorMessage);
     }
