@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.iOS;
 using CalcNova.App;
 using CalcNova.App.Services;
+using CalcNova.iOS.Services;
+using CalcNova.Persistence.Currency;
 using CalcNova.Persistence.History;
 using CalcNova.Persistence.Settings;
 using Foundation;
@@ -22,7 +24,11 @@ public sealed class AppDelegate : AvaloniaAppDelegate<SingleViewApp>
         var appDataDirectory = Path.Combine(localData, "CalcNova");
         AppComposition.Configure(new AppDependencies(
             new SqliteCalculationHistoryRepository(Path.Combine(appDataDirectory, "history.db")),
-            new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json"))));
+            new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json")))
+        {
+            ExternalLinkService = new IosExternalLinkService(),
+            CurrencyRateCache = new JsonCurrencyRateCache(Path.Combine(appDataDirectory, "currency"))
+        });
 
         return base.CustomizeAppBuilder(builder).WithInterFont();
     }
