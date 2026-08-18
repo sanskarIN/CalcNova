@@ -11,8 +11,8 @@ public sealed class HistoryViewModelTests
     {
         var repository = new MemoryHistoryRepository();
         var viewModel = new HistoryViewModel(repository);
-        await viewModel.InitializeAsync();
-        await viewModel.RecordAsync("2 + 2", "4");
+        await viewModel.InitializeAsync(TestContext.Current.CancellationToken);
+        await viewModel.RecordAsync("2 + 2", "4", TestContext.Current.CancellationToken);
 
         viewModel.ClearCommand.Execute(null);
 
@@ -32,8 +32,8 @@ public sealed class HistoryViewModelTests
     {
         var repository = new MemoryHistoryRepository();
         var viewModel = new HistoryViewModel(repository);
-        await viewModel.InitializeAsync();
-        await viewModel.RecordAsync("3 * 7", "21");
+        await viewModel.InitializeAsync(TestContext.Current.CancellationToken);
+        await viewModel.RecordAsync("3 * 7", "21", TestContext.Current.CancellationToken);
 
         viewModel.ClearCommand.Execute(null);
         viewModel.CancelClearCommand.Execute(null);
