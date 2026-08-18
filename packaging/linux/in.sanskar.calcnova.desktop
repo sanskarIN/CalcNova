@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=CalcNova
+GenericName=Calculator
+Comment=Fast, precise, privacy-first cross-platform calculator
+Exec=CalcNova.Desktop
+Icon=in.sanskar.calcnova
+Terminal=false
+Categories=Utility;Calculator;Education;
+Keywords=calculator;scientific;programmer;converter;graphing;statistics;
+StartupNotify=true
+StartupWMClass=CalcNova
