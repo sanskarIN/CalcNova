@@ -38,7 +38,7 @@ internal sealed class BrowserCurrencyRateCache : ICurrencyRateCache
         await BrowserInterop.EnsureInitializedAsync(cancellationToken);
         var model = new StoredSnapshot(
             snapshot.BaseCurrency,
-            new Dictionary<string, decimal>(snapshot.Rates, StringComparer.OrdinalIgnoreCase),
+            snapshot.Rates.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase),
             snapshot.RetrievedAt,
             snapshot.Source);
         BrowserInterop.SetItem(KeyPrefix + snapshot.BaseCurrency, JsonSerializer.Serialize(model, JsonOptions));
