@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.Modes.ProgrammerModeView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="8" Spacing="10">
+      <TextBlock Text="Programmer Calculator" FontSize="21" FontWeight="SemiBold" />
+      <TextBlock Text="Convert bases and inspect fixed-width two's-complement values." TextWrapping="Wrap" Opacity="0.62" />
+      <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Value" />
+      <Grid ColumnDefinitions="*,*">
+        <StackPanel Margin="2">
+          <TextBlock Text="Input base" />
+          <ComboBox ItemsSource="{Binding CommonBases}" SelectedItem="{Binding InputBase, Mode=TwoWay}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Margin="2">
+          <TextBlock Text="Word size" />
+          <ComboBox ItemsSource="{Binding WordSizes}" SelectedItem="{Binding WordSize, Mode=TwoWay}" />
+        </StackPanel>
+      </Grid>
+      <CheckBox Content="Signed two's-complement interpretation" IsChecked="{Binding Signed, Mode=TwoWay}" />
+      <Button Content="Convert" Command="{Binding ConvertCommand}" HorizontalAlignment="Left" />
+      <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+        <Border Padding="10" CornerRadius="10"><StackPanel><TextBlock Text="Binary" Opacity="0.6" /><TextBlock Text="{Binding Binary}" TextWrapping="Wrap" /></StackPanel></Border>
+        <Border Grid.Column="1" Padding="10" CornerRadius="10"><StackPanel><TextBlock Text="Octal" Opacity="0.6" /><TextBlock Text="{Binding Octal}" TextWrapping="Wrap" /></StackPanel></Border>
+        <Border Grid.Row="1" Padding="10" CornerRadius="10"><StackPanel><TextBlock Text="Decimal" Opacity="0.6" /><TextBlock Text="{Binding Decimal}" TextWrapping="Wrap" /></StackPanel></Border>
+        <Border Grid.Row="1" Grid.Column="1" Padding="10" CornerRadius="10"><StackPanel><TextBlock Text="Hexadecimal" Opacity="0.6" /><TextBlock Text="{Binding Hexadecimal}" TextWrapping="Wrap" /></StackPanel></Border>
+      </Grid>
+      <TextBlock Text="Interpreted value" FontWeight="SemiBold" />
+      <TextBlock Text="{Binding InterpretedValue}" FontSize="19" TextWrapping="Wrap" />
+      <TextBlock Text="Bit pattern" FontWeight="SemiBold" />
+      <TextBlock Text="{Binding BitPattern}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
