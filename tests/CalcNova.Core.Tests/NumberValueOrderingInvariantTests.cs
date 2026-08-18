@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using CalcNova.Core.Numerics;
 using Xunit;
@@ -8,7 +9,7 @@ public sealed class NumberValueOrderingInvariantTests
 {
     private static readonly NumberValue[] Values =
     [
-        NumberValue.FromInteger(BigInteger.Parse("-9007199254740993")),
+        NumberValue.FromInteger(BigInteger.Parse("-9007199254740993", CultureInfo.InvariantCulture)),
         NumberValue.FromDouble(-9007199254740992d),
         NumberValue.FromDecimal(-0.1m),
         NumberValue.FromDouble(-0.1d),
@@ -21,8 +22,8 @@ public sealed class NumberValueOrderingInvariantTests
         NumberValue.FromInteger(BigInteger.One),
         NumberValue.FromDecimal(1.0m),
         NumberValue.FromDouble(1d),
-        NumberValue.FromInteger(BigInteger.Parse("9007199254740992")),
-        NumberValue.FromInteger(BigInteger.Parse("9007199254740993"))
+        NumberValue.FromInteger(BigInteger.Parse("9007199254740992", CultureInfo.InvariantCulture)),
+        NumberValue.FromInteger(BigInteger.Parse("9007199254740993", CultureInfo.InvariantCulture))
     ];
 
     [Fact]
