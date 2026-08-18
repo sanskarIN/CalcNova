@@ -12,8 +12,11 @@ internal static class Program
     {
         AppComposition.Configure(new AppDependencies(
             new BrowserHistoryRepository(),
-            new BrowserSettingsRepository(),
-            new BrowserExternalLinkService()));
+            new BrowserSettingsRepository())
+        {
+            ExternalLinkService = new BrowserExternalLinkService(),
+            CurrencyRateCache = new BrowserCurrencyRateCache()
+        });
 
         return BuildAvaloniaApp()
             .WithInterFont()
