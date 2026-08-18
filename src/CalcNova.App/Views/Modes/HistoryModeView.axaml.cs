@@ -53,7 +53,6 @@ public partial class HistoryModeView : UserControl
 
             var csv = HistoryExportFormatter.ToCsv(viewModel.Entries);
             await using var stream = await file.OpenWriteAsync();
-            stream.SetLength(0);
             await using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
             await writer.WriteAsync(csv);
             await writer.FlushAsync();
