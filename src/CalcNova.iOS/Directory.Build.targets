@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <_CalcNovaBrandGenerator>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../tools/scripts/generate_brand_assets.py'))</_CalcNovaBrandGenerator>
+    <_CalcNovaIosMarketingIcon>$(MSBuildThisFileDirectory)Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png</_CalcNovaIosMarketingIcon>
+  </PropertyGroup>
+
+  <Target Name="GenerateCalcNovaIosBrandAssets"
+          BeforeTargets="PrepareForBuild"
+          Condition="!Exists('$(_CalcNovaIosMarketingIcon)')">
+    <Message Importance="High" Text="Generating CalcNova iOS AppIcon assets from repository-owned artwork." />
+    <Exec Command="python3 &quot;$(_CalcNovaBrandGenerator)&quot;" />
+  </Target>
+</Project>
