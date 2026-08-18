@@ -175,18 +175,34 @@ public partial class MainView : UserControl
         };
     }
 
-    private static void ApplySettings(AppSettings settings)
+    private void ApplySettings(AppSettings settings)
     {
-        if (Application.Current is null)
+        if (Application.Current is not null)
         {
-            return;
+            Application.Current.RequestedThemeVariant = settings.Theme switch
+            {
+                ThemePreference.Light => ThemeVariant.Light,
+                ThemePreference.Dark => ThemeVariant.Dark,
+                _ => ThemeVariant.Default
+            };
         }
 
-        Application.Current.RequestedThemeVariant = settings.Theme switch
+        SetStyleClass("high-contrast", settings.HighContrast);
+        SetStyleClass("reduced-motion", settings.ReducedMotion);
+    }
+
+    private void SetStyleClass(string className, bool enabled)
+    {
+        if (enabled)
         {
-            ThemePreference.Light => ThemeVariant.Light,
-            ThemePreference.Dark => ThemeVariant.Dark,
-            _ => ThemeVariant.Default
-        };
+            if (!Classes.Contains(className))
+            {
+                Classes.Add(className);
+            }
+        }
+        else
+        {
+            Classes.Remove(className);
+        }
     }
 }
