@@ -5,7 +5,7 @@
     <TextBlock Text="Calculation History" FontSize="21" FontWeight="SemiBold" />
 
     <StackPanel Grid.Row="1" Spacing="6" Margin="0,8,0,0">
-      <TextBox Text="{Binding SearchQuery, Mode=TwoWay}" Watermark="Search expressions or results" />
+      <TextBox Text="{Binding SearchQuery, Mode=TwoWay}" PlaceholderText="Search expressions or results" />
       <WrapPanel>
         <Button Content="Refresh" Command="{Binding RefreshCommand}" Margin="0,0,6,6" />
         <Button Content="Favorite / un-favorite" Command="{Binding ToggleFavoriteCommand}" Margin="0,0,6,6" />
