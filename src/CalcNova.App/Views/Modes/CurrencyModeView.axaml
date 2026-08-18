@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.Modes.CurrencyModeView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="8" Spacing="10">
+      <TextBlock Text="Currency Converter" FontSize="21" FontWeight="SemiBold" />
+      <TextBlock Text="Optional network-enhanced module. CalcNova never embeds API keys; the most recent successful rate can remain usable from local cache." TextWrapping="Wrap" Opacity="0.62" />
+      <TextBox Text="{Binding Amount, Mode=TwoWay}" Watermark="Amount" />
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+        <StackPanel>
+          <TextBlock Text="From" />
+          <TextBox Text="{Binding FromCurrency, Mode=TwoWay}" Watermark="USD" MaxLength="3" />
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+          <TextBlock Text="To" />
+          <TextBox Text="{Binding ToCurrency, Mode=TwoWay}" Watermark="INR" MaxLength="3" />
+        </StackPanel>
+      </Grid>
+      <WrapPanel>
+        <Button Content="Convert" Command="{Binding ConvertCommand}" Margin="0,0,6,6" />
+        <Button Content="Refresh rates" Command="{Binding RefreshCommand}" Margin="0,0,6,6" />
+      </WrapPanel>
+      <TextBlock Text="{Binding Result}" FontSize="28" FontWeight="SemiBold" TextWrapping="Wrap" />
+      <Border Padding="10" CornerRadius="10"><TextBlock Text="{Binding RateStatus}" TextWrapping="Wrap" /></Border>
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
