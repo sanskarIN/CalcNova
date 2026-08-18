@@ -5,7 +5,7 @@
     <StackPanel Margin="8" Spacing="10">
       <TextBlock Text="Programmer Calculator" FontSize="21" FontWeight="SemiBold" />
       <TextBlock Text="Convert bases 2–36, inspect fixed-width two's-complement values, and toggle bits directly." TextWrapping="Wrap" Opacity="0.62" />
-      <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Value" />
+      <TextBox Text="{Binding Input, Mode=TwoWay}" PlaceholderText="Value" />
       <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6">
         <StackPanel>
           <TextBlock Text="Input base" />
