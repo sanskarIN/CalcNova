@@ -8,6 +8,8 @@
     <Project Path="src/CalcNova.Equations/CalcNova.Equations.csproj" />
     <Project Path="src/CalcNova.Matrices/CalcNova.Matrices.csproj" />
     <Project Path="src/CalcNova.Graphing/CalcNova.Graphing.csproj" />
+    <Project Path="src/CalcNova.DateTime/CalcNova.DateTime.csproj" />
+    <Project Path="src/CalcNova.Currency/CalcNova.Currency.csproj" />
     <Project Path="src/CalcNova.Platform/CalcNova.Platform.csproj" />
     <Project Path="src/CalcNova.Persistence/CalcNova.Persistence.csproj" />
     <Project Path="src/CalcNova.App/CalcNova.App.csproj" />
@@ -21,6 +23,8 @@
     <Project Path="tests/CalcNova.Equations.Tests/CalcNova.Equations.Tests.csproj" />
     <Project Path="tests/CalcNova.Matrices.Tests/CalcNova.Matrices.Tests.csproj" />
     <Project Path="tests/CalcNova.Graphing.Tests/CalcNova.Graphing.Tests.csproj" />
+    <Project Path="tests/CalcNova.DateTime.Tests/CalcNova.DateTime.Tests.csproj" />
+    <Project Path="tests/CalcNova.Currency.Tests/CalcNova.Currency.Tests.csproj" />
     <Project Path="tests/CalcNova.Persistence.Tests/CalcNova.Persistence.Tests.csproj" />
     <Project Path="tests/CalcNova.App.Tests/CalcNova.App.Tests.csproj" />
   </Folder>
