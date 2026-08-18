@@ -32,7 +32,16 @@ dotnet_diagnostic.CA1707.severity = none
 dotnet_diagnostic.CA1822.severity = none
 dotnet_diagnostic.CA1859.severity = none
 
+[src/CalcNova.Converter/UnitConverter.cs]
+dotnet_diagnostic.CA1822.severity = none
+
 [src/CalcNova.Equations/EquationSolver.cs]
+dotnet_diagnostic.CA1822.severity = none
+
+[src/CalcNova.Graphing/SvgGraphExporter.cs]
+dotnet_diagnostic.CA1822.severity = none
+
+[src/CalcNova.Platform/History/HistoryExportService.cs]
 dotnet_diagnostic.CA1822.severity = none
 
 [src/CalcNova.Statistics/StatisticsCalculator.cs]
