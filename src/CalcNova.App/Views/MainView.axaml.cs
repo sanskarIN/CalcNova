@@ -1,10 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using CalcNova.App.ViewModels;
+using CalcNova.Core.Evaluation;
 using CalcNova.Platform.Settings;
 
 namespace CalcNova.App.Views;
@@ -60,6 +62,39 @@ public partial class MainView : UserControl
         }
 
         var calculator = viewModel.Calculator;
+        var shortcutModifier = (eventArgs.KeyModifiers & (KeyModifiers.Control | KeyModifiers.Meta)) != 0;
+        if (shortcutModifier && eventArgs.Source is not TextBox)
+        {
+            if (eventArgs.Key == Key.C)
+            {
+                var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+                if (clipboard is not null)
+                {
+                    var text = calculator.Result == "Error" ? calculator.Expression : calculator.Result;
+                    await clipboard.SetTextAsync(text);
+                    eventArgs.Handled = true;
+                }
+
+                return;
+            }
+
+            if (eventArgs.Key == Key.V)
+            {
+                var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+                if (clipboard is not null)
+                {
+                    var text = await clipboard.TryGetTextAsync();
+                    if (!string.IsNullOrWhiteSpace(text) && text.Length <= EvaluationOptions.Default.MaximumExpressionLength)
+                    {
+                        calculator.Expression = text.Trim();
+                        eventArgs.Handled = true;
+                    }
+                }
+
+                return;
+            }
+        }
+
         switch (eventArgs.Key)
         {
             case Key.Enter:
