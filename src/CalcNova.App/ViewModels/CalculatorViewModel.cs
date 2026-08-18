@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.Core.Errors;
 using CalcNova.Core.Evaluation;
 using CalcNova.Core.Memory;
 using CalcNova.Core.Numerics;
@@ -51,12 +52,10 @@ public sealed class CalculatorViewModel : ViewModelBase
         set
         {
             var normalized = value ?? string.Empty;
-            if (SetField(ref _expression, normalized))
+            if (SetField(ref _expression, normalized) &&
+                !string.Equals(_lastEvaluatedExpression, normalized, StringComparison.Ordinal))
             {
-                if (!string.Equals(_lastEvaluatedExpression, normalized, StringComparison.Ordinal))
-                {
-                    ResetRepeatState();
-                }
+                ResetRepeatState();
             }
         }
     }
@@ -238,7 +237,7 @@ public sealed class CalculatorViewModel : ViewModelBase
             Expression = transformation.TransformedExpression;
             StatusMessage = string.Empty;
         }
-        catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
+        catch (Exception exception) when (exception is ArgumentException or InvalidOperationException or CalculationException)
         {
             StatusMessage = exception.Message;
         }
@@ -334,7 +333,7 @@ public sealed class CalculatorViewModel : ViewModelBase
                 value = NumberValue.Parse(Result);
                 return true;
             }
-            catch (Exception exception) when (exception is ArgumentException or OverflowException)
+            catch (Exception exception) when (exception is ArgumentException or OverflowException or CalculationException)
             {
             }
         }
