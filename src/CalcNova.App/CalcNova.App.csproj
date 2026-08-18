@@ -18,5 +18,6 @@
     <ProjectReference Include="../CalcNova.Equations/CalcNova.Equations.csproj" />
     <ProjectReference Include="../CalcNova.Matrices/CalcNova.Matrices.csproj" />
     <ProjectReference Include="../CalcNova.Graphing/CalcNova.Graphing.csproj" />
+    <ProjectReference Include="../CalcNova.Platform/CalcNova.Platform.csproj" />
   </ItemGroup>
 </Project>
