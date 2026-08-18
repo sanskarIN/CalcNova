@@ -13,10 +13,14 @@
         <ComboBox Grid.Column="2" ItemsSource="{Binding AvailableUnits}" SelectedItem="{Binding ToUnit, Mode=TwoWay}" />
       </Grid>
       <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Input value" />
-      <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8">
+      <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="8">
         <Button Content="Convert" Command="{Binding ConvertCommand}" />
         <Button Grid.Column="1" Content="Copy result" Click="CopyResult" />
-        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+        <Button Grid.Column="2"
+                Content="★ Favorite / unfavorite"
+                Command="{Binding ToggleFavoriteCommand}"
+                ToolTip.Tip="Toggle the current unit pair in favorites" />
+        <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
           <TextBlock Text="Precision" VerticalAlignment="Center" />
           <ComboBox Width="84"
                     ItemsSource="{Binding PrecisionOptions}"
@@ -24,6 +28,28 @@
                     ToolTip.Tip="Significant digits used to display the converted result" />
         </StackPanel>
       </Grid>
+
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Recent pairs" FontWeight="SemiBold" />
+          <ComboBox ItemsSource="{Binding RecentPairs}"
+                    SelectedItem="{Binding SelectedRecentPair, Mode=TwoWay}"
+                    PlaceholderText="No recent pairs" />
+          <Button Content="Use recent pair"
+                  Command="{Binding UseRecentCommand}"
+                  HorizontalAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock Text="Favorite pairs" FontWeight="SemiBold" />
+          <ComboBox ItemsSource="{Binding FavoritePairs}"
+                    SelectedItem="{Binding SelectedFavoritePair, Mode=TwoWay}"
+                    PlaceholderText="No favorites yet" />
+          <Button Content="Use favorite pair"
+                  Command="{Binding UseFavoriteCommand}"
+                  HorizontalAlignment="Left" />
+        </StackPanel>
+      </Grid>
+
       <Border Padding="12" CornerRadius="12">
         <StackPanel>
           <TextBlock Text="Result" Opacity="0.6" />
