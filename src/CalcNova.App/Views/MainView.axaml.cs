@@ -105,6 +105,10 @@ public partial class MainView : UserControl
                 calculator.Clear();
                 eventArgs.Handled = true;
                 return;
+            case Key.F9:
+                calculator.ToggleSignCommand.Execute(null);
+                eventArgs.Handled = true;
+                return;
         }
 
         if (eventArgs.Source is TextBox)
