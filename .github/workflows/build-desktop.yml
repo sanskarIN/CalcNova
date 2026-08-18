@@ -1,0 +1,45 @@
+name: Desktop Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "*.slnx"
+      - "Directory.*.props"
+      - ".github/workflows/build-desktop.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "*.slnx"
+      - "Directory.*.props"
+      - ".github/workflows/build-desktop.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore desktop project
+        run: dotnet restore src/CalcNova.Desktop/CalcNova.Desktop.csproj
+
+      - name: Build desktop project
+        run: dotnet build src/CalcNova.Desktop/CalcNova.Desktop.csproj --configuration Release --no-restore
