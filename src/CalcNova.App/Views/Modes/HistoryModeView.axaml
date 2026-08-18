@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.Modes.HistoryModeView">
+  <Grid Margin="8" RowDefinitions="Auto,Auto,Auto,*,Auto">
+    <TextBlock Text="Calculation History" FontSize="21" FontWeight="SemiBold" />
+
+    <StackPanel Grid.Row="1" Spacing="6" Margin="0,8,0,0">
+      <TextBox Text="{Binding SearchQuery, Mode=TwoWay}" Watermark="Search expressions or results" />
+      <WrapPanel>
+        <Button Content="Refresh" Command="{Binding RefreshCommand}" Margin="0,0,6,6" />
+        <Button Content="Favorite / un-favorite" Command="{Binding ToggleFavoriteCommand}" Margin="0,0,6,6" />
+        <Button Content="Delete selected" Command="{Binding DeleteCommand}" Margin="0,0,6,6" />
+        <Button Content="Clear all" Command="{Binding ClearCommand}" Margin="0,0,6,6" />
+      </WrapPanel>
+    </StackPanel>
+
+    <Border Grid.Row="2"
+            IsVisible="{Binding ClearConfirmationRequired}"
+            Padding="10"
+            CornerRadius="10"
+            Margin="0,0,0,8">
+      <StackPanel Spacing="6">
+        <TextBlock Text="Clear all local calculation history? This cannot be undone." TextWrapping="Wrap" FontWeight="SemiBold" />
+        <WrapPanel>
+          <Button Content="Confirm clear" Command="{Binding ConfirmClearCommand}" Margin="0,0,6,0" />
+          <Button Content="Cancel" Command="{Binding CancelClearCommand}" />
+        </WrapPanel>
+      </StackPanel>
+    </Border>
+
+    <ListBox Grid.Row="3"
+             ItemsSource="{Binding Entries}"
+             SelectedItem="{Binding SelectedEntry, Mode=TwoWay}">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Border Padding="8" Margin="0,2" CornerRadius="8">
+            <StackPanel>
+              <TextBlock Text="{Binding Expression}" FontWeight="SemiBold" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding Result}" FontSize="17" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding CreatedAt}" Opacity="0.52" />
+              <TextBlock Text="★ Favorite" IsVisible="{Binding IsFavorite}" Opacity="0.7" />
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+    <TextBlock Grid.Row="4" Text="{Binding StatusMessage}" TextWrapping="Wrap" Margin="0,8,0,0" />
+  </Grid>
+</UserControl>
