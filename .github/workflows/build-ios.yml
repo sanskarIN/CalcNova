@@ -19,6 +19,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ios-simulator-build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ios-simulator:
     runs-on: macos-latest
