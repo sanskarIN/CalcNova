@@ -1,0 +1,50 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "Directory.Packages.props"
+      - "global.json"
+      - ".github/workflows/security-audit.yml"
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "23 4 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore core solution
+        run: dotnet restore CalcNova.slnx
+
+      - name: Restore advanced utilities
+        run: dotnet restore CalcNova.Advanced.slnx
+
+      - name: Audit vulnerable direct and transitive packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet list CalcNova.slnx package --vulnerable --include-transitive
+          dotnet list CalcNova.Advanced.slnx package --vulnerable --include-transitive
+
+      - name: Audit deprecated packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet list CalcNova.slnx package --deprecated
+          dotnet list CalcNova.Advanced.slnx package --deprecated
