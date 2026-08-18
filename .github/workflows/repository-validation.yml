@@ -1,0 +1,48 @@
+name: Repository Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - "*.md"
+      - "docs/**"
+      - "assets/**"
+      - "packaging/**"
+      - "src/**/*.xml"
+      - "src/**/*.axaml"
+      - "src/**/*.plist"
+      - "src/**/*.storyboard"
+      - "src/**/*.json"
+      - "tools/scripts/**"
+      - ".github/workflows/repository-validation.yml"
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repository-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate repository structure and structured files
+        run: python tools/scripts/validate_repository.py
+
+      - name: Validate Markdown local links
+        run: python tools/scripts/validate_links.py
+
+      - name: Generate deterministic brand assets
+        run: python tools/scripts/generate_brand_assets.py
+
+      - name: Verify deterministic brand assets
+        run: python tools/scripts/generate_brand_assets.py --check
