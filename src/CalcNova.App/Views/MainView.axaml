@@ -10,10 +10,7 @@
         <TextBlock Text="CalcNova" FontSize="26" FontWeight="SemiBold" />
         <TextBlock Text="Fast. Precise. Private. Everywhere." Opacity="0.68" />
       </StackPanel>
-      <TextBlock Grid.Column="1"
-                 Text="Local-first"
-                 VerticalAlignment="Center"
-                 Opacity="0.55" />
+      <TextBlock Grid.Column="1" Text="Local-first" VerticalAlignment="Center" Opacity="0.55" />
     </Grid>
 
     <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedModeIndex, Mode=TwoWay}">
@@ -27,29 +24,20 @@
               </StackPanel>
               <TextBlock Grid.Column="1" Text="{Binding AngleModeLabel}" VerticalAlignment="Center" FontWeight="SemiBold" />
             </Grid>
-
             <Border Padding="12" CornerRadius="14">
               <StackPanel Spacing="6">
-                <TextBox Text="{Binding Expression, Mode=TwoWay}"
-                         Watermark="Enter an expression"
-                         FontSize="19"
-                         HorizontalContentAlignment="Right" />
-                <Button Command="{Binding UseResultCommand}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        HorizontalContentAlignment="Right">
+                <TextBox Text="{Binding Expression, Mode=TwoWay}" Watermark="Enter an expression" FontSize="19" HorizontalContentAlignment="Right" />
+                <Button Command="{Binding UseResultCommand}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Right">
                   <TextBlock Text="{Binding Result}" FontSize="32" FontWeight="SemiBold" TextWrapping="Wrap" />
                 </Button>
                 <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Opacity="0.75" />
               </StackPanel>
             </Border>
-
             <Grid ColumnDefinitions="*,*,*">
               <Button Content="DEG" Command="{Binding SetAngleUnitCommand}" CommandParameter="Degrees" Margin="2" />
               <Button Grid.Column="1" Content="RAD" Command="{Binding SetAngleUnitCommand}" CommandParameter="Radians" Margin="2" />
               <Button Grid.Column="2" Content="GRAD" Command="{Binding SetAngleUnitCommand}" CommandParameter="Gradians" Margin="2" />
             </Grid>
-
             <Grid ColumnDefinitions="*,*,*,*,*">
               <Button Content="MC" Command="{Binding MemoryClearCommand}" Margin="2" />
               <Button Grid.Column="1" Content="MR" Command="{Binding MemoryRecallCommand}" Margin="2" />
@@ -58,48 +46,40 @@
               <Button Grid.Column="4" Content="M−" Command="{Binding MemorySubtractCommand}" Margin="2" />
             </Grid>
             <TextBlock Text="{Binding MemoryIndicator}" HorizontalAlignment="Right" Opacity="0.6" />
-
             <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto,Auto">
               <Button Classes="function-key" Content="sin" Command="{Binding AppendCommand}" CommandParameter="sin(" />
               <Button Classes="function-key" Grid.Column="1" Content="cos" Command="{Binding AppendCommand}" CommandParameter="cos(" />
               <Button Classes="function-key" Grid.Column="2" Content="tan" Command="{Binding AppendCommand}" CommandParameter="tan(" />
               <Button Classes="function-key" Grid.Column="3" Content="ln" Command="{Binding AppendCommand}" CommandParameter="ln(" />
               <Button Classes="function-key" Grid.Column="4" Content="log" Command="{Binding AppendCommand}" CommandParameter="log10(" />
-
               <Button Classes="function-key" Grid.Row="1" Content="√" Command="{Binding AppendCommand}" CommandParameter="sqrt(" />
               <Button Classes="function-key" Grid.Row="1" Grid.Column="1" Content="x²" Command="{Binding AppendCommand}" CommandParameter="sqr(" />
               <Button Classes="function-key" Grid.Row="1" Grid.Column="2" Content="xʸ" Command="{Binding AppendCommand}" CommandParameter="^" />
               <Button Classes="function-key" Grid.Row="1" Grid.Column="3" Content="π" Command="{Binding AppendCommand}" CommandParameter="pi" />
               <Button Classes="function-key" Grid.Row="1" Grid.Column="4" Content="e" Command="{Binding AppendCommand}" CommandParameter="e" />
-
               <Button Classes="function-key" Grid.Row="2" Content="(" Command="{Binding AppendCommand}" CommandParameter="(" />
               <Button Classes="function-key" Grid.Row="2" Grid.Column="1" Content=")" Command="{Binding AppendCommand}" CommandParameter=")" />
               <Button Classes="function-key" Grid.Row="2" Grid.Column="2" Content="%" Command="{Binding PercentageCommand}" />
               <Button Classes="function-key" Grid.Row="2" Grid.Column="3" Content="fact" Command="{Binding AppendCommand}" CommandParameter="factorial(" />
               <Button Classes="function-key" Grid.Row="2" Grid.Column="4" Content="1/x" Command="{Binding AppendCommand}" CommandParameter="reciprocal(" />
             </Grid>
-
             <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
               <Button Classes="calc-key" Content="AC" Command="{Binding ClearCommand}" />
               <Button Classes="calc-key" Grid.Column="1" Content="⌫" Command="{Binding BackspaceCommand}" />
               <Button Classes="calc-key" Grid.Column="2" Content="÷" Command="{Binding AppendCommand}" CommandParameter="/" />
               <Button Classes="calc-key" Grid.Column="3" Content="×" Command="{Binding AppendCommand}" CommandParameter="*" />
-
               <Button Classes="calc-key" Grid.Row="1" Content="7" Command="{Binding AppendCommand}" CommandParameter="7" />
               <Button Classes="calc-key" Grid.Row="1" Grid.Column="1" Content="8" Command="{Binding AppendCommand}" CommandParameter="8" />
               <Button Classes="calc-key" Grid.Row="1" Grid.Column="2" Content="9" Command="{Binding AppendCommand}" CommandParameter="9" />
               <Button Classes="calc-key" Grid.Row="1" Grid.Column="3" Content="−" Command="{Binding AppendCommand}" CommandParameter="-" />
-
               <Button Classes="calc-key" Grid.Row="2" Content="4" Command="{Binding AppendCommand}" CommandParameter="4" />
               <Button Classes="calc-key" Grid.Row="2" Grid.Column="1" Content="5" Command="{Binding AppendCommand}" CommandParameter="5" />
               <Button Classes="calc-key" Grid.Row="2" Grid.Column="2" Content="6" Command="{Binding AppendCommand}" CommandParameter="6" />
               <Button Classes="calc-key" Grid.Row="2" Grid.Column="3" Content="+" Command="{Binding AppendCommand}" CommandParameter="+" />
-
               <Button Classes="calc-key" Grid.Row="3" Content="1" Command="{Binding AppendCommand}" CommandParameter="1" />
               <Button Classes="calc-key" Grid.Row="3" Grid.Column="1" Content="2" Command="{Binding AppendCommand}" CommandParameter="2" />
               <Button Classes="calc-key" Grid.Row="3" Grid.Column="2" Content="3" Command="{Binding AppendCommand}" CommandParameter="3" />
               <Button Classes="calc-key" Grid.Row="3" Grid.Column="3" Grid.RowSpan="2" Content="=" Command="{Binding EvaluateCommand}" />
-
               <Button Classes="calc-key" Grid.Row="4" Grid.ColumnSpan="2" Content="0" Command="{Binding AppendCommand}" CommandParameter="0" />
               <Button Classes="calc-key" Grid.Row="4" Grid.Column="2" Content="." Command="{Binding AppendCommand}" CommandParameter="." />
             </Grid>
@@ -111,19 +91,15 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
           <StackPanel DataContext="{Binding Programmer}" Margin="8" Spacing="10">
             <TextBlock Text="Programmer Calculator" FontSize="21" FontWeight="SemiBold" />
-            <Grid ColumnDefinitions="2*,*,*" ColumnSpacing="6">
-              <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Value" />
-              <ComboBox Grid.Column="1" ItemsSource="{Binding CommonBases}" SelectedItem="{Binding InputBase, Mode=TwoWay}" />
-              <ComboBox Grid.Column="2" ItemsSource="{Binding WordSizes}" SelectedItem="{Binding WordSize, Mode=TwoWay}" />
-            </Grid>
+            <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Value" />
+            <ComboBox ItemsSource="{Binding CommonBases}" SelectedItem="{Binding InputBase, Mode=TwoWay}" />
+            <ComboBox ItemsSource="{Binding WordSizes}" SelectedItem="{Binding WordSize, Mode=TwoWay}" />
             <CheckBox Content="Signed two's-complement interpretation" IsChecked="{Binding Signed, Mode=TwoWay}" />
             <Button Content="Convert" Command="{Binding ConvertCommand}" HorizontalAlignment="Left" />
-            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
-              <Border Padding="10" CornerRadius="10"><StackPanel><TextBlock Text="BIN" Opacity="0.6" /><TextBlock Text="{Binding Binary}" TextWrapping="Wrap" /></StackPanel></Border>
-              <Border Grid.Column="1" Padding="10" CornerRadius="10"><StackPanel><TextBlock Text="OCT" Opacity="0.6" /><TextBlock Text="{Binding Octal}" TextWrapping="Wrap" /></StackPanel></Border>
-              <Border Grid.Row="1" Padding="10" CornerRadius="10"><StackPanel><TextBlock Text="DEC" Opacity="0.6" /><TextBlock Text="{Binding Decimal}" TextWrapping="Wrap" /></StackPanel></Border>
-              <Border Grid.Row="1" Grid.Column="1" Padding="10" CornerRadius="10"><StackPanel><TextBlock Text="HEX" Opacity="0.6" /><TextBlock Text="{Binding Hexadecimal}" TextWrapping="Wrap" /></StackPanel></Border>
-            </Grid>
+            <TextBlock Text="{Binding Binary}" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Octal}" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Decimal}" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Hexadecimal}" TextWrapping="Wrap" />
             <TextBlock Text="{Binding BitPattern}" TextWrapping="Wrap" />
             <TextBlock Text="{Binding InterpretedValue}" FontSize="19" />
             <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
@@ -197,10 +173,8 @@
           <StackPanel DataContext="{Binding Graphing}" Margin="8" Spacing="10">
             <TextBlock Text="Graphing" FontSize="21" FontWeight="SemiBold" />
             <TextBox Text="{Binding Expression, Mode=TwoWay}" Watermark="y = f(x)" />
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
-              <TextBox Text="{Binding MinimumX, Mode=TwoWay}" Watermark="Minimum x" />
-              <TextBox Grid.Column="1" Text="{Binding MaximumX, Mode=TwoWay}" Watermark="Maximum x" />
-            </Grid>
+            <TextBox Text="{Binding MinimumX, Mode=TwoWay}" Watermark="Minimum x" />
+            <TextBox Text="{Binding MaximumX, Mode=TwoWay}" Watermark="Maximum x" />
             <TextBox Text="{Binding SampleCount, Mode=TwoWay}" Watermark="Sample count" />
             <Button Content="Plot / sample" Command="{Binding PlotCommand}" HorizontalAlignment="Left" />
             <TextBlock Text="{Binding Summary}" FontWeight="SemiBold" TextWrapping="Wrap" />
@@ -210,8 +184,59 @@
         </ScrollViewer>
       </TabItem>
 
+      <TabItem Header="Date">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel DataContext="{Binding DateTime}" Margin="8" Spacing="10">
+            <TextBlock Text="Date &amp; Duration Utilities" FontSize="21" FontWeight="SemiBold" />
+            <TextBlock Text="Dates use yyyy-MM-dd. Calendar arithmetic is timezone-free." Opacity="0.62" TextWrapping="Wrap" />
+            <TextBlock Text="Start date" />
+            <TextBox Text="{Binding StartDate, Mode=TwoWay}" Watermark="yyyy-MM-dd" />
+            <TextBlock Text="End date" />
+            <TextBox Text="{Binding EndDate, Mode=TwoWay}" Watermark="yyyy-MM-dd" />
+            <Button Content="Calculate difference" Command="{Binding CalculateDifferenceCommand}" HorizontalAlignment="Left" />
+            <Border Padding="10" CornerRadius="10"><TextBlock Text="{Binding DifferenceResult}" TextWrapping="Wrap" /></Border>
+            <TextBlock Text="Add to start date" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,*,*,*">
+              <TextBox Text="{Binding Years, Mode=TwoWay}" Watermark="Years" Margin="2" />
+              <TextBox Grid.Column="1" Text="{Binding Months, Mode=TwoWay}" Watermark="Months" Margin="2" />
+              <TextBox Grid.Column="2" Text="{Binding Weeks, Mode=TwoWay}" Watermark="Weeks" Margin="2" />
+              <TextBox Grid.Column="3" Text="{Binding Days, Mode=TwoWay}" Watermark="Days" Margin="2" />
+            </Grid>
+            <Button Content="Add duration" Command="{Binding AddToDateCommand}" HorizontalAlignment="Left" />
+            <TextBlock Text="{Binding AddResult}" FontSize="19" FontWeight="SemiBold" />
+            <TextBlock Text="Fixed duration conversion" FontWeight="SemiBold" />
+            <TextBox Text="{Binding DurationValue, Mode=TwoWay}" Watermark="Duration value" />
+            <ComboBox ItemsSource="{Binding DurationUnits}" SelectedItem="{Binding DurationFrom, Mode=TwoWay}" />
+            <Button Content="Swap units" Command="{Binding SwapDurationUnitsCommand}" HorizontalAlignment="Left" />
+            <ComboBox ItemsSource="{Binding DurationUnits}" SelectedItem="{Binding DurationTo, Mode=TwoWay}" />
+            <Button Content="Convert duration" Command="{Binding ConvertDurationCommand}" HorizontalAlignment="Left" />
+            <TextBlock Text="{Binding DurationResult}" FontSize="24" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="FX">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel DataContext="{Binding Currency}" Margin="8" Spacing="10">
+            <TextBlock Text="Currency Converter" FontSize="21" FontWeight="SemiBold" />
+            <TextBlock Text="Optional network-enhanced module. CalcNova never embeds API keys; cached rates remain usable offline." Opacity="0.62" TextWrapping="Wrap" />
+            <TextBox Text="{Binding Amount, Mode=TwoWay}" Watermark="Amount" />
+            <TextBox Text="{Binding FromCurrency, Mode=TwoWay}" Watermark="From ISO code, e.g. USD" MaxLength="3" />
+            <TextBox Text="{Binding ToCurrency, Mode=TwoWay}" Watermark="To ISO code, e.g. INR" MaxLength="3" />
+            <WrapPanel>
+              <Button Content="Convert" Command="{Binding ConvertCommand}" Margin="0,0,6,6" />
+              <Button Content="Refresh rates" Command="{Binding RefreshCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
+            <TextBlock Text="{Binding Result}" FontSize="28" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <Border Padding="10" CornerRadius="10"><TextBlock Text="{Binding RateStatus}" TextWrapping="Wrap" /></Border>
+            <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
       <TabItem Header="History">
-        <Grid DataContext="{Binding History}" Margin="8" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="8">
+        <Grid DataContext="{Binding History}" Margin="8" RowDefinitions="Auto,Auto,*,Auto">
           <TextBlock Text="Calculation History" FontSize="21" FontWeight="SemiBold" />
           <StackPanel Grid.Row="1" Spacing="6">
             <TextBox Text="{Binding SearchQuery, Mode=TwoWay}" Watermark="Search" />
