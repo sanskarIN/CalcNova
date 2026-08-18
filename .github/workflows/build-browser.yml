@@ -1,0 +1,48 @@
+name: Browser Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Browser/**"
+      - "src/CalcNova.App/**"
+      - "src/CalcNova.Core/**"
+      - "src/CalcNova.Platform/**"
+      - "Directory.*.props"
+      - "global.json"
+      - ".github/workflows/build-browser.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Browser/**"
+      - "src/CalcNova.App/**"
+      - "src/CalcNova.Core/**"
+      - "src/CalcNova.Platform/**"
+      - "Directory.*.props"
+      - "global.json"
+      - ".github/workflows/build-browser.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install WebAssembly workload
+        run: dotnet workload install wasm-tools
+
+      - name: Restore Browser project
+        run: dotnet restore src/CalcNova.Browser/CalcNova.Browser.csproj
+
+      - name: Publish Browser release configuration
+        run: dotnet publish src/CalcNova.Browser/CalcNova.Browser.csproj --configuration Release --no-restore --output artifacts/browser
