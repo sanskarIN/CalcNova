@@ -2,6 +2,8 @@
 
 CalcNova supports keyboard-first use on desktop and Browser targets through the shared Avalonia application layer. Text boxes still receive normal platform text editing; calculator-level shortcuts are routed only when CalcNova's calculator surface owns the key event.
 
+The shared application header now includes a **Shortcuts** button that opens an in-app reference flyout for the primary calculator keyboard controls. Because it lives in `CalcNova.App`, the same reference is available to every platform head that hosts the shared view.
+
 ## Calculator shortcuts
 
 | Key | Action |
@@ -24,6 +26,12 @@ CalcNova supports keyboard-first use on desktop and Browser targets through the 
 | Ctrl+V / Cmd+V | Paste a length-bounded expression from the system clipboard when a text editor does not own the shortcut |
 
 The calculator's touch UI also includes explicit **Copy result**, **Copy expression**, and **Paste expression** actions for platforms where keyboard shortcuts are not convenient.
+
+## In-app shortcut reference
+
+Use the **Shortcuts** button in the CalcNova header to open the compact keyboard reference. It lists the primary evaluate, clear, backspace, sign-toggle, copy, paste, and numeric/operator controls without leaving the calculator.
+
+The reference is intentionally informational: it does not intercept keystrokes or alter focus while closed. Normal text-field keyboard behavior remains unchanged.
 
 ## Numpad behavior
 
@@ -58,4 +66,4 @@ Browser builds deliberately avoid overriding important browser/system shortcuts 
 
 ## Later power-user work
 
-Potential future additions include a searchable command palette, configurable shortcuts, direct mode switching, and a dedicated in-app shortcut reference dialog. Configurable shortcuts must detect duplicates/conflicts and offer reset-to-default behavior before they are considered complete.
+Potential future additions include a searchable command palette, configurable shortcuts, and direct mode switching. Configurable shortcuts must detect duplicates/conflicts and offer reset-to-default behavior before they are considered complete.
