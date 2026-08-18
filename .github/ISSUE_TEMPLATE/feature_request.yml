@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose an improvement for CalcNova
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or user need
+      description: Describe the problem this feature should solve.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform relevance
+      multiple: true
+      options:
+        - All platforms
+        - Windows
+        - Linux
+        - macOS
+        - Android
+        - iOS
+        - Browser/WebAssembly
+        - Core calculation engine
+  - type: textarea
+    id: ui
+    attributes:
+      label: UI / UX considerations
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Accessibility considerations
+      description: Explain keyboard, screen-reader, contrast, touch-target, text-scaling, or reduced-motion implications when relevant.
