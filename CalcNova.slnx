@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CalcNova.Core/CalcNova.Core.csproj" />
+    <Project Path="src/CalcNova.Scientific/CalcNova.Scientific.csproj" />
+    <Project Path="src/CalcNova.Programmer/CalcNova.Programmer.csproj" />
+    <Project Path="src/CalcNova.Converter/CalcNova.Converter.csproj" />
+    <Project Path="src/CalcNova.App/CalcNova.App.csproj" />
+    <Project Path="src/CalcNova.Desktop/CalcNova.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CalcNova.Core.Tests/CalcNova.Core.Tests.csproj" />
+    <Project Path="tests/CalcNova.Programmer.Tests/CalcNova.Programmer.Tests.csproj" />
+    <Project Path="tests/CalcNova.Converter.Tests/CalcNova.Converter.Tests.csproj" />
+  </Folder>
+</Solution>
