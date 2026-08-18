@@ -62,7 +62,7 @@ public sealed class CurrencyViewModel : ViewModelBase
 
     public ICommand RefreshCommand { get; }
 
-    private async Task ConvertAsync(bool forceRefresh)
+    public async Task ConvertAsync(bool forceRefresh = false)
     {
         try
         {
