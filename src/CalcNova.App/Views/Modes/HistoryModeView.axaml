@@ -10,6 +10,7 @@
         <Button Content="Refresh" Command="{Binding RefreshCommand}" Margin="0,0,6,6" />
         <Button Content="Favorite / un-favorite" Command="{Binding ToggleFavoriteCommand}" Margin="0,0,6,6" />
         <Button Content="Delete selected" Command="{Binding DeleteCommand}" Margin="0,0,6,6" />
+        <Button Content="Export CSV" Click="ExportCsv" Margin="0,0,6,6" />
         <Button Content="Clear all" Command="{Binding ClearCommand}" Margin="0,0,6,6" />
       </WrapPanel>
     </StackPanel>
