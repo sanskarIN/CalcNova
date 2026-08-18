@@ -1,0 +1,56 @@
+name: Android Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Android/**"
+      - "src/CalcNova.App/**"
+      - "src/CalcNova.Core/**"
+      - "src/CalcNova.Platform/**"
+      - "src/CalcNova.Persistence/**"
+      - "Directory.*.props"
+      - "global.json"
+      - ".github/workflows/build-android.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Android/**"
+      - "src/CalcNova.App/**"
+      - "src/CalcNova.Core/**"
+      - "src/CalcNova.Platform/**"
+      - "src/CalcNova.Persistence/**"
+      - "Directory.*.props"
+      - "global.json"
+      - ".github/workflows/build-android.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Android workload
+        run: dotnet workload install android
+
+      - name: Restore Android project
+        run: dotnet restore src/CalcNova.Android/CalcNova.Android.csproj
+
+      - name: Build Android release configuration
+        run: dotnet build src/CalcNova.Android/CalcNova.Android.csproj --configuration Release --no-restore
