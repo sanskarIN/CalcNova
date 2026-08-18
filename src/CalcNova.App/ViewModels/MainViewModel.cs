@@ -17,6 +17,8 @@ public sealed class MainViewModel : ViewModelBase
         Calculator = new CalculatorViewModel(
             recordCalculationAsync: (expression, result) => History.RecordAsync(expression, result),
             historyEnabledProvider: () => Settings.HistoryEnabled);
+        Currency = new CurrencyViewModel(dependencies.CurrencyRateCache, dependencies.CurrencyRateProvider);
+        About = new AboutViewModel(dependencies.ExternalLinkService);
 
         Settings.SettingsChanged += HandleSettingsChanged;
     }
@@ -37,9 +39,15 @@ public sealed class MainViewModel : ViewModelBase
 
     public GraphingViewModel Graphing { get; } = new();
 
+    public DateTimeViewModel DateTime { get; } = new();
+
+    public CurrencyViewModel Currency { get; }
+
     public HistoryViewModel History { get; }
 
     public SettingsViewModel Settings { get; }
+
+    public AboutViewModel About { get; }
 
     public int SelectedModeIndex
     {
