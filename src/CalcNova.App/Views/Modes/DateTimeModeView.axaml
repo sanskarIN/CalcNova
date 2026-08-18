@@ -9,11 +9,11 @@
       <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
         <StackPanel>
           <TextBlock Text="Start date" />
-          <TextBox Text="{Binding StartDate, Mode=TwoWay}" Watermark="yyyy-MM-dd" />
+          <TextBox Text="{Binding StartDate, Mode=TwoWay}" PlaceholderText="yyyy-MM-dd" />
         </StackPanel>
         <StackPanel Grid.Column="1">
           <TextBlock Text="End date" />
-          <TextBox Text="{Binding EndDate, Mode=TwoWay}" Watermark="yyyy-MM-dd" />
+          <TextBox Text="{Binding EndDate, Mode=TwoWay}" PlaceholderText="yyyy-MM-dd" />
         </StackPanel>
       </Grid>
       <Button Content="Calculate difference" Command="{Binding CalculateDifferenceCommand}" HorizontalAlignment="Left" />
@@ -21,16 +21,16 @@
 
       <TextBlock Text="Add to start date" FontWeight="SemiBold" />
       <Grid ColumnDefinitions="*,*,*,*">
-        <TextBox Text="{Binding Years, Mode=TwoWay}" Watermark="Years" Margin="2" />
-        <TextBox Grid.Column="1" Text="{Binding Months, Mode=TwoWay}" Watermark="Months" Margin="2" />
-        <TextBox Grid.Column="2" Text="{Binding Weeks, Mode=TwoWay}" Watermark="Weeks" Margin="2" />
-        <TextBox Grid.Column="3" Text="{Binding Days, Mode=TwoWay}" Watermark="Days" Margin="2" />
+        <TextBox Text="{Binding Years, Mode=TwoWay}" PlaceholderText="Years" Margin="2" />
+        <TextBox Grid.Column="1" Text="{Binding Months, Mode=TwoWay}" PlaceholderText="Months" Margin="2" />
+        <TextBox Grid.Column="2" Text="{Binding Weeks, Mode=TwoWay}" PlaceholderText="Weeks" Margin="2" />
+        <TextBox Grid.Column="3" Text="{Binding Days, Mode=TwoWay}" PlaceholderText="Days" Margin="2" />
       </Grid>
       <Button Content="Add calendar components" Command="{Binding AddToDateCommand}" HorizontalAlignment="Left" />
       <TextBlock Text="{Binding AddResult}" FontSize="20" FontWeight="SemiBold" />
 
       <TextBlock Text="Fixed duration conversion" FontWeight="SemiBold" />
-      <TextBox Text="{Binding DurationValue, Mode=TwoWay}" Watermark="Duration value" />
+      <TextBox Text="{Binding DurationValue, Mode=TwoWay}" PlaceholderText="Duration value" />
       <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="6">
         <ComboBox ItemsSource="{Binding DurationUnits}" SelectedItem="{Binding DurationFrom, Mode=TwoWay}" />
         <Button Grid.Column="1" Content="⇄" Command="{Binding SwapDurationUnitsCommand}" />
