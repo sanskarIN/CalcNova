@@ -1,0 +1,59 @@
+name: iOS Simulator Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.iOS/**"
+      - "src/CalcNova.App/**"
+      - "src/CalcNova.Core/**"
+      - "src/CalcNova.Platform/**"
+      - "src/CalcNova.Persistence/**"
+      - "Directory.*.props"
+      - "global.json"
+      - ".github/workflows/build-ios.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/CalcNova.iOS/**"
+      - "src/CalcNova.App/**"
+      - "src/CalcNova.Core/**"
+      - "src/CalcNova.Platform/**"
+      - "src/CalcNova.Persistence/**"
+      - "Directory.*.props"
+      - "global.json"
+      - ".github/workflows/build-ios.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  ios-simulator:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install iOS workload
+        run: dotnet workload install ios
+
+      - name: Select simulator runtime identifier
+        shell: bash
+        run: |
+          if [[ "$(uname -m)" == "arm64" ]]; then
+            echo "IOS_RID=iossimulator-arm64" >> "$GITHUB_ENV"
+          else
+            echo "IOS_RID=iossimulator-x64" >> "$GITHUB_ENV"
+          fi
+
+      - name: Restore iOS project
+        run: dotnet restore src/CalcNova.iOS/CalcNova.iOS.csproj -p:RuntimeIdentifier=${{ env.IOS_RID }}
+
+      - name: Build iOS simulator
+        run: dotnet build src/CalcNova.iOS/CalcNova.iOS.csproj --configuration Release --no-restore -p:RuntimeIdentifier=${{ env.IOS_RID }}
