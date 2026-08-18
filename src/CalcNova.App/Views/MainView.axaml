@@ -12,9 +12,40 @@
         <TextBlock Text="CalcNova" FontSize="26" FontWeight="SemiBold" />
         <TextBlock Text="Fast. Precise. Private. Everywhere." Opacity="0.68" />
       </StackPanel>
-      <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+      <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
         <TextBlock Text="Local-first" HorizontalAlignment="Right" Opacity="0.62" />
         <TextBlock Text="Apache-2.0 • Open source" HorizontalAlignment="Right" Opacity="0.48" />
+        <Button Content="Shortcuts"
+                HorizontalAlignment="Right"
+                Padding="10,4"
+                ToolTip.Tip="Show calculator keyboard shortcuts">
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedRight">
+              <Border Padding="14" MaxWidth="420">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="Keyboard shortcuts" FontSize="18" FontWeight="SemiBold" />
+                  <TextBlock Text="These shortcuts apply when Calc mode is active and a text field does not own the keystroke." TextWrapping="Wrap" Opacity="0.65" />
+                  <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="6">
+                    <TextBlock Text="Enter" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="1" Text="Evaluate / repeat equals" />
+                    <TextBlock Grid.Row="1" Text="Esc" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Clear calculator" />
+                    <TextBlock Grid.Row="2" Text="Backspace" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="Delete last calculator character" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Text="F9" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Toggle positive / negative" />
+                    <TextBlock Grid.Row="4" Text="Ctrl/Cmd+C" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="Copy calculator result" />
+                    <TextBlock Grid.Row="5" Text="Ctrl/Cmd+V" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="5" Grid.Column="1" Text="Paste a bounded expression" />
+                    <TextBlock Grid.Row="6" Text="0–9 + − × ÷" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="6" Grid.Column="1" Text="Type calculator digits/operators, including numpad" TextWrapping="Wrap" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
       </StackPanel>
     </Grid>
 
