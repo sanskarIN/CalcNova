@@ -15,11 +15,16 @@
         <TextBox Grid.Column="1" Text="{Binding MaximumX, Mode=TwoWay}" Watermark="Maximum x" Margin="2" />
         <TextBox Grid.Column="2" Text="{Binding SampleCount, Mode=TwoWay}" Watermark="Samples" Margin="2" />
       </Grid>
-      <Button Content="Plot / sample" Command="{Binding PlotCommand}" HorizontalAlignment="Left" />
+      <WrapPanel>
+        <Button Content="Plot / sample" Command="{Binding PlotCommand}" Margin="0,0,6,6" />
+        <Button Content="Fit data" Click="FitData" Margin="0,0,6,6" />
+        <Button Content="Reset view" Click="ResetViewport" Margin="0,0,6,6" />
+      </WrapPanel>
 
       <Border Padding="4" CornerRadius="12" MinHeight="320">
-        <controls:GraphPlotControl Segments="{Binding Segments}" MinHeight="320" />
+        <controls:GraphPlotControl x:Name="PlotControl" Segments="{Binding Segments}" MinHeight="320" />
       </Border>
+      <TextBlock Text="{Binding CoordinateText, ElementName=PlotControl}" HorizontalAlignment="Right" Opacity="0.62" />
 
       <TextBlock Text="{Binding Summary}" FontWeight="SemiBold" TextWrapping="Wrap" />
       <Border Padding="10" CornerRadius="10">
