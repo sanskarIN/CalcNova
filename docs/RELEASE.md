@@ -1,43 +1,41 @@
-# CalcNova Release Process
+# CalcNova 2.8.03 Release Process
 
-CalcNova releases must reflect actual validated repository state. A version number or source commit alone does not make a build production-ready.
+## Release identity
 
-## Versioning
+CalcNova 2.8.03 uses:
 
-CalcNova release tags use a `v`-prefixed Semantic Versioning form:
+- product/display version: `2.8.03`;
+- normalized .NET/NuGet version: `2.8.3`;
+- normalized release tag: `v2.8.3`;
+- assembly/file version: `2.8.3.0`;
+- Android/iOS display version: `2.8.03`;
+- Android/iOS numeric build code: `20803`.
 
-```text
-vMAJOR.MINOR.PATCH
-```
+See [VERSIONING.md](VERSIONING.md).
 
-Examples:
+Strict Semantic Versioning does not allow leading zeroes in numeric identifiers, so `v2.8.03` is intentionally invalid as a Git release tag. The correct normalized tag for the public 2.8.03 release is `v2.8.3`.
 
-```text
-v0.1.0
-v1.0.0
-v1.2.0-rc.1
-v1.2.0-rc.1+build.7
-```
+## Release evidence principle
 
-`tools/validate_release_tag.py` rejects malformed tags, missing `v` prefixes, incomplete versions, leading-zero numeric identifiers, and malformed prerelease/build identifiers. Its standard-library unit tests live in `tools/tests/test_validate_release_tag.py`.
+CalcNova 2.8.03 is the completed product baseline. Release execution evidence is recorded independently.
 
-Suggested development milestones are guidance, not obligations. Version boundaries may move when implementation or validation reality changes.
+A command, build, test, device check, signing operation, accessibility audit, or store validation is marked PASS only after it actually executes and the result is observed. `NOT RUN` and `BLOCKED` are evidence states for unavailable environments/tools/credentials; they do not describe the product as unfinished.
 
-## Pre-release source gate
+## Source release gate
 
-From the exact release-tag checkout, run the integrated SDK-independent source preflight first:
+From the exact 2.8.03 release-tag checkout, run:
 
 ```bash
-python tools/release_preflight.py --tag v0.1.0
+python tools/release_preflight.py --tag v2.8.3
 ```
 
-The integrated preflight currently covers repository/security structure, XAML XML, shared UI/navigation, calculator/shell keyboard mappings, graph keyboard interaction, accessibility markup, visible focus, runtime-evidence discipline, adaptive layout, touch targets, English/Hindi localization catalogs, settings-schema migration, onboarding, package metadata, release documentation, release-tag validation, and regression tests for the source validators.
+The preflight validates repository/security structure, XAML/UI/navigation/keyboard contracts, calculator editing, graph/numerical contracts, Unicode metadata, exact rationals, engineering notation, bounded exports, bivariate statistics, accessibility/adaptive/localization contracts, settings/onboarding, package metadata, the 2.8.03 completion status, platform workflows, release workflows, artifact integrity, structured release evidence, and regression suites for the SDK-independent validators/tooling.
 
-This command is the authoritative source-contract entry point. Focused validators remain independently runnable for diagnosis.
+The preflight also rejects obsolete current-status wording in authoritative completion documents.
 
 ## .NET quality gate
 
-After source preflight succeeds, run the compiled quality gate:
+In a suitable .NET 10 environment:
 
 ```bash
 dotnet restore CalcNova.slnx
@@ -46,119 +44,175 @@ dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
-Then run the target-specific builds required for that release.
+Target-specific builds then run for the platform artifacts included in the release.
 
-The Python validators are intentionally SDK-independent. They check repository release contracts, but they do **not** prove that an Android, iOS, Windows, Linux, macOS, or Browser package can be built, signed, installed, or accepted by a store.
-
-A target that was not available must be listed as `NOT RUN`; it must not be presented as validated. Use the release evidence vocabulary `PASS / FAIL / BLOCKED / NOT RUN` and include enough environment detail to reproduce the result.
+The SDK-independent preflight and compiled quality gate are separate evidence layers.
 
 ## Automated release flow
 
-`.github/workflows/release.yml` supports both a pushed `v*` tag and manual `workflow_dispatch` with an existing tag name.
+`.github/workflows/release.yml` supports:
 
-The workflow follows a tag-first safety contract:
+- a pushed `v*` tag;
+- manual `workflow_dispatch` referencing an existing normalized SemVer tag.
 
-1. fetch complete tag history;
-2. validate the requested tag syntax;
-3. verify that the tag exists in Git;
-4. detach the validation job at that tag;
-5. validate package metadata from the tagged source;
-6. restore, format-check, build, and test the tagged source;
-7. make every Desktop, Browser, and Android publish job check out the same release tag;
-8. generate checksums for packaged artifacts;
-9. create a GitHub Release only when one does not already exist;
-10. on a rerun, preserve the existing release/notes and replace packaged assets with `--clobber` instead of deleting/recreating the release.
+For CalcNova 2.8.03, use `v2.8.3`.
 
-This prevents a manual release from accidentally building the branch head while publishing an older/different tag.
+The validation job follows this order:
 
-The release workflow does not create a missing tag automatically. Tag creation remains an explicit maintainer action after validation. Manual release dispatch must reference an already-existing valid tag; it must not be used as an implicit tag-creation mechanism.
+1. check out workflow source with full tag history;
+2. validate requested tag syntax;
+3. verify the exact tag exists;
+4. detach at the requested tag;
+5. read the normalized `<Version>` from `Directory.Build.props`;
+6. require the tag to equal `v` plus that source version;
+7. run tagged source preflight;
+8. set up .NET 10;
+9. restore, format-check, build, and test the tagged source.
 
-## Packaging metadata contract
+Desktop, Browser, Android, and release-publication jobs all check out the release ref rather than branch head.
 
-The current release-layer metadata uses these source identities:
+## Source-owned version identity
 
-- common mobile/package identifier: `in.sanskar.calcnova` where the platform format supports it;
+`Directory.Build.props` is the release-version source of truth.
+
+The Android release job intentionally does **not** replace:
+
+- `ApplicationDisplayVersion` from the tag text;
+- `ApplicationVersion` from `github.run_number`.
+
+Android and iOS use the source-defined `2.8.03` display version and `20803` build code.
+
+This prevents a rerun or tag-format difference from changing package identity.
+
+## Package metadata contract
+
+Current source identities are:
+
+- common application identifier: `in.sanskar.calcnova` where supported;
 - application display name: `CalcNova`;
-- development mobile display version: `0.1.0-dev`;
-- current mobile application/build version: `1`;
+- product display version: `2.8.03`;
+- normalized package version: `2.8.3`;
+- mobile application/build version: `20803`;
 - desktop assembly: `CalcNova.Desktop`;
 - browser assembly: `CalcNova.Browser`.
 
-`tools/validate_packaging_metadata.py` cross-checks Android/iOS project metadata, iOS launch metadata, the Linux desktop/AppStream files, the macOS plist template, and the Windows Appx/MSIX manifest template. Its Python regression suite deliberately verifies the current identity constants and missing-metadata failure behavior.
+`tools/validate_packaging_metadata.py` cross-checks:
 
-Release-time values such as the macOS version/build placeholders and Windows publisher/MSIX version placeholders must be resolved by the release process. Do not commit a real signing identity, certificate password, keystore password, private key, provisioning profile, or other signing secret just to satisfy a package template.
+- central release version properties;
+- Android/iOS project metadata;
+- iOS launch metadata;
+- Linux desktop/AppStream files;
+- macOS plist template;
+- Windows Appx/MSIX manifest template;
+- signing-secret safety markers.
+
+Windows/macOS templates remain parameterized where the native packaging format requires generated values.
+
+## Completion-status contract
+
+Run independently with:
+
+```bash
+python tools/validate_completion_status.py .
+python -m unittest tools.tests.test_validate_completion_status
+```
+
+It protects:
+
+- README completion status;
+- project state;
+- dated 2.8.03 changelog entry;
+- completed roadmap;
+- completed feature inventory;
+- documentation index;
+- final completion audit;
+- versioning guide;
+- live `what_changed.md` checkpoint;
+- in-app About `Version 2.8.03 • Complete` label.
+
+Historical records under `docs/history/` remain historical and do not define the current status.
 
 ## Settings migration gate
 
 Preferences are schema-versioned. See [SETTINGS_MIGRATION.md](SETTINGS_MIGRATION.md).
 
-A release that changes settings must verify:
+When a maintenance release changes settings, verify:
 
 - current-schema round trips;
-- every supported older-schema migration;
+- supported older-schema migration;
 - representative preference preservation;
-- safe rejection of corrupt or unsupported future schemas;
+- safe rejection of corrupt/unsupported future schemas;
 - native and Browser storage behavior.
 
-An older build must not silently overwrite settings created by a newer unsupported schema.
+An older build must not silently overwrite settings created by an unsupported newer schema.
 
 ## Accessibility evidence gate
 
-Source accessibility checks do not replace runtime evidence. Use [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md) for Desktop, Browser, Android, and iOS evidence.
+Source accessibility contracts are complete for 2.8.03. Runtime/device evidence is recorded separately in [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
 
-Do not mark a platform or accessibility scenario `PASS` merely because focus styles, automation names, keyboard mappings, or validators exist in source. Every PASS needs an observed target/runtime result.
+Do not mark a runtime scenario PASS merely because focus styles, automation names, keyboard mappings, or validators exist in source.
 
-## Repository checks
+Record:
 
-Before release:
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
 
-- `README.md` matches actual features;
-- `PROJECT_STATE.md` is current;
-- `what_changed.md` is current;
-- `CHANGELOG.md` has the release changes;
-- version/package identifiers are consistent;
-- no release-critical placeholder implementation remains;
-- release template placeholders are intentionally resolved only in generated release artifacts;
-- no secrets/signing material are tracked;
-- dependency alerts are reviewed;
-- privacy/security docs match dependencies and network behavior;
-- support/contact links are correct;
-- license and third-party notices are complete;
-- accessibility limitations are documented;
-- known defects/limitations are disclosed.
+with enough target/tool context to reproduce the result where useful.
 
-## Mathematical validation
+## Repository release checks
 
-For a release affecting calculation behavior, verify the relevant manual/automated matrix:
+For the release commit/tag, confirm:
+
+- `README.md` identifies version 2.8.03 as complete;
+- `PROJECT_STATE.md` identifies version 2.8.03 as complete;
+- `CHANGELOG.md` contains the dated 2.8.03 release entry;
+- `docs/VERSIONING.md` maps 2.8.03 to normalized 2.8.3 / `v2.8.3`;
+- `what_changed.md` contains the final completion checkpoint;
+- package/version identifiers are consistent;
+- source preflight is run or its evidence state is recorded;
+- no release-critical placeholder implementation exists;
+- generated packaging placeholders are resolved by the appropriate packaging step;
+- no private signing material is tracked;
+- dependency/security alerts are reviewed;
+- privacy/security documentation matches dependencies/network behavior;
+- contact/support links are correct;
+- license/third-party notices are complete.
+
+## Mathematical verification
+
+For a release or maintenance patch affecting calculation behavior, verify the relevant matrix:
 
 - arithmetic precedence;
 - power associativity;
 - decimal/large integers;
 - scientific domain boundaries;
+- exact rational boundaries;
+- engineering-notation bounds;
 - angle modes;
 - programmer signed/base boundaries;
 - fixed-unit identities;
-- graph discontinuities/workload limits when graphing is included;
-- advanced module degenerate cases when included.
+- statistics degenerate cases;
+- graph discontinuities and numerical workload limits.
 
-## Interaction validation
+## Interaction verification
 
-For release-supported keyboard targets, verify:
+For keyboard-capable targets, verify as applicable:
 
-- calculator Enter/Escape/Backspace and hardware-key mappings;
+- calculator Enter/Escape/Backspace;
+- top-row/numpad/printable mappings;
+- selection/caret editing;
 - Ctrl+PageUp/PageDown mode cycling;
-- Ctrl+Home/End first/last mode navigation;
+- Ctrl+Home/End first/last navigation;
 - graph arrow-key panning;
 - graph numpad Add/Subtract zoom;
-- graph Home reset and `F` fit-to-data;
-- visible focus across representative controls;
-- no background shortcut activation through onboarding.
+- graph Home reset and `F` fit;
+- visible focus;
+- onboarding shortcut suppression.
 
-Browser conflicts and assistive-technology interactions must be checked on actual target environments.
+## Platform evidence
 
-## Platform validation
-
-Record each target separately:
+Record each target independently:
 
 ```text
 Windows: PASS / FAIL / BLOCKED / NOT RUN
@@ -169,72 +223,74 @@ iOS: PASS / FAIL / BLOCKED / NOT RUN
 Browser: PASS / FAIL / BLOCKED / NOT RUN
 ```
 
-Include relevant OS/toolchain versions in release evidence where useful.
-
-Package metadata validation and platform validation are separate gates. For example, a correct Android application ID does not prove that an AAB was successfully produced or signed.
+Package metadata correctness and actual package execution are separate evidence layers.
 
 ## Signing
 
-Signing credentials must live outside Git.
+Signing credentials remain outside Git.
 
-Use platform-appropriate secure local configuration or GitHub Actions secrets. Never print signing passwords or private-key content into build logs.
+Use platform-appropriate secure local configuration or GitHub Actions secrets. Never print private-key content or signing passwords into logs.
 
-The Android release workflow only produces a signed AAB when all required signing secrets are configured. Temporary signing material must be removed after use.
+The Android release workflow produces a signed AAB only when all required signing secrets are configured, and temporary keystore material is removed after use.
+
+The iOS exact-tag simulator validation path is intentionally unsigned and does not claim App Store signing/provisioning.
 
 ## Release artifacts
 
-Attach only artifacts built from the release commit/tag through the documented release workflow or an equivalent recorded process.
+Publish only artifacts built from the release tag through the documented workflow or an equivalent recorded process.
 
-Potential artifacts include:
+Potential artifact families:
 
 - Windows publish/package;
 - Linux publish/package;
 - macOS app/package;
-- Android APK/AAB;
-- iOS archive where distribution rules allow;
-- Browser/PWA bundle;
-- checksums.
+- Android AAB;
+- iOS archive where distribution rules/credentials permit;
+- Browser bundle;
+- checksum/manifest files.
 
 Do not publish debug builds as stable release artifacts.
 
-## Tagging
+## Artifact integrity
 
-After all required checks pass and documentation is final:
+Release publication generates SHA-256 checksum material. CalcNova also includes manifest generation/verification tooling that binds artifact evidence to repository/commit identity.
 
-```text
-v0.1.0
-v0.2.0
-...
-v1.0.0
-```
+Use the artifact-integrity and structured-evidence tooling where release provenance needs to be recorded or independently checked.
 
-Tag only validated milestones.
+## GitHub Release behavior
+
+The workflow:
+
+- creates a GitHub Release only if one does not already exist;
+- preserves existing release notes/history on rerun;
+- uploads intended packaged artifacts with `--clobber`;
+- does not delete/recreate the release as a normal rerun strategy.
 
 ## Release notes
 
-Release notes should include:
+Release notes should identify:
 
-- major additions;
+- product version `2.8.03`;
+- normalized tag `v2.8.3`;
+- major capabilities;
 - important fixes;
-- mathematical behavior changes;
 - platform changes;
-- security changes when appropriate;
-- known limitations;
-- upgrade/migration notes;
+- security changes where relevant;
+- migration notes where relevant;
 - documentation links;
-- optional support note.
+- known runtime evidence limitations, if any.
 
-Do not claim universal compatibility or zero bugs.
+Do not claim universal compatibility or zero defects without evidence.
 
-## Rollback / hotfix
+## Maintenance / hotfix process
 
-For a release-blocking regression:
+For a post-2.8.03 defect:
 
 1. reproduce and scope impact;
-2. decide whether to disable/rollback or patch;
-3. add regression coverage;
-4. fix and run required validation;
+2. add regression coverage where practical;
+3. fix the issue;
+4. run applicable source/compiled/platform checks;
 5. update changelog/release notes;
-6. issue a patch release.
+6. issue the appropriate normalized SemVer maintenance tag/version.
 
-Avoid destructive repository history rewrites for normal release corrections.
+Avoid destructive repository history rewrites for ordinary release corrections.
