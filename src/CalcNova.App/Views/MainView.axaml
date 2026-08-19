@@ -120,38 +120,54 @@
               <Button Content="Arithmetic right" Command="{Binding ArithmeticShiftRightCommand}" Margin="0,0,6,6" />
             </WrapPanel>
             <TextBlock Text="{Binding LastOperation}" Opacity="0.62" />
-            <Grid ColumnDefinitions="Auto,*">
+            <Grid ColumnDefinitions="Auto,*,Auto">
               <TextBlock Text="BIN" FontWeight="SemiBold" Margin="0,0,10,0" />
-              <TextBlock Grid.Column="1" Text="{Binding Binary}" TextWrapping="Wrap" />
+              <TextBlock Grid.Column="1" Text="{Binding Binary}" TextWrapping="Wrap" VerticalAlignment="Center" />
+              <Button Grid.Column="2" Content="Copy BIN" Command="{Binding CopyRepresentationCommand}" CommandParameter="binary" Margin="8,0,0,0" />
             </Grid>
-            <Grid ColumnDefinitions="Auto,*">
+            <Grid ColumnDefinitions="Auto,*,Auto">
               <TextBlock Text="OCT" FontWeight="SemiBold" Margin="0,0,10,0" />
-              <TextBlock Grid.Column="1" Text="{Binding Octal}" TextWrapping="Wrap" />
+              <TextBlock Grid.Column="1" Text="{Binding Octal}" TextWrapping="Wrap" VerticalAlignment="Center" />
+              <Button Grid.Column="2" Content="Copy OCT" Command="{Binding CopyRepresentationCommand}" CommandParameter="octal" Margin="8,0,0,0" />
             </Grid>
-            <Grid ColumnDefinitions="Auto,*">
+            <Grid ColumnDefinitions="Auto,*,Auto">
               <TextBlock Text="DEC" FontWeight="SemiBold" Margin="0,0,10,0" />
-              <TextBlock Grid.Column="1" Text="{Binding Decimal}" TextWrapping="Wrap" />
+              <TextBlock Grid.Column="1" Text="{Binding Decimal}" TextWrapping="Wrap" VerticalAlignment="Center" />
+              <Button Grid.Column="2" Content="Copy DEC" Command="{Binding CopyRepresentationCommand}" CommandParameter="decimal" Margin="8,0,0,0" />
             </Grid>
-            <Grid ColumnDefinitions="Auto,*">
+            <Grid ColumnDefinitions="Auto,*,Auto">
               <TextBlock Text="HEX" FontWeight="SemiBold" Margin="0,0,10,0" />
-              <TextBlock Grid.Column="1" Text="{Binding Hexadecimal}" TextWrapping="Wrap" />
+              <TextBlock Grid.Column="1" Text="{Binding Hexadecimal}" TextWrapping="Wrap" VerticalAlignment="Center" />
+              <Button Grid.Column="2" Content="Copy HEX" Command="{Binding CopyRepresentationCommand}" CommandParameter="hexadecimal" Margin="8,0,0,0" />
             </Grid>
             <TextBlock Text="Fixed-width bit pattern" FontWeight="SemiBold" />
-            <TextBlock Text="{Binding BitPattern}" TextWrapping="Wrap" />
-            <TextBlock Text="Interactive bit grid — most-significant bit first" Opacity="0.62" />
-            <ItemsControl ItemsSource="{Binding Bits}">
-              <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                  <WrapPanel />
-                </ItemsPanelTemplate>
-              </ItemsControl.ItemsPanel>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{Binding BitPattern}" TextWrapping="Wrap" VerticalAlignment="Center" />
+              <Button Grid.Column="1" Content="Copy bits" Command="{Binding CopyRepresentationCommand}" CommandParameter="bits" Margin="8,0,0,0" />
+            </Grid>
+            <TextBlock Text="Interactive bit grid — grouped by byte, most-significant byte and bit first" Opacity="0.62" />
+            <ItemsControl ItemsSource="{Binding BitGroups}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Button Content="{Binding Label}"
-                          Command="{Binding ToggleCommand}"
-                          AutomationProperties.Name="{Binding AccessibleLabel}"
-                          Margin="0,0,6,6"
-                          MinWidth="58" />
+                  <StackPanel Margin="0,0,0,8" Spacing="4">
+                    <TextBlock Text="{Binding Label}" FontWeight="SemiBold" Opacity="0.7" />
+                    <ItemsControl ItemsSource="{Binding Bits}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <WrapPanel />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Button Content="{Binding Label}"
+                                  Command="{Binding ToggleCommand}"
+                                  AutomationProperties.Name="{Binding AccessibleLabel}"
+                                  Margin="0,0,6,6"
+                                  MinWidth="58" />
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -169,11 +185,17 @@
             <TextBlock Text="Inspect Unicode scalars without splitting supplementary characters into UTF-16 units." Opacity="0.62" TextWrapping="Wrap" />
             <TextBlock Text="Code point to text" FontWeight="SemiBold" />
             <TextBox Text="{Binding CodePointInput, Mode=TwoWay}" Watermark="U+0041 or U+1F600" />
-            <Button Content="Decode code point" Command="{Binding DecodeCodePointCommand}" HorizontalAlignment="Left" />
+            <WrapPanel>
+              <Button Content="Decode code point" Command="{Binding DecodeCodePointCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy decoded result" Command="{Binding CopyCodePointResultCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
             <Border Padding="10" CornerRadius="10"><TextBlock Text="{Binding CodePointResult}" FontSize="20" TextWrapping="Wrap" /></Border>
             <TextBlock Text="Text to code points" FontWeight="SemiBold" />
             <TextBox Text="{Binding TextInput, Mode=TwoWay}" Watermark="Text to inspect" AcceptsReturn="True" MinHeight="90" TextWrapping="Wrap" />
-            <Button Content="Inspect text" Command="{Binding InspectTextCommand}" HorizontalAlignment="Left" />
+            <WrapPanel>
+              <Button Content="Inspect text" Command="{Binding InspectTextCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy code-point list" Command="{Binding CopyTextResultCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
             <Border Padding="10" CornerRadius="10"><TextBlock Text="{Binding TextResult}" TextWrapping="Wrap" /></Border>
             <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
           </StackPanel>
@@ -185,18 +207,40 @@
           <StackPanel DataContext="{Binding Converter}" Margin="8" Spacing="10">
             <TextBlock Text="Offline Unit Converter" FontSize="21" FontWeight="SemiBold" />
             <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
+            <TextBlock Text="Search units in the selected category" FontWeight="SemiBold" />
+            <TextBox Text="{Binding UnitSearchQuery, Mode=TwoWay}" Watermark="Search by name, symbol, or unit id" />
+            <ComboBox ItemsSource="{Binding SearchResults}" SelectedItem="{Binding SelectedSearchUnit, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Name}" />
+                    <TextBlock Text="{Binding Symbol}" Opacity="0.62" />
+                  </StackPanel>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <WrapPanel>
+              <Button Content="Use search as From" Command="{Binding UseSearchAsFromCommand}" Margin="0,0,6,6" />
+              <Button Content="Use search as To" Command="{Binding UseSearchAsToCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
+            <TextBlock Text="From" FontWeight="SemiBold" />
             <ComboBox ItemsSource="{Binding AvailableUnits}" SelectedItem="{Binding FromUnit, Mode=TwoWay}" />
             <Button Content="Swap units" Command="{Binding SwapCommand}" HorizontalAlignment="Left" />
+            <TextBlock Text="To" FontWeight="SemiBold" />
             <ComboBox ItemsSource="{Binding AvailableUnits}" SelectedItem="{Binding ToUnit, Mode=TwoWay}" />
             <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Input value" />
             <TextBlock Text="Significant digits" Opacity="0.62" />
             <ComboBox ItemsSource="{Binding PrecisionOptions}" SelectedItem="{Binding SignificantDigits, Mode=TwoWay}" />
             <WrapPanel>
               <Button Content="Convert" Command="{Binding ConvertCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy result" Command="{Binding CopyResultCommand}" Margin="0,0,6,6" />
               <Button Content="{Binding FavoriteToggleLabel}" Command="{Binding ToggleFavoriteCommand}" Margin="0,0,6,6" />
             </WrapPanel>
             <TextBlock Text="{Binding Result}" FontSize="28" FontWeight="SemiBold" TextWrapping="Wrap" />
-            <TextBlock Text="Recent pairs" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="Recent pairs" FontWeight="SemiBold" VerticalAlignment="Center" />
+              <Button Grid.Column="1" Content="Clear recents" Command="{Binding ClearRecentCommand}" />
+            </Grid>
             <ComboBox ItemsSource="{Binding RecentPairs}" SelectedItem="{Binding SelectedPair, Mode=TwoWay}">
               <ComboBox.ItemTemplate>
                 <DataTemplate><TextBlock Text="{Binding DisplayName}" /></DataTemplate>
@@ -262,21 +306,57 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
           <StackPanel DataContext="{Binding Graphing}" Margin="8" Spacing="10">
             <TextBlock Text="Graphing" FontSize="21" FontWeight="SemiBold" />
+            <TextBlock Text="Single expression" FontWeight="SemiBold" />
             <TextBox Text="{Binding Expression, Mode=TwoWay}" Watermark="y = f(x)" />
             <TextBox Text="{Binding MinimumX, Mode=TwoWay}" Watermark="Minimum x" />
             <TextBox Text="{Binding MaximumX, Mode=TwoWay}" Watermark="Maximum x" />
             <TextBox Text="{Binding SampleCount, Mode=TwoWay}" Watermark="Sample count" />
-            <Button Content="Plot / sample" Command="{Binding PlotCommand}" HorizontalAlignment="Left" />
+            <WrapPanel>
+              <Button Content="Plot / sample" Command="{Binding PlotCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy preview" Command="{Binding CopyPreviewCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy table CSV" Command="{Binding CopyTableCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
             <TextBlock Text="{Binding Summary}" FontWeight="SemiBold" TextWrapping="Wrap" />
             <Border Padding="10" CornerRadius="10"><TextBlock Text="{Binding Preview}" TextWrapping="Wrap" /></Border>
+            <TextBlock Text="Table of values (CSV, bounded)" FontWeight="SemiBold" />
+            <TextBox Text="{Binding TableCsv}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="100" MaxHeight="180" />
+
+            <TextBlock Text="Trace sampled graph" FontWeight="SemiBold" />
+            <TextBox Text="{Binding TraceX, Mode=TwoWay}" Watermark="x to trace" />
+            <WrapPanel>
+              <Button Content="Trace nearest point" Command="{Binding TraceCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy trace" Command="{Binding CopyTraceResultCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
+            <Border Padding="10" CornerRadius="10"><TextBlock Text="{Binding TraceResult}" TextWrapping="Wrap" /></Border>
+
             <TextBlock Text="Numerical analysis (approximate)" FontWeight="SemiBold" />
             <TextBox Text="{Binding AnalysisX, Mode=TwoWay}" Watermark="x for derivative" />
             <WrapPanel>
               <Button Content="Derivative at x" Command="{Binding DerivativeCommand}" Margin="0,0,6,6" />
               <Button Content="Find root in range" Command="{Binding FindRootCommand}" Margin="0,0,6,6" />
               <Button Content="Integrate over range" Command="{Binding IntegrateCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy analysis" Command="{Binding CopyAnalysisResultCommand}" Margin="0,0,6,6" />
             </WrapPanel>
             <Border Padding="10" CornerRadius="10"><TextBlock Text="{Binding AnalysisResult}" FontSize="18" TextWrapping="Wrap" /></Border>
+
+            <TextBlock Text="Multiple expressions" FontWeight="SemiBold" />
+            <TextBlock Text="Enter one expression per line. Up to 8 expressions are sampled with the same range and sample count." Opacity="0.62" TextWrapping="Wrap" />
+            <TextBox Text="{Binding MultiExpressionsText, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="100" Watermark="sin(x)&#10;cos(x)" />
+            <WrapPanel>
+              <Button Content="Sample expressions" Command="{Binding PlotMultipleCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy multi-series CSV" Command="{Binding CopyMultiTableCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
+            <TextBlock Text="{Binding MultiSummary}" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <TextBox Text="{Binding MultiTableCsv}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="100" MaxHeight="180" />
+
+            <TextBlock Text="Accessible SVG export" FontWeight="SemiBold" />
+            <TextBlock Text="Generates deterministic SVG from the current single-expression sample. Export is local and contains an image accessibility label." Opacity="0.62" TextWrapping="Wrap" />
+            <WrapPanel>
+              <Button Content="Generate SVG" Command="{Binding GenerateSvgCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy SVG" Command="{Binding CopySvgCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
+            <TextBox Text="{Binding SvgExport}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="80" MaxHeight="140" />
+            <TextBlock Text="{Binding CopyStatus}" TextWrapping="Wrap" Opacity="0.7" />
             <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
           </StackPanel>
         </ScrollViewer>
