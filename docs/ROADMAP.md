@@ -75,6 +75,7 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Shared multi-series text legend synchronized with the active graph presentation.
 - Extreme-bound numerical-analysis hardening plus dedicated edge-case and workload-budget regressions.
 - Explicit graph sampling, root-iteration, and Simpson-integration workload-budget coverage.
+- Bounded graph CSV/SVG display previews with complete private copy payloads.
 
 ### Persistence and platform architecture
 
@@ -82,7 +83,8 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Browser-safe history/storage path.
 - Search/favorite/delete/clear history flows.
 - TXT/CSV/JSON history export engine.
-- Shared history export-format selection, preview, and clipboard copy.
+- Shared history export-format selection, bounded preview, and full-content clipboard-copy workflow.
+- Shared reusable export-preview formatter with character/line limits, newline normalization, and UTF-16 boundary safety.
 - Settings/preferences abstraction.
 - Converter preference persistence through shared settings.
 - Explicit settings schema version with legacy-v0 migration and future-schema rejection.
@@ -124,7 +126,7 @@ The shared XAML still contains hard-coded English outside migrated surfaces; sem
 - Repository validation, formatting, build/test, coverage, security, advanced-utility, release, UI-contract, and platform workflow foundations.
 - Source-level shared-XAML command/property contract validation.
 - Source-level Avalonia XML well-formedness validation.
-- Dedicated adaptive-layout, touch-target, keyboard, graph-keyboard, graph-surface, graph-series-presentation, numerical-analysis, Unicode-metadata, focus-visibility, accessibility-evidence, localization, settings-schema, onboarding, and packaging-metadata source validators/workflows.
+- Dedicated adaptive-layout, touch-target, keyboard, graph-keyboard, graph-surface, graph-series-presentation, numerical-analysis, Unicode-metadata, export-preview, focus-visibility, accessibility-evidence, localization, settings-schema, onboarding, and packaging-metadata source validators/workflows.
 - Dedicated graph workload-budget validation covering sample caps, root iteration limits, and integration limits.
 - Python regression tests for the source validators added during hardening.
 - Unified SDK-independent release preflight covering the current source-contract inventory.
@@ -174,7 +176,6 @@ The shared XAML still contains hard-coded English outside migrated surfaces; sem
 - Improve cursor/selection-aware expression editing.
 - Add locale-aware printable keyboard/operator shortcuts without breaking text-box editing, Browser conventions, or assistive technology.
 - Improve empty/error/loading states without hiding calculation details.
-- Refine long graph/history export previews for compact layouts while preserving workload bounds.
 - Evaluate native file-save/share UX for history/graph exports after platform abstractions are validated.
 
 ### Converter/programmer polish
