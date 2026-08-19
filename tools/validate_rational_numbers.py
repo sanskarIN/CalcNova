@@ -41,7 +41,7 @@ def validate(root: Path) -> list[str]:
         "public static RationalNumber operator /",
         "Math.Abs((long)exponent) > MaximumDecimalScale",
         "Math.Abs(scale) > MaximumDecimalScale",
-        "BigInteger.Abs(numerator).GetBitLength() > MaximumBitLength",
+        "numerator.GetBitLength() > MaximumBitLength || denominator.GetBitLength() > MaximumBitLength",
     ):
         if marker not in rational:
             failures.append(f"RationalNumber is missing contract marker: {marker}")
