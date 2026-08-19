@@ -9,18 +9,24 @@ namespace CalcNova.App.ViewModels;
 public sealed class GraphingViewModel : ViewModelBase
 {
     private readonly GraphSampler _sampler = new();
+    private readonly GraphNumericalAnalyzer _analyzer = new();
     private string _expression = "sin(x)";
     private string _minimumX = "-6.283185307179586";
     private string _maximumX = "6.283185307179586";
+    private string _analysisX = "0";
     private int _sampleCount = 256;
     private IReadOnlyList<GraphSegment> _segments = Array.Empty<GraphSegment>();
     private string _summary = string.Empty;
     private string _preview = string.Empty;
+    private string _analysisResult = string.Empty;
     private string _errorMessage = string.Empty;
 
     public GraphingViewModel()
     {
         PlotCommand = new RelayCommand(_ => Plot());
+        DerivativeCommand = new RelayCommand(_ => CalculateDerivative());
+        FindRootCommand = new RelayCommand(_ => FindRoot());
+        IntegrateCommand = new RelayCommand(_ => Integrate());
         Plot();
     }
 
@@ -40,6 +46,12 @@ public sealed class GraphingViewModel : ViewModelBase
     {
         get => _maximumX;
         set => SetField(ref _maximumX, value ?? string.Empty);
+    }
+
+    public string AnalysisX
+    {
+        get => _analysisX;
+        set => SetField(ref _analysisX, value ?? string.Empty);
     }
 
     public int SampleCount
@@ -66,6 +78,12 @@ public sealed class GraphingViewModel : ViewModelBase
         private set => SetField(ref _preview, value);
     }
 
+    public string AnalysisResult
+    {
+        get => _analysisResult;
+        private set => SetField(ref _analysisResult, value);
+    }
+
     public string ErrorMessage
     {
         get => _errorMessage;
@@ -73,6 +91,12 @@ public sealed class GraphingViewModel : ViewModelBase
     }
 
     public ICommand PlotCommand { get; }
+
+    public ICommand DerivativeCommand { get; }
+
+    public ICommand FindRootCommand { get; }
+
+    public ICommand IntegrateCommand { get; }
 
     private void Plot()
     {
@@ -111,6 +135,52 @@ public sealed class GraphingViewModel : ViewModelBase
         }
     }
 
+    private void CalculateDerivative()
+    {
+        RunAnalysis(() =>
+        {
+            var x = ParseFinite(AnalysisX, "Analysis X");
+            var value = _analyzer.Derivative(Expression, x);
+            return $"f′({Format(x)}) ≈ {Format(value)}";
+        });
+    }
+
+    private void FindRoot()
+    {
+        RunAnalysis(() =>
+        {
+            var minimum = ParseFinite(MinimumX, "Minimum X");
+            var maximum = ParseFinite(MaximumX, "Maximum X");
+            var root = _analyzer.FindRoot(Expression, minimum, maximum);
+            return $"root ≈ {Format(root)}";
+        });
+    }
+
+    private void Integrate()
+    {
+        RunAnalysis(() =>
+        {
+            var minimum = ParseFinite(MinimumX, "Minimum X");
+            var maximum = ParseFinite(MaximumX, "Maximum X");
+            var integral = _analyzer.Integrate(Expression, minimum, maximum);
+            return $"∫[{Format(minimum)}, {Format(maximum)}] f(x) dx ≈ {Format(integral)}";
+        });
+    }
+
+    private void RunAnalysis(Func<string> operation)
+    {
+        try
+        {
+            AnalysisResult = operation();
+            ErrorMessage = string.Empty;
+        }
+        catch (Exception exception) when (exception is ArgumentException or FormatException or InvalidOperationException or OverflowException)
+        {
+            AnalysisResult = string.Empty;
+            ErrorMessage = exception.Message;
+        }
+    }
+
     private static double ParseFinite(string text, string label)
     {
         if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) || !double.IsFinite(value))
@@ -120,6 +190,8 @@ public sealed class GraphingViewModel : ViewModelBase
 
         return value;
     }
+
+    private static string Format(double value) => value.ToString("G12", CultureInfo.InvariantCulture);
 
     private static string BuildPreview(IEnumerable<GraphSegment> segments)
     {
