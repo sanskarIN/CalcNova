@@ -87,10 +87,13 @@ def main() -> int:
         '<Setter Property="MinHeight" Value="44" />',
         '<Style Selector="TextBox">',
         '<Style Selector="ComboBox">',
+        '<Style Selector="CheckBox">',
         '<Style Selector="TabItem">',
         '<Style Selector="ListBoxItem">',
         '<Style Selector="Button.calc-key">',
         '<Setter Property="MinHeight" Value="54" />',
+        '<Style Selector="UserControl.compact Button.calc-key">',
+        '<Setter Property="MinHeight" Value="50" />',
     )
     for fragment in required_touch_target_fragments:
         if fragment not in app_text:
@@ -102,7 +105,9 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print(f"Validated semantic names for {checked} symbol-heavy buttons and shared touch-target baselines.")
+    print(
+        f"Validated semantic names for {checked} symbol-heavy buttons and shared/compact touch-target baselines."
+    )
     return 0
 
 
