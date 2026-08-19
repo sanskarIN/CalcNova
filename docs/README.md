@@ -25,6 +25,7 @@ Use this index to find the authoritative guide for each area of the project.
 - [Graph numerical analysis](NUMERICAL_ANALYSIS.md)
 - [Graph numerical safety and workload bounds](GRAPH_NUMERICAL_SAFETY.md)
 - [Graph interaction](GRAPH_INTERACTION.md)
+- [Bounded export previews](EXPORT_PREVIEWS.md)
 - [Feature status](FEATURES.md)
 - [Keyboard shortcuts](KEYBOARD_SHORTCUTS.md)
 
