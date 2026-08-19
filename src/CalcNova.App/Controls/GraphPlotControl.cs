@@ -136,6 +136,18 @@ public sealed class GraphPlotControl : Control
         InvalidateVisual();
     }
 
+    public void PanLeft() => PanViewport(-KeyboardPanFraction, 0d);
+
+    public void PanRight() => PanViewport(KeyboardPanFraction, 0d);
+
+    public void PanUp() => PanViewport(0d, KeyboardPanFraction);
+
+    public void PanDown() => PanViewport(0d, -KeyboardPanFraction);
+
+    public void ZoomIn() => ZoomAround(ViewportCenter(), 0.82d);
+
+    public void ZoomOut() => ZoomAround(ViewportCenter(), 1.22d);
+
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -226,22 +238,22 @@ public sealed class GraphPlotControl : Control
         switch (action)
         {
             case GraphKeyboardAction.PanLeft:
-                PanViewport(-KeyboardPanFraction, 0d);
+                PanLeft();
                 break;
             case GraphKeyboardAction.PanRight:
-                PanViewport(KeyboardPanFraction, 0d);
+                PanRight();
                 break;
             case GraphKeyboardAction.PanUp:
-                PanViewport(0d, KeyboardPanFraction);
+                PanUp();
                 break;
             case GraphKeyboardAction.PanDown:
-                PanViewport(0d, -KeyboardPanFraction);
+                PanDown();
                 break;
             case GraphKeyboardAction.ZoomIn:
-                ZoomAround(ViewportCenter(), 0.82d);
+                ZoomIn();
                 break;
             case GraphKeyboardAction.ZoomOut:
-                ZoomAround(ViewportCenter(), 1.22d);
+                ZoomOut();
                 break;
             case GraphKeyboardAction.ResetViewport:
                 ResetViewport();
