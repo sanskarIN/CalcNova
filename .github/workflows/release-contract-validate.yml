@@ -1,0 +1,58 @@
+name: Release Contract Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/release.yml"
+      - ".github/workflows/release-contract-validate.yml"
+      - "src/CalcNova.Android/CalcNova.Android.csproj"
+      - "src/CalcNova.iOS/CalcNova.iOS.csproj"
+      - "src/CalcNova.iOS/Info.plist"
+      - "src/CalcNova.Desktop/CalcNova.Desktop.csproj"
+      - "src/CalcNova.Browser/CalcNova.Browser.csproj"
+      - "packaging/**"
+      - "tools/validate_packaging_metadata.py"
+      - "tools/validate_release_tag.py"
+      - "tools/tests/test_validate_release_tag.py"
+      - "docs/RELEASE.md"
+  pull_request:
+    paths:
+      - ".github/workflows/release.yml"
+      - ".github/workflows/release-contract-validate.yml"
+      - "src/CalcNova.Android/CalcNova.Android.csproj"
+      - "src/CalcNova.iOS/CalcNova.iOS.csproj"
+      - "src/CalcNova.iOS/Info.plist"
+      - "src/CalcNova.Desktop/CalcNova.Desktop.csproj"
+      - "src/CalcNova.Browser/CalcNova.Browser.csproj"
+      - "packaging/**"
+      - "tools/validate_packaging_metadata.py"
+      - "tools/validate_release_tag.py"
+      - "tools/tests/test_validate_release_tag.py"
+      - "docs/RELEASE.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-release-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Test release-tag validator
+        run: python tools/tests/test_validate_release_tag.py
+
+      - name: Validate representative release tag
+        run: python tools/validate_release_tag.py v0.1.0-rc.1
+
+      - name: Validate package metadata
+        run: python tools/validate_packaging_metadata.py .
