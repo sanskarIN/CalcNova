@@ -1,0 +1,39 @@
+name: Touch target validation
+
+on:
+  push:
+    paths:
+      - "src/CalcNova.App/App.axaml"
+      - "src/CalcNova.App/Views/**"
+      - "tools/validate_touch_targets.py"
+      - "tools/tests/test_validate_touch_targets.py"
+      - ".github/workflows/touch-target-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.App/App.axaml"
+      - "src/CalcNova.App/Views/**"
+      - "tools/validate_touch_targets.py"
+      - "tools/tests/test_validate_touch_targets.py"
+      - ".github/workflows/touch-target-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  touch-target-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate touch targets
+        run: python tools/validate_touch_targets.py
+
+      - name: Test touch target validator
+        run: python -m unittest tools.tests.test_validate_touch_targets
