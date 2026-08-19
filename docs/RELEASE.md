@@ -19,6 +19,7 @@ Suggested development milestones are guidance, not obligations. Version boundari
 Before tagging a release, verify at minimum:
 
 ```bash
+python tools/validate_packaging_metadata.py .
 dotnet restore CalcNova.slnx
 dotnet format CalcNova.slnx --verify-no-changes --no-restore
 dotnet build CalcNova.slnx --configuration Release --no-restore
@@ -27,7 +28,24 @@ dotnet test CalcNova.slnx --configuration Release --no-build
 
 Then run the target-specific builds required for that release.
 
+The package-metadata validator is intentionally SDK-independent. It checks repository identity/version contracts and structured release metadata, but it does **not** prove that an Android, iOS, Windows, Linux, macOS, or Browser package can be built, signed, installed, or accepted by a store.
+
 A target that was not available must be listed as `NOT RUN`; it must not be presented as validated.
+
+## Packaging metadata contract
+
+The current release-layer metadata uses these source identities:
+
+- common mobile/package identifier: `in.sanskar.calcnova` where the platform format supports it;
+- application display name: `CalcNova`;
+- development mobile display version: `0.1.0-dev`;
+- current mobile application/build version: `1`;
+- desktop assembly: `CalcNova.Desktop`;
+- browser assembly: `CalcNova.Browser`.
+
+`tools/validate_packaging_metadata.py` cross-checks Android/iOS project metadata, iOS launch metadata, the Linux desktop/AppStream files, the macOS plist template, and the Windows Appx/MSIX manifest template. The dedicated `Packaging Metadata Validate` workflow runs this preflight when relevant files change.
+
+Release-time values such as the macOS version/build placeholders and Windows publisher/MSIX version placeholders must be resolved by the release process. Do not commit a real signing identity, certificate password, keystore password, private key, provisioning profile, or other signing secret just to satisfy a package template.
 
 ## Repository checks
 
@@ -39,6 +57,7 @@ Before release:
 - `CHANGELOG.md` has the release changes;
 - version/package identifiers are consistent;
 - no release-critical placeholder implementation remains;
+- release template placeholders are intentionally resolved only in generated release artifacts;
 - no secrets/signing material are tracked;
 - dependency alerts are reviewed;
 - privacy/security docs match dependencies and network behavior;
@@ -75,6 +94,8 @@ Browser: PASS / FAIL / NOT RUN
 ```
 
 Include relevant OS/toolchain versions in release evidence where useful.
+
+Package metadata validation and platform validation are separate gates. For example, a correct Android application ID does not prove that an AAB was successfully produced or signed.
 
 ## Signing
 
