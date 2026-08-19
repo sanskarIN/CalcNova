@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using CalcNova.App.Infrastructure;
 using CalcNova.App.Services;
@@ -17,6 +18,7 @@ public partial class MainView : UserControl
     private static readonly string[] AdaptiveStyleClasses = ["compact", "medium", "expanded"];
 
     private MainViewModel? _subscribedViewModel;
+    private bool _onboardingWasVisible;
 
     public MainView()
     {
@@ -66,14 +68,19 @@ public partial class MainView : UserControl
         {
             if (_subscribedViewModel is not null)
             {
-                _subscribedViewModel.SettingsChanged -= ApplySettings;
+                _subscribedViewModel.SettingsChanged -= HandleSettingsChanged;
             }
 
             _subscribedViewModel = viewModel;
-            viewModel.SettingsChanged += ApplySettings;
+            viewModel.SettingsChanged += HandleSettingsChanged;
         }
 
         await viewModel.InitializeAsync();
+        _onboardingWasVisible = viewModel.Settings.ShouldShowOnboarding;
+        if (_onboardingWasVisible)
+        {
+            QueueOnboardingFocus();
+        }
     }
 
     private void OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs eventArgs)
@@ -88,8 +95,9 @@ public partial class MainView : UserControl
             return;
         }
 
-        _subscribedViewModel.SettingsChanged -= ApplySettings;
+        _subscribedViewModel.SettingsChanged -= HandleSettingsChanged;
         _subscribedViewModel = null;
+        _onboardingWasVisible = false;
     }
 
     private async void OnKeyDown(object? sender, KeyEventArgs eventArgs)
@@ -148,6 +156,40 @@ public partial class MainView : UserControl
                 eventArgs.Handled = true;
                 break;
         }
+    }
+
+    private void HandleSettingsChanged(AppSettings settings)
+    {
+        ApplySettings(settings);
+
+        var onboardingIsVisible = _subscribedViewModel?.Settings.ShouldShowOnboarding ?? false;
+        if (_onboardingWasVisible && !onboardingIsVisible)
+        {
+            QueueCalculatorFocus();
+        }
+
+        _onboardingWasVisible = onboardingIsVisible;
+    }
+
+    private void QueueOnboardingFocus()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            var overlay = this.GetVisualDescendants().OfType<OnboardingOverlay>().FirstOrDefault();
+            overlay?.GetVisualDescendants().OfType<Button>().FirstOrDefault()?.Focus();
+        });
+    }
+
+    private void QueueCalculatorFocus()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            var calculator = _subscribedViewModel?.Calculator;
+            this.GetVisualDescendants()
+                .OfType<TextBox>()
+                .FirstOrDefault(textBox => ReferenceEquals(textBox.DataContext, calculator))
+                ?.Focus();
+        });
     }
 
     private void ApplyAdaptiveLayout(double width)
