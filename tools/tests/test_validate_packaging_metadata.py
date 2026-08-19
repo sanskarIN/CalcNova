@@ -29,7 +29,9 @@ class PackagingMetadataValidatorTests(unittest.TestCase):
         validator = load_validator()
         self.assertEqual("in.sanskar.calcnova", validator.APP_ID)
         self.assertEqual("CalcNova", validator.APP_NAME)
-        self.assertEqual("0.1.0-dev", validator.DEV_DISPLAY_VERSION)
+        self.assertEqual("2.8.03", validator.DISPLAY_VERSION)
+        self.assertEqual("2.8.3", validator.SEMVER_VERSION)
+        self.assertEqual("20803", validator.MOBILE_BUILD_CODE)
 
     def test_missing_metadata_is_reported(self) -> None:
         validator = load_validator()
