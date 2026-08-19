@@ -31,11 +31,14 @@ public sealed class GraphingViewModel : ViewModelBase
     private string _preview = string.Empty;
     private string _analysisResult = string.Empty;
     private string _traceResult = string.Empty;
+    private string _tableExportContent = string.Empty;
     private string _tableCsv = string.Empty;
     private string _tablePreview = string.Empty;
     private string _multiSummary = string.Empty;
+    private string _multiTableExportContent = string.Empty;
     private string _multiTableCsv = string.Empty;
     private string _multiTablePreview = string.Empty;
+    private string _svgExportContent = string.Empty;
     private string _svgExport = string.Empty;
     private string _svgPreview = string.Empty;
     private string _copyStatus = string.Empty;
@@ -244,6 +247,7 @@ public sealed class GraphingViewModel : ViewModelBase
             var result = _sampler.Sample(Expression, options);
 
             TraceResult = string.Empty;
+            _svgExportContent = string.Empty;
             SvgExport = string.Empty;
             SvgPreview = string.Empty;
             CopyStatus = string.Empty;
@@ -258,8 +262,9 @@ public sealed class GraphingViewModel : ViewModelBase
 
             Segments = result.Segments;
             TableRows = GraphTableExporter.CreateRows(result.Segments);
-            TableCsv = GraphTableExporter.ToCsv(TableRows);
-            TablePreview = ExportPreviewFormatter.Create(TableCsv);
+            _tableExportContent = GraphTableExporter.ToCsv(TableRows);
+            TablePreview = ExportPreviewFormatter.Create(_tableExportContent);
+            TableCsv = TablePreview;
             var pointCount = result.Segments.Sum(segment => segment.Points.Count);
             Summary = $"{result.Segments.Count} segment(s) • {pointCount} valid point(s) • {result.InvalidSampleCount} invalid sample(s)";
             Preview = BuildPreview(result.Segments);
@@ -269,6 +274,7 @@ public sealed class GraphingViewModel : ViewModelBase
         catch (Exception exception) when (exception is ArgumentException or FormatException or OverflowException)
         {
             TraceResult = string.Empty;
+            _svgExportContent = string.Empty;
             SvgExport = string.Empty;
             SvgPreview = string.Empty;
             CopyStatus = string.Empty;
@@ -295,8 +301,9 @@ public sealed class GraphingViewModel : ViewModelBase
 
             MultiSeries = result.Series;
             MultiTableRows = MultiGraphTableExporter.CreateRows(result.Series);
-            MultiTableCsv = MultiGraphTableExporter.ToCsv(MultiTableRows);
-            MultiTablePreview = ExportPreviewFormatter.Create(MultiTableCsv);
+            _multiTableExportContent = MultiGraphTableExporter.ToCsv(MultiTableRows);
+            MultiTablePreview = ExportPreviewFormatter.Create(_multiTableExportContent);
+            MultiTableCsv = MultiTablePreview;
             var pointCount = result.Series.Sum(series => series.ValidPointCount);
             var invalidCount = result.Series.Sum(series => series.InvalidSampleCount);
             MultiSummary = $"{result.Series.Count} expression(s) • {pointCount} valid point(s) • {invalidCount} invalid sample(s)";
@@ -367,13 +374,15 @@ public sealed class GraphingViewModel : ViewModelBase
                 throw new InvalidOperationException("Plot a graph before generating SVG export.");
             }
 
-            SvgExport = _svgExporter.Export(Segments);
-            SvgPreview = ExportPreviewFormatter.Create(SvgExport);
+            _svgExportContent = _svgExporter.Export(Segments);
+            SvgPreview = ExportPreviewFormatter.Create(_svgExportContent);
+            SvgExport = SvgPreview;
             CopyStatus = string.Empty;
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
         {
+            _svgExportContent = string.Empty;
             SvgExport = string.Empty;
             SvgPreview = string.Empty;
             ErrorMessage = exception.Message;
@@ -400,17 +409,17 @@ public sealed class GraphingViewModel : ViewModelBase
 
     private async Task CopyTableAsync()
     {
-        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, TableCsv, "graph table");
+        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, _tableExportContent, "graph table");
     }
 
     private async Task CopyMultiTableAsync()
     {
-        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, MultiTableCsv, "multi-expression graph table");
+        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, _multiTableExportContent, "multi-expression graph table");
     }
 
     private async Task CopySvgAsync()
     {
-        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, SvgExport, "SVG graph export");
+        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, _svgExportContent, "SVG graph export");
     }
 
     private void RunAnalysis(Func<string> operation)
@@ -442,10 +451,12 @@ public sealed class GraphingViewModel : ViewModelBase
     {
         Segments = Array.Empty<GraphSegment>();
         TableRows = Array.Empty<GraphTableRow>();
+        _tableExportContent = string.Empty;
         TableCsv = string.Empty;
         TablePreview = string.Empty;
         Summary = string.Empty;
         Preview = string.Empty;
+        _svgExportContent = string.Empty;
         SvgExport = string.Empty;
         SvgPreview = string.Empty;
     }
@@ -454,6 +465,7 @@ public sealed class GraphingViewModel : ViewModelBase
     {
         MultiSeries = Array.Empty<GraphExpressionSample>();
         MultiTableRows = Array.Empty<MultiGraphTableRow>();
+        _multiTableExportContent = string.Empty;
         MultiTableCsv = string.Empty;
         MultiTablePreview = string.Empty;
         MultiSummary = string.Empty;
