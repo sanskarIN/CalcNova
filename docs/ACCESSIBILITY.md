@@ -108,7 +108,7 @@ Graphing requires:
 - explicit approximate labeling for numerical analysis;
 - no rapid flashing or unnecessary animated effects.
 
-The shared UI already provides textual sample/analysis output, but trace/table-of-values and full graph keyboard interaction remain future work.
+The shared UI now provides textual sample/analysis output, nearest-point trace output, bounded table-of-values CSV, multi-expression CSV, and accessible SVG generation/copy. Full graph keyboard pan/zoom interaction and target-platform screen-reader validation remain future work.
 
 ## Clipboard accessibility and privacy
 
