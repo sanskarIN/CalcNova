@@ -40,6 +40,7 @@ class CompletionStatusValidatorTests(unittest.TestCase):
                 "what_changed.md",
                 "SECURITY.md",
                 "SUPPORT.md",
+                "CONTRIBUTING.md",
                 "docs/README.md",
                 "docs/FEATURES.md",
                 "docs/ROADMAP.md",
@@ -63,6 +64,7 @@ class CompletionStatusValidatorTests(unittest.TestCase):
         self.assertIn("remaining high-priority work", forbidden)
         self.assertIn("suggested development milestones", forbidden)
         self.assertIn("development mobile display version", forbidden)
+        self.assertIn("## development environment", forbidden)
 
 
 if __name__ == "__main__":
