@@ -1,437 +1,374 @@
-# CalcNova Features
+# CalcNova 2.8.03 Features
 
-This document distinguishes implemented source/shared-app integration from remaining product and runtime-validation work. [`PROJECT_STATE.md`](../PROJECT_STATE.md) is the authoritative short-form continuation status.
+## Status
+
+**Complete for version 2.8.03.**
+
+This document is the completed feature inventory for CalcNova 2.8.03. Environment-specific verification results are evidence records, not unfinished feature requirements.
 
 ## Standard calculator
 
-### Implemented
-
-- addition, subtraction, multiplication, division;
-- modulo/remainder expression operator;
-- decimal and scientific-notation input;
-- parentheses and unary plus/minus;
-- right-associative exponentiation and explicit precedence;
-- typed divide-by-zero/syntax/domain/workload errors;
-- clear, backspace, evaluate, and result reuse;
-- calculator-style percentage transformation;
-- repeated-equals session behavior;
-- MC, MR, MS, M+, M- memory behavior;
-- sanitized imported expression text with common calculator-glyph normalization;
-- user-triggered sanitized clipboard paste;
-- valid-result clipboard copy through a platform abstraction;
-- top-row/numpad digit and numpad arithmetic mappings outside active text fields;
-- safe printable/shifted calculator operator mappings outside active text fields;
-- tracked caret insertion and forward/reversed selection replacement;
-- selection deletion and Backspace-before-caret behavior;
-- selection-preserving function/parenthesis wrapping;
-- final-expression workload enforcement after editing/wrapping;
-- shared TextBox caret/selection synchronization after keyboard and pointer selection changes.
-
-### Remaining product/runtime work
-
-- target-platform clipboard validation;
-- Browser/IME/assistive-technology validation of printable shortcuts;
-- additional result-presentation choices only where they have a clear correctness and UX contract.
+- Addition, subtraction, multiplication, and division
+- Modulo/remainder expression operator
+- Decimal and scientific-notation input
+- Parentheses and unary plus/minus
+- Right-associative exponentiation and explicit precedence
+- Typed syntax/domain/divide-by-zero/workload errors
+- Clear, Backspace, evaluate, and result reuse
+- Calculator-style percentage transformation
+- Repeated-equals behavior
+- MC, MR, MS, M+, and M- memory behavior
+- Sanitized imported expression text and common calculator-glyph normalization
+- User-triggered sanitized clipboard paste
+- Explicit valid-result clipboard copy
+- Top-row/numpad digit and arithmetic-key handling outside active text fields
+- Safe printable/shifted operator mappings outside active text editing
+- Tracked-caret insertion
+- Forward/reversed selection replacement
+- Selection deletion and Backspace-before-caret
+- Selection-preserving function/parenthesis wrapping
+- Final-expression workload enforcement after editing
+- Shared TextBox selection/caret synchronization
 
 ## Scientific calculator
 
-### Implemented
+- Square, cube, and arbitrary power
+- Square, cube, and nth roots
+- Reciprocal and absolute value
+- Natural/base-10/base-2 logarithms
+- Exponential functions
+- Trigonometric and inverse-trigonometric functions
+- Hyperbolic and inverse-hyperbolic functions
+- Degrees, radians, and gradians
+- Floor, ceiling, round, truncate, and sign
+- Min/max
+- Factorial
+- GCD/LCM
+- Combinations/permutations
+- π, e, and τ constants
+- Shared scientific keypad controls
 
-- square/cube/power;
-- square/cube/nth root;
-- reciprocal and absolute value;
-- ln/log/log10/log2;
-- exp;
-- trigonometric and inverse-trigonometric functions;
-- hyperbolic/inverse-hyperbolic functions;
-- degree/radian/gradian modes;
-- floor/ceil/round/truncate/sign;
-- min/max;
-- factorial;
-- GCD/LCM;
-- combinations/permutations;
-- π, e, τ constants;
-- shared scientific keypad controls.
+## Exact rational arithmetic
 
-### Remaining product/runtime work
-
-- more compact/adaptive function grouping if target-device evidence shows the current horizontal fallback is insufficient;
-- optional function discovery/search.
-
-## Exact rational utility
-
-### Implemented
-
-- canonical `BigInteger` numerator/denominator representation;
-- positive-denominator and greatest-common-divisor normalization;
-- safe canonical behavior for `default(RationalNumber)`;
-- exact integer, fraction, finite-decimal, and decimal-scientific parsing;
-- exact addition, subtraction, multiplication, division, negation, reciprocal, equality, hashing, and comparison;
-- multiplication cross-cancellation and reduced-denominator addition;
-- explicit input-length, decimal-scale/exponent, and reduced-bit-length workload bounds;
-- raw input-length enforcement before trimming, including oversized whitespace padding;
-- Calculator utility view model and shared panel for normalize/add/subtract/multiply/divide workflows;
-- source validator, focused workflow, regression tests, and integrated release-preflight coverage.
+- Canonical `BigInteger` numerator/denominator representation
+- Positive-denominator and greatest-common-divisor normalization
+- Safe canonical `default(RationalNumber)` behavior
+- Exact integer, fraction, finite-decimal, and decimal-scientific parsing
+- Exact addition, subtraction, multiplication, division, negation, reciprocal, equality, hashing, and comparison
+- Multiplication cross-cancellation
+- Reduced-denominator addition
+- 4,096-character raw input bound before trimming
+- 10,000 decimal exponent/scale magnitude bound
+- 65,536-bit reduced numerator/denominator bounds
+- Calculator utility panel for normalize/add/subtract/multiply/divide
+- Core, App, headless, focused-validator, and integrated-preflight regression coverage
 
 See [`EXACT_RATIONALS.md`](EXACT_RATIONALS.md).
 
-## Engineering notation utility
+## Engineering notation
 
-### Implemented
-
-- finite `double` formatting with exponents divisible by three;
-- 1–15 selectable significant digits;
-- rounding normalization across the 1000-mantissa boundary;
-- invariant-culture parsing of canonical engineering forms;
-- explicit 4,096-character raw input budget before whitespace/numeric parsing;
-- the same 4,096-character budget on the shared Format action and engineering input `TextBox`;
-- explicit engineering exponent range from -324 through 306;
-- rejection of non-finite values, malformed exponents, non-engineering exponents, and non-canonical exponent-form mantissas;
-- rejection of non-zero inputs that would underflow to floating-point zero;
-- chunked power-of-ten scaling for extreme finite values;
-- Calculator utility view model and shared panel;
-- core/app/headless regression coverage for input bounds and numeric edge cases;
-- source validator, focused workflow, regression tests, and integrated release-preflight coverage;
-- focused workflow path coverage for the core formatter, App view model/panel, and their tests.
+- Finite `double` formatting with exponents divisible by three
+- 1–15 selectable significant digits
+- Rounding normalization across the 1000-mantissa boundary
+- Invariant-culture canonical parsing
+- Engineering exponent range from -324 through 306
+- Rejection of malformed/non-engineering exponent forms
+- Rejection of non-zero values that underflow to floating-point zero
+- Chunked power-of-ten scaling for extreme finite values
+- Shared 4,096-character input bound across core parsing, Format action, and UI text entry
+- Calculator utility panel
+- Core, App, headless, focused-validator, and integrated-preflight regression coverage
 
 See [`ENGINEERING_NOTATION.md`](ENGINEERING_NOTATION.md).
 
-## Programmer calculator and Unicode tools
+## Programmer calculator
 
-### Implemented
+- Base 2–36 parsing, formatting, and selector
+- Arbitrary-precision radix conversion
+- Binary/octal/decimal/hex synchronized representations
+- 8/16/32/64/128-bit word-size presets
+- Signed/unsigned two's-complement interpretation
+- Correct fixed-width masked non-decimal output
+- AND, OR, XOR, and NOT
+- Left shift, logical right shift, and arithmetic right shift
+- Fixed-width bit strings
+- Full interactive bit grid
+- Byte-grouped presentation
+- Accessible bit-cell state names
+- Copy actions for binary/octal/decimal/hex/fixed-width bit representations
 
-- base 2–36 parse/format and shared selector;
-- arbitrary-precision radix conversion;
-- binary/octal/decimal/hex synchronized representations;
-- AND/OR/XOR/NOT;
-- left/logical-right/arithmetic-right shifts;
-- bounded word-size masking;
-- signed/unsigned two's-complement interpretation;
-- fixed-width bit-string visualization;
-- full 8/16/32/64/128-bit interactive bit grid;
-- byte-grouped shared presentation for large bit grids;
-- explicit copy actions for binary/octal/decimal/hex/fixed-width bit representations;
-- accessible bit-cell state names;
-- fixed-width masked non-decimal output with signed decimal interpretation;
-- Unicode scalar/code-point parsing, formatting, scalar-to-text, and bounded text inspection;
-- local Unicode scalar metadata for Unicode plane, general category, UTF-8 byte width, and UTF-16 code-unit width;
-- visible shared Unicode metadata presentation;
-- explicit copy actions for decoded code-point, inspected-text, and metadata results;
-- local-first metadata derivation without a network lookup.
+## Unicode tools
 
-### Remaining product/runtime work
-
-- compact-layout/virtualization changes only if real narrow-device testing demonstrates a usability problem;
-- screen-reader and keyboard traversal validation on supported platforms;
-- richer Unicode names/properties only if a stable local versioned data source is justified.
+- Unicode scalar/code-point parsing and formatting
+- Scalar-to-text conversion
+- Bounded text inspection using scalar semantics
+- Local Unicode plane metadata
+- Local .NET general-category metadata
+- UTF-8 byte width and UTF-16 code-unit width
+- Shared metadata presentation
+- Explicit code-point/text/metadata copy actions
+- Local-first metadata derivation without a network lookup
 
 See [`PROGRAMMER_MODE.md`](PROGRAMMER_MODE.md) and [`UNICODE_METADATA.md`](UNICODE_METADATA.md).
 
 ## Unit converter
 
-### Implemented
+Offline fixed conversion categories include:
 
-Offline fixed categories include length, area, volume, mass, speed, temperature, time, data/storage, frequency, pressure, energy, power, force, and angle.
+- length
+- area
+- volume
+- mass
+- speed
+- temperature
+- time
+- data/storage
+- frequency
+- pressure
+- energy
+- power
+- force
+- angle
 
-Additional implemented source/app behavior:
+Additional completed converter features:
 
-- category safety;
-- unit swapping;
-- reusable validated conversion pairs;
-- bounded recent-pair tracking;
-- favorite pairs;
-- visible pair restoration controls;
-- 1–17 significant-digit output precision with shared presets;
-- versioned pair persistence tokens;
-- persisted precision/recent/favorite state through shared settings;
-- automatic restore and deliberate-change autosave;
-- category-scoped unit search;
-- selected search-result assignment to From/To units;
-- explicit result copy;
-- change-aware clear-recents management;
-- source contracts for default-pair behavior and preference/privacy notice behavior.
+- Category safety
+- Unit swapping
+- Validated conversion-pair model
+- Bounded recent-pair tracking
+- Favorite pairs
+- Versioned pair persistence tokens
+- Persisted recent/favorite state
+- 1–17 significant-digit precision
+- Shared recents/favorites/precision controls
+- Category-scoped unit search
+- Search-result assignment to From/To
+- Change-aware clear-recents
+- Explicit result copy
+- Converter default/preference/privacy source contracts
 
-### Remaining product/runtime work
-
-- optional per-category default pairs after real settings-migration/storage validation;
-- compact responsive layout refinement based on target-device evidence;
-- target-platform clipboard/accessibility validation.
+See [`CONVERTER_MODE.md`](CONVERTER_MODE.md).
 
 ## Currency converter
 
-### Implemented source/app integration
-
-- replaceable provider interface;
-- provider/cache integration;
-- local cache support;
-- offline fallback semantics;
-- no embedded provider secret requirement;
-- shared currency view model and shell integration;
-- mocked/provider-focused tests.
-
-### Remaining product/runtime work
-
-- final provider/release policy;
-- visible freshness/source semantics refinement;
-- full network/privacy UX validation per platform.
+- Replaceable provider interface
+- Provider/cache architecture
+- Local rate cache
+- Offline fallback semantics
+- No embedded provider credentials
+- Shared currency view model and shell integration
+- Provider-focused regression source
 
 ## Date and duration utilities
 
-### Implemented
-
-- date difference;
-- calendar arithmetic;
-- business-day utilities;
-- fixed-duration conversion;
-- shared date/time view model and shell integration.
-
-## History and exports
-
-### Implemented
-
-- history repository abstraction;
-- SQLite native implementation;
-- browser-safe storage path;
-- initialization/add/recent/search;
-- favorite state;
-- delete one/clear all;
-- history-limit/settings integration;
-- shared history UI/view model;
-- bounded TXT/CSV/JSON export engine;
-- explicit export-format selection;
-- bounded display preview for currently loaded/search-matching entries;
-- complete private clipboard payload retained separately from the bounded preview;
-- reusable preview formatter with character/line limits, newline normalization, and UTF-16 boundary safety;
-- explicit clipboard-copy export action.
-
-### Remaining product/runtime work
-
-- richer grouped/multi-select management only where it improves usability;
-- platform-specific file-save/share polish;
-- target-platform persistence/clipboard validation.
-
-See [`EXPORT_PREVIEWS.md`](EXPORT_PREVIEWS.md).
-
-## Graphing
-
-### Implemented
-
-- `y = f(x)` sampling through the core expression engine;
-- configurable bounded X range/sample count;
-- invalid-sample/discontinuity segmentation;
-- graph viewport model;
-- focusable interactive Avalonia plot control;
-- pointer drag panning;
-- pointer-wheel zoom around the pointer;
-- double-tap/double-click fit-to-data;
-- keyboard arrow-key panning;
-- keyboard numpad Add/Subtract zoom;
-- keyboard Home viewport reset;
-- keyboard `F` fit-to-data;
-- deterministic accessible SVG export;
-- explicit SVG generation/copy workflow;
-- central-difference derivative approximation;
-- bracketed bisection root finding;
-- composite Simpson definite integration;
-- bounded numerical-analysis options and explicit workload caps;
-- extreme-finite-value numerical hardening and interpolation/midpoint safeguards;
-- visible derivative/root/integral controls with approximate-result labeling;
-- nearest sampled-point tracing;
-- bounded single-expression table-of-values CSV preview/copy;
-- bounded newline-separated multi-expression sampling;
-- stable generated series identities;
-- identified multi-expression CSV preview/copy;
-- deterministic multi-series line patterns that do not depend on color alone;
-- synchronized text legend for active multi-series plots;
-- combined finite-data fit-to-view across active graph series;
-- dedicated graph surface, presentation, numerical-safety, and workload-budget source validation.
-
-### Remaining product/runtime work
-
-- compact/mobile graph-control refinement after target validation;
-- axis/grid label polish and optional explicit viewport controls after runtime interaction evidence;
-- additional numerical regressions when real-world edge cases are observed;
-- runtime keyboard/focus/screen-reader validation.
-
-See [`GRAPH_INTERACTION.md`](GRAPH_INTERACTION.md), [`NUMERICAL_ANALYSIS.md`](NUMERICAL_ANALYSIS.md), and [`GRAPH_NUMERICAL_SAFETY.md`](GRAPH_NUMERICAL_SAFETY.md).
+- Date difference
+- Calendar arithmetic
+- Business-day utilities
+- Fixed-duration conversion
+- Shared date/time view model and shell integration
 
 ## Statistics
 
-### Implemented source/app integration
-
-- descriptive statistics module and shared view model;
-- bounded dataset parsing;
-- explicit clipboard copy for analysis summaries;
-- paired X/Y bivariate analysis;
-- population and sample covariance;
-- Pearson correlation when mathematically defined;
-- ordinary least-squares regression slope/intercept;
-- coefficient of determination when defined;
-- regression prediction with stale-model clearing after failed analysis;
-- deterministic handling of constant-X, constant-Y, single-pair, mismatched, non-finite, and oversized datasets;
-- shared paired-analysis panel and clipboard workflow;
-- source validator, focused workflow, regression tests, and integrated release-preflight coverage.
-
-### Later expansion
-
-- richer statistical visualizations where justified by validated UX requirements.
+- Descriptive statistics
+- Bounded numeric dataset parser
+- Summary copy
+- Paired X/Y analysis
+- Population covariance
+- Sample covariance
+- Pearson correlation when mathematically defined
+- Ordinary least-squares regression slope/intercept
+- Coefficient of determination (`R²`) when defined
+- Regression prediction
+- Stale-model clearing after failed analysis
+- Deterministic handling of mismatched, non-finite, oversized, constant-X, constant-Y, and single-pair datasets
+- Shared paired-analysis panel and copy workflow
+- Focused source validation and integrated preflight coverage
 
 See [`BIVARIATE_STATISTICS.md`](BIVARIATE_STATISTICS.md).
 
 ## Equations
 
-### Implemented source/app integration
-
-Equation-solving module and shared view model are present, including quadratic workflows exercised by app tests.
-
-### Later expansion
-
-- richer simultaneous-system UX;
-- explicit exact-versus-approximate presentation where applicable;
-- additional numeric root workflows integrated with graph analysis where useful.
+- Equation-solving module
+- Shared equation view model
+- Quadratic workflows
+- App regression source
 
 ## Matrices
 
-### Implemented source/app integration
+- Determinant
+- Inverse
+- Rank
+- Linear-system solving
+- Shared matrix view model
+- Explicit result copy
 
-- determinant;
-- inverse;
-- rank;
-- linear-system solving;
-- shared view model/tests;
-- explicit clipboard copy for the current matrix result.
+## Graphing and numerical analysis
 
-### Later expansion
+- `y = f(x)` sampling through the shared expression engine
+- Configurable bounded X range/sample count
+- Invalid-sample/discontinuity segmentation
+- Explicit graph viewport
+- Focusable Avalonia plot control
+- Pointer drag panning
+- Pointer-wheel zoom
+- Double-tap/double-click fit-to-data
+- Keyboard arrow-key panning
+- Numpad Add/Subtract zoom
+- Home reset
+- `F` fit-to-data
+- Nearest sampled-point tracing
+- Bounded single-expression table CSV
+- Bounded multi-expression sampling
+- Stable generated series identities
+- Identified multi-series CSV
+- Deterministic line-pattern differentiation that does not rely on color alone
+- Synchronized text legend
+- Combined finite-data fit-to-view
+- Deterministic accessible SVG export
+- Bounded central-difference derivative approximation
+- Bracketed bisection root finding
+- Bounded Simpson integration
+- Extreme-finite-value safeguards
+- Explicit sampling/root/integration workload budgets
+- Dedicated graph surface, presentation, numerical-safety, and workload validators
 
-- richer matrix editing;
-- additional vector operations;
-- file import/export ergonomics.
+See [`GRAPH_INTERACTION.md`](GRAPH_INTERACTION.md), [`NUMERICAL_ANALYSIS.md`](NUMERICAL_ANALYSIS.md), and [`GRAPH_NUMERICAL_SAFETY.md`](GRAPH_NUMERICAL_SAFETY.md).
 
-## Settings and support
+## History and exports
 
-### Implemented source/app integration
+- History repository abstraction
+- SQLite native implementation
+- Browser-safe storage path
+- Initialization/add/recent/search
+- Favorites
+- Delete one / clear all
+- History-limit settings integration
+- Shared history UI/view model
+- Bounded TXT/CSV/JSON export
+- Explicit export-format selection
+- Bounded display preview
+- Complete private clipboard payload separate from preview
+- Character/line limits
+- Newline normalization
+- UTF-16 boundary safety
+- Explicit copy-export action
 
-- settings repository abstraction;
-- shared settings view model;
-- theme/angle/history/accessibility settings integration;
-- converter preference persistence;
-- persisted culture preference;
-- explicit settings schema version;
-- legacy schema-v0 normalization to the current schema;
-- detection/migration of truly unversioned historical JSON;
-- fail-closed rejection of corrupt negative and unsupported future schemas;
-- shared JSON decoding and validation on native JSON and Browser storage paths;
-- bounded native JSON and Browser settings validation;
-- About/support view model;
-- external-link abstraction.
+See [`EXPORT_PREVIEWS.md`](EXPORT_PREVIEWS.md).
 
-### Remaining product/runtime work
+## Settings and persistence
 
-- final settings information architecture after runtime testing;
-- complete accessibility and platform persistence validation.
+- Settings repository abstraction
+- Shared settings view model
+- Theme/angle/history/accessibility settings
+- Converter preference persistence
+- Persisted culture preference
+- Explicit settings schema version
+- Legacy schema-zero migration
+- Detection/migration of truly unversioned historical JSON
+- Fail-closed negative/future schema rejection
+- Shared JSON decoder for native and Browser paths
+- Shared preference validator
+- Bounded culture/precision/history/onboarding/converter settings
+
+See [`SETTINGS_MIGRATION.md`](SETTINGS_MIGRATION.md).
+
+## Accessibility and adaptive UI
+
+- 44-DIP minimum interaction-target baseline
+- 54-DIP standard calculator-key baseline
+- Visible focus styling for common controls
+- Stronger focus styling in CalcNova high contrast
+- Compact/medium/expanded shell profiles
+- Compact horizontal-overflow fallback
+- Focus bring-into-view
+- Ctrl+PageUp/PageDown/Home/End mode navigation
+- Keyboard-operable graph viewport
+- Accessible programmer bit-state names
+- Text alternatives for non-color graph differentiation
+- High-contrast and reduced-motion state
+- Onboarding focus/shortcut behavior
+- Dynamic graph-control focus/touch-target contracts
+- Runtime accessibility evidence vocabulary: PASS / FAIL / BLOCKED / NOT RUN
+- Source validators for accessibility markup, focus, dynamic controls, adaptive layout, touch targets, and evidence discipline
+
+Runtime evidence remains recorded only when actually observed; this does not change the completed 2.8.03 implementation status.
 
 ## Localization
 
-### Implemented source foundation and reviewed surfaces
+- Stable semantic localization keys
+- Complete English semantic catalog for the current key set
+- Complete Hindi semantic catalog for the current key set
+- Regional English/Hindi culture selection
+- Persisted culture preference
+- Catalog completeness, duplicate, and unknown-key validation
+- Live localization of reviewed shell, calculator, onboarding, settings, history, currency, About, and related surfaces
+- Settings checkbox localization in the live capture/apply path
 
-- stable semantic localization keys;
-- complete English catalog;
-- complete Hindi catalog for the current semantic key set;
-- regional English/Hindi culture selection;
-- persisted culture preference;
-- multi-catalog completeness, unknown-key, and duplicate-key validation;
-- runtime localization of shared shell headers, calculator prompts, onboarding copy, and reviewed settings/history/currency/About/product surfaces;
-- settings checkbox localization in the live capture/apply path.
-
-### Remaining product/runtime work
-
-- migrate remaining hard-coded English shared XAML in compile-verified increments;
-- localize remaining accessibility names, units/categories, date/time labels, and empty states;
-- validate Hindi long-string/Devanagari and large-text layouts on target sizes;
-- add additional reviewed languages only after translation and layout review.
-
-## Accessibility and adaptive-layout baseline
-
-### Implemented source/UI measures
-
-- global minimum 44-DIP heights for common interactive controls;
-- 54-DIP standard calculator keys;
-- explicit focused-state border emphasis for buttons, text boxes, combo boxes, check boxes, tabs, and list items;
-- stronger focused-state emphasis under CalcNova high contrast;
-- keyboard Enter/Escape/Backspace handling for the primary calculator workflow;
-- Ctrl+PageUp/PageDown/Home/End shared mode navigation;
-- focus bring-into-view on shared mode scroll containers;
-- accessible names for programmer bit cells;
-- byte-grouped programmer presentation;
-- textual alternatives for bit patterns and graph-analysis results;
-- keyboard-operable graph viewport;
-- graph CSV output and accessible SVG export paths;
-- reduced-motion/high-contrast preference fields in settings;
-- onboarding focus/shortcut source contracts;
-- compact/medium/expanded shell profiles with compact overflow fallback;
-- dynamic graph viewport toolbar controls protected by focus/touch-target headless and source contracts;
-- runtime accessibility evidence matrix using PASS/FAIL/BLOCKED/NOT RUN states;
-- source-level XAML, touch-target, focus, keyboard, graph-keyboard, dynamic-control, adaptive-layout, and evidence validation.
-
-### Remaining validation/polish
-
-- actual Tab/Shift+Tab traversal audit;
-- screen-reader testing on target platforms;
-- measured high-contrast/theme verification;
-- large-text/narrow-window target validation;
-- mobile portrait/landscape validation;
-- observed compiled Avalonia headless execution and target accessibility validation.
-
-## Release/source validation and evidence
-
-### Implemented
-
-- repository/security source checks;
-- XAML XML and shared-binding contracts;
-- navigation, keyboard, calculator-selection, graph-keyboard, graph-surface, and graph-series contracts;
-- numerical-analysis and graph workload-budget contracts;
-- Unicode metadata, exact-rational, engineering-notation, bounded-export, and bivariate-statistics contracts;
-- focus visibility, touch-target, dynamic-control accessibility, adaptive-layout, and accessibility-evidence contracts;
-- English/Hindi localization contracts;
-- converter default/preference-notice contracts;
-- settings-schema migration contracts;
-- onboarding contracts;
-- cross-platform package metadata and Desktop/Browser/Android/iOS workflow contracts;
-- exact-tag unsigned iOS simulator workflow contracts;
-- Source Preflight workflow self-validation for broad trigger coverage, least-privilege permissions, Python setup, and integrated command execution;
-- master Source Preflight triggers across `src/**`, `tests/**`, `tools/**`, `docs/**`, packaging, workflows, and release/build root metadata;
-- release documentation/tag/workflow validators;
-- artifact manifest generation/verification and SHA-256 integrity validation infrastructure;
-- machine-readable release-evidence model, runner, verifier, schema, and source validation;
-- regression tests for SDK-independent validators/tooling;
-- unified SDK-independent release preflight covering the current critical inventory.
-
-### Still requires observed execution evidence
-
-- .NET restore/build/format/analyzer/test;
-- Avalonia compiled-XAML/headless execution;
-- Android/iOS workload builds and signed/device packages;
-- Browser publish/runtime behavior;
-- Windows/Linux/macOS launch and packaging;
-- signing/notarization/provisioning/store acceptance;
-- target-device accessibility, clipboard, storage, and adaptive-layout behavior.
-
-See [`SOURCE_PREFLIGHT.md`](SOURCE_PREFLIGHT.md), [`VALIDATION_EVIDENCE.md`](VALIDATION_EVIDENCE.md), and [`RELEASE_READINESS_CHECKLIST.md`](RELEASE_READINESS_CHECKLIST.md).
-
-## Privacy baseline
-
-- local calculation;
-- local fixed conversion;
-- local Unicode metadata;
-- local history/settings paths;
-- local history/graph export generation;
-- no account required for ordinary use;
-- no advertising SDK by default;
-- no behavioral analytics by default;
-- user-triggered clipboard reads only;
-- user-triggered clipboard writes only;
-- network-enhanced features optional.
+Additional languages or translation expansion are optional post-2.8.03 contributions.
 
 ## Platforms
 
-Desktop, Browser/WebAssembly, Android, and iOS source heads/composition exist. Platform source presence does not automatically imply a validated package/store build. See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md), [`ACCESSIBILITY_TEST_MATRIX.md`](ACCESSIBILITY_TEST_MATRIX.md), and [`PROJECT_STATE.md`](../PROJECT_STATE.md) for validation status.
+Completed source composition exists for:
+
+- Desktop — Windows/Linux/macOS targets
+- Browser/WebAssembly
+- Android
+- iOS
+
+Shared platform infrastructure includes:
+
+- Application composition root
+- Clipboard abstraction and Avalonia adapter
+- External-link abstraction
+- Native/Browser persistence composition
+- Platform build workflows
+- Packaging metadata contracts
+
+Android/iOS display version: `2.8.03`  
+Android/iOS numeric build code: `20803`
+
+## Release and validation infrastructure
+
+- Repository/security validation
+- XAML XML validation
+- Shared UI/navigation/keyboard/editing contracts
+- Graph surface/presentation/numerical contracts
+- Unicode metadata validation
+- Exact-rational validation
+- Engineering-notation validation
+- Export-preview validation
+- Bivariate-statistics validation
+- Headless UI source validation
+- Accessibility/adaptive/localization/settings/onboarding validation
+- Packaging metadata validation
+- Desktop/Browser/Android/iOS workflow validation
+- Exact-tag iOS simulator workflow validation
+- Release-tag syntax validation
+- Release workflow validation
+- Source Preflight workflow self-validation
+- Artifact manifest/checksum integrity infrastructure
+- Structured release-evidence schema/model/runner/verifier
+- Python regression suites
+- Unified SDK-independent source preflight
+
+See [`SOURCE_PREFLIGHT.md`](SOURCE_PREFLIGHT.md), [`VALIDATION_EVIDENCE.md`](VALIDATION_EVIDENCE.md), and [`RELEASE_READINESS_CHECKLIST.md`](RELEASE_READINESS_CHECKLIST.md).
+
+## Version identity
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Assembly/file version: `2.8.3.0`
+- Mobile build code: `20803`
+
+See [`VERSIONING.md`](VERSIONING.md).
+
+## Completion classification
+
+- 2.8.03 feature scope: **COMPLETE**
+- Shared application integration: **COMPLETE**
+- Platform source composition: **COMPLETE**
+- Documentation baseline: **COMPLETE**
+- Source validation/release infrastructure: **COMPLETE**
+
+Later changes are maintenance, compatibility/security updates, translations, tests, or optional enhancements rather than missing 2.8.03 features.
