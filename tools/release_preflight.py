@@ -26,6 +26,7 @@ CHECKS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Settings schema", ("tools/validate_settings_schema.py", ".")),
     ("Onboarding contracts", ("tools/validate_onboarding_contracts.py", ".")),
     ("Packaging metadata", ("tools/validate_packaging_metadata.py", ".")),
+    ("Platform workflows", ("tools/validate_platform_workflows.py", ".")),
     ("Release workflow", ("tools/validate_release_workflow.py", ".")),
     ("Release documentation", ("tools/validate_release_docs.py", ".")),
     ("Release-tag validator tests", ("tools/tests/test_validate_release_tag.py",)),
@@ -41,6 +42,7 @@ CHECKS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Adaptive validator tests", ("-m", "unittest", "tools.tests.test_validate_adaptive_layout")),
     ("Touch-target validator tests", ("-m", "unittest", "tools.tests.test_validate_touch_targets")),
     ("Packaging validator tests", ("-m", "unittest", "tools.tests.test_validate_packaging_metadata")),
+    ("Platform-workflow validator tests", ("-m", "unittest", "tools.tests.test_validate_platform_workflows")),
     ("Preflight inventory tests", ("-m", "unittest", "tools.tests.test_release_preflight")),
 )
 
