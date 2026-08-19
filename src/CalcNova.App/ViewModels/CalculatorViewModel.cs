@@ -313,7 +313,7 @@ public sealed class CalculatorViewModel : ViewModelBase
             return;
         }
 
-        Expression = string.Concat(Expression.AsSpan(0, start), token, Expression.AsSpan(end));
+        Expression = Expression[..start] + token + Expression[end..];
         StatusMessage = string.Empty;
         RequestSelection(start + token.Length);
     }
