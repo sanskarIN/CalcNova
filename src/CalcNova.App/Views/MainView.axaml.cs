@@ -13,6 +13,7 @@ using CalcNova.App.Infrastructure;
 using CalcNova.App.Localization;
 using CalcNova.App.Services;
 using CalcNova.App.ViewModels;
+using CalcNova.Graphing;
 using CalcNova.Platform.Settings;
 
 namespace CalcNova.App.Views;
@@ -31,6 +32,7 @@ public partial class MainView : UserControl
     private TextBox? _calculatorExpressionTextBox;
     private CalculatorViewModel? _calculatorEditorViewModel;
     private GraphPlotControl? _graphPlotControl;
+    private TextBlock? _graphLegendTextBlock;
     private GraphingViewModel? _graphPlotViewModel;
     private bool _onboardingWasVisible;
 
@@ -324,6 +326,7 @@ public partial class MainView : UserControl
     {
         if (_graphPlotControl is not null && ReferenceEquals(_graphPlotViewModel, graphing))
         {
+            SynchronizeGraphPlot();
             return;
         }
 
@@ -340,16 +343,27 @@ public partial class MainView : UserControl
         var plot = new GraphPlotControl
         {
             MinHeight = 300,
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            Segments = graphing.Segments
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch
         };
         ToolTip.SetTip(plot, "Interactive graph: drag to pan, wheel or numpad +/- to zoom, Home to reset, F to fit data.");
 
+        var legend = new TextBlock
+        {
+            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+            Opacity = 0.72,
+            IsVisible = false,
+            Margin = new Thickness(0, 2, 0, 4)
+        };
+        legend.Classes.Add("graph-series-legend");
+
         var insertionIndex = Math.Min(8, graphPanel.Children.Count);
         graphPanel.Children.Insert(insertionIndex, plot);
+        graphPanel.Children.Insert(Math.Min(insertionIndex + 1, graphPanel.Children.Count), legend);
         _graphPlotControl = plot;
+        _graphLegendTextBlock = legend;
         _graphPlotViewModel = graphing;
         graphing.PropertyChanged += HandleGraphingPropertyChanged;
+        SynchronizeGraphPlot();
     }
 
     private void DetachGraphPlot()
@@ -359,22 +373,61 @@ public partial class MainView : UserControl
             _graphPlotViewModel.PropertyChanged -= HandleGraphingPropertyChanged;
         }
 
-        if (_graphPlotControl?.Parent is Panel panel)
+        if (_graphPlotControl?.Parent is Panel plotPanel)
         {
-            panel.Children.Remove(_graphPlotControl);
+            plotPanel.Children.Remove(_graphPlotControl);
+        }
+
+        if (_graphLegendTextBlock?.Parent is Panel legendPanel)
+        {
+            legendPanel.Children.Remove(_graphLegendTextBlock);
         }
 
         _graphPlotControl = null;
+        _graphLegendTextBlock = null;
         _graphPlotViewModel = null;
     }
 
     private void HandleGraphingPropertyChanged(object? sender, PropertyChangedEventArgs eventArgs)
     {
-        if (eventArgs.PropertyName == nameof(GraphingViewModel.Segments) &&
-            _graphPlotControl is not null &&
-            _graphPlotViewModel is not null)
+        if (eventArgs.PropertyName is nameof(GraphingViewModel.Segments)
+            or nameof(GraphingViewModel.MultiSeries)
+            or nameof(GraphingViewModel.PlotMode))
         {
-            _graphPlotControl.Segments = _graphPlotViewModel.Segments;
+            SynchronizeGraphPlot();
+        }
+    }
+
+    private void SynchronizeGraphPlot()
+    {
+        if (_graphPlotControl is null || _graphPlotViewModel is null)
+        {
+            return;
+        }
+
+        if (_graphPlotViewModel.PlotMode == GraphPlotMode.Multiple && _graphPlotViewModel.MultiSeries.Count > 0)
+        {
+            _graphPlotControl.Segments = Array.Empty<GraphSegment>();
+            _graphPlotControl.Series = _graphPlotViewModel.MultiSeries;
+
+            if (_graphLegendTextBlock is not null)
+            {
+                var presentations = GraphSeriesPresentationFactory.Create(_graphPlotViewModel.MultiSeries);
+                _graphLegendTextBlock.Text = string.Join(
+                    Environment.NewLine,
+                    presentations.Select(presentation => presentation.LegendText));
+                _graphLegendTextBlock.IsVisible = presentations.Count > 0;
+            }
+
+            return;
+        }
+
+        _graphPlotControl.Series = Array.Empty<GraphExpressionSample>();
+        _graphPlotControl.Segments = _graphPlotViewModel.Segments;
+        if (_graphLegendTextBlock is not null)
+        {
+            _graphLegendTextBlock.Text = string.Empty;
+            _graphLegendTextBlock.IsVisible = false;
         }
     }
 
