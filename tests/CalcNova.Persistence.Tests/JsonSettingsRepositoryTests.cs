@@ -68,7 +68,20 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
         await repository.SaveAsync(expected);
         var actual = await repository.LoadAsync();
 
-        Assert.Equal(expected, actual);
+        Assert.Equal(expected.Theme, actual.Theme);
+        Assert.Equal(expected.AngleUnit, actual.AngleUnit);
+        Assert.Equal(expected.CultureName, actual.CultureName);
+        Assert.Equal(expected.DecimalPrecision, actual.DecimalPrecision);
+        Assert.Equal(expected.UseGroupingSeparators, actual.UseGroupingSeparators);
+        Assert.Equal(expected.HapticsEnabled, actual.HapticsEnabled);
+        Assert.Equal(expected.HistoryEnabled, actual.HistoryEnabled);
+        Assert.Equal(expected.HistoryLimit, actual.HistoryLimit);
+        Assert.Equal(expected.ReducedMotion, actual.ReducedMotion);
+        Assert.Equal(expected.HighContrast, actual.HighContrast);
+        Assert.Equal(expected.ConverterSignificantDigits, actual.ConverterSignificantDigits);
+        Assert.Equal(expected.ConverterRecentPairs, actual.ConverterRecentPairs);
+        Assert.Equal(expected.ConverterFavoritePairs, actual.ConverterFavoritePairs);
+        Assert.Equal(expected.CompletedOnboardingVersion, actual.CompletedOnboardingVersion);
     }
 
     [Fact]
