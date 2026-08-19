@@ -1,3 +1,4 @@
+using CalcNova.App.Localization;
 using CalcNova.Currency;
 using CalcNova.Platform.Clipboard;
 using CalcNova.Platform.External;
@@ -17,6 +18,8 @@ public sealed record AppDependencies(
     public ICurrencyRateCache? CurrencyRateCache { get; init; }
 
     public ICurrencyRateProvider? CurrencyRateProvider { get; init; }
+
+    public IAppLocalizer? Localizer { get; init; }
 
     public static AppDependencies Empty { get; } = new(null, null);
 }
