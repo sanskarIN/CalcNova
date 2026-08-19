@@ -1,0 +1,84 @@
+using System.Windows.Input;
+using CalcNova.App.Infrastructure;
+using CalcNova.Programmer;
+
+namespace CalcNova.App.ViewModels;
+
+public sealed class CodePointViewModel : ViewModelBase
+{
+    private string _codePointInput = "U+0041";
+    private string _textInput = "A";
+    private string _codePointResult = "U+0041 → A";
+    private string _textResult = "U+0041";
+    private string _errorMessage = string.Empty;
+
+    public CodePointViewModel()
+    {
+        DecodeCodePointCommand = new RelayCommand(_ => DecodeCodePoint());
+        InspectTextCommand = new RelayCommand(_ => InspectText());
+    }
+
+    public string CodePointInput
+    {
+        get => _codePointInput;
+        set => SetField(ref _codePointInput, value ?? string.Empty);
+    }
+
+    public string TextInput
+    {
+        get => _textInput;
+        set => SetField(ref _textInput, value ?? string.Empty);
+    }
+
+    public string CodePointResult
+    {
+        get => _codePointResult;
+        private set => SetField(ref _codePointResult, value);
+    }
+
+    public string TextResult
+    {
+        get => _textResult;
+        private set => SetField(ref _textResult, value);
+    }
+
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        private set => SetField(ref _errorMessage, value);
+    }
+
+    public ICommand DecodeCodePointCommand { get; }
+
+    public ICommand InspectTextCommand { get; }
+
+    private void DecodeCodePoint()
+    {
+        try
+        {
+            var value = UnicodeCodePointHelper.Parse(CodePointInput);
+            CodePointResult = $"{UnicodeCodePointHelper.Format(value)} → {UnicodeCodePointHelper.ToText(value)}";
+            ErrorMessage = string.Empty;
+        }
+        catch (Exception exception) when (exception is ArgumentException or FormatException)
+        {
+            CodePointResult = string.Empty;
+            ErrorMessage = exception.Message;
+        }
+    }
+
+    private void InspectText()
+    {
+        try
+        {
+            var codePoints = UnicodeCodePointHelper.GetCodePoints(TextInput);
+            TextResult = codePoints.Count == 0 ? "No code points." : string.Join("  ", codePoints);
+            ErrorMessage = string.Empty;
+        }
+        catch (Exception exception) when (exception is ArgumentException or FormatException)
+        {
+            TextResult = string.Empty;
+            ErrorMessage = exception.Message;
+        }
+    }
+}
