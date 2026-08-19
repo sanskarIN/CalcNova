@@ -56,6 +56,8 @@ public sealed class BrowserSettingsRepository : ISettingsRepository
 
     private static AppSettings Validate(AppSettings settings)
     {
+        settings = AppSettingsSchema.Normalize(settings);
+
         if (!Enum.IsDefined(settings.Theme))
         {
             throw new InvalidDataException("The stored theme preference is invalid.");
