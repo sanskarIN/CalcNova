@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Localization;
 using CalcNova.Core.Evaluation;
 using CalcNova.Platform.Settings;
 
@@ -8,9 +9,11 @@ namespace CalcNova.App.ViewModels;
 public sealed class SettingsViewModel : ViewModelBase
 {
     private readonly ISettingsRepository? _repository;
+    private readonly IAppLocalizer _localizer;
     private readonly SemaphoreSlim _saveGate = new(1, 1);
     private ThemePreference _theme = ThemePreference.System;
     private AngleUnit _angleUnit = AngleUnit.Degrees;
+    private string _cultureName = "en";
     private int _decimalPrecision = 15;
     private bool _useGroupingSeparators = true;
     private bool _hapticsEnabled = true;
@@ -24,9 +27,13 @@ public sealed class SettingsViewModel : ViewModelBase
     private int _completedOnboardingVersion;
     private string _statusMessage = string.Empty;
 
-    public SettingsViewModel(ISettingsRepository? repository)
+    public SettingsViewModel(ISettingsRepository? repository, IAppLocalizer? localizer = null)
     {
         _repository = repository;
+        _localizer = localizer ?? new AppLocalizer();
+        SupportedCultureNames = _localizer.SupportedCultures
+            .Select(culture => culture.Name)
+            .ToArray();
         SaveCommand = new AsyncRelayCommand(_ => SaveAsync());
         ResetCommand = new AsyncRelayCommand(_ => ResetAsync());
         CompleteOnboardingCommand = new AsyncRelayCommand(_ => CompleteOnboardingAsync());
@@ -39,6 +46,8 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public IReadOnlyList<AngleUnit> AngleUnits { get; } = Enum.GetValues<AngleUnit>();
 
+    public IReadOnlyList<string> SupportedCultureNames { get; }
+
     public ThemePreference Theme
     {
         get => _theme;
@@ -49,6 +58,12 @@ public sealed class SettingsViewModel : ViewModelBase
     {
         get => _angleUnit;
         set => SetField(ref _angleUnit, value);
+    }
+
+    public string CultureName
+    {
+        get => _cultureName;
+        set => SetField(ref _cultureName, value ?? string.Empty);
     }
 
     public int DecimalPrecision
@@ -128,9 +143,9 @@ public sealed class SettingsViewModel : ViewModelBase
             StatusMessage = _repository is null
                 ? "Settings storage is not configured for this platform yet; defaults are active."
                 : string.Empty;
-            SettingsChanged?.Invoke(settings);
+            SettingsChanged?.Invoke(CreateValidatedSettings());
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
         {
             StatusMessage = $"Settings could not be loaded: {exception.Message}";
         }
@@ -270,10 +285,23 @@ public sealed class SettingsViewModel : ViewModelBase
             throw new ArgumentOutOfRangeException(nameof(ConverterSignificantDigits), "Converter precision must be between 1 and 17.");
         }
 
+        if (!_localizer.TrySetCulture(CultureName))
+        {
+            throw new ArgumentException("The selected application language is not supported.", nameof(CultureName));
+        }
+
+        var normalizedCultureName = _localizer.Culture.Name;
+        if (!string.Equals(_cultureName, normalizedCultureName, StringComparison.Ordinal))
+        {
+            _cultureName = normalizedCultureName;
+            OnPropertyChanged(nameof(CultureName));
+        }
+
         return new AppSettings
         {
             Theme = Theme,
             AngleUnit = AngleUnit,
+            CultureName = normalizedCultureName,
             DecimalPrecision = DecimalPrecision,
             UseGroupingSeparators = UseGroupingSeparators,
             HapticsEnabled = HapticsEnabled,
@@ -292,6 +320,7 @@ public sealed class SettingsViewModel : ViewModelBase
     {
         Theme = settings.Theme;
         AngleUnit = settings.AngleUnit;
+        ApplyCulture(settings.CultureName);
         DecimalPrecision = settings.DecimalPrecision;
         UseGroupingSeparators = settings.UseGroupingSeparators;
         HapticsEnabled = settings.HapticsEnabled;
@@ -308,5 +337,16 @@ public sealed class SettingsViewModel : ViewModelBase
         OnPropertyChanged(nameof(ConverterFavoritePairs));
         OnPropertyChanged(nameof(CompletedOnboardingVersion));
         OnPropertyChanged(nameof(ShouldShowOnboarding));
+    }
+
+    private void ApplyCulture(string? cultureName)
+    {
+        if (!_localizer.TrySetCulture(cultureName))
+        {
+            _localizer.TrySetCulture("en");
+        }
+
+        _cultureName = _localizer.Culture.Name;
+        OnPropertyChanged(nameof(CultureName));
     }
 }
