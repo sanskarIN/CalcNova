@@ -87,12 +87,17 @@ public sealed class ConverterViewModel : ViewModelBase
         get => _selectedPair;
         set
         {
-            if (!SetField(ref _selectedPair, value) || value is null)
+            if (value is null)
             {
+                SetField(ref _selectedPair, null);
                 return;
             }
 
+            _selectedPair = value;
+            OnPropertyChanged();
             ApplyPair(value);
+            _selectedPair = null;
+            OnPropertyChanged();
         }
     }
 
