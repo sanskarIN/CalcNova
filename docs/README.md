@@ -11,9 +11,13 @@ Use this index to find the authoritative guide for each area of the project.
 - [Release process](RELEASE.md)
 - [Platform support](PLATFORM_SUPPORT.md)
 
-## Calculation and features
+## Calculation and feature contracts
 
 - [Calculation engine](CALCULATION_ENGINE.md)
+- [Input safety and expression import](INPUT_SAFETY.md)
+- [Programmer mode](PROGRAMMER_MODE.md)
+- [Converter mode](CONVERTER_MODE.md)
+- [Graph numerical analysis](NUMERICAL_ANALYSIS.md)
 - [Feature status](FEATURES.md)
 - [Keyboard shortcuts](KEYBOARD_SHORTCUTS.md)
 
