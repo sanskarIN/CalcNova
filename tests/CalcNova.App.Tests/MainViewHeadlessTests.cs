@@ -14,9 +14,7 @@ public sealed class MainViewHeadlessTests
     [AvaloniaFact]
     public async Task SharedShell_LoadsEveryPrimaryMode()
     {
-        var viewModel = new MainViewModel();
-        await viewModel.InitializeAsync();
-        await viewModel.Settings.CompleteOnboardingAsync();
+        var viewModel = await CreateReadyViewModelAsync();
         var view = new MainView { DataContext = viewModel };
         var window = new Window { Width = 980, Height = 780, Content = view };
 
@@ -33,27 +31,26 @@ public sealed class MainViewHeadlessTests
     }
 
     [AvaloniaFact]
-    public async Task CalculatorEvaluateButton_ExecutesBoundCommand()
+    public async Task CalculatorClearButton_ExecutesBoundCommand()
     {
-        var viewModel = new MainViewModel();
-        await viewModel.InitializeAsync();
-        await viewModel.Settings.CompleteOnboardingAsync();
+        var viewModel = await CreateReadyViewModelAsync();
         var view = new MainView { DataContext = viewModel };
         var window = new Window { Width = 980, Height = 780, Content = view };
 
         window.Show();
         try
         {
-            viewModel.Calculator.Expression = "2 + 3 * 4";
-            var evaluateButton = view.GetVisualDescendants()
+            viewModel.Calculator.Expression = "12345";
+            var clearButton = view.GetVisualDescendants()
                 .OfType<Button>()
-                .First(button => string.Equals(button.Content?.ToString(), "=", StringComparison.Ordinal));
+                .First(button => string.Equals(button.Content?.ToString(), "AC", StringComparison.Ordinal));
 
-            Assert.NotNull(evaluateButton.Command);
-            evaluateButton.Focus();
-            window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+            Assert.NotNull(clearButton.Command);
+            Assert.True(clearButton.Command.CanExecute(clearButton.CommandParameter));
+            clearButton.Command.Execute(clearButton.CommandParameter);
 
-            Assert.Equal("14", viewModel.Calculator.Result);
+            Assert.Equal(string.Empty, viewModel.Calculator.Expression);
+            Assert.Equal("0", viewModel.Calculator.Result);
         }
         finally
         {
@@ -64,9 +61,7 @@ public sealed class MainViewHeadlessTests
     [AvaloniaFact]
     public async Task CompactWindow_AppliesCompactAdaptiveClass()
     {
-        var viewModel = new MainViewModel();
-        await viewModel.InitializeAsync();
-        await viewModel.Settings.CompleteOnboardingAsync();
+        var viewModel = await CreateReadyViewModelAsync();
         var view = new MainView { DataContext = viewModel };
         var window = new Window { Width = 480, Height = 760, Content = view };
 
@@ -74,6 +69,51 @@ public sealed class MainViewHeadlessTests
         try
         {
             Assert.Contains("compact", view.Classes);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task CtrlPageDown_AdvancesSharedModeSelection()
+    {
+        var viewModel = await CreateReadyViewModelAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 980, Height = 780, Content = view };
+
+        window.Show();
+        try
+        {
+            var firstTab = view.GetVisualDescendants().OfType<TabItem>().First();
+            Assert.True(firstTab.Focus());
+            Assert.Equal(0, viewModel.SelectedModeIndex);
+
+            window.KeyPressQwerty(PhysicalKey.PageDown, RawInputModifiers.Control);
+
+            Assert.Equal(1, viewModel.SelectedModeIndex);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task HighContrastPreference_AppliesShellClass()
+    {
+        var viewModel = await CreateReadyViewModelAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 980, Height = 780, Content = view };
+
+        window.Show();
+        try
+        {
+            viewModel.Settings.HighContrast = true;
+            await viewModel.Settings.SaveAsync();
+
+            Assert.Contains("high-contrast", view.Classes);
         }
         finally
         {
@@ -104,5 +144,13 @@ public sealed class MainViewHeadlessTests
         {
             window.Close();
         }
+    }
+
+    private static async Task<MainViewModel> CreateReadyViewModelAsync()
+    {
+        var viewModel = new MainViewModel();
+        await viewModel.InitializeAsync();
+        await viewModel.Settings.CompleteOnboardingAsync();
+        return viewModel;
     }
 }
