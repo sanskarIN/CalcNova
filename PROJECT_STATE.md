@@ -10,7 +10,7 @@
 
 ## Current Phase
 
-Broad feature completion + cross-platform validation hardening. Core calculator, scientific, programmer, converter, graphing, statistics, matrix, history, utility, persistence, and platform-composition foundations are implemented. Recent continuation work repaired app-layer contracts, completed productivity backends, exposed them in shared Avalonia XAML, added history export preview/copy and advanced result-copy workflows, strengthened source-level UI validation, and added dedicated adaptive-layout and touch-target regression validation. Remaining work is concentrated on runtime adaptive/mobile polish, deeper accessibility validation, automated UI/integration coverage, observed build/test results, platform/package validation, localization, onboarding, and release hardening.
+Broad feature completion + cross-platform validation hardening. Core calculator, scientific, programmer, converter, graphing, statistics, matrix, history, utility, persistence, and platform-composition foundations are implemented. Recent continuation work repaired app-layer contracts, completed productivity backends, exposed them in shared Avalonia XAML, added history export preview/copy and advanced result-copy workflows, strengthened source-level UI validation, added dedicated adaptive-layout and touch-target regression validation, and hardened keyboard-first shared-shell navigation. Remaining work is concentrated on runtime adaptive/mobile polish, deeper accessibility validation, automated UI/integration coverage, observed build/test results, platform/package validation, localization, onboarding, and release hardening.
 
 ## Master Technical Direction
 
@@ -119,6 +119,10 @@ Broad feature completion + cross-platform validation hardening. Core calculator,
 - Browser/WebAssembly composition
 - Android composition
 - iOS composition
+- Shared mode-selection API with cyclic normalization and first/last navigation
+- Invalid `TabControl` binding indexes are ignored instead of wrapping to another mode
+- Keyboard-first shell navigation through `Ctrl+PageUp`, `Ctrl+PageDown`, `Ctrl+Home`, and `Ctrl+End`
+- Shell navigation requires exactly the Control modifier and remains suppressed while onboarding is visible
 
 ### Repository infrastructure
 
@@ -129,7 +133,8 @@ Broad feature completion + cross-platform validation hardening. Core calculator,
 - Source-level shared command/property binding validation covering Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History
 - Source-level adaptive layout validator covering compact/medium/expanded classes, mode reachability, focus bring-into-view behavior, and narrow-layout scrolling contracts
 - Dedicated touch-target validator protecting the shared 44-DIP minimum interaction baseline and rejecting obvious view-level regressions
-- Dedicated adaptive-layout and touch-target GitHub Actions workflows plus Python regression tests
+- Dedicated keyboard contract validator covering calculator hardware mappings, shared-shell navigation mappings, and view wiring
+- Dedicated adaptive-layout, touch-target, and keyboard GitHub Actions workflows plus Python regression tests
 - Release workflow foundation
 - Original branding asset source and verification helpers
 
@@ -151,13 +156,14 @@ The shared Avalonia shell currently exposes:
 - History with search/favorite/delete/clear plus TXT/CSV/JSON preview/copy export
 - Settings
 - About/support
+- Keyboard mode cycling and deterministic first/last mode navigation
 
-These controls are source-wired and protected by the shared UI contract validator. Compact/medium/expanded source contracts and the 44-DIP shared touch baseline are additionally guarded by dedicated SDK-independent validators. They are **not** considered runtime-validated until Avalonia compilation/UI tests and target accessibility/device checks are observed.
+These controls are source-wired and protected by the shared UI contract validator. Compact/medium/expanded source contracts, the 44-DIP shared touch baseline, and keyboard-navigation mappings are additionally guarded by dedicated SDK-independent validators. They are **not** considered runtime-validated until Avalonia compilation/UI tests and target accessibility/device checks are observed.
 
 ## Remaining High-Priority Work
 
 1. Finish runtime adaptive navigation and compact/mobile layouts across every mode, especially long result surfaces and 64/128-bit programmer grids.
-2. Perform a full accessibility pass: keyboard traversal, screen-reader behavior, focus visibility, contrast, target sizes, large text, and reduced-motion behavior.
+2. Perform a full accessibility pass: keyboard traversal, screen-reader behavior, focus visibility, contrast, target sizes, large text, and reduced-motion behavior. Keyboard shortcut source contracts are improved, but actual traversal/assistive-technology behavior remains unverified.
 3. Add stable UI/integration automation for the shared Avalonia shell.
 4. Observe real GitHub Actions/build/test output from a suitable execution path and fix any compiler/analyzer/test failures.
 5. Validate all platform heads with their required SDK/workload environments and fix target-specific compilation/packaging issues.
@@ -176,8 +182,9 @@ These controls are source-wired and protected by the shared UI contract validato
 5. Numerical graph analysis is intentionally approximate and bounded; UI and documentation must continue labeling it as approximate.
 6. Converter pair persistence uses versioned unit-ID tokens. Unknown/obsolete tokens are ignored by the converter restore layer, while settings storage also enforces count/length bounds.
 7. Large 64/128-bit interactive grids may require additional compact-layout or virtualization polish on narrow/mobile screens even though byte grouping is exposed in shared XAML.
-8. Source-level XAML/XML, binding, adaptive-layout, and touch-target checks reduce regression risk but do not replace Avalonia XAML compilation, real UI automation, screen-reader/touch testing, or large-text validation.
+8. Source-level XAML/XML, binding, adaptive-layout, touch-target, and keyboard checks reduce regression risk but do not replace Avalonia XAML compilation, real UI automation, screen-reader/touch testing, or large-text validation.
 9. History preview/copy export is implemented; platform-native file-save/share UX remains separate release polish.
+10. `Ctrl+PageUp`, `Ctrl+PageDown`, `Ctrl+Home`, and `Ctrl+End` are protected by source/unit contracts, but browser/OS/accessibility-tool shortcut conflicts still require target runtime verification.
 
 ## Validation Status
 
@@ -203,6 +210,11 @@ These controls are source-wired and protected by the shared UI contract validato
 - Adaptive layout validator Python tests: IMPLEMENTED
 - Touch-target regression validator: IMPLEMENTED
 - Touch-target validator Python tests: IMPLEMENTED
+- Main view navigation boundary/invalid-index tests: IMPLEMENTED
+- Shared shell keyboard shortcut tests: IMPLEMENTED
+- Keyboard contract validator: IMPLEMENTED
+- Keyboard contract validator Python tests: IMPLEMENTED
+- Dedicated keyboard validation workflow: IMPLEMENTED
 
 ### This continuation execution
 
@@ -215,7 +227,7 @@ These controls are source-wired and protected by the shared UI contract validato
 - iOS build/package validation: **NOT RUN in this execution**
 - Browser/WebAssembly build validation: **NOT RUN in this execution**
 - Desktop OS packaging validation: **NOT RUN in this execution**
-- GitHub combined status checks for inspected direct-push commits: **NO STATUS CHECKS EXPOSED**
+- GitHub workflow lookup for the inspected keyboard-validator commit: **NO WORKFLOW RUNS EXPOSED**
 
 A check is never marked PASS unless it actually ran and its result was observed.
 
@@ -223,11 +235,11 @@ A check is never marked PASS unless it actually ran and its result was observed.
 
 The next development pass should begin with the first still-incomplete item below rather than recreating completed modules:
 
-1. Runtime adaptive/mobile layout polish for Calculator, Programmer, Converter, Graph, Date, FX, History, and advanced modes; prioritize long outputs and narrow touch interaction.
-2. Accessibility audit and screen-reader/focus/keyboard refinements, especially the large bit grid, long exports, and graph experience.
+1. Runtime focus traversal and adaptive/mobile layout polish for Calculator, Programmer, Converter, Graph, Date, FX, History, and advanced modes; prioritize long outputs, narrow touch interaction, and 64/128-bit programmer grids.
+2. Screen-reader/focus/high-contrast/large-text accessibility refinements on top of the new keyboard navigation contract.
 3. Inspect actual GitHub Actions/check results and fix any real compile/analyzer/test failures.
 4. Add reliable shared-shell UI/integration tests where the Avalonia test stack is stable.
-5. Improve cursor/selection-aware calculator editing and broader keyboard/numpad shortcuts.
+5. Improve cursor/selection-aware calculator editing and locale-aware keyboard/numpad shortcuts without breaking text-box editing or browser conventions.
 6. Expand localization/onboarding only after core UI validation is stable.
 7. Continue store/package/release hardening only after observed CI/platform validation.
 
