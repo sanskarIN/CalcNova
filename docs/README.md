@@ -7,6 +7,7 @@ Use this index to find the authoritative guide for each area of the project.
 - [Architecture](ARCHITECTURE.md)
 - [Building](BUILDING.md)
 - [Testing](TESTING.md)
+- [UI automation](UI_AUTOMATION.md)
 - [Troubleshooting](TROUBLESHOOTING.md)
 - [Release process](RELEASE.md)
 - [Release readiness checklist](RELEASE_READINESS_CHECKLIST.md)
