@@ -8,6 +8,7 @@ namespace CalcNova.App.ViewModels;
 public sealed class SettingsViewModel : ViewModelBase
 {
     private readonly ISettingsRepository? _repository;
+    private readonly SemaphoreSlim _saveGate = new(1, 1);
     private ThemePreference _theme = ThemePreference.System;
     private AngleUnit _angleUnit = AngleUnit.Degrees;
     private int _decimalPrecision = 15;
@@ -17,6 +18,9 @@ public sealed class SettingsViewModel : ViewModelBase
     private int _historyLimit = 500;
     private bool _reducedMotion;
     private bool _highContrast;
+    private int _converterSignificantDigits = 15;
+    private string[] _converterRecentPairs = [];
+    private string[] _converterFavoritePairs = [];
     private string _statusMessage = string.Empty;
 
     public SettingsViewModel(ISettingsRepository? repository)
@@ -86,6 +90,12 @@ public sealed class SettingsViewModel : ViewModelBase
         set => SetField(ref _highContrast, value);
     }
 
+    public int ConverterSignificantDigits => _converterSignificantDigits;
+
+    public IReadOnlyList<string> ConverterRecentPairs => _converterRecentPairs;
+
+    public IReadOnlyList<string> ConverterFavoritePairs => _converterFavoritePairs;
+
     public string StatusMessage
     {
         get => _statusMessage;
@@ -122,7 +132,7 @@ public sealed class SettingsViewModel : ViewModelBase
             var settings = CreateValidatedSettings();
             if (_repository is not null)
             {
-                await _repository.SaveAsync(settings, cancellationToken);
+                await SaveToRepositoryAsync(settings, cancellationToken);
                 StatusMessage = "Settings saved.";
             }
             else
@@ -138,10 +148,60 @@ public sealed class SettingsViewModel : ViewModelBase
         }
     }
 
+    public async Task PersistConverterStateAsync(
+        int significantDigits,
+        IEnumerable<string> recentPairs,
+        IEnumerable<string> favoritePairs,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(recentPairs);
+        ArgumentNullException.ThrowIfNull(favoritePairs);
+        if (significantDigits is < 1 or > 17)
+        {
+            throw new ArgumentOutOfRangeException(nameof(significantDigits));
+        }
+
+        _converterSignificantDigits = significantDigits;
+        _converterRecentPairs = recentPairs.Take(12).ToArray();
+        _converterFavoritePairs = favoritePairs.Take(100).ToArray();
+
+        if (_repository is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await SaveToRepositoryAsync(CreateValidatedSettings(), cancellationToken);
+        }
+        catch (Exception exception) when (exception is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
+        {
+            StatusMessage = $"Converter preferences could not be saved: {exception.Message}";
+        }
+    }
+
     private async Task ResetAsync()
     {
         Apply(new AppSettings());
         await SaveAsync();
+    }
+
+    private async Task SaveToRepositoryAsync(AppSettings settings, CancellationToken cancellationToken)
+    {
+        if (_repository is null)
+        {
+            return;
+        }
+
+        await _saveGate.WaitAsync(cancellationToken);
+        try
+        {
+            await _repository.SaveAsync(settings, cancellationToken);
+        }
+        finally
+        {
+            _saveGate.Release();
+        }
     }
 
     private AppSettings CreateValidatedSettings()
@@ -156,6 +216,11 @@ public sealed class SettingsViewModel : ViewModelBase
             throw new ArgumentOutOfRangeException(nameof(HistoryLimit), "History limit must be between 1 and 5000.");
         }
 
+        if (_converterSignificantDigits is < 1 or > 17)
+        {
+            throw new ArgumentOutOfRangeException(nameof(ConverterSignificantDigits), "Converter precision must be between 1 and 17.");
+        }
+
         return new AppSettings
         {
             Theme = Theme,
@@ -166,7 +231,10 @@ public sealed class SettingsViewModel : ViewModelBase
             HistoryEnabled = HistoryEnabled,
             HistoryLimit = HistoryLimit,
             ReducedMotion = ReducedMotion,
-            HighContrast = HighContrast
+            HighContrast = HighContrast,
+            ConverterSignificantDigits = _converterSignificantDigits,
+            ConverterRecentPairs = _converterRecentPairs.ToArray(),
+            ConverterFavoritePairs = _converterFavoritePairs.ToArray()
         };
     }
 
@@ -181,5 +249,11 @@ public sealed class SettingsViewModel : ViewModelBase
         HistoryLimit = settings.HistoryLimit;
         ReducedMotion = settings.ReducedMotion;
         HighContrast = settings.HighContrast;
+        _converterSignificantDigits = settings.ConverterSignificantDigits;
+        _converterRecentPairs = settings.ConverterRecentPairs?.Take(12).ToArray() ?? [];
+        _converterFavoritePairs = settings.ConverterFavoritePairs?.Take(100).ToArray() ?? [];
+        OnPropertyChanged(nameof(ConverterSignificantDigits));
+        OnPropertyChanged(nameof(ConverterRecentPairs));
+        OnPropertyChanged(nameof(ConverterFavoritePairs));
     }
 }
