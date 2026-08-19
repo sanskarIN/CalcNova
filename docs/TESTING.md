@@ -7,6 +7,7 @@ CalcNova treats mathematical correctness and regression protection as primary en
 From the repository root:
 
 ```bash
+python tools/release_preflight.py
 dotnet restore CalcNova.slnx
 dotnet format CalcNova.slnx --verify-no-changes --no-restore
 dotnet build CalcNova.slnx --configuration Release --no-restore
@@ -14,6 +15,8 @@ dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
 A check is only PASS when it actually completes successfully. If a required platform/environment is unavailable, record `NOT RUN` with the reason.
+
+The Python preflight is SDK-independent source-contract validation. It does not replace the compiled `.NET` commands.
 
 ## Current test projects
 
@@ -30,17 +33,21 @@ Protects:
 - angle modes;
 - scientific functions;
 - workload limits;
-- numeric equality/hash invariants.
+- numeric equality/hash invariants;
+- imported-expression sanitization and normalization.
 
 ### CalcNova.Programmer.Tests
 
 Protects:
 
-- base conversion;
+- base 2–36 conversion;
 - large integer round trips;
 - signed/two's-complement interpretation;
 - fixed-width bitwise operations;
-- invalid radix input.
+- shifts;
+- bit inspection/toggling;
+- Unicode scalar/code-point helpers;
+- invalid radix/input boundaries.
 
 ### CalcNova.Converter.Tests
 
@@ -49,18 +56,65 @@ Protects:
 - known fixed-unit identities;
 - affine temperature conversion;
 - cross-category rejection;
-- search.
+- search;
+- conversion-pair models;
+- recent/favorite state;
+- versioned pair tokens;
+- significant-digit formatting.
 
 ### CalcNova.Persistence.Tests
 
-Protects native SQLite history behavior:
+Protects native persistence behavior:
 
-- schema initialization;
-- add/read;
-- search;
-- favorites;
-- delete;
-- clear.
+- SQLite schema initialization;
+- history add/read/search/favorites/delete/clear;
+- settings JSON round trips;
+- culture/converter/onboarding validation;
+- legacy settings-schema migration;
+- unsupported future settings-schema rejection.
+
+### CalcNova.Platform.Tests
+
+Protects shared platform-independent contracts, including the versioned `AppSettingsSchema` migration boundary.
+
+### CalcNova.App.Tests
+
+Protects shared application/view-model behavior, including:
+
+- calculator/session workflows;
+- clipboard behavior through fakes;
+- programmer and Unicode view models;
+- converter persistence/search/productivity behavior;
+- statistics/equation/matrix/graph/date/currency/history/settings view models;
+- localization behavior;
+- navigation semantics;
+- adaptive-layout profile rules;
+- keyboard mappings;
+- Avalonia headless shared-shell integration tests;
+- Avalonia headless graph viewport keyboard tests.
+
+The App test project uses `Avalonia.Headless.XUnit` with xUnit v3 for focused real-control integration scenarios. See [UI_AUTOMATION.md](UI_AUTOMATION.md).
+
+## SDK-independent validator tests
+
+`tools/tests/` regression-tests repository validators themselves. Current protected areas include:
+
+- release preflight inventory;
+- release tag/documentation/workflow contracts;
+- XAML/source UI contracts;
+- keyboard and graph-keyboard contracts;
+- adaptive layout;
+- touch targets;
+- focus visibility;
+- accessibility evidence discipline;
+- localization catalogs;
+- settings schema migration contracts;
+- onboarding;
+- packaging metadata;
+- platform build workflow contracts;
+- headless UI-test configuration/execution-path contracts.
+
+These tests are intentionally standard-library Python where practical so they remain runnable without the .NET SDK.
 
 ## Unit-test expectations
 
@@ -76,7 +130,7 @@ Mathematical code should avoid assertion tolerances that are so broad they would
 
 ## Property / invariant tests
 
-Planned invariant coverage includes properties such as:
+Useful invariants include:
 
 - `a + 0 = a`;
 - `a * 1 = a`;
@@ -84,7 +138,8 @@ Planned invariant coverage includes properties such as:
 - fixed-unit round trips within justified tolerance;
 - deterministic parse/evaluate output;
 - formatter/parser round trips for supported forms;
-- programmer signed/unsigned conversion invariants.
+- programmer signed/unsigned conversion invariants;
+- settings-schema migration preserves unaffected preferences.
 
 Property-based tooling should only be added if its dependency cost is justified; deterministic generated test loops are also acceptable.
 
@@ -134,7 +189,8 @@ Include:
 - word-size boundaries;
 - shift behavior;
 - two's-complement min/max;
-- bit grid/string state.
+- bit grid/string state;
+- Unicode supplementary scalar behavior.
 
 ## Converter tests
 
@@ -146,21 +202,26 @@ Every newly added unit category needs at least one known identity and one round-
 
 Tests should use isolated temporary storage and remove it after execution. Migration tests must be added before persisted schema-breaking changes.
 
-Browser storage requires a separate browser-compatible test strategy.
+Native settings migration now has explicit tests. Browser storage shares the same schema normalization contract and still requires real Browser runtime/storage validation.
 
-## UI tests
+## Headless UI tests
 
-Planned Avalonia UI/headless tests should cover:
+Implemented Avalonia headless scenarios currently include:
 
-- keypad input;
-- expression display;
-- result/error state;
-- mode switching;
-- history;
-- settings;
-- dialogs;
-- theme switching;
-- accessibility labels/focus where tooling allows it.
+- shared shell mode inventory;
+- real Calculator clear-command binding;
+- compact adaptive-class application;
+- Ctrl+PageDown shell mode navigation;
+- high-contrast class application;
+- onboarding visibility and Skip behavior;
+- graph arrow-key pan;
+- graph keyboard zoom;
+- graph Home reset;
+- graph `F` fit-to-data.
+
+`.github/workflows/headless-ui-validate.yml` restores and executes `CalcNova.App.Tests` under .NET 10 in addition to running SDK-independent source-contract checks.
+
+The headless suite is not a replacement for target-platform accessibility, rendering, touch, clipboard-permission, storage, or packaging tests.
 
 ## Integration tests
 
@@ -169,17 +230,32 @@ Important end-to-end flows include:
 - calculate -> store history -> recall expression;
 - scientific function with angle mode;
 - programmer base conversion;
-- unit conversion;
-- preference persistence;
-- offline startup.
+- unit conversion and persisted pair state;
+- preference persistence/migration;
+- onboarding completion/skip;
+- offline startup;
+- graph keyboard navigation plus textual alternatives.
+
+Add these to headless automation only when they can be asserted deterministically without depending on unavailable native services.
+
+## Platform workflow validation
+
+Dedicated build workflows exist for:
+
+- Desktop on Windows/Linux/macOS runners;
+- Browser/WebAssembly;
+- Android;
+- iOS simulator.
+
+`tools/validate_platform_workflows.py` protects their source contracts, SDK/workload commands, runners, read-only permissions, and separation from signing secrets. A source-contract PASS does not mean those builds ran successfully.
 
 ## Visual regression
 
-Stable major layouts can use screenshot/snapshot tests after the design system settles. Visual snapshots should not replace semantic/assertion-based interaction tests.
+Stable major layouts can use screenshot/snapshot tests after the design system settles and the headless interaction suite is observed stable. Visual snapshots should not replace semantic/assertion-based interaction tests.
 
-## Manual testing
+## Runtime/manual testing
 
-Before release, smoke-test:
+Before release, exercise the evidence matrix in [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md) and smoke-test:
 
 - compact phone-like size;
 - landscape/medium layout;
@@ -187,8 +263,12 @@ Before release, smoke-test:
 - keyboard-only input;
 - high-DPI/text scaling;
 - dark/light themes;
+- CalcNova high contrast;
 - offline behavior;
 - long expressions/results;
+- 64/128-bit programmer grids;
+- graph pointer/keyboard interaction;
+- clipboard permission/failure flows;
 - error recovery.
 
 ## Bug-fix rule
