@@ -16,6 +16,7 @@ namespace CalcNova.App.Views;
 public partial class MainView : UserControl
 {
     private static readonly string[] AdaptiveStyleClasses = ["compact", "medium", "expanded"];
+    private static readonly string[] AccessibilityStyleClasses = ["high-contrast", "reduced-motion"];
 
     private MainViewModel? _subscribedViewModel;
     private bool _onboardingWasVisible;
@@ -161,6 +162,7 @@ public partial class MainView : UserControl
     private void HandleSettingsChanged(AppSettings settings)
     {
         ApplySettings(settings);
+        ApplyAccessibilityPreferences(settings);
 
         var onboardingIsVisible = _subscribedViewModel?.Settings.ShouldShowOnboarding ?? false;
         if (_onboardingWasVisible && !onboardingIsVisible)
@@ -169,6 +171,24 @@ public partial class MainView : UserControl
         }
 
         _onboardingWasVisible = onboardingIsVisible;
+    }
+
+    private void ApplyAccessibilityPreferences(AppSettings settings)
+    {
+        foreach (var styleClass in AccessibilityStyleClasses)
+        {
+            Classes.Remove(styleClass);
+        }
+
+        if (settings.HighContrast)
+        {
+            Classes.Add("high-contrast");
+        }
+
+        if (settings.ReducedMotion)
+        {
+            Classes.Add("reduced-motion");
+        }
     }
 
     private void QueueOnboardingFocus()
