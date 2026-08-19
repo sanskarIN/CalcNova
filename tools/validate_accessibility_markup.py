@@ -55,6 +55,7 @@ def main() -> int:
 
     root = Path(args.root).resolve()
     main_view = root / "src" / "CalcNova.App" / "Views" / "MainView.axaml"
+    main_view_code = root / "src" / "CalcNova.App" / "Views" / "MainView.axaml.cs"
     app_xaml = root / "src" / "CalcNova.App" / "App.axaml"
     failures: list[str] = []
 
@@ -78,8 +79,9 @@ def main() -> int:
 
     try:
         app_text = app_xaml.read_text(encoding="utf-8")
+        main_view_code_text = main_view_code.read_text(encoding="utf-8")
     except OSError as exc:
-        print(f"Unable to read {app_xaml}: {exc}", file=sys.stderr)
+        print(f"Unable to read accessibility source: {exc}", file=sys.stderr)
         return 2
 
     required_touch_target_fragments = (
@@ -99,6 +101,29 @@ def main() -> int:
         if fragment not in app_text:
             failures.append(f"App.axaml is missing accessibility baseline fragment: {fragment}")
 
+    required_preference_style_fragments = (
+        '<Style Selector="UserControl.high-contrast Button">',
+        '<Style Selector="UserControl.high-contrast TextBox">',
+        '<Style Selector="UserControl.high-contrast ComboBox">',
+        '<Style Selector="UserControl.high-contrast TabItem">',
+        '<Style Selector="UserControl.high-contrast ListBoxItem">',
+    )
+    for fragment in required_preference_style_fragments:
+        if fragment not in app_text:
+            failures.append(f"App.axaml is missing high-contrast style fragment: {fragment}")
+
+    required_preference_wiring_fragments = (
+        'AccessibilityStyleClasses = ["high-contrast", "reduced-motion"]',
+        "ApplyAccessibilityPreferences(settings)",
+        "if (settings.HighContrast)",
+        'Classes.Add("high-contrast")',
+        "if (settings.ReducedMotion)",
+        'Classes.Add("reduced-motion")',
+    )
+    for fragment in required_preference_wiring_fragments:
+        if fragment not in main_view_code_text:
+            failures.append(f"MainView is missing accessibility preference wiring: {fragment}")
+
     if failures:
         print("Accessibility markup validation failed:", file=sys.stderr)
         for failure in failures:
@@ -106,7 +131,8 @@ def main() -> int:
         return 1
 
     print(
-        f"Validated semantic names for {checked} symbol-heavy buttons and shared/compact touch-target baselines."
+        f"Validated semantic names for {checked} symbol-heavy buttons, shared/compact touch targets, "
+        "high-contrast styles, and reduced-motion/high-contrast shell preference wiring."
     )
     return 0
 
