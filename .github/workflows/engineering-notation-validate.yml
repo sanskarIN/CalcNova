@@ -5,14 +5,22 @@ on:
     branches: [main]
     paths:
       - "src/CalcNova.Core/Numerics/EngineeringNotationFormatter.cs"
+      - "src/CalcNova.App/ViewModels/EngineeringNotationViewModel.cs"
+      - "src/CalcNova.App/Controls/EngineeringNotationPanel.cs"
       - "tests/CalcNova.Core.Tests/EngineeringNotationFormatterTests.cs"
+      - "tests/CalcNova.App.Tests/EngineeringNotationViewModelTests.cs"
+      - "tests/CalcNova.App.Tests/EngineeringNotationPanelHeadlessTests.cs"
       - "tools/validate_engineering_notation.py"
       - "tools/tests/test_validate_engineering_notation.py"
       - ".github/workflows/engineering-notation-validate.yml"
   pull_request:
     paths:
       - "src/CalcNova.Core/Numerics/EngineeringNotationFormatter.cs"
+      - "src/CalcNova.App/ViewModels/EngineeringNotationViewModel.cs"
+      - "src/CalcNova.App/Controls/EngineeringNotationPanel.cs"
       - "tests/CalcNova.Core.Tests/EngineeringNotationFormatterTests.cs"
+      - "tests/CalcNova.App.Tests/EngineeringNotationViewModelTests.cs"
+      - "tests/CalcNova.App.Tests/EngineeringNotationPanelHeadlessTests.cs"
       - "tools/validate_engineering_notation.py"
       - "tools/tests/test_validate_engineering_notation.py"
       - ".github/workflows/engineering-notation-validate.yml"
