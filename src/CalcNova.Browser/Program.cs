@@ -15,6 +15,7 @@ internal static class Program
             new BrowserSettingsRepository())
         {
             ExternalLinkService = new BrowserExternalLinkService(),
+            ClipboardService = new AvaloniaClipboardService(),
             CurrencyRateCache = new BrowserCurrencyRateCache()
         });
 
