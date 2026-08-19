@@ -160,6 +160,25 @@ CONTRACTS: dict[str, dict[str, tuple[str, ...]]] = {
             "StatusMessage",
         ),
     },
+    "SettingsViewModel": {
+        "commands": ("SaveCommand", "ResetCommand"),
+        "properties": (
+            "Themes",
+            "Theme",
+            "AngleUnits",
+            "AngleUnit",
+            "SupportedCultureNames",
+            "CultureName",
+            "DecimalPrecision",
+            "HistoryLimit",
+            "HistoryEnabled",
+            "UseGroupingSeparators",
+            "HapticsEnabled",
+            "ReducedMotion",
+            "HighContrast",
+            "StatusMessage",
+        ),
+    },
 }
 
 XAML_CONTEXT_NAMES = {
@@ -171,6 +190,7 @@ XAML_CONTEXT_NAMES = {
     "MatricesViewModel": "Matrices",
     "GraphingViewModel": "Graphing",
     "HistoryViewModel": "History",
+    "SettingsViewModel": "Settings",
 }
 
 ADAPTIVE_CONTRACTS: dict[str, tuple[str, ...]] = {
