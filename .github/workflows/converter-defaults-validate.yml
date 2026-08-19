@@ -1,0 +1,49 @@
+name: Converter Defaults Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Converter/ConversionDefaults.cs"
+      - "src/CalcNova.Converter/UnitCatalog.cs"
+      - "src/CalcNova.App/ViewModels/ConverterViewModel.cs"
+      - "tests/CalcNova.Converter.Tests/ConversionDefaultsTests.cs"
+      - "tests/CalcNova.App.Tests/ConverterDefaultPairViewModelTests.cs"
+      - "tools/validate_converter_defaults.py"
+      - "tools/tests/test_validate_converter_defaults.py"
+      - "docs/CONVERTER_MODE.md"
+      - ".github/workflows/converter-defaults-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.Converter/ConversionDefaults.cs"
+      - "src/CalcNova.Converter/UnitCatalog.cs"
+      - "src/CalcNova.App/ViewModels/ConverterViewModel.cs"
+      - "tests/CalcNova.Converter.Tests/ConversionDefaultsTests.cs"
+      - "tests/CalcNova.App.Tests/ConverterDefaultPairViewModelTests.cs"
+      - "tools/validate_converter_defaults.py"
+      - "tools/tests/test_validate_converter_defaults.py"
+      - "docs/CONVERTER_MODE.md"
+      - ".github/workflows/converter-defaults-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  converter-defaults:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate converter default-pair contracts
+        run: python tools/validate_converter_defaults.py .
+
+      - name: Run converter-default validator tests
+        run: python -m unittest tools.tests.test_validate_converter_defaults
