@@ -28,10 +28,11 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Fixed-width bit visualization.
 - Full 8/16/32/64/128-bit interactive grid.
 - Byte-grouped bit view-model collections for all supported word sizes.
-- Copy actions for binary/octal/decimal/hex/fixed-width bit representations.
+- Shared byte-group presentation.
+- Shared copy actions for binary/octal/decimal/hex/fixed-width bit representations.
 - Accessible bit-cell names.
 - Unicode scalar/code-point helper backend and shared UI.
-- Unicode decode/inspection result copy actions.
+- Shared Unicode decode/inspection result copy actions.
 
 ### Conversion and utility modules
 
@@ -44,10 +45,10 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Persisted recent/favorite pairs across launches.
 - Selectable and persisted significant-digit display precision.
 - Shared recents/favorites/precision controls.
-- Category-scoped unit search backend/view-model workflow.
-- Search-result assignment as From/To unit.
-- Change-aware clear-recents workflow.
-- Conversion-result clipboard copy.
+- Shared category-scoped unit search workflow.
+- Shared search-result assignment as From/To unit.
+- Shared change-aware clear-recents workflow.
+- Shared conversion-result clipboard copy.
 - Optional currency-rate provider/cache architecture.
 - Date difference, calendar arithmetic, business-day, and duration utilities.
 
@@ -58,12 +59,12 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Matrix source module/view model.
 - Graph sampling and discontinuity segmentation.
 - Graph viewport and interactive plot control.
-- SVG graph export engine and view-model generation/copy workflow.
+- SVG graph export engine plus shared generation/copy workflow.
 - Bounded numerical derivative, root, and integral analysis.
 - Shared derivative/root/integral controls with approximate-result labeling.
-- Nearest sampled-point graph tracing backend/view-model workflow.
-- Bounded single-expression table-of-values CSV export.
-- Bounded multi-expression sampling and identified CSV export.
+- Shared nearest sampled-point graph tracing.
+- Shared bounded single-expression table-of-values CSV export/copy.
+- Shared bounded multi-expression sampling and identified CSV export/copy.
 - Newline-separated multi-expression parsing with stable generated series identities.
 
 ### Persistence and platform architecture
@@ -71,13 +72,15 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Native SQLite calculation history behind an abstraction.
 - Browser-safe history/storage path.
 - Search/favorite/delete/clear history flows.
-- TXT/CSV/JSON history export.
+- TXT/CSV/JSON history export engine.
 - Settings/preferences abstraction.
 - Converter preference persistence through shared settings.
 - Desktop, Browser/WebAssembly, Android, and iOS heads/composition.
 - Shared Avalonia `TopLevel` clipboard service attachment.
 - Shared clipboard dependency injection into Calculator, Programmer, Unicode, Converter, and Graphing modes.
-- Repository validation, format, test/build, coverage, security, advanced-utility, release, and platform workflow foundations.
+- Repository validation, format, test/build, coverage, security, advanced-utility, release, UI-contract, and platform workflow foundations.
+- Source-level shared-XAML command/property contract validation.
+- Source-level Avalonia XML well-formedness validation.
 
 ## Now
 
@@ -87,9 +90,9 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Improve navigation when many modes are present on narrow screens.
 - Audit focus order and visible focus states.
 - Verify screen-reader behavior for the programmer bit grid, graph analysis, and dynamic results.
-- Verify touch target sizes and high-contrast behavior.
+- Verify touch target sizes, large-text behavior, and high-contrast behavior.
 - Add reduced-motion behavior where animation is introduced.
-- Apply the existing byte grouping to the shared Programmer UI and evaluate virtualization for 64/128-bit layouts on compact devices.
+- Evaluate virtualization or alternative compact presentation for 64/128-bit programmer grids on narrow devices.
 
 ### Validation hardening
 
@@ -98,16 +101,15 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Add targeted integration/UI automation where stable and maintainable.
 - Exercise clipboard behavior on Desktop, Browser, Android, and iOS target environments.
 - Exercise settings migration/restore behavior on native and Browser storage paths.
-- Keep vulnerability, repository, docs, and asset validation gates active.
+- Keep vulnerability, repository, XAML, UI-contract, docs, and asset validation gates active.
 
 ### Interaction polish
 
 - Improve cursor/selection-aware expression editing.
-- Expose programmer radix-copy actions in the shared UI.
-- Expose converter search, clear-recents, and result-copy actions in the shared UI.
-- Expose graph trace, table, multi-expression, and SVG export actions in the shared UI.
 - Add direct copy-result support to matrix/statistics outputs where useful.
+- Connect the existing history export engine to an explicit user-facing export workflow.
 - Improve empty/error/loading states without hiding calculation details.
+- Refine graph controls for compact layouts without weakening workload bounds.
 
 ## Next
 
@@ -119,13 +121,11 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 
 ### Programmer productivity
 
-- Add visible byte/nibble headings for large bit grids using the existing byte-group model.
 - Evaluate user-selectable custom word sizes only if interaction and workload semantics remain clear.
 - Add additional code-point metadata only from stable local data sources.
 
 ### Graphing experience
 
-- Connect the existing trace/table/multiple-expression/export workflows to the shared UI.
 - Add deterministic color assignment by theme for multiple expressions.
 - Improve pan/zoom/reset controls and axis/grid labeling.
 - Continue workload-budget and discontinuity tests.
