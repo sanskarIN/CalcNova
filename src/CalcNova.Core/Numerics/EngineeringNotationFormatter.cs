@@ -79,7 +79,8 @@ public static class EngineeringNotationFormatter
 
         if (mantissa != 0d && Math.Abs(mantissa) is < 1d or >= 1000d)
         {
-            throw new FormatException("Engineering mantissa must have an absolute value from 1 (inclusive) to 1000 (exclusive)."
+            throw new FormatException(
+                "Engineering mantissa must have an absolute value from 1 (inclusive) to 1000 (exclusive)."
             );
         }
 
@@ -87,6 +88,11 @@ public static class EngineeringNotationFormatter
         if (!double.IsFinite(value))
         {
             throw new OverflowException("Engineering notation value exceeds the supported numeric range.");
+        }
+
+        if (mantissa != 0d && value == 0d)
+        {
+            throw new OverflowException("Engineering notation value is below the supported non-zero numeric range.");
         }
 
         return value;
