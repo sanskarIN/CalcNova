@@ -21,6 +21,8 @@ Examples:
 
 Exponent zero is omitted for ordinary-scale values.
 
+The shared Calculator Format action accepts invariant-culture finite numeric text and applies the same **4,096-character input budget** before invoking `double.TryParse`.
+
 ## Significant digits
 
 The formatter accepts **1 through 15 significant digits**.
@@ -48,6 +50,19 @@ When an exponent marker is present:
 - the exponent must be within the finite engineering range;
 - a non-zero mantissa must have absolute value from `1` inclusive to `1000` exclusive;
 - a non-zero input must not underflow to floating-point zero during bounded scaling.
+
+## Text workload bound
+
+Engineering input text is limited to **4,096 characters**.
+
+The parser checks the raw string length before whitespace scanning/trimming and before numeric parsing. This keeps oversized blank or numeric input from turning a small Calculator utility into unbounded text-processing work.
+
+The shared UI applies the same contract in two additional places:
+
+- the Format action checks `InputText.Length` before `double.TryParse`;
+- the engineering input `TextBox` sets `MaxLength` to `EngineeringNotationFormatter.MaximumInputCharacters`.
+
+Core, app, and headless regressions protect all three layers.
 
 ## Exponent workload bounds
 
@@ -78,15 +93,19 @@ The regression suite includes round trips for both extremes plus representative 
 
 ## Error behavior
 
-Formatting rejects:
+Formatting through the shared Calculator utility rejects:
 
+- input above 4,096 characters before numeric parsing;
 - `NaN`;
 - positive/negative infinity;
 - significant-digit counts outside 1–15.
 
+Core formatting rejects non-finite numeric values and unsupported significant-digit counts.
+
 Parsing rejects:
 
-- empty text;
+- null/empty/whitespace text;
+- raw input above 4,096 characters, including oversized all-whitespace input;
 - non-finite values;
 - multiple exponent markers;
 - non-integer exponents;
@@ -96,15 +115,29 @@ Parsing rejects:
 - results that overflow the finite `double` range;
 - non-zero engineering values that underflow to floating-point zero.
 
+## Shared Calculator integration
+
+Application source:
+
+- `src/CalcNova.App/ViewModels/EngineeringNotationViewModel.cs`;
+- `src/CalcNova.App/Controls/EngineeringNotationPanel.cs`.
+
+The shared TextBox is bounded to the same core input contract, and the view model clears stale formatted/parsed output when formatting/parsing fails.
+
 ## Source contracts
 
 Implementation:
 
 - `src/CalcNova.Core/Numerics/EngineeringNotationFormatter.cs`
 
-Regression tests:
+Core regression tests:
 
 - `tests/CalcNova.Core.Tests/EngineeringNotationFormatterTests.cs`
+
+App/headless regression tests:
+
+- `tests/CalcNova.App.Tests/EngineeringNotationViewModelTests.cs`;
+- `tests/CalcNova.App.Tests/EngineeringNotationPanelHeadlessTests.cs`.
 
 SDK-independent validation:
 
@@ -113,12 +146,14 @@ python tools/validate_engineering_notation.py .
 python -m unittest tools.tests.test_validate_engineering_notation
 ```
 
-The engineering validator and its regression suite are included in `python tools/release_preflight.py`.
+The engineering validator checks the core parser/formatter, shared view-model input guard, panel `MaxLength`, and corresponding core/app/headless regression scenarios. It is included in `python tools/release_preflight.py`.
 
 Focused workflow:
 
 - `.github/workflows/engineering-notation-validate.yml`
 
+The focused workflow watches the core implementation/tests, shared view model/panel/tests, validator, and validator regression so changes to any protected engineering path trigger the contract gate.
+
 ## Evidence policy
 
-The implementation, test source, source validator, focused workflow, and integrated preflight wiring are present. Compiled `.NET` tests remain **NOT RUN** until their execution is observed in a suitable .NET 10 environment.
+The implementation, test source, source validator, focused workflow, shared UI guards, and integrated preflight wiring are present. Compiled `.NET`/Avalonia tests remain **NOT RUN** until their execution is observed in a suitable .NET 10 environment.
