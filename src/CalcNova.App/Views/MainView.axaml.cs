@@ -21,9 +21,22 @@ public partial class MainView : UserControl
     public MainView()
     {
         InitializeComponent();
+        AttachOnboardingOverlay();
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+
+    private void AttachOnboardingOverlay()
+    {
+        if (Content is not Grid shell)
+        {
+            return;
+        }
+
+        var overlay = new OnboardingOverlay();
+        Grid.SetRowSpan(overlay, Math.Max(1, shell.RowDefinitions.Count));
+        shell.Children.Add(overlay);
+    }
 
     protected override void OnSizeChanged(SizeChangedEventArgs eventArgs)
     {
@@ -82,6 +95,11 @@ public partial class MainView : UserControl
     private async void OnKeyDown(object? sender, KeyEventArgs eventArgs)
     {
         if (DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        if (viewModel.Settings.ShouldShowOnboarding)
         {
             return;
         }
