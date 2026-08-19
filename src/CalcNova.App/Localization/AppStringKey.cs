@@ -20,6 +20,10 @@ public enum AppStringKey
     ModeSettings,
     ModeAbout,
 
+    CalculatorTitle,
+    CalculatorSubtitle,
+    PromptEnterExpression,
+
     ActionEvaluate,
     ActionPasteExpression,
     ActionCopyResult,
