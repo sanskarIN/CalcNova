@@ -2,11 +2,23 @@
 
 CalcNova should be ready for reviewed translations without allowing locale formatting to change mathematical meaning.
 
+## Current implementation state
+
+The application layer now contains an initial localization foundation:
+
+- `AppStringKey` defines stable semantic keys for core shell modes, common actions, common labels, status text, and baseline errors;
+- `EnglishAppStrings` is the complete initial source-language catalog;
+- `IAppLocalizer` defines culture selection and lookup behavior;
+- `AppLocalizer` validates catalog completeness at startup, exposes supported cultures, accepts English regional cultures, and rejects unsupported/unreviewed cultures without changing the active culture;
+- tests cover catalog completeness, fallback behavior, regional English selection, unsupported cultures, invalid culture names, and culture-change notification behavior.
+
+This foundation is **not yet a claim that the shared XAML has been fully migrated to localized bindings**. Existing visible English strings should be migrated incrementally after the binding approach is validated with Avalonia compilation and UI tests. Until reviewed translations are added, English remains the only supported source language.
+
 ## Source language
 
 English is the initial source language.
 
-Additional languages should be added only when translations can be reviewed for correctness and UI fit.
+Additional languages should be added only when translations can be reviewed for correctness and UI fit. A new language must not be added to `SupportedCultures` merely because a machine-generated draft exists.
 
 ## What should be localizable
 
@@ -75,6 +87,8 @@ Translations can be longer than English. UI must avoid fixed-width assumptions f
 
 Scientific symbol buttons can remain compact, but their accessible names need localized strings.
 
+The current compact/medium/expanded shell is a useful baseline for long-string testing, but target-language layout must still be validated rather than inferred from English behavior.
+
 ## Right-to-left languages
 
 Future RTL support needs intentional testing for:
@@ -94,20 +108,31 @@ Machine-generated translations may be useful as draft material but should not be
 
 ## Resource organization
 
-As localization infrastructure is implemented:
+As localization infrastructure is expanded:
 
-- keep resource keys stable and semantic;
+- keep `AppStringKey` entries stable and semantic;
+- keep one reviewed catalog per supported language;
+- validate that every supported catalog contains every required key;
 - avoid concatenating translated fragments to build sentences;
 - use formatting placeholders for values;
 - add translator context for ambiguous terms;
 - test missing-resource fallback;
-- keep source strings out of calculation/domain code where they represent UI messages.
+- keep source strings out of calculation/domain code where they represent UI messages;
+- never localize parser keywords or persisted unit IDs without an explicit canonicalization layer.
 
 ## Tests
 
-Localization-related tests should eventually cover:
+Current automated source tests cover:
 
-- resource completeness/fallback;
+- source-catalog completeness;
+- English fallback;
+- English regional culture selection;
+- unsupported/invalid culture rejection;
+- culture-change event behavior.
+
+Future localization tests should cover:
+
+- localized XAML/view-model binding refresh;
 - long-string layout samples;
 - decimal/grouping normalization;
 - locale changes without corruption of stored values;
