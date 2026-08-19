@@ -27,6 +27,15 @@ internal static class EnglishAppStrings
             [AppStringKey.CalculatorSubtitle] = "Safe local expression evaluation",
             [AppStringKey.PromptEnterExpression] = "Enter an expression",
 
+            [AppStringKey.OnboardingWelcome] = "Welcome to CalcNova",
+            [AppStringKey.OnboardingCalculateTitle] = "Calculate your way",
+            [AppStringKey.OnboardingCalculateBody] = "Use standard and scientific calculation, Programmer, Converter, Statistics, Equations, Matrices, Graphing, Date & Duration, Currency, and History from one shared workspace.",
+            [AppStringKey.OnboardingInputTitle] = "Keyboard and touch friendly",
+            [AppStringKey.OnboardingInputBody] = "On keyboard targets, Ctrl+PageUp and Ctrl+PageDown cycle through modes; Ctrl+Home and Ctrl+End jump to the first and last modes. Calculator number-pad input is supported when you are not editing a text field.",
+            [AppStringKey.OnboardingPrivacyTitle] = "Local-first by default",
+            [AppStringKey.OnboardingPrivacyBody] = "Calculation history and preferences stay in local app storage. Physical unit conversion is offline. Currency rates are the optional network-enhanced feature and can use cached data when available.",
+            [AppStringKey.OnboardingNoAccount] = "No account is required for core CalcNova features. You can skip this introduction immediately.",
+
             [AppStringKey.ActionEvaluate] = "Evaluate",
             [AppStringKey.ActionPasteExpression] = "Paste expression",
             [AppStringKey.ActionCopyResult] = "Copy result",
@@ -38,6 +47,8 @@ internal static class EnglishAppStrings
             [AppStringKey.ActionRefresh] = "Refresh",
             [AppStringKey.ActionSave] = "Save",
             [AppStringKey.ActionReset] = "Reset",
+            [AppStringKey.ActionSkip] = "Skip",
+            [AppStringKey.ActionStartCalculating] = "Start calculating",
 
             [AppStringKey.LabelExpression] = "Expression",
             [AppStringKey.LabelResult] = "Result",
