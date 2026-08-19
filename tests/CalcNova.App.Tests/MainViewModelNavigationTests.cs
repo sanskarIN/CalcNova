@@ -58,6 +58,18 @@ public sealed class MainViewModelNavigationTests
     }
 
     [Fact]
+    public void SelectedModeIndex_IgnoresTransientInvalidBindingValues()
+    {
+        var viewModel = new MainViewModel { SelectedModeIndex = 4 };
+
+        viewModel.SelectedModeIndex = -1;
+        Assert.Equal(4, viewModel.SelectedModeIndex);
+
+        viewModel.SelectedModeIndex = MainViewModel.ModeCount;
+        Assert.Equal(4, viewModel.SelectedModeIndex);
+    }
+
+    [Fact]
     public void SelectFirstAndLastMode_SelectExpectedBoundaries()
     {
         var viewModel = new MainViewModel();
