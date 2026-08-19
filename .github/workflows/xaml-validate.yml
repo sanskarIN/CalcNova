@@ -1,0 +1,34 @@
+name: XAML Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**/*.axaml"
+      - "tools/validate_xaml.py"
+      - ".github/workflows/xaml-validate.yml"
+  pull_request:
+    paths:
+      - "src/**/*.axaml"
+      - "tools/validate_xaml.py"
+      - ".github/workflows/xaml-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-xaml:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate Avalonia XAML XML
+        run: python tools/validate_xaml.py .
