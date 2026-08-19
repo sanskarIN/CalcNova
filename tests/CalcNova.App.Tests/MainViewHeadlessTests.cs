@@ -187,6 +187,38 @@ public sealed class MainViewHeadlessTests
     }
 
     [AvaloniaFact]
+    public async Task HindiCulture_LocalizesVisibleOnboardingCopy()
+    {
+        var viewModel = new MainViewModel();
+        await viewModel.InitializeAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 720, Height = 760, Content = view };
+
+        window.Show();
+        try
+        {
+            viewModel.Settings.CultureName = "hi-IN";
+            await viewModel.Settings.SaveAsync();
+
+            var overlay = view.GetVisualDescendants().OfType<OnboardingOverlay>().Single();
+            Assert.True(overlay.IsVisible);
+            Assert.Contains(
+                overlay.GetVisualDescendants().OfType<TextBlock>(),
+                textBlock => string.Equals(textBlock.Text, "CalcNova में आपका स्वागत है", StringComparison.Ordinal));
+            Assert.Contains(
+                overlay.GetVisualDescendants().OfType<Button>(),
+                button => string.Equals(button.Content?.ToString(), "छोड़ें", StringComparison.Ordinal));
+            Assert.Contains(
+                overlay.GetVisualDescendants().OfType<Button>(),
+                button => string.Equals(button.Content?.ToString(), "गणना शुरू करें", StringComparison.Ordinal));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public async Task NewUser_OnboardingOverlayIsVisibleAndSkipHidesIt()
     {
         var viewModel = new MainViewModel();
