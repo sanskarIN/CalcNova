@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.OnboardingOverlay"
+             IsVisible="{Binding ShouldShowOnboarding}">
+  <Border Background="#CC000000" Padding="16">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+      <Border MaxWidth="640"
+              Margin="0,24"
+              Padding="24"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Background="#FFF8FAFD"
+              BorderBrush="#FF596780"
+              BorderThickness="1"
+              CornerRadius="18">
+        <StackPanel Spacing="14">
+          <TextBlock Text="Welcome to CalcNova"
+                     FontSize="28"
+                     FontWeight="SemiBold"
+                     Foreground="#FF111827"
+                     TextWrapping="Wrap" />
+          <TextBlock Text="Fast. Precise. Private. Everywhere."
+                     FontSize="17"
+                     Foreground="#FF334155"
+                     TextWrapping="Wrap" />
+
+          <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Calculate your way"
+                         FontSize="18"
+                         FontWeight="SemiBold"
+                         Foreground="#FF111827" />
+              <TextBlock Text="Use standard and scientific calculation, Programmer, Converter, Statistics, Equations, Matrices, Graphing, Date &amp; Duration, Currency, and History from one shared workspace."
+                         Foreground="#FF334155"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+
+          <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Keyboard and touch friendly"
+                         FontSize="18"
+                         FontWeight="SemiBold"
+                         Foreground="#FF111827" />
+              <TextBlock Text="On keyboard targets, Ctrl+PageUp and Ctrl+PageDown cycle through modes. Calculator hardware number-pad input is supported when you are not editing a text field."
+                         Foreground="#FF334155"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+
+          <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Local-first by default"
+                         FontSize="18"
+                         FontWeight="SemiBold"
+                         Foreground="#FF111827" />
+              <TextBlock Text="Calculation history and preferences stay in local app storage. Physical unit conversion is offline. Currency rates are the optional network-enhanced feature and can use cached data when available."
+                         Foreground="#FF334155"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+
+          <TextBlock Text="No account is required for core CalcNova features. You can skip this introduction immediately."
+                     Foreground="#FF475569"
+                     TextWrapping="Wrap" />
+
+          <WrapPanel HorizontalAlignment="Right">
+            <Button Content="Skip"
+                    Command="{Binding SkipOnboardingCommand}"
+                    AutomationProperties.Name="Skip CalcNova introduction"
+                    Margin="0,0,8,8" />
+            <Button Content="Start calculating"
+                    Command="{Binding CompleteOnboardingCommand}"
+                    AutomationProperties.Name="Complete CalcNova introduction and start calculating"
+                    Margin="0,0,0,8" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+    </ScrollViewer>
+  </Border>
+</UserControl>
