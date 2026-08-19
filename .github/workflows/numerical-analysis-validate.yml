@@ -1,0 +1,49 @@
+name: Numerical Analysis Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Graphing/GraphNumericalAnalyzer.cs"
+      - "src/CalcNova.Graphing/NumericalAnalysisOptions.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphNumericalAnalyzerTests.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphNumericalExtremeTests.cs"
+      - "tests/CalcNova.Graphing.Tests/NumericalAnalysisOptionsTests.cs"
+      - "tools/validate_numerical_analysis.py"
+      - "tools/tests/test_validate_numerical_analysis.py"
+      - "docs/NUMERICAL_ANALYSIS.md"
+      - ".github/workflows/numerical-analysis-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.Graphing/GraphNumericalAnalyzer.cs"
+      - "src/CalcNova.Graphing/NumericalAnalysisOptions.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphNumericalAnalyzerTests.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphNumericalExtremeTests.cs"
+      - "tests/CalcNova.Graphing.Tests/NumericalAnalysisOptionsTests.cs"
+      - "tools/validate_numerical_analysis.py"
+      - "tools/tests/test_validate_numerical_analysis.py"
+      - "docs/NUMERICAL_ANALYSIS.md"
+      - ".github/workflows/numerical-analysis-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  numerical-analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate numerical-analysis safety contracts
+        run: python tools/validate_numerical_analysis.py .
+
+      - name: Run numerical-analysis validator tests
+        run: python -m unittest tools.tests.test_validate_numerical_analysis
