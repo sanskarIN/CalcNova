@@ -12,6 +12,9 @@ public sealed class GraphPlotControl : Control
     public static readonly StyledProperty<IReadOnlyList<GraphSegment>?> SegmentsProperty =
         AvaloniaProperty.Register<GraphPlotControl, IReadOnlyList<GraphSegment>?>(nameof(Segments));
 
+    public static readonly StyledProperty<IReadOnlyList<GraphExpressionSample>?> SeriesProperty =
+        AvaloniaProperty.Register<GraphPlotControl, IReadOnlyList<GraphExpressionSample>?>(nameof(Series));
+
     public static readonly StyledProperty<string> CoordinateTextProperty =
         AvaloniaProperty.Register<GraphPlotControl, string>(nameof(CoordinateText), string.Empty);
 
@@ -29,7 +32,7 @@ public sealed class GraphPlotControl : Control
 
     static GraphPlotControl()
     {
-        AffectsRender<GraphPlotControl>(SegmentsProperty);
+        AffectsRender<GraphPlotControl>(SegmentsProperty, SeriesProperty);
     }
 
     public GraphPlotControl()
@@ -43,6 +46,12 @@ public sealed class GraphPlotControl : Control
     {
         get => GetValue(SegmentsProperty);
         set => SetValue(SegmentsProperty, value);
+    }
+
+    public IReadOnlyList<GraphExpressionSample>? Series
+    {
+        get => GetValue(SeriesProperty);
+        set => SetValue(SeriesProperty, value);
     }
 
     public string CoordinateText
@@ -69,7 +78,23 @@ public sealed class GraphPlotControl : Control
         var curvePen = new Pen(themeForeground, 2d, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
 
         DrawGrid(context, bounds, subtlePen, axisPen);
-        DrawSegments(context, bounds, curvePen);
+
+        if (Series is { Count: > 0 })
+        {
+            for (var seriesIndex = 0; seriesIndex < Series.Count; seriesIndex++)
+            {
+                DrawSegments(
+                    context,
+                    bounds,
+                    curvePen,
+                    Series[seriesIndex].Segments,
+                    GraphSeriesPatternCatalog.ForSeriesIndex(seriesIndex));
+            }
+        }
+        else
+        {
+            DrawSegments(context, bounds, curvePen, Segments, GraphSeriesPattern.Solid);
+        }
     }
 
     public void ResetViewport()
@@ -83,12 +108,12 @@ public sealed class GraphPlotControl : Control
 
     public void FitToData()
     {
-        var points = Segments?
+        var points = GetRenderableSegments()
             .SelectMany(segment => segment.Points)
             .Where(point => double.IsFinite(point.X) && double.IsFinite(point.Y))
             .ToArray();
 
-        if (points is null || points.Length == 0)
+        if (points.Length == 0)
         {
             ResetViewport();
             return;
@@ -114,7 +139,7 @@ public sealed class GraphPlotControl : Control
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property == SegmentsProperty)
+        if (change.Property == SegmentsProperty || change.Property == SeriesProperty)
         {
             FitToData();
         }
@@ -251,32 +276,72 @@ public sealed class GraphPlotControl : Control
         }
     }
 
-    private void DrawSegments(DrawingContext context, Rect bounds, Pen curvePen)
+    private void DrawSegments(
+        DrawingContext context,
+        Rect bounds,
+        Pen curvePen,
+        IReadOnlyList<GraphSegment>? segments,
+        GraphSeriesPattern pattern)
     {
-        if (Segments is null)
+        if (segments is null)
         {
             return;
         }
 
-        foreach (var segment in Segments)
+        foreach (var segment in segments)
         {
             Point? previous = null;
+            var edgeIndex = 0;
+
             foreach (var point in segment.Points)
             {
                 if (!double.IsFinite(point.X) || !double.IsFinite(point.Y))
                 {
                     previous = null;
+                    edgeIndex = 0;
                     continue;
                 }
 
                 var screen = DataToScreen(point);
-                if (previous is not null && SegmentMayIntersectBounds(previous.Value, screen, bounds))
+                if (previous is not null)
                 {
-                    context.DrawLine(curvePen, previous.Value, screen);
+                    if (GraphSeriesPatternCatalog.ShouldDrawEdge(pattern, edgeIndex) &&
+                        SegmentMayIntersectBounds(previous.Value, screen, bounds))
+                    {
+                        context.DrawLine(curvePen, previous.Value, screen);
+                    }
+
+                    edgeIndex++;
                 }
 
                 previous = screen;
             }
+        }
+    }
+
+    private IEnumerable<GraphSegment> GetRenderableSegments()
+    {
+        if (Series is { Count: > 0 })
+        {
+            foreach (var series in Series)
+            {
+                foreach (var segment in series.Segments)
+                {
+                    yield return segment;
+                }
+            }
+
+            yield break;
+        }
+
+        if (Segments is null)
+        {
+            yield break;
+        }
+
+        foreach (var segment in Segments)
+        {
+            yield return segment;
         }
     }
 
