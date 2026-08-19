@@ -11,6 +11,7 @@ CalcNova is an open-source, privacy-first, cross-platform calculator built with 
 [![Build and Test](https://github.com/sanskarIN/CalcNova/actions/workflows/build-test.yml/badge.svg)](https://github.com/sanskarIN/CalcNova/actions/workflows/build-test.yml)
 [![Formatting](https://github.com/sanskarIN/CalcNova/actions/workflows/format.yml/badge.svg)](https://github.com/sanskarIN/CalcNova/actions/workflows/format.yml)
 [![Documentation Check](https://github.com/sanskarIN/CalcNova/actions/workflows/docs-check.yml/badge.svg)](https://github.com/sanskarIN/CalcNova/actions/workflows/docs-check.yml)
+[![Source Preflight](https://github.com/sanskarIN/CalcNova/actions/workflows/source-preflight.yml/badge.svg)](https://github.com/sanskarIN/CalcNova/actions/workflows/source-preflight.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 ## Current capabilities
@@ -36,6 +37,7 @@ CalcNova is an open-source, privacy-first, cross-platform calculator built with 
 - MC, MR, MS, M+, and M- memory operations
 - Sanitized external expression import with common calculator-glyph normalization
 - User-triggered sanitized clipboard paste and result copy
+- Top-row/numpad digit and numpad arithmetic-key support outside active text fields
 
 ### Programmer tools
 
@@ -47,6 +49,8 @@ CalcNova is an open-source, privacy-first, cross-platform calculator built with 
 - AND, OR, XOR, NOT
 - Left shift, logical right shift, arithmetic right shift
 - Full interactive word-size bit grid with accessible bit labels
+- Byte-grouped presentation for large word sizes
+- Copy actions for radix and fixed-width bit representations
 - Unicode scalar/code-point parsing, formatting, scalar-to-text, and bounded text inspection
 - Dedicated shared Unicode code-point UI
 
@@ -54,7 +58,7 @@ CalcNova is an open-source, privacy-first, cross-platform calculator built with 
 
 Fixed conversion categories include length, area, volume, mass, speed, temperature, time, data/storage, frequency, pressure, energy, power, force, and angle.
 
-The shared converter supports unit swapping, selectable 1–17 significant-digit result precision, recent conversion pairs, favorite pairs, pair restoration, and persisted converter preferences across launches. Fixed physical/data conversions remain local and offline.
+The shared converter supports unit swapping, selectable 1–17 significant-digit result precision, category-scoped search, recent conversion pairs, favorite pairs, pair restoration, clear-recents, result copy, and persisted converter preferences across launches. Fixed physical/data conversions remain local and offline.
 
 ### Currency and date/time utilities
 
@@ -71,8 +75,14 @@ The shared converter supports unit swapping, selectable 1–17 significant-digit
 - `y = f(x)` sampling through the shared expression engine
 - Workload-bounded sampling and discontinuity segmentation
 - Explicit graph viewport model
-- Interactive Avalonia plot control
-- Deterministic SVG graph export
+- Focusable interactive Avalonia plot control
+- Pointer drag pan, wheel zoom, and double-tap/double-click fit-to-data
+- Keyboard arrow-key pan
+- Keyboard numpad Add/Subtract zoom
+- Keyboard Home reset and `F` fit-to-data
+- Nearest sampled-point trace
+- Single- and multi-expression bounded CSV output
+- Deterministic accessible SVG graph export
 - Bounded central-difference derivative approximation
 - Bracketed bisection root finding
 - Bounded Simpson numerical integration
@@ -82,9 +92,9 @@ Numerical analysis is approximate by design and is labeled accordingly.
 
 ### Advanced mathematics
 
-- Statistics module and shared view model
+- Statistics module and shared view model with result copy
 - Equation-solving module and shared view model
-- Matrix utilities and shared view model
+- Matrix utilities and shared view model with result copy
 
 ### Local history and settings
 
@@ -92,10 +102,27 @@ Numerical analysis is approximate by design and is labeled accordingly.
 - SQLite-backed native history
 - Browser-safe storage path
 - Search, favorites, delete, and clear workflows
-- TXT/CSV/JSON history export
+- TXT/CSV/JSON history export preview and copy
 - Settings/preferences abstraction and view model
-- Persisted converter preferences
+- Persisted converter and culture preferences
+- Explicit settings schema version
+- Legacy settings-schema normalization and fail-closed future-schema rejection
 - About/support external-link abstraction
+
+### Accessibility and localization source foundations
+
+- Shared 44-DIP minimum interaction-target baseline
+- Explicit visible keyboard-focus emphasis, strengthened under CalcNova high contrast
+- Ctrl+PageUp/PageDown cyclic mode navigation
+- Ctrl+Home/End first/last mode navigation
+- Graph keyboard viewport interaction
+- Focus bring-into-view behavior for shared scroll containers
+- English semantic string catalog
+- Hindi semantic string catalog for the current key set
+- Regional English/Hindi culture selection such as `en-IN` and `hi-IN`
+- Conservative runtime accessibility evidence matrix
+
+The shared XAML is still predominantly English, so the Hindi semantic catalog is localization infrastructure rather than a claim that the complete UI is already translated.
 
 ## Shared application
 
@@ -115,7 +142,7 @@ The shared Avalonia shell currently exposes:
 - Settings
 - About/support
 
-The next UI priorities are adaptive/mobile layout refinement, deeper accessibility validation, interaction polish, and automated UI/integration testing. See [`docs/ROADMAP.md`](docs/ROADMAP.md).
+The remaining high-priority work is dominated by real compiled/runtime evidence: .NET build/test results, target-device accessibility/adaptive validation, UI/integration automation, and platform packaging/signing checks. See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Platform source targets
 
@@ -150,6 +177,7 @@ CalcNova/
 ├── .github/
 │   └── workflows/
 ├── docs/
+├── packaging/
 ├── src/
 │   ├── CalcNova.App/
 │   ├── CalcNova.Core/
@@ -181,7 +209,13 @@ CalcNova/
 
 The repository pins a .NET 10 SDK feature band through [`global.json`](global.json). Install the required stable .NET SDK and platform workloads for the target you intend to build.
 
-Basic verification sequence:
+Run the SDK-independent source gate first:
+
+```bash
+python tools/release_preflight.py
+```
+
+Then run the compiled verification sequence:
 
 ```bash
 dotnet restore CalcNova.slnx
@@ -190,7 +224,7 @@ dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
-See [`docs/BUILDING.md`](docs/BUILDING.md) and [`docs/TESTING.md`](docs/TESTING.md) before platform-specific work.
+See [`docs/SOURCE_PREFLIGHT.md`](docs/SOURCE_PREFLIGHT.md), [`docs/BUILDING.md`](docs/BUILDING.md), and [`docs/TESTING.md`](docs/TESTING.md) before platform-specific work.
 
 ## Run the desktop application
 
@@ -206,7 +240,7 @@ CalcNova does not execute arbitrary user code to evaluate expressions. Calculati
 
 A feature is not considered validated merely because source code or tests exist. Build/test/platform status must be based on commands or workflows that actually ran and whose results were observed. When an environment is unavailable, project state records `NOT RUN` instead of inventing PASS.
 
-See [`docs/CALCULATION_ENGINE.md`](docs/CALCULATION_ENGINE.md), [`docs/INPUT_SAFETY.md`](docs/INPUT_SAFETY.md), and [`docs/TESTING.md`](docs/TESTING.md).
+See [`docs/CALCULATION_ENGINE.md`](docs/CALCULATION_ENGINE.md), [`docs/INPUT_SAFETY.md`](docs/INPUT_SAFETY.md), [`docs/ACCESSIBILITY_TEST_MATRIX.md`](docs/ACCESSIBILITY_TEST_MATRIX.md), and [`docs/TESTING.md`](docs/TESTING.md).
 
 ## Privacy
 
