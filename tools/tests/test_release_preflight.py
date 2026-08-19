@@ -68,6 +68,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools/validate_onboarding_contracts.py",
             "tools/validate_packaging_metadata.py",
             "tools/validate_platform_workflows.py",
+            "tools/validate_source_preflight_workflow.py",
             "tools/validate_release_ios_workflow.py",
             "tools/validate_release_workflow.py",
             "tools/validate_release_docs.py",
@@ -86,6 +87,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
         expected_modules = {
             "tools.tests.test_validate_release_workflow",
             "tools.tests.test_validate_release_docs",
+            "tools.tests.test_validate_source_preflight_workflow",
             "tools.tests.test_validate_release_ios_workflow",
             "tools.tests.test_validate_headless_ui_tests",
             "tools.tests.test_validate_focus_visibility",
