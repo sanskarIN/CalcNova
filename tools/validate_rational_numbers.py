@@ -29,6 +29,8 @@ def validate(root: Path) -> list[str]:
         "public const int MaximumInputCharacters = 4_096;",
         "public const int MaximumDecimalScale = 10_000;",
         "public const int MaximumBitLength = 65_536;",
+        "private readonly BigInteger _denominator;",
+        "public BigInteger Denominator => _denominator.IsZero ? BigInteger.One : _denominator;",
         "BigInteger.GreatestCommonDivisor",
         "if (denominator.Sign < 0)",
         "public static RationalNumber Parse(string? text)",
@@ -49,6 +51,7 @@ def validate(root: Path) -> list[str]:
     for marker in (
         "Constructor_NormalizesSignAndGreatestCommonDivisor",
         "Constructor_RejectsZeroDenominator",
+        "DefaultValue_IsCanonicalZero",
         "Parse_ProducesCanonicalExactRepresentation",
         "Parse_DecimalPointOne_IsExactlyOneTenth",
         "Parse_RejectsInvalidSyntax",
@@ -84,7 +87,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated exact rational normalization, decimal parsing, arithmetic cancellation, and workload bounds.")
+    print("Validated exact rational normalization, default canonicalization, decimal parsing, arithmetic cancellation, and workload bounds.")
     return 0
 
 
