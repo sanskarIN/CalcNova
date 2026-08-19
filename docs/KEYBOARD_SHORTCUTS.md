@@ -2,15 +2,19 @@
 
 CalcNova is intended to support efficient keyboard-first use on desktop and browser targets. This file distinguishes currently implemented shortcuts from planned mappings.
 
-## Current desktop key handling
+## Current shared key handling
 
 | Key | Current action |
 |---|---|
-| Enter / Return | Evaluate current expression |
-| Escape | Clear expression/result state |
-| Backspace | Remove the final expression character |
+| Enter / Return | Evaluate current expression while Calculator mode is active |
+| Escape | Clear expression/result state while Calculator mode is active |
+| Backspace | Remove the final expression character when Calculator mode is active and focus is not inside a text box |
+| Ctrl+PageDown | Select the next CalcNova mode, wrapping from About to Calc |
+| Ctrl+PageUp | Select the previous CalcNova mode, wrapping from Calc to About |
 
-The expression text box also receives ordinary text entry according to Avalonia/platform text-input behavior.
+The expression text box also receives ordinary text entry according to Avalonia/platform text-input behavior. Backspace is deliberately left to an active text box instead of being intercepted by the shell so normal caret/selection editing can occur.
+
+Mode cycling is implemented through `MainViewModel` rather than hard-coded tab mutations in the view. A repository validator checks that `MainViewModel.ModeCount` matches the number of shared XAML tabs and that the two keyboard shortcuts remain wired.
 
 ## Planned calculator mappings
 
@@ -36,7 +40,7 @@ The following mappings are intended but must be tested before being marked imple
 
 ## Mode shortcuts
 
-Mode-switch shortcuts are not finalized. They should avoid conflicts with OS/browser conventions and remain discoverable in an in-app shortcut dialog.
+`Ctrl+PageUp` and `Ctrl+PageDown` are the current shared mode-navigation shortcuts. Additional direct mode shortcuts are not finalized. Any future mappings should avoid conflicts with OS/browser conventions and remain discoverable in an in-app shortcut reference.
 
 ## Focus and accessibility requirements
 
@@ -51,7 +55,7 @@ Keyboard support is not complete merely because key events exist. Each interacti
 
 ## Browser considerations
 
-Browser builds must avoid hijacking important browser/system shortcuts. Any shortcut that conflicts with navigation, developer tools, tabs, or accessibility software should be changed or made configurable.
+Browser builds must avoid hijacking important browser/system shortcuts. Any shortcut that conflicts with navigation, developer tools, tabs, or accessibility software should be changed or made configurable after target-browser validation.
 
 ## Custom shortcuts
 
