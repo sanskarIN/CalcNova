@@ -100,4 +100,24 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
 
         await Assert.ThrowsAsync<InvalidDataException>(() => repository.SaveAsync(invalid));
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("not-a-real-culture")]
+    public async Task Save_InvalidCultureName_IsRejected(string cultureName)
+    {
+        var repository = new JsonSettingsRepository(_filePath);
+        var invalid = new AppSettings { CultureName = cultureName };
+
+        await Assert.ThrowsAsync<InvalidDataException>(() => repository.SaveAsync(invalid));
+    }
+
+    [Fact]
+    public async Task Save_NegativeOnboardingVersion_IsRejected()
+    {
+        var repository = new JsonSettingsRepository(_filePath);
+        var invalid = new AppSettings { CompletedOnboardingVersion = -1 };
+
+        await Assert.ThrowsAsync<InvalidDataException>(() => repository.SaveAsync(invalid));
+    }
 }
