@@ -27,12 +27,27 @@ public sealed class ShellLocalizationTests
         Assert.Equal("परिचय", headers[^1]);
     }
 
+    [Fact]
+    public void HindiOnboardingStrings_UseSemanticCatalog()
+    {
+        var localizer = new AppLocalizer("hi-IN");
+
+        Assert.Equal("CalcNova में आपका स्वागत है", localizer[AppStringKey.OnboardingWelcome]);
+        Assert.Equal("अपने तरीके से गणना करें", localizer[AppStringKey.OnboardingCalculateTitle]);
+        Assert.Equal("छोड़ें", localizer[AppStringKey.ActionSkip]);
+        Assert.Equal("गणना शुरू करें", localizer[AppStringKey.ActionStartCalculating]);
+    }
+
     [Theory]
     [InlineData("CalcNova", AppStringKey.AppName)]
     [InlineData("Paste expression", AppStringKey.ActionPasteExpression)]
     [InlineData("Copy result", AppStringKey.ActionCopyResult)]
     [InlineData("Word size", AppStringKey.LabelWordSize)]
     [InlineData("History limit", AppStringKey.LabelHistoryLimit)]
+    [InlineData("Welcome to CalcNova", AppStringKey.OnboardingWelcome)]
+    [InlineData("Calculate your way", AppStringKey.OnboardingCalculateTitle)]
+    [InlineData("Skip", AppStringKey.ActionSkip)]
+    [InlineData("Start calculating", AppStringKey.ActionStartCalculating)]
     public void KnownSharedLiterals_MapToSemanticKeys(string literal, AppStringKey expected)
     {
         Assert.True(ShellLocalization.TryGetLiteralKey(literal, out var actual));
