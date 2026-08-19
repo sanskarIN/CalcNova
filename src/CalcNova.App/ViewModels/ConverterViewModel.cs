@@ -1,7 +1,9 @@
 using System.Globalization;
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Services;
 using CalcNova.Converter;
+using CalcNova.Platform.Clipboard;
 
 namespace CalcNova.App.ViewModels;
 
@@ -9,11 +11,15 @@ public sealed class ConverterViewModel : ViewModelBase
 {
     private readonly UnitConverter _converter = new();
     private readonly ConversionPairHistory _pairHistory = new();
+    private readonly IClipboardService? _clipboardService;
     private UnitCategory _selectedCategory = UnitCategory.Length;
     private IReadOnlyList<UnitDefinition> _availableUnits;
     private UnitDefinition _fromUnit;
     private UnitDefinition _toUnit;
     private ConversionPair? _selectedPair;
+    private UnitDefinition? _selectedSearchUnit;
+    private string _unitSearchQuery = string.Empty;
+    private IReadOnlyList<UnitDefinition> _searchResults = Array.Empty<UnitDefinition>();
     private string _input = "1";
     private string _result = string.Empty;
     private string _errorMessage = string.Empty;
@@ -21,8 +27,9 @@ public sealed class ConverterViewModel : ViewModelBase
     private bool _suppressPairRecording;
     private bool _suppressPersistenceNotifications;
 
-    public ConverterViewModel()
+    public ConverterViewModel(IClipboardService? clipboardService = null)
     {
+        _clipboardService = clipboardService;
         _availableUnits = UnitCatalog.ForCategory(_selectedCategory);
         _fromUnit = _availableUnits[0];
         _toUnit = _availableUnits.Count > 1 ? _availableUnits[1] : _availableUnits[0];
@@ -30,6 +37,11 @@ public sealed class ConverterViewModel : ViewModelBase
         SwapCommand = new RelayCommand(_ => Swap());
         ToggleFavoriteCommand = new RelayCommand(_ => ToggleCurrentFavorite());
         ApplyPairCommand = new RelayCommand(ApplyPair);
+        UseSearchAsFromCommand = new RelayCommand(_ => UseSearchUnit(asFrom: true));
+        UseSearchAsToCommand = new RelayCommand(_ => UseSearchUnit(asFrom: false));
+        ClearRecentCommand = new RelayCommand(_ => ClearRecent());
+        CopyResultCommand = new AsyncRelayCommand(_ => CopyResultAsync());
+        RefreshSearchResults();
         Convert();
     }
 
@@ -53,6 +65,8 @@ public sealed class ConverterViewModel : ViewModelBase
             OnPropertyChanged(nameof(AvailableUnits));
             FromUnit = _availableUnits[0];
             ToUnit = _availableUnits.Count > 1 ? _availableUnits[1] : _availableUnits[0];
+            SelectedSearchUnit = null;
+            RefreshSearchResults();
             Convert();
         }
     }
@@ -102,6 +116,31 @@ public sealed class ConverterViewModel : ViewModelBase
             _selectedPair = null;
             OnPropertyChanged();
         }
+    }
+
+    public string UnitSearchQuery
+    {
+        get => _unitSearchQuery;
+        set
+        {
+            if (SetField(ref _unitSearchQuery, value ?? string.Empty))
+            {
+                SelectedSearchUnit = null;
+                RefreshSearchResults();
+            }
+        }
+    }
+
+    public IReadOnlyList<UnitDefinition> SearchResults
+    {
+        get => _searchResults;
+        private set => SetField(ref _searchResults, value);
+    }
+
+    public UnitDefinition? SelectedSearchUnit
+    {
+        get => _selectedSearchUnit;
+        set => SetField(ref _selectedSearchUnit, value);
     }
 
     public string Input
@@ -158,16 +197,19 @@ public sealed class ConverterViewModel : ViewModelBase
 
     public ICommand ApplyPairCommand { get; }
 
-    public string[] GetRecentPairTokens() =>
-        RecentPairs.Select(ConversionPairToken.Encode).ToArray();
+    public ICommand UseSearchAsFromCommand { get; }
 
-    public string[] GetFavoritePairTokens() =>
-        FavoritePairs.Take(100).Select(ConversionPairToken.Encode).ToArray();
+    public ICommand UseSearchAsToCommand { get; }
 
-    public void RestorePersistedState(
-        IEnumerable<string>? recentTokens,
-        IEnumerable<string>? favoriteTokens,
-        int significantDigits)
+    public ICommand ClearRecentCommand { get; }
+
+    public ICommand CopyResultCommand { get; }
+
+    public string[] GetRecentPairTokens() => RecentPairs.Select(ConversionPairToken.Encode).ToArray();
+
+    public string[] GetFavoritePairTokens() => FavoritePairs.Take(100).Select(ConversionPairToken.Encode).ToArray();
+
+    public void RestorePersistedState(IEnumerable<string>? recentTokens, IEnumerable<string>? favoriteTokens, int significantDigits)
     {
         var recentPairs = DecodeTokens(recentTokens);
         var favoritePairs = DecodeTokens(favoriteTokens).Take(100).ToArray();
@@ -262,6 +304,49 @@ public sealed class ConverterViewModel : ViewModelBase
         }
 
         Convert(recordPair: true);
+    }
+
+    private void RefreshSearchResults()
+    {
+        SearchResults = UnitSearch.Search(SelectedCategory, UnitSearchQuery);
+    }
+
+    private void UseSearchUnit(bool asFrom)
+    {
+        if (SelectedSearchUnit is null)
+        {
+            ErrorMessage = "Select a search result first.";
+            return;
+        }
+
+        if (asFrom)
+        {
+            FromUnit = SelectedSearchUnit;
+        }
+        else
+        {
+            ToUnit = SelectedSearchUnit;
+        }
+
+        ErrorMessage = string.Empty;
+    }
+
+    private void ClearRecent()
+    {
+        if (!_pairHistory.ClearRecent())
+        {
+            ErrorMessage = "Recent conversion pairs are already empty.";
+            return;
+        }
+
+        OnPropertyChanged(nameof(RecentPairs));
+        ErrorMessage = "Recent conversion pairs cleared.";
+        NotifyPersistenceStateChanged();
+    }
+
+    private async Task CopyResultAsync()
+    {
+        ErrorMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, Result, "conversion result");
     }
 
     private void NotifyPairStateChanged()
