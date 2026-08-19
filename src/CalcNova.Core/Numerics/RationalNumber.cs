@@ -9,6 +9,9 @@ public readonly struct RationalNumber : IEquatable<RationalNumber>, IComparable<
     public const int MaximumDecimalScale = 10_000;
     public const int MaximumBitLength = 65_536;
 
+    private readonly BigInteger _numerator;
+    private readonly BigInteger _denominator;
+
     public RationalNumber(BigInteger numerator, BigInteger denominator)
     {
         if (denominator.IsZero)
@@ -18,8 +21,8 @@ public readonly struct RationalNumber : IEquatable<RationalNumber>, IComparable<
 
         if (numerator.IsZero)
         {
-            Numerator = BigInteger.Zero;
-            Denominator = BigInteger.One;
+            _numerator = BigInteger.Zero;
+            _denominator = BigInteger.One;
             return;
         }
 
@@ -34,13 +37,13 @@ public readonly struct RationalNumber : IEquatable<RationalNumber>, IComparable<
         denominator /= divisor;
         ValidateMagnitude(numerator, denominator);
 
-        Numerator = numerator;
-        Denominator = denominator;
+        _numerator = numerator;
+        _denominator = denominator;
     }
 
-    public BigInteger Numerator { get; }
+    public BigInteger Numerator => _numerator;
 
-    public BigInteger Denominator { get; }
+    public BigInteger Denominator => _denominator.IsZero ? BigInteger.One : _denominator;
 
     public bool IsInteger => Denominator.IsOne;
 
