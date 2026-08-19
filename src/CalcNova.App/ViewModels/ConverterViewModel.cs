@@ -19,18 +19,21 @@ public sealed class ConverterViewModel : ViewModelBase
     private string _errorMessage = string.Empty;
     private int _significantDigits = 15;
     private bool _suppressPairRecording;
+    private bool _suppressPersistenceNotifications;
 
     public ConverterViewModel()
     {
         _availableUnits = UnitCatalog.ForCategory(_selectedCategory);
         _fromUnit = _availableUnits[0];
         _toUnit = _availableUnits.Count > 1 ? _availableUnits[1] : _availableUnits[0];
-        ConvertCommand = new RelayCommand(_ => Convert());
+        ConvertCommand = new RelayCommand(_ => Convert(recordPair: true));
         SwapCommand = new RelayCommand(_ => Swap());
         ToggleFavoriteCommand = new RelayCommand(_ => ToggleCurrentFavorite());
         ApplyPairCommand = new RelayCommand(ApplyPair);
         Convert();
     }
+
+    public event Action? PersistenceStateChanged;
 
     public IReadOnlyList<UnitCategory> Categories { get; } = Enum.GetValues<UnitCategory>();
 
@@ -120,6 +123,7 @@ public sealed class ConverterViewModel : ViewModelBase
             if (SetField(ref _significantDigits, value))
             {
                 Convert();
+                NotifyPersistenceStateChanged();
             }
         }
     }
@@ -154,7 +158,38 @@ public sealed class ConverterViewModel : ViewModelBase
 
     public ICommand ApplyPairCommand { get; }
 
-    private void Convert()
+    public string[] GetRecentPairTokens() =>
+        RecentPairs.Select(ConversionPairToken.Encode).ToArray();
+
+    public string[] GetFavoritePairTokens() =>
+        FavoritePairs.Take(100).Select(ConversionPairToken.Encode).ToArray();
+
+    public void RestorePersistedState(
+        IEnumerable<string>? recentTokens,
+        IEnumerable<string>? favoriteTokens,
+        int significantDigits)
+    {
+        var recentPairs = DecodeTokens(recentTokens);
+        var favoritePairs = DecodeTokens(favoriteTokens).Take(100).ToArray();
+
+        _suppressPersistenceNotifications = true;
+        try
+        {
+            _pairHistory.Restore(recentPairs, favoritePairs);
+            _significantDigits = significantDigits is >= 1 and <= 17 ? significantDigits : 15;
+            OnPropertyChanged(nameof(SignificantDigits));
+            OnPropertyChanged(nameof(RecentPairs));
+            OnPropertyChanged(nameof(FavoritePairs));
+            NotifyPairStateChanged();
+            Convert();
+        }
+        finally
+        {
+            _suppressPersistenceNotifications = false;
+        }
+    }
+
+    private void Convert(bool recordPair = false)
     {
         if (!double.TryParse(Input, NumberStyles.Float, CultureInfo.InvariantCulture, out var input) || !double.IsFinite(input))
         {
@@ -168,10 +203,10 @@ public sealed class ConverterViewModel : ViewModelBase
             var converted = _converter.Convert(input, FromUnit.Id, ToUnit.Id);
             Result = $"{converted.ToString($"G{SignificantDigits}", CultureInfo.InvariantCulture)} {ToUnit.Symbol}";
             ErrorMessage = string.Empty;
-            if (!_suppressPairRecording)
+            if (recordPair && !_suppressPairRecording && _pairHistory.Record(CurrentPair))
             {
-                _pairHistory.Record(CurrentPair);
                 OnPropertyChanged(nameof(RecentPairs));
+                NotifyPersistenceStateChanged();
             }
         }
         catch (Exception exception) when (exception is InvalidOperationException or ArgumentException or OverflowException)
@@ -193,7 +228,7 @@ public sealed class ConverterViewModel : ViewModelBase
             _suppressPairRecording = false;
         }
 
-        Convert();
+        Convert(recordPair: true);
     }
 
     private void ToggleCurrentFavorite()
@@ -201,6 +236,7 @@ public sealed class ConverterViewModel : ViewModelBase
         _pairHistory.ToggleFavorite(CurrentPair);
         NotifyPairStateChanged();
         OnPropertyChanged(nameof(FavoritePairs));
+        NotifyPersistenceStateChanged();
     }
 
     private void ApplyPair(object? parameter)
@@ -225,7 +261,7 @@ public sealed class ConverterViewModel : ViewModelBase
             _suppressPairRecording = false;
         }
 
-        Convert();
+        Convert(recordPair: true);
     }
 
     private void NotifyPairStateChanged()
@@ -233,5 +269,32 @@ public sealed class ConverterViewModel : ViewModelBase
         OnPropertyChanged(nameof(CurrentPair));
         OnPropertyChanged(nameof(IsCurrentPairFavorite));
         OnPropertyChanged(nameof(FavoriteToggleLabel));
+    }
+
+    private void NotifyPersistenceStateChanged()
+    {
+        if (!_suppressPersistenceNotifications)
+        {
+            PersistenceStateChanged?.Invoke();
+        }
+    }
+
+    private static IReadOnlyList<ConversionPair> DecodeTokens(IEnumerable<string>? tokens)
+    {
+        if (tokens is null)
+        {
+            return Array.Empty<ConversionPair>();
+        }
+
+        var pairs = new List<ConversionPair>();
+        foreach (var token in tokens)
+        {
+            if (ConversionPairToken.TryDecode(token, out var pair) && pair is not null)
+            {
+                pairs.Add(pair);
+            }
+        }
+
+        return pairs;
     }
 }
