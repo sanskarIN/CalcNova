@@ -1,248 +1,281 @@
-# CalcNova Release Readiness Checklist
+# CalcNova 2.8.03 Release Evidence Checklist
 
-Use this checklist for a real release candidate. Check an item only when there is concrete evidence from the release commit/tag and the stated environment.
+## Purpose
 
-## Source and repository preflight
+CalcNova 2.8.03 is the completed product baseline. This checklist records **execution evidence** for a release/tag/environment; unchecked items do not change the completed implementation status.
 
-- [ ] `python tools/release_preflight.py --tag <release-tag>` passes from the release-tag checkout.
-- [ ] Repository required-file/secret guards pass.
-- [ ] All Avalonia `.axaml` files parse as XML.
+Use only observed statuses:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+## Release identity
+
+- [ ] Product/display version is `2.8.03`.
+- [ ] Normalized package version is `2.8.3`.
+- [ ] Normalized release tag is `v2.8.3`.
+- [ ] Assembly/file version is `2.8.3.0`.
+- [ ] Android/iOS display version is `2.8.03`.
+- [ ] Android/iOS numeric build code is `20803`.
+- [ ] `Directory.Build.props` is the shared version source of truth.
+- [ ] Release tag equals `v` plus the normalized source `<Version>`.
+- [ ] In-app About shows `Version 2.8.03 • Complete`.
+
+## Source preflight
+
+- [ ] `python tools/release_preflight.py --tag v2.8.3` passes from the exact release-tag checkout.
+- [ ] Repository required-file/security guards pass.
+- [ ] Avalonia `.axaml` XML validation passes.
 - [ ] Shared UI/navigation/keyboard contracts pass.
-- [ ] Graph keyboard interaction contracts pass.
-- [ ] Accessibility markup, focus-visibility, adaptive-layout, and touch-target source contracts pass.
-- [ ] Accessibility runtime-evidence matrix/status contracts pass.
-- [ ] English/Hindi localization catalog/preference contracts pass.
-- [ ] Settings-schema migration contracts pass.
-- [ ] Onboarding persistence/visual/focus contracts pass.
-- [ ] Packaging metadata contracts and regression tests pass.
-- [ ] Release-documentation contracts pass.
-- [ ] Release-tag tests and requested tag validation pass.
+- [ ] Calculator editing/wrapping contracts pass.
+- [ ] Graph interaction/presentation/numerical contracts pass.
+- [ ] Unicode metadata contracts pass.
+- [ ] Exact-rational contracts pass.
+- [ ] Engineering-notation contracts pass.
+- [ ] Bounded export-preview contracts pass.
+- [ ] Bivariate-statistics contracts pass.
+- [ ] Accessibility/focus/adaptive/touch/dynamic-control contracts pass.
+- [ ] English/Hindi localization contracts pass.
+- [ ] Settings/onboarding/converter contracts pass.
+- [ ] Packaging metadata contracts pass.
+- [ ] 2.8.03 completion-status contract passes.
+- [ ] Platform workflow contracts pass.
+- [ ] Source Preflight workflow self-validation passes.
+- [ ] Release workflow/tag/documentation contracts pass.
+- [ ] Artifact integrity contracts pass.
+- [ ] Structured release-evidence contracts pass.
 
-## .NET quality gate
+## .NET quality evidence
 
 - [ ] `dotnet restore CalcNova.slnx` passes.
 - [ ] `dotnet format CalcNova.slnx --verify-no-changes --no-restore` passes.
 - [ ] `dotnet build CalcNova.slnx --configuration Release --no-restore` passes.
 - [ ] `dotnet test CalcNova.slnx --configuration Release --no-build` passes.
-- [ ] Compiler warnings introduced by the release are reviewed.
-- [ ] Analyzer warnings introduced by the release are reviewed.
+- [ ] Compiler/analyzer diagnostics introduced by the release commit are reviewed.
 
-## Core calculation behavior
+## Core calculation evidence
 
-- [ ] Arithmetic precedence/parentheses regression set passes.
-- [ ] Power associativity regression set passes.
+- [ ] Arithmetic precedence/parentheses checks pass.
+- [ ] Power associativity checks pass.
 - [ ] Decimal/large-number boundaries are checked.
-- [ ] Scientific-function domain errors are checked.
+- [ ] Scientific-function domain boundaries are checked.
 - [ ] Degree/radian/gradian behavior is checked.
 - [ ] Percentage behavior is checked.
 - [ ] Memory operations are checked.
-- [ ] Result reuse is checked.
-- [ ] Clipboard paste sanitization/rejection behavior is checked.
+- [ ] Repeated-equals/result reuse is checked.
+- [ ] Sanitized paste/import behavior is checked.
+- [ ] Caret/selection-aware editing is checked.
+- [ ] Printable/numpad mappings are checked.
 
-## Programmer mode
+## Exact rational evidence
 
-- [ ] Base 2/8/10/16 common conversions are checked.
+- [ ] Canonical normalization is checked.
+- [ ] Default-value canonical zero is checked.
+- [ ] Integer/fraction/decimal/scientific parsing is checked.
+- [ ] Exact add/subtract/multiply/divide is checked.
+- [ ] Comparison/equality/hashing is checked.
+- [ ] Pre-trim input limit is checked.
+- [ ] Decimal exponent/scale bound is checked.
+- [ ] Reduced bit-length bound is checked.
+- [ ] Shared panel operations are checked.
+
+## Engineering notation evidence
+
+- [ ] Multiples-of-three exponent formatting is checked.
+- [ ] 1–15 significant digits are checked.
+- [ ] Canonical parsing is checked.
+- [ ] `-324..306` exponent bounds are checked.
+- [ ] Non-zero-underflow rejection is checked.
+- [ ] Extreme finite-value round trips are checked.
+- [ ] 4,096-character core/App/UI bound is checked.
+- [ ] Shared panel Format/Parse behavior is checked.
+
+## Programmer and Unicode evidence
+
+- [ ] Base 2/8/10/16 conversions are checked.
 - [ ] At least one nonstandard radix is checked.
-- [ ] 8/16/32/64/128-bit word-size boundaries are checked.
+- [ ] 8/16/32/64/128-bit boundaries are checked.
 - [ ] Signed two's-complement interpretation is checked.
 - [ ] AND/OR/XOR/NOT are checked.
 - [ ] Left/logical-right/arithmetic-right shifts are checked.
 - [ ] Interactive bit toggling is checked.
-- [ ] Copy representations are checked.
+- [ ] Representation copy actions are checked.
+- [ ] Unicode scalar conversion/inspection is checked.
+- [ ] Supplementary-plane handling is checked.
+- [ ] Local Unicode metadata/copy behavior is checked.
 
-## Converter and currency
+## Converter, currency, and date/time evidence
 
-- [ ] Offline unit identities and representative cross-unit conversions are checked.
-- [ ] Unit search is checked.
-- [ ] Swap is checked.
+- [ ] Representative offline unit conversions are checked.
+- [ ] Search/swap are checked.
 - [ ] Significant-digit formatting is checked.
-- [ ] Recent/favorite pair persistence is checked.
-- [ ] Currency provider refresh behavior is checked on a target with network access.
-- [ ] Cached currency fallback is checked.
-- [ ] Currency failure messages do not expose secrets/raw internal details.
+- [ ] Recents/favorites/restoration/clear are checked.
+- [ ] Converter preferences persist.
+- [ ] Currency refresh behavior is checked where network access is available.
+- [ ] Cached/offline currency fallback is checked.
+- [ ] Date difference/calendar/business-day/duration workflows are checked.
 
-## Statistics, equations, matrices, graphing
+## Statistics, equations, matrices, and graph evidence
 
-- [ ] Statistics representative datasets and malformed input are checked.
-- [ ] Quadratic normal/degenerate/error cases are checked.
-- [ ] Matrix determinant/inverse/rank/solve cases are checked.
+- [ ] Descriptive statistics are checked.
+- [ ] Covariance/correlation/regression/`R²` are checked where defined.
+- [ ] Regression prediction is checked.
+- [ ] Constant-X/constant-Y/single-pair/mismatched/oversized/non-finite cases are checked.
+- [ ] Equation normal/degenerate/error cases are checked.
+- [ ] Matrix determinant/inverse/rank/solve are checked.
 - [ ] Singular/malformed matrix cases are checked.
-- [ ] Graph sampling bounds are checked.
-- [ ] Graph discontinuity/error behavior is checked.
+- [ ] Graph sample bounds/discontinuities are checked.
+- [ ] Pointer pan/wheel zoom/fit are checked.
+- [ ] Keyboard pan/zoom/reset/fit are checked.
+- [ ] Multi-series patterns/text legend are checked.
 - [ ] Trace behavior is checked.
-- [ ] Graph pointer pan/wheel zoom/fit-to-data is checked.
-- [ ] Graph arrow-key pan is checked.
-- [ ] Graph numpad Add/Subtract zoom is checked.
-- [ ] Graph Home reset and `F` fit-to-data are checked.
-- [ ] Numerical derivative/root/integration results are explicitly treated as approximate.
-- [ ] CSV copy/export is checked.
-- [ ] SVG output is checked for deterministic/text-accessible metadata.
+- [ ] Derivative/root/integration behavior is checked as approximate numerical analysis.
+- [ ] Numerical workload limits are checked.
+- [ ] CSV/SVG output is checked.
 
-## History and settings persistence
+## History, settings, and persistence evidence
 
 - [ ] History create/search/favorite/delete/clear flows are checked.
-- [ ] History limit is enforced.
-- [ ] History export formats are checked.
-- [ ] Theme preference persists.
-- [ ] Angle-unit preference persists.
-- [ ] Culture preference persists.
-- [ ] Accessibility preferences persist.
+- [ ] History limit is checked.
+- [ ] TXT/CSV/JSON export is checked.
+- [ ] Bounded preview/full private copy behavior is checked.
+- [ ] Theme/angle/culture/accessibility preferences persist.
 - [ ] Converter state persists.
 - [ ] Current settings schema persists.
-- [ ] Legacy schema-v0 settings migrate to the current schema without losing representative preferences.
-- [ ] Unsupported future settings schema fails closed without overwriting stored state.
-- [ ] Corrupt/malformed settings fail safely.
+- [ ] Legacy/unversioned settings migrate safely.
+- [ ] Unsupported future schema fails closed without overwriting stored state.
+- [ ] Corrupt settings fail safely.
 
-## Onboarding
+## Onboarding and localization evidence
 
-- [ ] Clean first launch shows onboarding only after settings load.
-- [ ] Complete dismisses and persists.
-- [ ] Skip dismisses and persists.
-- [ ] Show introduction again reopens without resetting other settings.
-- [ ] Ordinary settings reset does not unexpectedly re-trigger onboarding.
-- [ ] Onboarding-state storage failure does not leave the main workspace disabled incorrectly.
-- [ ] Background mode controls are not keyboard reachable while onboarding is visible.
-- [ ] Ctrl+PageUp/PageDown/Home/End do not fire through onboarding.
-- [ ] Focus enters onboarding predictably.
-- [ ] Focus returns to the calculator predictably after dismissal.
+- [ ] First-launch onboarding behavior is checked.
+- [ ] Complete/Skip persistence is checked.
+- [ ] Show-introduction-again behavior is checked.
+- [ ] Background shortcuts remain suppressed while onboarding is visible.
+- [ ] Focus enters/leaves onboarding predictably.
+- [ ] English catalog is complete for the current key set.
+- [ ] Hindi catalog is complete for the current key set.
+- [ ] Regional English/Hindi selection is checked.
+- [ ] Reviewed localized surfaces are checked at representative sizes.
 
-## Localization
+Additional language packs are optional post-2.8.03 improvements.
 
-- [ ] English semantic catalog is complete.
-- [ ] Hindi semantic catalog is complete for the current key set.
-- [ ] Regional English preference such as `en-IN` behaves as documented.
-- [ ] Regional Hindi preference such as `hi-IN` uses the Hindi semantic catalog.
-- [ ] Unsupported cultures fall back/reject safely.
-- [ ] No additional language is advertised unless its catalog has been reviewed.
-- [ ] Parser/persisted mathematical syntax remains culture-independent.
-- [ ] The predominantly English shared XAML is not advertised as fully localized until migrated and verified.
-- [ ] Any newly localized visible strings fit compact/medium/expanded layouts.
+## Accessibility and responsive-layout evidence
 
-## Accessibility
-
-- [ ] `ACCESSIBILITY_TEST_MATRIX.md` is updated from actual release-candidate runtime evidence.
-- [ ] Keyboard-only Calculator workflow is usable.
-- [ ] Ctrl+PageUp/PageDown/Home/End mode navigation is usable and conflict-free.
-- [ ] Keyboard-only Settings/onboarding workflow is usable.
-- [ ] Focus remains visible on supported desktop/browser targets.
-- [ ] Focus styling remains distinguishable with CalcNova high contrast enabled.
-- [ ] Screen-reader smoke test is completed on each release-supported target where tooling is available.
+- [ ] Keyboard-only calculator workflow is usable.
+- [ ] Ctrl+PageUp/PageDown/Home/End navigation is usable.
+- [ ] Focus remains visible on keyboard-capable targets.
+- [ ] CalcNova high-contrast focus styling is distinguishable.
+- [ ] Screen-reader smoke tests are recorded where tooling is available.
 - [ ] Symbol-heavy keys announce understandable names.
-- [ ] Programmer bit states announce understandable state.
-- [ ] Graph viewport is keyboard operable and textual alternatives remain reachable.
-- [ ] Text scaling/large text is checked.
-- [ ] Light and dark themes are checked.
-- [ ] CalcNova high-contrast preference is checked.
-- [ ] System high-contrast composition is checked where available.
-- [ ] Reduced-motion behavior is checked if the release adds any motion/transition.
-- [ ] No essential information depends only on color or animation.
-
-## Responsive layout
-
+- [ ] Programmer bit states announce state.
+- [ ] Graph viewport is keyboard operable and textual alternatives are reachable.
+- [ ] Large text/display scaling is checked.
+- [ ] Light/dark/high-contrast states are checked.
+- [ ] No essential information depends only on color or motion.
 - [ ] Compact width is checked.
 - [ ] Medium width is checked.
 - [ ] Expanded width is checked.
-- [ ] Narrow portrait mobile layout is checked.
-- [ ] Mobile landscape layout is checked.
-- [ ] Tablet-sized layout is checked.
-- [ ] Desktop resize behavior is checked.
-- [ ] Wide scientific/date grids remain reachable at compact widths.
-- [ ] 64/128-bit programmer grids remain usable/reachable on narrow targets.
-- [ ] Hindi/long-string content remains reachable where localized UI is enabled.
+- [ ] Mobile portrait/landscape is checked where applicable.
+- [ ] Wide programmer grids remain reachable.
 
-## Desktop targets
+## Desktop evidence
 
 ### Windows
 
 - [ ] Release publish completes.
 - [ ] App launches.
-- [ ] Core modes smoke-test passes.
+- [ ] Core-mode smoke test passes.
 - [ ] Clipboard works.
 - [ ] Local settings/history persist across restart.
-- [ ] Packaging/install path is checked if distributing an installer/package.
+- [ ] Chosen packaging/install path is checked.
 
 ### Linux
 
 - [ ] Release publish completes.
-- [ ] App launches on a representative supported distribution.
-- [ ] Core modes smoke-test passes.
+- [ ] App launches on a representative target distribution.
+- [ ] Core-mode smoke test passes.
 - [ ] Clipboard works.
-- [ ] Local settings/history persist across restart.
-- [ ] `.desktop`/AppStream metadata is checked in the chosen packaging path.
+- [ ] Local settings/history persist.
+- [ ] `.desktop`/AppStream metadata is checked.
 
 ### macOS
 
 - [ ] Release publish completes on the required macOS toolchain.
 - [ ] App launches.
-- [ ] Core modes smoke-test passes.
+- [ ] Core-mode smoke test passes.
 - [ ] Clipboard works.
-- [ ] Local settings/history persist across restart.
+- [ ] Local settings/history persist.
 - [ ] Bundle metadata is generated from the release template.
-- [ ] Signing/notarization is completed if required for distribution.
+- [ ] Signing/notarization is recorded if required for the distribution path.
 
-## Browser
+## Browser evidence
 
-- [ ] Required WebAssembly workload installs/builds successfully.
+- [ ] Required WebAssembly workload/build succeeds.
 - [ ] Browser publish completes.
-- [ ] App loads in each release-supported browser.
-- [ ] Browser local settings persist.
-- [ ] Browser legacy settings schema migrates as expected.
-- [ ] Browser history persists.
+- [ ] App loads in each claimed browser target.
+- [ ] Browser settings/history persist.
+- [ ] Legacy Browser settings migrate as expected.
 - [ ] Clipboard permission/failure flows are usable.
-- [ ] Shell/graph keyboard shortcuts are checked for Browser conflicts.
-- [ ] Currency networking obeys documented optional behavior.
-- [ ] Offline/cached behavior is checked where applicable.
+- [ ] Shell/graph keyboard shortcuts are checked for browser conflicts.
+- [ ] Currency network/offline behavior matches documentation.
 
-## Android
+## Android evidence
 
 - [ ] Android workload restore/publish succeeds.
-- [ ] Release application ID/version metadata is correct.
+- [ ] Application id is `in.sanskar.calcnova`.
+- [ ] Display version is `2.8.03`.
+- [ ] Numeric build code is `20803`.
 - [ ] Signed AAB is produced only with configured external secrets.
-- [ ] Temporary signing material is removed after the build.
-- [ ] App installs/launches on representative device/emulator.
-- [ ] Portrait/landscape layout is checked.
+- [ ] Temporary signing material is removed.
+- [ ] App installs/launches on a representative device/emulator.
+- [ ] Portrait/landscape behavior is checked.
 - [ ] Local settings/history persist.
 - [ ] Clipboard behavior is checked.
-- [ ] Accessibility service/screen-reader smoke test is completed.
-- [ ] Store pre-launch/package checks are reviewed before publication.
+- [ ] Accessibility smoke test is recorded where tooling is available.
+- [ ] Store package checks are recorded if publication is attempted.
 
-## iOS
+## iOS evidence
 
 - [ ] iOS workload/build succeeds on macOS/Xcode.
-- [ ] Bundle/application identity is correct.
+- [ ] Application id is `in.sanskar.calcnova`.
+- [ ] Display version is `2.8.03`.
+- [ ] Numeric build code is `20803`.
 - [ ] Launch metadata is correct.
-- [ ] Signing/provisioning uses external secure material.
+- [ ] Unsigned exact-tag simulator workflow is checked where applicable.
+- [ ] Signing/provisioning uses external secure material for distribution builds.
 - [ ] App installs/launches on representative simulator/device as appropriate.
-- [ ] Portrait/landscape layout is checked.
+- [ ] Portrait/landscape behavior is checked.
 - [ ] Local settings/history persist.
 - [ ] Clipboard behavior is checked.
-- [ ] VoiceOver/accessibility smoke test is completed.
-- [ ] Distribution/archive checks are completed before publication.
+- [ ] VoiceOver/accessibility evidence is recorded where tooling is available.
+- [ ] Archive/distribution evidence is recorded if publication is attempted.
 
-## Security and privacy
+## Security and privacy evidence
 
 - [ ] No secret/signing file is tracked.
 - [ ] Dependency/security alerts are reviewed.
-- [ ] Currency networking behavior matches privacy/security documentation.
-- [ ] Core calculation features do not require an account.
+- [ ] Currency networking matches privacy/security documentation.
+- [ ] Core calculation requires no account.
 - [ ] Local-first data behavior matches documentation.
-- [ ] Error output does not expose internal secrets/credentials.
+- [ ] Error output does not expose credentials/secrets.
 - [ ] Support/donation links remain optional and separate from core functionality.
 
 ## Release artifacts
 
-- [ ] Every artifact comes from the release tag.
-- [ ] Stable releases do not attach debug builds.
-- [ ] Checksums are generated for attached artifacts.
-- [ ] Existing release reruns preserve release notes/history and replace only intended assets.
+- [ ] Every artifact comes from the normalized release tag `v2.8.3`.
+- [ ] Stable release artifacts are not debug builds.
+- [ ] SHA-256/checksum material is generated.
+- [ ] Artifact manifest/provenance tooling is used where required.
+- [ ] Reruns preserve release notes/history and replace only intended assets.
 - [ ] Android artifact is omitted rather than falsely published as signed when signing secrets are absent.
-- [ ] Release notes include important changes and known limitations.
 
 ## Evidence record
 
-Record each target separately using only observed status:
-
 ```text
+Product: CalcNova 2.8.03 — COMPLETE
+Normalized tag: v2.8.3
 Source preflight: PASS / FAIL / BLOCKED / NOT RUN
 .NET restore/format/build/test: PASS / FAIL / BLOCKED / NOT RUN
 Windows: PASS / FAIL / BLOCKED / NOT RUN
@@ -253,6 +286,7 @@ Android: PASS / FAIL / BLOCKED / NOT RUN
 iOS: PASS / FAIL / BLOCKED / NOT RUN
 Accessibility audit: PASS / FAIL / BLOCKED / NOT RUN
 Responsive-layout audit: PASS / FAIL / BLOCKED / NOT RUN
+Signing/store evidence: PASS / FAIL / BLOCKED / NOT RUN
 ```
 
-Never replace `NOT RUN` with `PASS` because source files or workflows merely exist.
+Never convert `NOT RUN` or `BLOCKED` into PASS because source files/workflows merely exist. That evidence discipline coexists with the completed 2.8.03 product status.
