@@ -37,6 +37,7 @@ internal static class Program
             new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json")))
         {
             ExternalLinkService = new DesktopExternalLinkService(),
+            ClipboardService = new AvaloniaClipboardService(),
             CurrencyRateCache = new JsonCurrencyRateCache(Path.Combine(appDataDirectory, "currency"))
         };
     }
