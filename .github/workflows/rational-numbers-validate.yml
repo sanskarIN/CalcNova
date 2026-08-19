@@ -1,0 +1,41 @@
+name: Rational Numbers Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Core/Numerics/RationalNumber.cs"
+      - "tests/CalcNova.Core.Tests/RationalNumberTests.cs"
+      - "tools/validate_rational_numbers.py"
+      - "tools/tests/test_validate_rational_numbers.py"
+      - ".github/workflows/rational-numbers-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.Core/Numerics/RationalNumber.cs"
+      - "tests/CalcNova.Core.Tests/RationalNumberTests.cs"
+      - "tools/validate_rational_numbers.py"
+      - "tools/tests/test_validate_rational_numbers.py"
+      - ".github/workflows/rational-numbers-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rational-numbers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate exact rational contracts
+        run: python tools/validate_rational_numbers.py .
+
+      - name: Run exact rational validator tests
+        run: python -m unittest tools.tests.test_validate_rational_numbers
