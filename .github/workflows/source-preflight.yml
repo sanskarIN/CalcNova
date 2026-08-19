@@ -25,6 +25,7 @@ on:
       - "docs/RELEASE_READINESS_CHECKLIST.md"
       - "docs/SETTINGS_MIGRATION.md"
       - "docs/SOURCE_PREFLIGHT.md"
+      - ".github/workflows/release.yml"
       - ".github/workflows/source-preflight.yml"
   pull_request:
     paths:
@@ -49,6 +50,7 @@ on:
       - "docs/RELEASE_READINESS_CHECKLIST.md"
       - "docs/SETTINGS_MIGRATION.md"
       - "docs/SOURCE_PREFLIGHT.md"
+      - ".github/workflows/release.yml"
       - ".github/workflows/source-preflight.yml"
   workflow_dispatch:
 
