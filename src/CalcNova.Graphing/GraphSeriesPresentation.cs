@@ -9,42 +9,22 @@ public sealed record GraphSeriesPresentation(
     int ValidPointCount,
     int InvalidSampleCount)
 {
-    public string PatternLabel => Pattern switch
-    {
-        GraphSeriesLinePattern.Solid => "solid",
-        GraphSeriesLinePattern.Dash => "dashed",
-        GraphSeriesLinePattern.Dot => "dotted",
-        GraphSeriesLinePattern.DashDot => "dash-dot",
-        GraphSeriesLinePattern.DashDotDot => "dash-dot-dot",
-        GraphSeriesLinePattern.LongDash => "long dash",
-        GraphSeriesLinePattern.ShortDash => "short dash",
-        GraphSeriesLinePattern.SparseDot => "sparse dot",
-        _ => "line"
-    };
+    public string PatternLabel => GraphSeriesLinePatternCatalog.GetLabel(Pattern);
 
     public string LegendText => $"{Label} [{PatternLabel}] — {Expression}";
 }
 
 public static class GraphSeriesPresentationFactory
 {
-    private static readonly GraphSeriesLinePattern[] Patterns =
-    [
-        GraphSeriesLinePattern.Solid,
-        GraphSeriesLinePattern.Dash,
-        GraphSeriesLinePattern.Dot,
-        GraphSeriesLinePattern.DashDot,
-        GraphSeriesLinePattern.DashDotDot,
-        GraphSeriesLinePattern.LongDash,
-        GraphSeriesLinePattern.ShortDash,
-        GraphSeriesLinePattern.SparseDot
-    ];
-
     public static IReadOnlyList<GraphSeriesPresentation> Create(IReadOnlyList<GraphExpressionSample> samples)
     {
         ArgumentNullException.ThrowIfNull(samples);
-        if (samples.Count > Patterns.Length)
+        if (samples.Count > GraphSeriesLinePatternCatalog.PatternCount)
         {
-            throw new ArgumentOutOfRangeException(nameof(samples), samples.Count, $"At most {Patterns.Length} series can be presented distinctly.");
+            throw new ArgumentOutOfRangeException(
+                nameof(samples),
+                samples.Count,
+                $"At most {GraphSeriesLinePatternCatalog.PatternCount} series can be presented distinctly.");
         }
 
         return samples
@@ -52,7 +32,7 @@ public static class GraphSeriesPresentationFactory
                 sample.Definition.Id,
                 sample.Definition.Label,
                 sample.Definition.Expression,
-                Patterns[index],
+                GraphSeriesLinePatternCatalog.ForSeriesIndex(index),
                 sample.Segments.Count,
                 sample.ValidPointCount,
                 sample.InvalidSampleCount))
@@ -61,13 +41,16 @@ public static class GraphSeriesPresentationFactory
 
     public static GraphSeriesLinePattern PatternForIndex(int index)
     {
-        if (index < 0 || index >= Patterns.Length)
+        if (index < 0 || index >= GraphSeriesLinePatternCatalog.PatternCount)
         {
-            throw new ArgumentOutOfRangeException(nameof(index), index, $"Series index must be between 0 and {Patterns.Length - 1}.");
+            throw new ArgumentOutOfRangeException(
+                nameof(index),
+                index,
+                $"Series index must be between 0 and {GraphSeriesLinePatternCatalog.PatternCount - 1}.");
         }
 
-        return Patterns[index];
+        return GraphSeriesLinePatternCatalog.ForSeriesIndex(index);
     }
 
-    public static int DistinctPatternCount => Patterns.Length;
+    public static int DistinctPatternCount => GraphSeriesLinePatternCatalog.PatternCount;
 }
