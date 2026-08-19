@@ -4,6 +4,8 @@ namespace CalcNova.Platform.Settings;
 
 public sealed record AppSettings
 {
+    public int SchemaVersion { get; init; } = AppSettingsSchema.CurrentVersion;
+
     public ThemePreference Theme { get; init; } = ThemePreference.System;
 
     public AngleUnit AngleUnit { get; init; } = AngleUnit.Degrees;
