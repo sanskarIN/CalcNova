@@ -128,6 +128,27 @@ Non-intrusive optional support surface. It must never interrupt calculations or 
 
 Responsive mode navigation/workspace layout that changes structure at available-width thresholds.
 
+The initial AdaptiveShell behavior is implemented through a shared width profile and root style classes. The current source breakpoints are:
+
+```text
+Compact   <= 599 logical px
+Medium     600–979 logical px
+Expanded  >= 980 logical px
+```
+
+These breakpoints are based on available layout width, not device names. `AdaptiveLayoutProfile` is the source of truth for classification. The shell applies `compact`, `medium`, or `expanded` classes when its width changes.
+
+In compact mode:
+
+- outer shell margin is reduced;
+- ordinary button padding is reduced without reducing common controls below the shared 44-pixel target baseline;
+- calculator keys remain at least 50 pixels tall;
+- tab headers use denser padding and a 44-pixel minimum width;
+- mode `ScrollViewer` containers enable horizontal scrolling as a safe fallback for still-wide control groups;
+- focus changes request bring-into-view behavior.
+
+Horizontal scrolling is a safety fallback, not the final mobile design for every mode. Wide calculator/scientific/date grids and large programmer bit collections still require target-device structural review.
+
 ## Calculator keys
 
 Keys need consistent:
@@ -148,7 +169,8 @@ Operators/functions may use visual grouping but should not depend on color alone
 - expression/result at top;
 - keypad below;
 - mode navigation through compact selector/navigation;
-- history/settings as page/sheet.
+- history/settings as page/sheet;
+- temporary horizontal overflow fallback only where deeper reflow is not yet implemented.
 
 ### Medium
 
