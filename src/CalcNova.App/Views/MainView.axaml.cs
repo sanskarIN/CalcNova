@@ -113,19 +113,12 @@ public partial class MainView : UserControl
             return;
         }
 
-        if ((eventArgs.KeyModifiers & KeyModifiers.Control) != 0)
+        var navigationAction = ShellKeyboardShortcut.GetNavigationAction(eventArgs.Key, eventArgs.KeyModifiers);
+        if (navigationAction != ShellNavigationAction.None)
         {
-            switch (eventArgs.Key)
-            {
-                case Key.PageDown:
-                    viewModel.SelectNextMode();
-                    eventArgs.Handled = true;
-                    return;
-                case Key.PageUp:
-                    viewModel.SelectPreviousMode();
-                    eventArgs.Handled = true;
-                    return;
-            }
+            ApplyShellNavigation(viewModel, navigationAction);
+            eventArgs.Handled = true;
+            return;
         }
 
         if (viewModel.SelectedModeIndex != 0)
@@ -155,6 +148,25 @@ public partial class MainView : UserControl
             case Key.Back when eventArgs.Source is not TextBox:
                 viewModel.Calculator.Backspace();
                 eventArgs.Handled = true;
+                break;
+        }
+    }
+
+    private static void ApplyShellNavigation(MainViewModel viewModel, ShellNavigationAction action)
+    {
+        switch (action)
+        {
+            case ShellNavigationAction.PreviousMode:
+                viewModel.SelectPreviousMode();
+                break;
+            case ShellNavigationAction.NextMode:
+                viewModel.SelectNextMode();
+                break;
+            case ShellNavigationAction.FirstMode:
+                viewModel.SelectFirstMode();
+                break;
+            case ShellNavigationAction.LastMode:
+                viewModel.SelectLastMode();
                 break;
         }
     }
