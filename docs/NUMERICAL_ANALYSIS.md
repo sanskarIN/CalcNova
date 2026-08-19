@@ -4,13 +4,13 @@ CalcNova graph analysis reuses the same project-owned expression engine used for
 
 ## Scope
 
-The current backend provides three bounded numerical operations:
+The current implementation provides three bounded numerical operations:
 
 - central-difference first derivative approximation;
 - bracketed root finding by bisection;
 - definite integration by composite Simpson's rule.
 
-These operations intentionally return approximate floating-point results and must be labeled accordingly in the UI.
+These operations intentionally return approximate floating-point results. The shared Graph UI labels the analysis section and returned values as approximate.
 
 ## Derivative
 
@@ -20,7 +20,7 @@ These operations intentionally return approximate floating-point results and mus
 
 The default finite-difference step is `1e-5`. A caller may provide a different positive finite step through `NumericalAnalysisOptions`.
 
-A finite-difference derivative is sensitive to step size, floating-point rounding, rapidly changing functions, discontinuities, and domain boundaries. It must not be presented as symbolic differentiation.
+A finite-difference derivative is sensitive to step size, floating-point rounding, rapidly changing functions, discontinuities, and domain boundaries. It is not symbolic differentiation.
 
 ## Root finding
 
@@ -52,17 +52,17 @@ Reversed bounds return the negative of the forward integral. Equal bounds return
 
 Each sampled `x` value is converted to a CalcNova `NumberValue` and passed to a compiled expression through the variables dictionary. Evaluation errors are surfaced as analysis errors instead of converted into arbitrary numeric sentinel values.
 
-## Shared view-model integration
+## Shared UI integration
 
-`GraphingViewModel` exposes commands for:
+`GraphingViewModel` and the shared Graph tab expose:
 
 - derivative at `AnalysisX`;
 - root search across the current minimum/maximum X interval;
-- integration across the current minimum/maximum X interval.
+- integration across the current minimum/maximum X interval;
+- a separate approximate-analysis result area;
+- user-facing error text for invalid numeric input, expression failures, and unbracketed roots.
 
-The resulting text explicitly uses approximate notation.
-
-The remaining shared-XAML task is to expose these commands with suitable fields/buttons and keep them usable by keyboard, touch, and assistive technology.
+The numerical-analysis controls are now part of the shared XAML shell. Remaining work is interaction/accessibility validation, trace/table-of-values UX, multiple-expression workflows, and richer export controls.
 
 ## Testing expectations
 
@@ -80,4 +80,4 @@ Additional future tests should cover trigonometric functions, domain boundaries,
 
 ## Validation rule
 
-Numerical-analysis source and tests are implemented. They are **NOT RUN locally in the current continuation environment** because the required .NET SDK is unavailable. Release documentation must only mark them PASS after an observed build/test result.
+Numerical-analysis source, view-model integration, shared controls, and tests are implemented. They are **NOT RUN locally in the current continuation environment** because the required .NET SDK is unavailable. Release documentation must only mark them PASS after an observed build/test result.
