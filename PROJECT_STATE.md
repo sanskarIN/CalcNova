@@ -80,12 +80,17 @@ For the detailed source review performed on 2026-08-19, see [`docs/FINAL_SOURCE_
 - Selectable 1–15 significant digits
 - Rounding normalization across a 1000 mantissa boundary
 - Canonical engineering parser
+- Maximum raw input length of 4,096 characters, enforced before whitespace scanning/trimming and numeric parsing
+- Shared Format action enforces the same 4,096-character budget before `double.TryParse`
+- Shared engineering input `TextBox` applies the same core `MaxLength`
 - Explicit engineering exponent range from -324 through 306
 - Rejection of non-finite/malformed/non-engineering/non-canonical forms
+- Rejection of non-zero values that underflow to floating-point zero
 - Chunked power-of-ten scaling for extreme finite values
 - Calculator utility view model and shared panel
-- Core/app/headless regression source
+- Core/app/headless regression source for numeric and input-boundary behavior
 - Dedicated source validator/workflow and integrated release-preflight coverage
+- Focused workflow watches core formatter/tests plus the App view model/panel/tests protected by the validator
 
 ### Programmer and Unicode tools
 
@@ -255,7 +260,7 @@ Current headless source scenarios include:
 - multi-series graph presentation/legend integration;
 - Unicode metadata panel rendering/bindings;
 - exact-rational Calculator panel/shared-shell integration;
-- engineering-notation Calculator panel/bindings;
+- engineering-notation Calculator panel/bindings and input `MaxLength` contract;
 - paired-statistics panel/shared-shell integration;
 - dynamic graph-control focus/touch-target behavior.
 
@@ -277,7 +282,7 @@ Implemented SDK-independent validators/tooling cover:
 - graph numerical-analysis safety and workload budgets;
 - Unicode metadata;
 - exact rational arithmetic;
-- engineering notation;
+- engineering notation, including core/App text budgets and non-zero underflow handling;
 - bounded export previews;
 - bivariate statistics;
 - headless UI-test setup/scenario/execution-path contracts;
@@ -293,6 +298,7 @@ Implemented SDK-independent validators/tooling cover:
 - onboarding persistence/visual/focus contracts;
 - packaging metadata;
 - Desktop/Browser/Android/iOS build-workflow contracts;
+- Source Preflight workflow trigger/least-privilege/toolchain/command contracts;
 - exact-tag iOS simulator release-workflow contracts;
 - tag-first release workflow contracts;
 - release documentation/evidence contracts;
@@ -304,6 +310,8 @@ Implemented SDK-independent validators/tooling cover:
 
 Additional release/platform source hardening includes:
 
+- Source Preflight watches `src/**`, `tests/**`, `tools/**`, `docs/**`, packaging, workflows, and relevant build/release root metadata on pushes to `main` and pull requests;
+- Source Preflight remains least-privilege with read-only repository contents and rejects unsafe/narrow contract drift through its own validator/regressions;
 - release workflow validates the exact detached release tag before .NET restore/build/test;
 - Desktop release artifacts for Windows/Linux/macOS source paths;
 - Browser release publish path;
@@ -325,7 +333,7 @@ The shared Avalonia shell exposes:
 - Sanitized paste and copy-result actions
 - Selection-aware calculator keypad editing and printable operator handling
 - Exact rational Calculator utility
-- Engineering-notation Calculator utility
+- Engineering-notation Calculator utility with bounded input handling
 - Programmer calculator with full radix selector, bitwise operations, shifts, grouped bit grid, and copy actions
 - Unicode code-point tools with local scalar metadata
 - Offline unit converter with precision/search/recents/favorites/clear/copy
@@ -379,7 +387,7 @@ The following work cannot be honestly marked complete from source presence alone
 
 - Core/domain tests: IMPLEMENTED
 - Exact rational tests: IMPLEMENTED
-- Engineering notation tests: IMPLEMENTED
+- Engineering notation core/App/headless tests: IMPLEMENTED
 - Programmer/Unicode tests: IMPLEMENTED
 - Converter tests: IMPLEMENTED
 - Persistence/history/export tests: IMPLEMENTED
@@ -394,6 +402,7 @@ The following work cannot be honestly marked complete from source presence alone
 - Calculator selection-editing/keyboard tests: IMPLEMENTED
 - Avalonia headless shared-shell/feature tests: IMPLEMENTED IN SOURCE
 - SDK-independent validator regression tests: IMPLEMENTED
+- Source Preflight workflow validator/regressions: IMPLEMENTED
 - Artifact-integrity/release-evidence tooling tests: IMPLEMENTED IN SOURCE
 - Platform/release workflow source contracts: IMPLEMENTED
 
