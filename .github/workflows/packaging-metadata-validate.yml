@@ -1,0 +1,46 @@
+name: Packaging Metadata Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Android/CalcNova.Android.csproj"
+      - "src/CalcNova.iOS/CalcNova.iOS.csproj"
+      - "src/CalcNova.iOS/Info.plist"
+      - "src/CalcNova.Desktop/CalcNova.Desktop.csproj"
+      - "src/CalcNova.Browser/CalcNova.Browser.csproj"
+      - "packaging/**"
+      - "tools/validate_packaging_metadata.py"
+      - "docs/RELEASE.md"
+      - ".github/workflows/packaging-metadata-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.Android/CalcNova.Android.csproj"
+      - "src/CalcNova.iOS/CalcNova.iOS.csproj"
+      - "src/CalcNova.iOS/Info.plist"
+      - "src/CalcNova.Desktop/CalcNova.Desktop.csproj"
+      - "src/CalcNova.Browser/CalcNova.Browser.csproj"
+      - "packaging/**"
+      - "tools/validate_packaging_metadata.py"
+      - "docs/RELEASE.md"
+      - ".github/workflows/packaging-metadata-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-packaging-metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate package metadata
+        run: python tools/validate_packaging_metadata.py .
