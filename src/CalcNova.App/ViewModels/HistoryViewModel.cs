@@ -17,7 +17,9 @@ public sealed class HistoryViewModel : ViewModelBase
     private string _searchQuery = string.Empty;
     private string _statusMessage = string.Empty;
     private HistoryExportFormat _selectedExportFormat = HistoryExportFormat.PlainText;
+    private string _exportContent = string.Empty;
     private string _exportPreview = string.Empty;
+    private bool _isExportPreviewTruncated;
     private bool _isInitialized;
 
     public HistoryViewModel(
@@ -69,7 +71,7 @@ public sealed class HistoryViewModel : ViewModelBase
         {
             if (SetField(ref _selectedExportFormat, value))
             {
-                ExportPreview = string.Empty;
+                ClearExport();
             }
         }
     }
@@ -78,6 +80,12 @@ public sealed class HistoryViewModel : ViewModelBase
     {
         get => _exportPreview;
         private set => SetField(ref _exportPreview, value);
+    }
+
+    public bool IsExportPreviewTruncated
+    {
+        get => _isExportPreviewTruncated;
+        private set => SetField(ref _isExportPreviewTruncated, value);
     }
 
     public bool IsAvailable => _repository is not null;
@@ -152,7 +160,7 @@ public sealed class HistoryViewModel : ViewModelBase
         {
             Entries = Array.Empty<HistoryEntry>();
             SelectedEntry = null;
-            ExportPreview = string.Empty;
+            ClearExport();
             StatusMessage = "History storage is not configured for this platform yet.";
             return;
         }
@@ -166,7 +174,7 @@ public sealed class HistoryViewModel : ViewModelBase
                 SelectedEntry = null;
             }
 
-            ExportPreview = string.Empty;
+            ClearExport();
             StatusMessage = Entries.Count == 0 ? "No matching history entries." : string.Empty;
         }
         catch (Exception exception)
@@ -187,7 +195,7 @@ public sealed class HistoryViewModel : ViewModelBase
             await _repository.ClearAsync(cancellationToken);
             Entries = Array.Empty<HistoryEntry>();
             SelectedEntry = null;
-            ExportPreview = string.Empty;
+            ClearExport();
             StatusMessage = "History cleared.";
         }
         catch (Exception exception)
@@ -252,25 +260,44 @@ public sealed class HistoryViewModel : ViewModelBase
     {
         try
         {
-            ExportPreview = _exportService.Export(Entries, SelectedExportFormat);
-            StatusMessage = Entries.Count == 0
-                ? "Export preview is empty because there are no matching history entries."
-                : $"Prepared {SelectedExportFormat} export for {Entries.Count} history entr{(Entries.Count == 1 ? "y" : "ies")}.";
+            _exportContent = _exportService.Export(Entries, SelectedExportFormat);
+            ExportPreview = ExportPreviewFormatter.Create(_exportContent);
+            IsExportPreviewTruncated = !string.Equals(_exportContent, ExportPreview, StringComparison.Ordinal);
+
+            if (Entries.Count == 0)
+            {
+                StatusMessage = "Export preview is empty because there are no matching history entries.";
+            }
+            else
+            {
+                StatusMessage = $"Prepared {SelectedExportFormat} export for {Entries.Count} history entr{(Entries.Count == 1 ? "y" : "ies")}.";
+                if (IsExportPreviewTruncated)
+                {
+                    StatusMessage += " Preview is shortened; copy uses the full export.";
+                }
+            }
         }
         catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
         {
-            ExportPreview = string.Empty;
+            ClearExport();
             StatusMessage = $"History export could not be generated: {exception.Message}";
         }
     }
 
     private async Task CopyExportAsync()
     {
-        if (string.IsNullOrWhiteSpace(ExportPreview))
+        if (string.IsNullOrWhiteSpace(_exportContent))
         {
             GenerateExport();
         }
 
-        StatusMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, ExportPreview, "history export");
+        StatusMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, _exportContent, "history export");
+    }
+
+    private void ClearExport()
+    {
+        _exportContent = string.Empty;
+        ExportPreview = string.Empty;
+        IsExportPreviewTruncated = false;
     }
 }
