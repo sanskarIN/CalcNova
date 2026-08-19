@@ -88,12 +88,12 @@ public sealed class GraphPlotControl : Control
                     bounds,
                     curvePen,
                     Series[seriesIndex].Segments,
-                    GraphSeriesPatternCatalog.ForSeriesIndex(seriesIndex));
+                    GraphSeriesLinePatternCatalog.ForSeriesIndex(seriesIndex));
             }
         }
         else
         {
-            DrawSegments(context, bounds, curvePen, Segments, GraphSeriesPattern.Solid);
+            DrawSegments(context, bounds, curvePen, Segments, GraphSeriesLinePattern.Solid);
         }
     }
 
@@ -281,7 +281,7 @@ public sealed class GraphPlotControl : Control
         Rect bounds,
         Pen curvePen,
         IReadOnlyList<GraphSegment>? segments,
-        GraphSeriesPattern pattern)
+        GraphSeriesLinePattern pattern)
     {
         if (segments is null)
         {
@@ -305,7 +305,7 @@ public sealed class GraphPlotControl : Control
                 var screen = DataToScreen(point);
                 if (previous is not null)
                 {
-                    if (GraphSeriesPatternCatalog.ShouldDrawEdge(pattern, edgeIndex) &&
+                    if (GraphSeriesLinePatternCatalog.ShouldDrawEdge(pattern, edgeIndex) &&
                         SegmentMayIntersectBounds(previous.Value, screen, bounds))
                     {
                         context.DrawLine(curvePen, previous.Value, screen);
