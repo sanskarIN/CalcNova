@@ -1,0 +1,45 @@
+name: Dynamic Controls Accessibility Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.App/Views/MainView.CheckBoxLocalization.cs"
+      - "src/CalcNova.App/Controls/GraphPlotControl.cs"
+      - "tests/CalcNova.App.Tests/GraphViewportToolbarAccessibilityHeadlessTests.cs"
+      - "tools/validate_dynamic_controls_accessibility.py"
+      - "tools/tests/test_validate_dynamic_controls_accessibility.py"
+      - "docs/GRAPH_VIEWPORT_CONTROLS.md"
+      - ".github/workflows/dynamic-controls-accessibility-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.App/Views/MainView.CheckBoxLocalization.cs"
+      - "src/CalcNova.App/Controls/GraphPlotControl.cs"
+      - "tests/CalcNova.App.Tests/GraphViewportToolbarAccessibilityHeadlessTests.cs"
+      - "tools/validate_dynamic_controls_accessibility.py"
+      - "tools/tests/test_validate_dynamic_controls_accessibility.py"
+      - "docs/GRAPH_VIEWPORT_CONTROLS.md"
+      - ".github/workflows/dynamic-controls-accessibility-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dynamic-controls-accessibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate dynamic-control accessibility contracts
+        run: python tools/validate_dynamic_controls_accessibility.py .
+
+      - name: Run validator regression tests
+        run: python -m unittest tools.tests.test_validate_dynamic_controls_accessibility
