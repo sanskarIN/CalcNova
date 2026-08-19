@@ -32,7 +32,9 @@ public sealed class CodePointMetadataPanel : Border
                     TextWrapping = Avalonia.Media.TextWrapping.Wrap
                 },
                 codePointMetadata,
-                textMetadata
+                CreateCopyButton("Copy scalar metadata", nameof(CodePointViewModel.CopyCodePointMetadataCommand)),
+                textMetadata,
+                CreateCopyButton("Copy inspected metadata", nameof(CodePointViewModel.CopyTextMetadataCommand))
             }
         };
     }
@@ -46,5 +48,16 @@ public sealed class CodePointMetadataPanel : Border
         };
         block.Bind(TextBlock.TextProperty, new Binding(propertyName));
         return block;
+    }
+
+    private static Button CreateCopyButton(string label, string commandPropertyName)
+    {
+        var button = new Button
+        {
+            Content = label,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left
+        };
+        button.Bind(Button.CommandProperty, new Binding(commandPropertyName));
+        return button;
     }
 }
