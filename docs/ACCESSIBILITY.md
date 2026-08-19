@@ -8,14 +8,29 @@ CalcNova now includes several accessibility-oriented implementation measures, bu
 
 Current source/UI measures include:
 
-- global minimum 44-pixel heights for Button, TextBox, ComboBox, TabItem, and ListBoxItem controls;
-- 54-pixel minimum height for standard calculator keys;
+- global minimum 44-pixel heights for Button, TextBox, ComboBox, CheckBox, TabItem, and ListBoxItem controls;
+- 54-pixel minimum height for standard calculator keys, with compact-layout keys remaining at least 50 pixels tall;
+- width-driven `compact`, `medium`, and `expanded` shared-shell profiles;
+- compact-width horizontal scroll fallback for mode content that still contains wide fixed-column control groups;
+- focus-change bring-into-view behavior on shared mode scroll containers;
 - keyboard Enter/Escape/Backspace support in the primary calculator mode;
 - accessible state names for programmer bit cells such as `Bit 7, set`;
 - textual programmer bit patterns in addition to the interactive bit grid;
 - textual graph sampling/analysis output in addition to graphical presentation;
 - reduced-motion and high-contrast preference fields in settings;
 - scrollable shared-mode layouts rather than fixed-height content clipping.
+
+## Adaptive layout baseline
+
+The shared shell now selects an available-width profile instead of relying on device names:
+
+- **Compact:** up to 599 logical pixels;
+- **Medium:** 600–979 logical pixels;
+- **Expanded:** 980 logical pixels and above.
+
+Compact mode reduces non-essential padding while preserving minimum interactive target heights. It also enables horizontal scrolling inside shared mode scroll containers as a safe fallback for wide calculator/function/date grids that have not yet received a deeper structural reflow. Focus changes are configured to bring the focused control into view where the Avalonia scroll container supports that behavior.
+
+This is an implementation baseline, not a claim that every mode is fully optimized for phones. The final mobile pass must still verify actual portrait/landscape behavior, text scaling, tab-header navigation, screen-reader order, and 64/128-bit programmer interaction on target devices.
 
 ## Requirements
 
@@ -38,7 +53,7 @@ Current source/UI measures include:
 
 ### Touch targets
 
-Common shared controls now use a minimum 44-pixel height, while calculator keys use 54 pixels. This is a source-level baseline, not a substitute for device testing.
+Common shared controls now use a minimum 44-pixel height, while calculator keys use 54 pixels in normal layouts and at least 50 pixels in compact mode. This is a source-level baseline, not a substitute for device testing.
 
 Dense scientific/programmer layouts should adapt rather than shrinking important targets below usable sizes. The 64/128-bit grid requires special compact-layout review on phones.
 
