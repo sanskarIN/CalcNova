@@ -1,3 +1,4 @@
+using CalcNova.App.Localization;
 using CalcNova.App.Services;
 using CalcNova.Platform.Settings;
 
@@ -14,6 +15,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         dependencies ??= AppDependencies.Empty;
 
+        Localizer = dependencies.Localizer ?? new AppLocalizer();
         Settings = new SettingsViewModel(dependencies.SettingsRepository);
         History = new HistoryViewModel(
             dependencies.HistoryRepository,
@@ -37,6 +39,8 @@ public sealed class MainViewModel : ViewModelBase
     }
 
     public event Action<AppSettings>? SettingsChanged;
+
+    public IAppLocalizer Localizer { get; }
 
     public CalculatorViewModel Calculator { get; }
 
