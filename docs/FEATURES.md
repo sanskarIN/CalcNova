@@ -83,11 +83,16 @@ See [`EXACT_RATIONALS.md`](EXACT_RATIONALS.md).
 - 1–15 selectable significant digits;
 - rounding normalization across the 1000-mantissa boundary;
 - invariant-culture parsing of canonical engineering forms;
+- explicit 4,096-character raw input budget before whitespace/numeric parsing;
+- the same 4,096-character budget on the shared Format action and engineering input `TextBox`;
 - explicit engineering exponent range from -324 through 306;
 - rejection of non-finite values, malformed exponents, non-engineering exponents, and non-canonical exponent-form mantissas;
+- rejection of non-zero inputs that would underflow to floating-point zero;
 - chunked power-of-ten scaling for extreme finite values;
 - Calculator utility view model and shared panel;
-- source validator, focused workflow, regression tests, and integrated release-preflight coverage.
+- core/app/headless regression coverage for input bounds and numeric edge cases;
+- source validator, focused workflow, regression tests, and integrated release-preflight coverage;
+- focused workflow path coverage for the core formatter, App view model/panel, and their tests.
 
 See [`ENGINEERING_NOTATION.md`](ENGINEERING_NOTATION.md).
 
@@ -393,6 +398,8 @@ Equation-solving module and shared view model are present, including quadratic w
 - onboarding contracts;
 - cross-platform package metadata and Desktop/Browser/Android/iOS workflow contracts;
 - exact-tag unsigned iOS simulator workflow contracts;
+- Source Preflight workflow self-validation for broad trigger coverage, least-privilege permissions, Python setup, and integrated command execution;
+- master Source Preflight triggers across `src/**`, `tests/**`, `tools/**`, `docs/**`, packaging, workflows, and release/build root metadata;
 - release documentation/tag/workflow validators;
 - artifact manifest generation/verification and SHA-256 integrity validation infrastructure;
 - machine-readable release-evidence model, runner, verifier, schema, and source validation;
