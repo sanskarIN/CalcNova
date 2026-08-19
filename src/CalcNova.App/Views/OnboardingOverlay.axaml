@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CalcNova.App.Views.OnboardingOverlay"
-             IsVisible="{Binding ShouldShowOnboarding}">
+             IsVisible="{Binding Settings.ShouldShowOnboarding}">
   <Border Background="#CC000000" Padding="16">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                   VerticalScrollBarVisibility="Auto"
@@ -69,11 +69,11 @@
 
           <WrapPanel HorizontalAlignment="Right">
             <Button Content="Skip"
-                    Command="{Binding SkipOnboardingCommand}"
+                    Command="{Binding Settings.SkipOnboardingCommand}"
                     AutomationProperties.Name="Skip CalcNova introduction"
                     Margin="0,0,8,8" />
             <Button Content="Start calculating"
-                    Command="{Binding CompleteOnboardingCommand}"
+                    Command="{Binding Settings.CompleteOnboardingCommand}"
                     AutomationProperties.Name="Complete CalcNova introduction and start calculating"
                     Margin="0,0,0,8" />
           </WrapPanel>
