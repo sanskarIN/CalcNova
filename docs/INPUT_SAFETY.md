@@ -30,32 +30,39 @@ Sanitization is not a replacement for parsing. Sanitized text is still parsed an
 
 `CalculatorViewModel.ImportExpression(...)` and `ImportExpressionCommand` use the sanitizer and preserve the existing expression when imported text is rejected. The user-facing status message receives the rejection reason.
 
-A future clipboard service must call this import path rather than assigning clipboard text directly to `Expression`.
+`PasteAsync` obtains text through `IClipboardService` and sends it through the same sanitizer path. It does not auto-evaluate the pasted expression. `CopyResultAsync` writes only a valid displayed result.
 
-## Clipboard integration requirements
+## Clipboard architecture
 
-When platform clipboard support is wired:
+Clipboard access is isolated behind `CalcNova.Platform.Clipboard.IClipboardService`. The shared app provides `AvaloniaClipboardService`, which is attached to the active Avalonia top-level clipboard while `MainView` is attached to the visual tree and detached when the view leaves it.
 
-1. keep the clipboard interface in a platform abstraction rather than `CalcNova.Core`;
-2. never require clipboard permission for ordinary calculator use;
-3. import text through `CalculatorViewModel.ImportExpression`;
-4. do not auto-evaluate pasted/imported expressions unless the user explicitly requests evaluation;
-5. avoid reading clipboard content in the background;
-6. avoid telemetry/logging of clipboard content;
-7. impose the existing expression length limit before evaluation;
-8. provide an accessible error message when text cannot be imported.
+Current Desktop, Browser/WebAssembly, Android, and iOS compositions inject this shared adapter.
+
+Privacy and safety requirements are enforced by design:
+
+1. ordinary calculator use does not require clipboard access;
+2. clipboard text is read only after the user invokes paste;
+3. clipboard content is not evaluated automatically;
+4. imported text always uses `CalculatorViewModel.ImportExpression`;
+5. clipboard content is not intentionally logged or sent to telemetry;
+6. evaluator expression-length limits still apply;
+7. unavailable/cancelled/rejected clipboard operations produce user-facing status messages.
 
 ## Testing expectations
 
-Regression tests should cover:
+Regression coverage includes:
 
 - calculator glyph normalization;
 - multiline whitespace normalization;
 - unsupported symbols/control characters;
 - maximum-length enforcement;
 - view-model preservation of the previous expression on rejected import;
-- successful evaluation after a sanitized import.
+- successful evaluation after sanitized import;
+- sanitized clipboard paste through a fake clipboard service;
+- unsafe clipboard rejection;
+- valid result copy;
+- unavailable clipboard reporting.
 
 ## Validation rule
 
-Source/tests existing does not mean a platform clipboard path has been validated. Clipboard integration must be compiled and exercised on the relevant target before it is marked PASS.
+Source and regression tests exist, but target-specific clipboard behavior must still be compiled and exercised on each supported platform before release readiness is marked PASS. In the current continuation environment, local .NET restore/build/test execution is **NOT RUN** because the required SDK is unavailable.
