@@ -1,0 +1,47 @@
+name: Settings Schema Validate
+
+on:
+  push:
+    paths:
+      - 'src/CalcNova.Platform/Settings/AppSettings.cs'
+      - 'src/CalcNova.Platform/Settings/AppSettingsSchema.cs'
+      - 'src/CalcNova.Persistence/Settings/JsonSettingsRepository.cs'
+      - 'src/CalcNova.Browser/Services/BrowserSettingsRepository.cs'
+      - 'tests/CalcNova.Platform.Tests/AppSettingsSchemaTests.cs'
+      - 'tests/CalcNova.Persistence.Tests/JsonSettingsRepositoryTests.cs'
+      - 'tools/validate_settings_schema.py'
+      - 'tools/tests/test_validate_settings_schema.py'
+      - '.github/workflows/settings-schema-validate.yml'
+  pull_request:
+    paths:
+      - 'src/CalcNova.Platform/Settings/AppSettings.cs'
+      - 'src/CalcNova.Platform/Settings/AppSettingsSchema.cs'
+      - 'src/CalcNova.Persistence/Settings/JsonSettingsRepository.cs'
+      - 'src/CalcNova.Browser/Services/BrowserSettingsRepository.cs'
+      - 'tests/CalcNova.Platform.Tests/AppSettingsSchemaTests.cs'
+      - 'tests/CalcNova.Persistence.Tests/JsonSettingsRepositoryTests.cs'
+      - 'tools/validate_settings_schema.py'
+      - 'tools/tests/test_validate_settings_schema.py'
+      - '.github/workflows/settings-schema-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  settings-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Validate settings schema contracts
+        run: python tools/validate_settings_schema.py
+
+      - name: Run settings schema validator tests
+        run: python -m unittest tools.tests.test_validate_settings_schema
