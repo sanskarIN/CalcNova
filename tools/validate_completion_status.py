@@ -43,6 +43,11 @@ CURRENT_STATUS_CONTRACTS: dict[str, tuple[str, ...]] = {
         "Feature requests are optional post-2.8.03 enhancements",
         "Support CalcNova maintenance and optional improvements",
     ),
+    "CONTRIBUTING.md": (
+        "**CalcNova 2.8.03 is the completed product baseline.**",
+        "## Contributor setup",
+        "maintenance, correctness, security, compatibility, documentation, translations, tests, dependency updates, or explicitly proposed optional enhancements",
+    ),
     "docs/README.md": (
         "# CalcNova 2.8.03 Documentation",
         "**Project status: Complete for version 2.8.03.**",
@@ -102,6 +107,7 @@ FORBIDDEN_CURRENT_STATUS_MARKERS = (
     "first validated milestone will be created",
     "suggested development milestones",
     "development mobile display version",
+    "## development environment",
 )
 
 
