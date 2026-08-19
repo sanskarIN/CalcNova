@@ -45,7 +45,7 @@
                          FontSize="18"
                          FontWeight="SemiBold"
                          Foreground="#FF111827" />
-              <TextBlock Text="On keyboard targets, Ctrl+PageUp and Ctrl+PageDown cycle through modes. Calculator hardware number-pad input is supported when you are not editing a text field."
+              <TextBlock Text="On keyboard targets, Ctrl+PageUp and Ctrl+PageDown cycle through modes; Ctrl+Home and Ctrl+End jump to the first and last modes. Calculator number-pad input is supported when you are not editing a text field."
                          Foreground="#FF334155"
                          TextWrapping="Wrap" />
             </StackPanel>
