@@ -51,6 +51,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools/validate_graph_numerical_budgets.py",
             "tools/validate_unicode_metadata.py",
             "tools/validate_rational_numbers.py",
+            "tools/validate_engineering_notation.py",
             "tools/validate_export_previews.py",
             "tools/validate_bivariate_statistics.py",
             "tools/validate_headless_ui_tests.py",
@@ -68,6 +69,8 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools/validate_platform_workflows.py",
             "tools/validate_release_workflow.py",
             "tools/validate_release_docs.py",
+            "tools/validate_artifact_integrity.py",
+            "tools/validate_release_evidence_infrastructure.py",
             "tools/tests/test_validate_release_tag.py",
         }
         self.assertTrue(expected.issubset(configured_files))
@@ -93,6 +96,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools.tests.test_validate_graph_numerical_budgets",
             "tools.tests.test_validate_unicode_metadata",
             "tools.tests.test_validate_rational_numbers",
+            "tools.tests.test_validate_engineering_notation",
             "tools.tests.test_validate_export_previews",
             "tools.tests.test_validate_bivariate_statistics",
             "tools.tests.test_validate_localization_catalog",
@@ -103,6 +107,13 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools.tests.test_validate_touch_targets",
             "tools.tests.test_validate_packaging_metadata",
             "tools.tests.test_validate_platform_workflows",
+            "tools.tests.test_artifact_manifest",
+            "tools.tests.test_verify_artifact_manifest",
+            "tools.tests.test_validate_artifact_integrity",
+            "tools.tests.test_release_evidence",
+            "tools.tests.test_run_release_evidence",
+            "tools.tests.test_verify_release_evidence",
+            "tools.tests.test_validate_release_evidence_infrastructure",
         }
         self.assertTrue(expected_modules.issubset(configured_modules))
 
