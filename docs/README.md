@@ -49,6 +49,7 @@ Use this index to find the authoritative guide for each area of the project.
 
 - [Roadmap](ROADMAP.md)
 - [Project state](../PROJECT_STATE.md)
+- [Final source audit — 2026-08-19](FINAL_SOURCE_AUDIT_2026-08-19.md)
 - [What changed](../what_changed.md)
 - [Changelog](../CHANGELOG.md)
 
