@@ -16,10 +16,10 @@ public sealed class GraphSeriesPresentationTests
 
         var presentations = GraphSeriesPresentationFactory.Create(samples);
 
-        Assert.Equal(8, presentations.Count);
-        Assert.Equal(8, presentations.Select(item => item.Pattern).Distinct().Count());
+        Assert.Equal(GraphSeriesLinePatternCatalog.PatternCount, presentations.Count);
+        Assert.Equal(GraphSeriesLinePatternCatalog.PatternCount, presentations.Select(item => item.Pattern).Distinct().Count());
         Assert.Equal(GraphSeriesLinePattern.Solid, presentations[0].Pattern);
-        Assert.Equal(GraphSeriesLinePattern.SparseDot, presentations[^1].Pattern);
+        Assert.Equal(GraphSeriesLinePattern.AlternatingDash, presentations[^1].Pattern);
         Assert.Equal("Series 1 [solid] — x + 1", presentations[0].LegendText);
     }
 
@@ -47,7 +47,7 @@ public sealed class GraphSeriesPresentationTests
     [Fact]
     public void MoreThanEightSeries_IsRejectedInsteadOfReusingAmbiguousPatterns()
     {
-        var samples = Enumerable.Range(0, 9)
+        var samples = Enumerable.Range(0, GraphSeriesLinePatternCatalog.PatternCount + 1)
             .Select(index => new GraphExpressionSample(
                 new GraphExpressionDefinition($"s{index}", $"Series {index}", "x"),
                 [],
