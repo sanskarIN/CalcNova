@@ -58,14 +58,14 @@ public readonly struct RationalNumber : IEquatable<RationalNumber>, IComparable<
             throw new FormatException("Rational number text is required.");
         }
 
-        var trimmed = text.Trim();
-        if (trimmed.Length > MaximumInputCharacters)
+        if (text.Length > MaximumInputCharacters)
         {
             throw new ArgumentException(
                 $"Rational input may contain at most {MaximumInputCharacters} characters.",
                 nameof(text));
         }
 
+        var trimmed = text.Trim();
         var slashIndex = trimmed.IndexOf('/');
         if (slashIndex >= 0)
         {
