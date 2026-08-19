@@ -8,87 +8,99 @@ It deliberately separates three different claims:
 
 1. **implemented in source** — code/tests/docs/workflow contracts exist;
 2. **validated by SDK-independent source contracts** — Python validators can inspect deterministic repository contracts without compiling .NET;
-3. **observed runtime/release evidence** — a command, build, test, platform run, accessibility audit, signing step, or package validation actually executed and its result was observed.
+3. **observed runtime/release evidence** — a command, build, test, platform run, accessibility audit, signing step, artifact verification, or package validation actually executed and its result was observed.
 
-Only the first two layers can be completed from source review alone. A source audit must not convert an unexecuted .NET/platform check into PASS evidence.
+A source audit must never convert an unexecuted .NET/platform check into PASS evidence.
 
 ## Concrete defects fixed during the final audit
 
 ### Exact-rational validator/source mismatch
 
-The exact-rational source validator expected a magnitude-check marker that was not present in the implementation even though the actual bit-length guard existed in another form.
+The exact-rational source validator expected a magnitude-check marker that did not match the actual implementation even though the reduced bit-length guard was present.
 
-The validator was aligned with the real source contract so its repository-validity regression no longer fails because of a stale textual marker.
+The validator was aligned with the real `GetBitLength()` contract so its repository-validity regression no longer fails because of stale textual matching.
 
 ### Default `RationalNumber` invalid-state exposure
 
 A C# value type can always be created with `default`. The original auto-property representation therefore allowed `default(RationalNumber)` to expose a zero denominator even though normal construction rejects denominator zero.
 
-The type now stores backing fields and exposes a canonical denominator of `1` when the backing denominator is the all-zero default. As a result:
+The type now stores backing fields and exposes a canonical denominator of `1` for the all-zero default backing state. Therefore:
 
 - `default(RationalNumber)` behaves as exact zero;
+- numerator is `0`;
+- denominator is `1`;
 - equality/hash/string/comparison/arithmetic behavior remains canonical;
-- consumers do not observe a synthetic `0/0` state simply because the struct was default-initialized.
+- consumers do not observe a synthetic `0/0` state merely because the struct was default-initialized.
 
-A dedicated regression and source-contract guard protect this behavior.
+Dedicated regression and source-contract guards protect this behavior.
 
 ### Exact-rational whitespace workload-budget bypass
 
-The exact-rational documentation required the input-character budget to apply before trimming. The implementation instead checked the trimmed text length, allowing a very small valid number to be wrapped in arbitrarily large whitespace and bypass the intended raw-input budget.
+The exact-rational contract required the raw input-character budget to apply before trimming. The implementation instead checked the trimmed text length, allowing a small valid number to be surrounded by arbitrarily large whitespace and evade the intended input budget.
 
-The parser now checks `text.Length` before trimming. A dedicated regression covers oversized whitespace-padded input and the source validator requires the pre-trim guard.
+The parser now checks `text.Length` before trimming. A regression covers oversized whitespace-padded input and the source validator requires the pre-trim guard.
 
-### Engineering-notation exponent contract mismatch
+### Engineering-notation finite exponent contract mismatch
 
-The engineering-notation validator/documentation required explicit finite engineering exponent bounds, but the formatter/parser source and tests did not yet contain that complete contract.
+The engineering-notation validator/documentation required explicit finite engineering exponent bounds, but formatter/parser source and tests did not yet fully implement that contract.
 
 The implementation now defines and enforces:
 
 - minimum engineering exponent: `-324`;
 - maximum engineering exponent: `306`.
 
-Regression coverage includes out-of-range non-zero and zero-mantissa forms so an input such as a zero multiplied by an enormous power of ten cannot bypass the exponent workload contract.
+Regression coverage includes out-of-range non-zero and zero-mantissa forms so an input such as `0e+309` cannot bypass the exponent workload contract merely because the mathematical value would still be zero.
+
+### Engineering non-zero underflow silently becoming zero
+
+A final numeric edge review found another real issue after the explicit exponent bounds were added.
+
+`1e-324` uses a syntactically valid engineering exponent, but the value is below the minimum positive subnormal `double`. Chunked power-of-ten scaling therefore produces floating-point `0`.
+
+Returning `0` for a non-zero canonical engineering input would silently change its meaning.
+
+The parser now rejects the case when:
+
+- the parsed mantissa is non-zero; and
+- bounded scaling produces `0`.
+
+It throws `OverflowException` with a below-supported-non-zero-range message. The regression suite includes `Parse_RejectsUnderflowingNonZeroEngineeringValue`, and the SDK-independent validator requires both the source guard and the regression scenario.
+
+Representable extreme forms such as the formatter output for `double.Epsilon` remain part of round-trip coverage.
 
 ### Integrated release-preflight inventory gaps
 
-Several focused validators existed but were not represented in the single SDK-independent release preflight. The integrated inventory was expanded to include the current critical source contracts and their regression suites, including:
+Several focused validators existed but were not represented in the single SDK-independent release preflight.
+
+The integrated inventory was expanded to include the current critical source contracts and their regression suites, including:
 
 - exact rational arithmetic;
 - engineering notation;
 - artifact integrity infrastructure;
 - structured release-evidence infrastructure;
 - dynamic shared-control accessibility;
-- exact-tag iOS simulator release workflow.
+- exact-tag unsigned iOS simulator release workflow.
 
-The preflight inventory regression was expanded at the same time so these validators cannot silently fall out of the integrated gate.
+The preflight inventory regression was expanded simultaneously so these validators cannot silently fall out of the integrated gate.
 
 ### Documentation drift
 
-The final review found multiple documentation files lagging behind source completed earlier on 2026-08-19. The documentation set was synchronized so completed features are not still advertised as future ideas.
+The final review found multiple documentation files lagging behind source completed earlier on 2026-08-19. Completed features were still described as future work in some places, and newer release/integrity tooling was missing from public indexes.
 
-Updated areas include:
-
-- documentation index;
-- feature inventory;
-- roadmap;
-- SDK-independent preflight guide;
-- exact-rational contract;
-- this final source-audit record;
-- continuation/change checkpoint.
+The documentation set was synchronized so source state, roadmap, features, changelog, public README, preflight guide, numeric guides, project state, final audit, and continuation checkpoint describe the same current scope.
 
 ## Completed source capabilities confirmed in the final review
-
-The current source tree contains the following major capability groups.
 
 ### Calculation and numeric utilities
 
 - safe project-owned expression parser/evaluator;
 - standard/scientific calculator behavior;
 - repeated equals, percentage, and calculator memory workflows;
-- selection/caret-aware calculator editing and wrapping;
+- selection/caret-aware calculator editing and selection-preserving wrapping;
 - safe printable/shifted operator mappings outside active text-editing fields;
 - bounded exact rational arithmetic with shared Calculator utility UI;
-- bounded engineering notation formatting/parsing with shared Calculator utility UI.
+- bounded engineering-notation formatting/parsing with explicit finite exponent and non-zero-underflow protection;
+- focused tests/source validators/workflows for the recent numeric utilities.
 
 ### Programmer and Unicode
 
@@ -116,10 +128,17 @@ The current source tree contains the following major capability groups.
 - linear regression and prediction;
 - equations;
 - matrices;
-- graph sampling, viewport interaction, tracing, CSV/SVG export;
+- deterministic behavior for degenerate/non-finite/oversized paired datasets.
+
+### Graphing and numerical analysis
+
+- graph sampling, viewport interaction, and tracing;
+- CSV/SVG export workflows;
 - derivative/root/integration approximation with explicit workload bounds;
 - deterministic non-color-only multi-series line patterns and text legend;
-- extreme-finite-value numerical-analysis hardening.
+- combined-series fit-to-data;
+- extreme-finite-value numerical-analysis hardening;
+- bounded display previews with complete private copy payloads.
 
 ### Persistence and platform composition
 
@@ -128,7 +147,7 @@ The current source tree contains the following major capability groups.
 - versioned settings schema and migration/validation architecture;
 - Desktop, Browser/WebAssembly, Android, and iOS composition heads;
 - shared clipboard abstraction;
-- bounded export previews with full private copy payloads.
+- settings/culture/converter preference persistence contracts.
 
 ### Product quality
 
@@ -151,7 +170,7 @@ The current source tree contains the following major capability groups.
 
 ## Documentation status
 
-The documentation index now links the current major contracts, including:
+The main documentation index now links the current major contracts, including:
 
 - `EXACT_RATIONALS.md`;
 - `ENGINEERING_NOTATION.md`;
@@ -160,11 +179,18 @@ The documentation index now links the current major contracts, including:
 - `GRAPH_NUMERICAL_SAFETY.md`;
 - `EXPORT_PREVIEWS.md`;
 - `SOURCE_PREFLIGHT.md`;
-- `VALIDATION_EVIDENCE.md`.
+- `VALIDATION_EVIDENCE.md`;
+- this final source audit.
 
 `FEATURES.md` distinguishes completed source features from remaining runtime/product work.
 
 `ROADMAP.md` no longer lists exact rational arithmetic, engineering notation, covariance/correlation/regression, printable calculator operator mappings, deterministic multi-series differentiation, or already-added numerical edge hardening as future work.
+
+`README.md`, `CHANGELOG.md`, `PROJECT_STATE.md`, and `what_changed.md` have been synchronized with the same source/evidence boundary.
+
+The previous active continuation was preserved verbatim at:
+
+`docs/history/what_changed_through_pre_final_audit_2026-08-19.md`.
 
 ## Source-validation entry points
 
@@ -188,6 +214,16 @@ python tools/run_release_evidence.py --scope source
 
 and evaluated through the repository evidence verifier according to `VALIDATION_EVIDENCE.md`.
 
+## Observed GitHub status at the final audit boundary
+
+The exact `main` commit was inspected through the GitHub connector during the final review.
+
+A combined-status lookup returned no status contexts for the checked latest commit. A separate commit-workflow lookup available through the connector returned no pull-request-triggered workflow runs for that commit.
+
+These empty results are **not** treated as CI success.
+
+The connector available in this environment did not provide a general push-run listing for the branch through the allowed endpoint, so no unobserved push workflow is inferred either way.
+
 ## Runtime/release evidence still required
 
 The final source review does **not** claim PASS for checks that were not observed. Before a release candidate can be called fully validated, real execution evidence is still required for at least:
@@ -205,20 +241,34 @@ The final source review does **not** claim PASS for checks that were not observe
 - real artifact generation followed by manifest/checksum verification;
 - release-candidate structured evidence generated from the exact commit being released.
 
+## Local execution limitation
+
+The active assistant execution environment does not provide the required .NET 10 SDK.
+
+The complete final repository also could not be materialized locally from GitHub in the independent container path used during the continuation because that environment could not resolve `github.com`.
+
+Accordingly:
+
+- local .NET restore/build/test/headless execution is **NOT RUN**;
+- the final integrated Python preflight is **NOT RUN locally against a materialized final tree**;
+- source/workflow/test presence is not promoted to PASS evidence.
+
 ## Known source-level limitation that remains intentional
 
-The semantic English/Hindi catalog is implemented, but the shared XAML still contains unmigrated hard-coded English. CalcNova therefore must not claim complete Hindi UI localization yet. Remaining visible strings should be migrated in compile-verified increments and validated with real Devanagari/large-text/compact layouts.
+The semantic English/Hindi catalog and reviewed live mappings are implemented, but shared XAML still contains unmigrated hard-coded English.
+
+CalcNova therefore must not claim complete Hindi UI localization yet. Remaining visible strings should be migrated in compile-verified increments and validated with real Devanagari/large-text/compact layouts.
 
 ## Final continuation rule
 
 Future work should start with **observed execution evidence**, not by recreating already completed source modules.
 
-When a real compiler, test, platform, accessibility, packaging, or signing failure is observed:
+When a real compiler, test, platform, accessibility, packaging, artifact, or signing failure is observed:
 
-1. record the exact failing command/environment;
+1. record the exact failing command/environment/commit;
 2. fix the smallest concrete cause;
 3. add or strengthen regression coverage where practical;
 4. rerun the affected validation;
 5. update structured/manual evidence without converting unavailable checks into PASS.
 
-The source-level final audit is complete only in that limited sense: the known source/documentation inconsistencies found during this review were corrected, while runtime/platform release readiness remains evidence-dependent.
+The source-level final audit is complete only in that limited sense: the known source/documentation inconsistencies and concrete numeric/release-gate defects found during this review were corrected, while runtime/platform release readiness remains evidence-dependent.
