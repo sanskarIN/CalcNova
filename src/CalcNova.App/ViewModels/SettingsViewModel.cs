@@ -21,6 +21,7 @@ public sealed class SettingsViewModel : ViewModelBase
     private int _converterSignificantDigits = 15;
     private string[] _converterRecentPairs = [];
     private string[] _converterFavoritePairs = [];
+    private int _completedOnboardingVersion;
     private string _statusMessage = string.Empty;
 
     public SettingsViewModel(ISettingsRepository? repository)
@@ -28,6 +29,8 @@ public sealed class SettingsViewModel : ViewModelBase
         _repository = repository;
         SaveCommand = new AsyncRelayCommand(_ => SaveAsync());
         ResetCommand = new AsyncRelayCommand(_ => ResetAsync());
+        CompleteOnboardingCommand = new AsyncRelayCommand(_ => CompleteOnboardingAsync());
+        SkipOnboardingCommand = new AsyncRelayCommand(_ => SkipOnboardingAsync());
     }
 
     public event Action<AppSettings>? SettingsChanged;
@@ -96,6 +99,10 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public IReadOnlyList<string> ConverterFavoritePairs => _converterFavoritePairs;
 
+    public int CompletedOnboardingVersion => _completedOnboardingVersion;
+
+    public bool ShouldShowOnboarding => OnboardingPolicy.ShouldShow(_completedOnboardingVersion);
+
     public string StatusMessage
     {
         get => _statusMessage;
@@ -105,6 +112,10 @@ public sealed class SettingsViewModel : ViewModelBase
     public ICommand SaveCommand { get; }
 
     public ICommand ResetCommand { get; }
+
+    public ICommand CompleteOnboardingCommand { get; }
+
+    public ICommand SkipOnboardingCommand { get; }
 
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
@@ -180,9 +191,47 @@ public sealed class SettingsViewModel : ViewModelBase
         }
     }
 
+    public Task CompleteOnboardingAsync(CancellationToken cancellationToken = default)
+    {
+        return PersistOnboardingCompletionAsync("Onboarding completed.", cancellationToken);
+    }
+
+    public Task SkipOnboardingAsync(CancellationToken cancellationToken = default)
+    {
+        return PersistOnboardingCompletionAsync("Onboarding skipped.", cancellationToken);
+    }
+
+    private async Task PersistOnboardingCompletionAsync(string successMessage, CancellationToken cancellationToken)
+    {
+        _completedOnboardingVersion = OnboardingPolicy.MarkCurrentVersionCompleted();
+        OnPropertyChanged(nameof(CompletedOnboardingVersion));
+        OnPropertyChanged(nameof(ShouldShowOnboarding));
+
+        var settings = CreateValidatedSettings();
+        try
+        {
+            if (_repository is not null)
+            {
+                await SaveToRepositoryAsync(settings, cancellationToken);
+                StatusMessage = successMessage;
+            }
+            else
+            {
+                StatusMessage = $"{successMessage} The choice applies for this session because settings storage is unavailable.";
+            }
+
+            SettingsChanged?.Invoke(settings);
+        }
+        catch (Exception exception) when (exception is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
+        {
+            StatusMessage = $"Onboarding state could not be saved: {exception.Message}";
+        }
+    }
+
     private async Task ResetAsync()
     {
-        Apply(new AppSettings());
+        var completedOnboardingVersion = _completedOnboardingVersion;
+        Apply(new AppSettings { CompletedOnboardingVersion = completedOnboardingVersion });
         await SaveAsync();
     }
 
@@ -234,7 +283,8 @@ public sealed class SettingsViewModel : ViewModelBase
             HighContrast = HighContrast,
             ConverterSignificantDigits = _converterSignificantDigits,
             ConverterRecentPairs = _converterRecentPairs.ToArray(),
-            ConverterFavoritePairs = _converterFavoritePairs.ToArray()
+            ConverterFavoritePairs = _converterFavoritePairs.ToArray(),
+            CompletedOnboardingVersion = OnboardingPolicy.NormalizeCompletedVersion(_completedOnboardingVersion)
         };
     }
 
@@ -252,8 +302,11 @@ public sealed class SettingsViewModel : ViewModelBase
         _converterSignificantDigits = settings.ConverterSignificantDigits;
         _converterRecentPairs = settings.ConverterRecentPairs?.Take(12).ToArray() ?? [];
         _converterFavoritePairs = settings.ConverterFavoritePairs?.Take(100).ToArray() ?? [];
+        _completedOnboardingVersion = OnboardingPolicy.NormalizeCompletedVersion(settings.CompletedOnboardingVersion);
         OnPropertyChanged(nameof(ConverterSignificantDigits));
         OnPropertyChanged(nameof(ConverterRecentPairs));
         OnPropertyChanged(nameof(ConverterFavoritePairs));
+        OnPropertyChanged(nameof(CompletedOnboardingVersion));
+        OnPropertyChanged(nameof(ShouldShowOnboarding));
     }
 }
