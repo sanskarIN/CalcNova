@@ -78,7 +78,7 @@ public sealed class GraphNumericalAnalyzer
             var middle = SafeMidpoint(left, right);
             if (middle == left || middle == right)
             {
-                return middle;
+                return Math.Abs(leftValue) <= Math.Abs(rightValue) ? left : right;
             }
 
             var middleValue = EvaluateAt(compiled, middle, angleUnit);
@@ -96,6 +96,7 @@ public sealed class GraphNumericalAnalyzer
             else
             {
                 right = middle;
+                rightValue = middleValue;
             }
         }
 
@@ -136,7 +137,8 @@ public sealed class GraphNumericalAnalyzer
 
         for (var index = 1; index < intervals; index++)
         {
-            var x = minimumX + (index * width);
+            var fraction = (double)index / intervals;
+            var x = (minimumX * (1d - fraction)) + (maximumX * fraction);
             if (!double.IsFinite(x))
             {
                 throw new InvalidOperationException("Integration sample point is outside the supported numeric range.");
