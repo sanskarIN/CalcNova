@@ -1,0 +1,133 @@
+name: Validation Evidence
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "tools/**"
+      - "docs/release-evidence.schema.json"
+      - "docs/VALIDATION_EVIDENCE.md"
+      - ".github/workflows/validation-evidence.yml"
+      - "CalcNova.slnx"
+      - "Directory.*.props"
+      - "global.json"
+  pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "tools/**"
+      - "docs/release-evidence.schema.json"
+      - "docs/VALIDATION_EVIDENCE.md"
+      - ".github/workflows/validation-evidence.yml"
+      - "CalcNova.slnx"
+      - "Directory.*.props"
+      - "global.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core-desktop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - name: Collect core and Desktop evidence
+        run: python tools/run_release_evidence.py --scope core --platform desktop
+      - name: Require core and Desktop PASS evidence
+        run: python tools/verify_release_evidence.py artifacts/validation/release-evidence.json --scope core --require-platform desktop
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-evidence-core-desktop
+          path: artifacts/validation
+          if-no-files-found: error
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - name: Install WebAssembly workload
+        run: dotnet workload install wasm-tools
+      - name: Collect Browser evidence
+        run: python tools/run_release_evidence.py --scope source --platform browser
+      - name: Require source and Browser PASS evidence
+        run: python tools/verify_release_evidence.py artifacts/validation/release-evidence.json --scope source --require-platform browser
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-evidence-browser
+          path: artifacts/validation
+          if-no-files-found: error
+
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install Android workload
+        run: dotnet workload install android
+      - name: Collect Android evidence
+        run: python tools/run_release_evidence.py --scope source --platform android
+      - name: Require source and Android PASS evidence
+        run: python tools/verify_release_evidence.py artifacts/validation/release-evidence.json --scope source --require-platform android
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-evidence-android
+          path: artifacts/validation
+          if-no-files-found: error
+
+  ios:
+    runs-on: macos-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - name: Install iOS workload
+        run: dotnet workload install ios
+      - name: Collect iOS simulator evidence
+        run: python tools/run_release_evidence.py --scope source --platform ios
+      - name: Require source and iOS simulator PASS evidence
+        run: python tools/verify_release_evidence.py artifacts/validation/release-evidence.json --scope source --require-platform ios
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-evidence-ios
+          path: artifacts/validation
+          if-no-files-found: error
