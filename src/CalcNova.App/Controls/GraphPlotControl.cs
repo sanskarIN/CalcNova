@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using CalcNova.App.Infrastructure;
 using CalcNova.Graphing;
 
 namespace CalcNova.App.Controls;
@@ -17,6 +18,7 @@ public sealed class GraphPlotControl : Control
     private const double MinimumSpan = 1e-9d;
     private const double MaximumSpan = 1e15d;
     private const double AxisPadding = 0.08d;
+    private const double KeyboardPanFraction = 0.10d;
 
     private double _minimumX = -10d;
     private double _maximumX = 10d;
@@ -178,6 +180,51 @@ public sealed class GraphPlotControl : Control
         eventArgs.Handled = true;
     }
 
+    protected override void OnKeyDown(KeyEventArgs eventArgs)
+    {
+        base.OnKeyDown(eventArgs);
+
+        var action = GraphKeyboardInput.GetAction(eventArgs.Key, eventArgs.KeyModifiers);
+        if (action == GraphKeyboardAction.None)
+        {
+            return;
+        }
+
+        ApplyKeyboardAction(action);
+        eventArgs.Handled = true;
+    }
+
+    private void ApplyKeyboardAction(GraphKeyboardAction action)
+    {
+        switch (action)
+        {
+            case GraphKeyboardAction.PanLeft:
+                PanViewport(-KeyboardPanFraction, 0d);
+                break;
+            case GraphKeyboardAction.PanRight:
+                PanViewport(KeyboardPanFraction, 0d);
+                break;
+            case GraphKeyboardAction.PanUp:
+                PanViewport(0d, KeyboardPanFraction);
+                break;
+            case GraphKeyboardAction.PanDown:
+                PanViewport(0d, -KeyboardPanFraction);
+                break;
+            case GraphKeyboardAction.ZoomIn:
+                ZoomAround(ViewportCenter(), 0.82d);
+                break;
+            case GraphKeyboardAction.ZoomOut:
+                ZoomAround(ViewportCenter(), 1.22d);
+                break;
+            case GraphKeyboardAction.ResetViewport:
+                ResetViewport();
+                break;
+            case GraphKeyboardAction.FitToData:
+                FitToData();
+                break;
+        }
+    }
+
     private void DrawGrid(DrawingContext context, Rect bounds, Pen subtlePen, Pen axisPen)
     {
         const int divisions = 10;
@@ -262,6 +309,21 @@ public sealed class GraphPlotControl : Control
         _maximumY += yDelta;
         InvalidateVisual();
     }
+
+    private void PanViewport(double xFraction, double yFraction)
+    {
+        var xDelta = (_maximumX - _minimumX) * xFraction;
+        var yDelta = (_maximumY - _minimumY) * yFraction;
+        _minimumX += xDelta;
+        _maximumX += xDelta;
+        _minimumY += yDelta;
+        _maximumY += yDelta;
+        InvalidateVisual();
+    }
+
+    private GraphPoint ViewportCenter() => new(
+        (_minimumX + _maximumX) / 2d,
+        (_minimumY + _maximumY) / 2d);
 
     private void ZoomAround(GraphPoint anchor, double factor)
     {
