@@ -1,0 +1,58 @@
+name: Source Preflight
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.App/**"
+      - "src/CalcNova.Platform/Settings/AppSettings.cs"
+      - "src/CalcNova.Persistence/Settings/JsonSettingsRepository.cs"
+      - "src/CalcNova.Browser/Services/BrowserSettingsRepository.cs"
+      - "src/CalcNova.Android/CalcNova.Android.csproj"
+      - "src/CalcNova.iOS/**"
+      - "src/CalcNova.Desktop/CalcNova.Desktop.csproj"
+      - "src/CalcNova.Browser/CalcNova.Browser.csproj"
+      - "packaging/**"
+      - "tools/**"
+      - "docs/ACCESSIBILITY.md"
+      - "docs/LOCALIZATION.md"
+      - "docs/ONBOARDING.md"
+      - "docs/RELEASE.md"
+      - ".github/workflows/source-preflight.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.App/**"
+      - "src/CalcNova.Platform/Settings/AppSettings.cs"
+      - "src/CalcNova.Persistence/Settings/JsonSettingsRepository.cs"
+      - "src/CalcNova.Browser/Services/BrowserSettingsRepository.cs"
+      - "src/CalcNova.Android/CalcNova.Android.csproj"
+      - "src/CalcNova.iOS/**"
+      - "src/CalcNova.Desktop/CalcNova.Desktop.csproj"
+      - "src/CalcNova.Browser/CalcNova.Browser.csproj"
+      - "packaging/**"
+      - "tools/**"
+      - "docs/ACCESSIBILITY.md"
+      - "docs/LOCALIZATION.md"
+      - "docs/ONBOARDING.md"
+      - "docs/RELEASE.md"
+      - ".github/workflows/source-preflight.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Run integrated source preflight
+        run: python tools/release_preflight.py
