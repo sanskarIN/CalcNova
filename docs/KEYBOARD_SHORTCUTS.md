@@ -16,19 +16,30 @@ The expression text box also receives ordinary text entry according to Avalonia/
 
 Mode cycling is implemented through `MainViewModel` rather than hard-coded tab mutations in the view. A repository validator checks that `MainViewModel.ModeCount` matches the number of shared XAML tabs and that the two keyboard shortcuts remain wired.
 
+## Current calculator hardware mappings
+
+When Calculator mode is active, focus is outside a text box, and no modifier is held, the shared shell maps these keys directly to canonical parser tokens:
+
+| Key | Action/token |
+|---|---|
+| Top-row `0`–`9` | Insert matching digit |
+| Numpad `0`–`9` | Insert matching digit |
+| Numpad `+` | `+` |
+| Numpad `-` | `-` |
+| Numpad `*` | `*` |
+| Numpad `/` | `/` |
+| Numpad decimal | `.` canonical decimal token |
+
+The mapping intentionally does not interpret shifted OEM punctuation keys yet. Those keys vary by keyboard layout and locale, so they should be handled only after locale/input-boundary behavior is defined and tested. The mapping is unit-tested and protected by a source-level CI contract validator.
+
 ## Planned calculator mappings
 
 The following mappings are intended but must be tested before being marked implemented:
 
 | Key | Intended action |
 |---|---|
-| `0`–`9` | Insert digit |
-| Numpad `0`–`9` | Insert digit |
-| `.` / locale-aware decimal input | Insert decimal separator safely |
-| `+` | Addition |
-| `-` | Subtraction |
-| `*` | Multiplication |
-| `/` | Division |
+| Locale-aware decimal punctuation outside the numpad | Insert decimal separator safely |
+| Top-row `+`, `-`, `*`, `/` punctuation variants | Arithmetic operators with keyboard-layout awareness |
 | `%` | Percentage/modulo according to active context |
 | `^` | Power |
 | `(` / `)` | Parentheses |
