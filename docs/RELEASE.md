@@ -23,14 +23,23 @@ v1.2.0-rc.1+build.7
 
 Suggested development milestones are guidance, not obligations. Version boundaries may move when implementation or validation reality changes.
 
-## Pre-release quality gate
+## Pre-release source gate
 
-Before tagging a release, verify at minimum:
+From the exact release-tag checkout, run the integrated SDK-independent source preflight first:
 
 ```bash
-python tools/tests/test_validate_release_tag.py
-python tools/validate_release_tag.py v0.1.0
-python tools/validate_packaging_metadata.py .
+python tools/release_preflight.py --tag v0.1.0
+```
+
+The integrated preflight currently covers repository/security structure, XAML XML, shared UI/navigation, calculator/shell keyboard mappings, graph keyboard interaction, accessibility markup, visible focus, runtime-evidence discipline, adaptive layout, touch targets, English/Hindi localization catalogs, settings-schema migration, onboarding, package metadata, release documentation, release-tag validation, and regression tests for the source validators.
+
+This command is the authoritative source-contract entry point. Focused validators remain independently runnable for diagnosis.
+
+## .NET quality gate
+
+After source preflight succeeds, run the compiled quality gate:
+
+```bash
 dotnet restore CalcNova.slnx
 dotnet format CalcNova.slnx --verify-no-changes --no-restore
 dotnet build CalcNova.slnx --configuration Release --no-restore
@@ -41,13 +50,13 @@ Then run the target-specific builds required for that release.
 
 The Python validators are intentionally SDK-independent. They check repository release contracts, but they do **not** prove that an Android, iOS, Windows, Linux, macOS, or Browser package can be built, signed, installed, or accepted by a store.
 
-A target that was not available must be listed as `NOT RUN`; it must not be presented as validated.
+A target that was not available must be listed as `NOT RUN`; it must not be presented as validated. Use the release evidence vocabulary `PASS / FAIL / BLOCKED / NOT RUN` and include enough environment detail to reproduce the result.
 
 ## Automated release flow
 
 `.github/workflows/release.yml` supports both a pushed `v*` tag and manual `workflow_dispatch` with an existing tag name.
 
-The workflow now follows a tag-first safety contract:
+The workflow follows a tag-first safety contract:
 
 1. fetch complete tag history;
 2. validate the requested tag syntax;
@@ -62,7 +71,7 @@ The workflow now follows a tag-first safety contract:
 
 This prevents a manual release from accidentally building the branch head while publishing an older/different tag.
 
-The release workflow does not create a missing tag automatically. Tag creation remains an explicit maintainer action after validation.
+The release workflow does not create a missing tag automatically. Tag creation remains an explicit maintainer action after validation. Manual release dispatch must reference an already-existing valid tag; it must not be used as an implicit tag-creation mechanism.
 
 ## Packaging metadata contract
 
@@ -75,9 +84,29 @@ The current release-layer metadata uses these source identities:
 - desktop assembly: `CalcNova.Desktop`;
 - browser assembly: `CalcNova.Browser`.
 
-`tools/validate_packaging_metadata.py` cross-checks Android/iOS project metadata, iOS launch metadata, the Linux desktop/AppStream files, the macOS plist template, and the Windows Appx/MSIX manifest template. The dedicated `Packaging Metadata Validate` and `Release Contract Validate` workflows run this preflight when relevant files change.
+`tools/validate_packaging_metadata.py` cross-checks Android/iOS project metadata, iOS launch metadata, the Linux desktop/AppStream files, the macOS plist template, and the Windows Appx/MSIX manifest template. Its Python regression suite deliberately verifies the current identity constants and missing-metadata failure behavior.
 
 Release-time values such as the macOS version/build placeholders and Windows publisher/MSIX version placeholders must be resolved by the release process. Do not commit a real signing identity, certificate password, keystore password, private key, provisioning profile, or other signing secret just to satisfy a package template.
+
+## Settings migration gate
+
+Preferences are schema-versioned. See [SETTINGS_MIGRATION.md](SETTINGS_MIGRATION.md).
+
+A release that changes settings must verify:
+
+- current-schema round trips;
+- every supported older-schema migration;
+- representative preference preservation;
+- safe rejection of corrupt or unsupported future schemas;
+- native and Browser storage behavior.
+
+An older build must not silently overwrite settings created by a newer unsupported schema.
+
+## Accessibility evidence gate
+
+Source accessibility checks do not replace runtime evidence. Use [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md) for Desktop, Browser, Android, and iOS evidence.
+
+Do not mark a platform or accessibility scenario `PASS` merely because focus styles, automation names, keyboard mappings, or validators exist in source. Every PASS needs an observed target/runtime result.
 
 ## Repository checks
 
@@ -112,17 +141,32 @@ For a release affecting calculation behavior, verify the relevant manual/automat
 - graph discontinuities/workload limits when graphing is included;
 - advanced module degenerate cases when included.
 
+## Interaction validation
+
+For release-supported keyboard targets, verify:
+
+- calculator Enter/Escape/Backspace and hardware-key mappings;
+- Ctrl+PageUp/PageDown mode cycling;
+- Ctrl+Home/End first/last mode navigation;
+- graph arrow-key panning;
+- graph numpad Add/Subtract zoom;
+- graph Home reset and `F` fit-to-data;
+- visible focus across representative controls;
+- no background shortcut activation through onboarding.
+
+Browser conflicts and assistive-technology interactions must be checked on actual target environments.
+
 ## Platform validation
 
 Record each target separately:
 
 ```text
-Windows: PASS / FAIL / NOT RUN
-Linux: PASS / FAIL / NOT RUN
-macOS: PASS / FAIL / NOT RUN
-Android: PASS / FAIL / NOT RUN
-iOS: PASS / FAIL / NOT RUN
-Browser: PASS / FAIL / NOT RUN
+Windows: PASS / FAIL / BLOCKED / NOT RUN
+Linux: PASS / FAIL / BLOCKED / NOT RUN
+macOS: PASS / FAIL / BLOCKED / NOT RUN
+Android: PASS / FAIL / BLOCKED / NOT RUN
+iOS: PASS / FAIL / BLOCKED / NOT RUN
+Browser: PASS / FAIL / BLOCKED / NOT RUN
 ```
 
 Include relevant OS/toolchain versions in release evidence where useful.
@@ -135,7 +179,7 @@ Signing credentials must live outside Git.
 
 Use platform-appropriate secure local configuration or GitHub Actions secrets. Never print signing passwords or private-key content into build logs.
 
-The Android release workflow only produces a signed AAB when all required signing secrets are configured. The temporary keystore is created in runner temporary storage and removed in an `always()` cleanup step.
+The Android release workflow only produces a signed AAB when all required signing secrets are configured. Temporary signing material must be removed after use.
 
 ## Release artifacts
 
@@ -164,7 +208,7 @@ v0.2.0
 v1.0.0
 ```
 
-Tag only validated milestones. Manual release dispatch must reference an already-existing valid tag; it must not be used as an implicit tag-creation mechanism.
+Tag only validated milestones.
 
 ## Release notes
 
