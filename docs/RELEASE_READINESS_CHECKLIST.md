@@ -8,10 +8,14 @@ Use this checklist for a real release candidate. Check an item only when there i
 - [ ] Repository required-file/secret guards pass.
 - [ ] All Avalonia `.axaml` files parse as XML.
 - [ ] Shared UI/navigation/keyboard contracts pass.
-- [ ] Accessibility source contracts pass.
-- [ ] Localization catalog/preference contracts pass.
+- [ ] Graph keyboard interaction contracts pass.
+- [ ] Accessibility markup, focus-visibility, adaptive-layout, and touch-target source contracts pass.
+- [ ] Accessibility runtime-evidence matrix/status contracts pass.
+- [ ] English/Hindi localization catalog/preference contracts pass.
+- [ ] Settings-schema migration contracts pass.
 - [ ] Onboarding persistence/visual/focus contracts pass.
-- [ ] Packaging metadata contracts pass.
+- [ ] Packaging metadata contracts and regression tests pass.
+- [ ] Release-documentation contracts pass.
 - [ ] Release-tag tests and requested tag validation pass.
 
 ## .NET quality gate
@@ -66,6 +70,10 @@ Use this checklist for a real release candidate. Check an item only when there i
 - [ ] Graph sampling bounds are checked.
 - [ ] Graph discontinuity/error behavior is checked.
 - [ ] Trace behavior is checked.
+- [ ] Graph pointer pan/wheel zoom/fit-to-data is checked.
+- [ ] Graph arrow-key pan is checked.
+- [ ] Graph numpad Add/Subtract zoom is checked.
+- [ ] Graph Home reset and `F` fit-to-data are checked.
 - [ ] Numerical derivative/root/integration results are explicitly treated as approximate.
 - [ ] CSV copy/export is checked.
 - [ ] SVG output is checked for deterministic/text-accessible metadata.
@@ -80,6 +88,9 @@ Use this checklist for a real release candidate. Check an item only when there i
 - [ ] Culture preference persists.
 - [ ] Accessibility preferences persist.
 - [ ] Converter state persists.
+- [ ] Current settings schema persists.
+- [ ] Legacy schema-v0 settings migrate to the current schema without losing representative preferences.
+- [ ] Unsupported future settings schema fails closed without overwriting stored state.
 - [ ] Corrupt/malformed settings fail safely.
 
 ## Onboarding
@@ -91,27 +102,34 @@ Use this checklist for a real release candidate. Check an item only when there i
 - [ ] Ordinary settings reset does not unexpectedly re-trigger onboarding.
 - [ ] Onboarding-state storage failure does not leave the main workspace disabled incorrectly.
 - [ ] Background mode controls are not keyboard reachable while onboarding is visible.
-- [ ] Background calculator/mode shortcuts do not fire through onboarding.
+- [ ] Ctrl+PageUp/PageDown/Home/End do not fire through onboarding.
 - [ ] Focus enters onboarding predictably.
 - [ ] Focus returns to the calculator predictably after dismissal.
 
 ## Localization
 
-- [ ] English source catalog is complete.
+- [ ] English semantic catalog is complete.
+- [ ] Hindi semantic catalog is complete for the current key set.
 - [ ] Regional English preference such as `en-IN` behaves as documented.
+- [ ] Regional Hindi preference such as `hi-IN` uses the Hindi semantic catalog.
 - [ ] Unsupported cultures fall back/reject safely.
 - [ ] No additional language is advertised unless its catalog has been reviewed.
 - [ ] Parser/persisted mathematical syntax remains culture-independent.
+- [ ] The predominantly English shared XAML is not advertised as fully localized until migrated and verified.
 - [ ] Any newly localized visible strings fit compact/medium/expanded layouts.
 
 ## Accessibility
 
+- [ ] `ACCESSIBILITY_TEST_MATRIX.md` is updated from actual release-candidate runtime evidence.
 - [ ] Keyboard-only Calculator workflow is usable.
+- [ ] Ctrl+PageUp/PageDown/Home/End mode navigation is usable and conflict-free.
 - [ ] Keyboard-only Settings/onboarding workflow is usable.
 - [ ] Focus remains visible on supported desktop/browser targets.
+- [ ] Focus styling remains distinguishable with CalcNova high contrast enabled.
 - [ ] Screen-reader smoke test is completed on each release-supported target where tooling is available.
 - [ ] Symbol-heavy keys announce understandable names.
 - [ ] Programmer bit states announce understandable state.
+- [ ] Graph viewport is keyboard operable and textual alternatives remain reachable.
 - [ ] Text scaling/large text is checked.
 - [ ] Light and dark themes are checked.
 - [ ] CalcNova high-contrast preference is checked.
@@ -130,6 +148,7 @@ Use this checklist for a real release candidate. Check an item only when there i
 - [ ] Desktop resize behavior is checked.
 - [ ] Wide scientific/date grids remain reachable at compact widths.
 - [ ] 64/128-bit programmer grids remain usable/reachable on narrow targets.
+- [ ] Hindi/long-string content remains reachable where localized UI is enabled.
 
 ## Desktop targets
 
@@ -167,8 +186,10 @@ Use this checklist for a real release candidate. Check an item only when there i
 - [ ] Browser publish completes.
 - [ ] App loads in each release-supported browser.
 - [ ] Browser local settings persist.
+- [ ] Browser legacy settings schema migrates as expected.
 - [ ] Browser history persists.
 - [ ] Clipboard permission/failure flows are usable.
+- [ ] Shell/graph keyboard shortcuts are checked for Browser conflicts.
 - [ ] Currency networking obeys documented optional behavior.
 - [ ] Offline/cached behavior is checked where applicable.
 
@@ -219,19 +240,19 @@ Use this checklist for a real release candidate. Check an item only when there i
 
 ## Evidence record
 
-Record each target separately:
+Record each target separately using only observed status:
 
 ```text
-Source preflight: PASS / FAIL / NOT RUN
-.NET restore/format/build/test: PASS / FAIL / NOT RUN
-Windows: PASS / FAIL / NOT RUN
-Linux: PASS / FAIL / NOT RUN
-macOS: PASS / FAIL / NOT RUN
-Browser: PASS / FAIL / NOT RUN
-Android: PASS / FAIL / NOT RUN
-iOS: PASS / FAIL / NOT RUN
-Accessibility audit: PASS / FAIL / NOT RUN
-Responsive-layout audit: PASS / FAIL / NOT RUN
+Source preflight: PASS / FAIL / BLOCKED / NOT RUN
+.NET restore/format/build/test: PASS / FAIL / BLOCKED / NOT RUN
+Windows: PASS / FAIL / BLOCKED / NOT RUN
+Linux: PASS / FAIL / BLOCKED / NOT RUN
+macOS: PASS / FAIL / BLOCKED / NOT RUN
+Browser: PASS / FAIL / BLOCKED / NOT RUN
+Android: PASS / FAIL / BLOCKED / NOT RUN
+iOS: PASS / FAIL / BLOCKED / NOT RUN
+Accessibility audit: PASS / FAIL / BLOCKED / NOT RUN
+Responsive-layout audit: PASS / FAIL / BLOCKED / NOT RUN
 ```
 
 Never replace `NOT RUN` with `PASS` because source files or workflows merely exist.
