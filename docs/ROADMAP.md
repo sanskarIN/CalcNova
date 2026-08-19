@@ -27,8 +27,11 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - AND/OR/XOR/NOT and left/logical-right/arithmetic-right shifts.
 - Fixed-width bit visualization.
 - Full 8/16/32/64/128-bit interactive grid.
+- Byte-grouped bit view-model collections for all supported word sizes.
+- Copy actions for binary/octal/decimal/hex/fixed-width bit representations.
 - Accessible bit-cell names.
 - Unicode scalar/code-point helper backend and shared UI.
+- Unicode decode/inspection result copy actions.
 
 ### Conversion and utility modules
 
@@ -41,6 +44,10 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Persisted recent/favorite pairs across launches.
 - Selectable and persisted significant-digit display precision.
 - Shared recents/favorites/precision controls.
+- Category-scoped unit search backend/view-model workflow.
+- Search-result assignment as From/To unit.
+- Change-aware clear-recents workflow.
+- Conversion-result clipboard copy.
 - Optional currency-rate provider/cache architecture.
 - Date difference, calendar arithmetic, business-day, and duration utilities.
 
@@ -51,9 +58,13 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Matrix source module/view model.
 - Graph sampling and discontinuity segmentation.
 - Graph viewport and interactive plot control.
-- SVG graph export.
+- SVG graph export engine and view-model generation/copy workflow.
 - Bounded numerical derivative, root, and integral analysis.
 - Shared derivative/root/integral controls with approximate-result labeling.
+- Nearest sampled-point graph tracing backend/view-model workflow.
+- Bounded single-expression table-of-values CSV export.
+- Bounded multi-expression sampling and identified CSV export.
+- Newline-separated multi-expression parsing with stable generated series identities.
 
 ### Persistence and platform architecture
 
@@ -65,6 +76,7 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Converter preference persistence through shared settings.
 - Desktop, Browser/WebAssembly, Android, and iOS heads/composition.
 - Shared Avalonia `TopLevel` clipboard service attachment.
+- Shared clipboard dependency injection into Calculator, Programmer, Unicode, Converter, and Graphing modes.
 - Repository validation, format, test/build, coverage, security, advanced-utility, release, and platform workflow foundations.
 
 ## Now
@@ -77,7 +89,7 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Verify screen-reader behavior for the programmer bit grid, graph analysis, and dynamic results.
 - Verify touch target sizes and high-contrast behavior.
 - Add reduced-motion behavior where animation is introduced.
-- Consider grouping/virtualization strategies for 64/128-bit programmer grids on compact devices.
+- Apply the existing byte grouping to the shared Programmer UI and evaluate virtualization for 64/128-bit layouts on compact devices.
 
 ### Validation hardening
 
@@ -91,33 +103,31 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 ### Interaction polish
 
 - Improve cursor/selection-aware expression editing.
-- Add copy actions for programmer radix representations.
-- Add direct copy-result support to converter/graph/matrix/statistics outputs where useful.
+- Expose programmer radix-copy actions in the shared UI.
+- Expose converter search, clear-recents, and result-copy actions in the shared UI.
+- Expose graph trace, table, multi-expression, and SVG export actions in the shared UI.
+- Add direct copy-result support to matrix/statistics outputs where useful.
 - Improve empty/error/loading states without hiding calculation details.
 
 ## Next
 
 ### Converter productivity
 
-- Add searchable category/unit workflow.
 - Add optional per-category default-pair preferences.
-- Add explicit clear-recents management.
 - Add visible persistence/privacy explanation for saved converter preferences.
 - Keep physical conversions fully offline.
 
 ### Programmer productivity
 
-- Add grouped byte/nibble headings for large bit grids.
-- Add convenient copy actions for binary/octal/decimal/hex values.
-- Consider user-selectable custom word sizes only if interaction and workload semantics remain clear.
+- Add visible byte/nibble headings for large bit grids using the existing byte-group model.
+- Evaluate user-selectable custom word sizes only if interaction and workload semantics remain clear.
 - Add additional code-point metadata only from stable local data sources.
 
 ### Graphing experience
 
-- Add trace/cursor and table-of-values UX.
-- Add multiple-expression model with deterministic color assignment by theme.
+- Connect the existing trace/table/multiple-expression/export workflows to the shared UI.
+- Add deterministic color assignment by theme for multiple expressions.
 - Improve pan/zoom/reset controls and axis/grid labeling.
-- Add export controls for SVG and tabular data.
 - Continue workload-budget and discontinuity tests.
 - Add additional numerical-analysis edge-case coverage.
 
