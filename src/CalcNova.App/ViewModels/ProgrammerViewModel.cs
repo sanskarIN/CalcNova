@@ -8,8 +8,10 @@ namespace CalcNova.App.ViewModels;
 public sealed class ProgrammerViewModel : ViewModelBase
 {
     private string _input = "42";
+    private string _operand = "15";
     private int _inputBase = 10;
     private int _wordSize = 64;
+    private int _shiftCount = 1;
     private bool _signed = true;
     private string _binary = "101010";
     private string _octal = "52";
@@ -17,6 +19,7 @@ public sealed class ProgrammerViewModel : ViewModelBase
     private string _hexadecimal = "2A";
     private string _bitPattern = BitwiseCalculator.ToBitString(new BigInteger(42), 64);
     private string _interpretedValue = "42";
+    private string _lastOperation = string.Empty;
     private string _errorMessage = string.Empty;
     private IReadOnlyList<BitCellViewModel> _bits = Array.Empty<BitCellViewModel>();
 
@@ -24,6 +27,13 @@ public sealed class ProgrammerViewModel : ViewModelBase
     {
         ConvertCommand = new RelayCommand(_ => Convert());
         ToggleBitCommand = new RelayCommand(ToggleBit);
+        AndCommand = new RelayCommand(_ => ApplyBinaryOperation("AND", BitwiseCalculator.And));
+        OrCommand = new RelayCommand(_ => ApplyBinaryOperation("OR", BitwiseCalculator.Or));
+        XorCommand = new RelayCommand(_ => ApplyBinaryOperation("XOR", BitwiseCalculator.Xor));
+        NotCommand = new RelayCommand(_ => ApplyUnaryOperation("NOT", BitwiseCalculator.Not));
+        ShiftLeftCommand = new RelayCommand(_ => ApplyShift("SHL", BitwiseCalculator.ShiftLeft));
+        LogicalShiftRightCommand = new RelayCommand(_ => ApplyShift("LSHR", BitwiseCalculator.LogicalShiftRight));
+        ArithmeticShiftRightCommand = new RelayCommand(_ => ApplyShift("ASHR", BitwiseCalculator.ArithmeticShiftRight));
         Convert();
     }
 
@@ -37,6 +47,12 @@ public sealed class ProgrammerViewModel : ViewModelBase
     {
         get => _input;
         set => SetField(ref _input, value ?? string.Empty);
+    }
+
+    public string Operand
+    {
+        get => _operand;
+        set => SetField(ref _operand, value ?? string.Empty);
     }
 
     public int InputBase
@@ -62,6 +78,20 @@ public sealed class ProgrammerViewModel : ViewModelBase
             {
                 Convert();
             }
+        }
+    }
+
+    public int ShiftCount
+    {
+        get => _shiftCount;
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Shift count cannot be negative.");
+            }
+
+            SetField(ref _shiftCount, value);
         }
     }
 
@@ -113,6 +143,12 @@ public sealed class ProgrammerViewModel : ViewModelBase
         private set => SetField(ref _interpretedValue, value);
     }
 
+    public string LastOperation
+    {
+        get => _lastOperation;
+        private set => SetField(ref _lastOperation, value);
+    }
+
     public string ErrorMessage
     {
         get => _errorMessage;
@@ -128,6 +164,20 @@ public sealed class ProgrammerViewModel : ViewModelBase
     public ICommand ConvertCommand { get; }
 
     public ICommand ToggleBitCommand { get; }
+
+    public ICommand AndCommand { get; }
+
+    public ICommand OrCommand { get; }
+
+    public ICommand XorCommand { get; }
+
+    public ICommand NotCommand { get; }
+
+    public ICommand ShiftLeftCommand { get; }
+
+    public ICommand LogicalShiftRightCommand { get; }
+
+    public ICommand ArithmeticShiftRightCommand { get; }
 
     public void ToggleBit(int bitIndex)
     {
@@ -160,14 +210,71 @@ public sealed class ProgrammerViewModel : ViewModelBase
         {
             var value = RadixConverter.Parse(Input, InputBase);
             var toggled = BitwiseCalculator.ToggleBit(value, bitIndex, WordSize);
-            Input = RadixConverter.Format(toggled, InputBase);
-            UpdateRepresentations(toggled);
-            ErrorMessage = string.Empty;
+            ApplyResult(toggled, $"Toggle b{bitIndex}");
         }
         catch (Exception exception) when (exception is FormatException or ArgumentException or OverflowException)
         {
             ErrorMessage = exception.Message;
         }
+    }
+
+    private void ApplyBinaryOperation(
+        string label,
+        Func<BigInteger, BigInteger, int, BigInteger> operation)
+    {
+        try
+        {
+            var left = RadixConverter.Parse(Input, InputBase);
+            var right = RadixConverter.Parse(Operand, InputBase);
+            ApplyResult(operation(left, right, WordSize), label);
+        }
+        catch (Exception exception) when (exception is FormatException or ArgumentException or OverflowException)
+        {
+            ErrorMessage = exception.Message;
+        }
+    }
+
+    private void ApplyUnaryOperation(
+        string label,
+        Func<BigInteger, int, BigInteger> operation)
+    {
+        try
+        {
+            var value = RadixConverter.Parse(Input, InputBase);
+            ApplyResult(operation(value, WordSize), label);
+        }
+        catch (Exception exception) when (exception is FormatException or ArgumentException or OverflowException)
+        {
+            ErrorMessage = exception.Message;
+        }
+    }
+
+    private void ApplyShift(
+        string label,
+        Func<BigInteger, int, int, BigInteger> operation)
+    {
+        try
+        {
+            if (ShiftCount > WordSize)
+            {
+                throw new ArgumentOutOfRangeException(nameof(ShiftCount), ShiftCount, "Shift count cannot exceed the selected word size.");
+            }
+
+            var value = RadixConverter.Parse(Input, InputBase);
+            ApplyResult(operation(value, ShiftCount, WordSize), $"{label} {ShiftCount}");
+        }
+        catch (Exception exception) when (exception is FormatException or ArgumentException or OverflowException)
+        {
+            ErrorMessage = exception.Message;
+        }
+    }
+
+    private void ApplyResult(BigInteger result, string operationLabel)
+    {
+        Input = RadixConverter.Format(result, InputBase);
+        UpdateRepresentations(result);
+        LastOperation = operationLabel;
+        ErrorMessage = string.Empty;
     }
 
     private void UpdateRepresentations(BigInteger value)
