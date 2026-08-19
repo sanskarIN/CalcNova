@@ -1,5 +1,43 @@
 # What Changed
 
+## 2026-08-19 — Adaptive + Touch Validation Continuation
+
+### Added — Adaptive Layout Validation
+
+- Added `tools/validate_adaptive_layout.py`.
+- Added SDK-independent checks for compact, medium, and expanded layout classes.
+- Added checks for width-change handling and compact fallback behavior.
+- Added checks that focused controls are brought into view.
+- Added checks that every primary CalcNova mode remains present in the shared shell contract.
+- Added `tools/tests/test_validate_adaptive_layout.py`.
+- Added `.github/workflows/adaptive-layout-validate.yml`.
+- Added `docs/ADAPTIVE_LAYOUT.md` with width-profile rules and manual narrow-screen validation guidance.
+
+### Added — Touch Target Regression Validation
+
+- Added `tools/validate_touch_targets.py`.
+- Added source checks for the shared 44-DIP interactive-control baseline.
+- Added detection for explicit view-level `MinHeight` values below the shared minimum.
+- Added `tools/tests/test_validate_touch_targets.py`.
+- Added `.github/workflows/touch-target-validate.yml`.
+
+### Validation Status
+
+- The GitHub combined-status endpoint was checked for the latest adaptive-layout documentation commit and returned no exposed statuses at that time.
+- No CI PASS is inferred from an empty status list.
+- The active continuation environment still does not expose the .NET SDK, so restore/build/test claims remain unverified locally.
+- GitHub connector write actions used for this continuation do not expose a per-commit author-email override; commits were therefore created through the authenticated repository identity rather than falsely claiming a custom author email was applied.
+
+### Commits Added in This Continuation
+
+- `1b9bfd44` — ci(adaptive): add responsive layout contract validator
+- `c9dedebc` — test(adaptive): cover responsive layout validator
+- `964d547f` — ci(adaptive): validate responsive UI contracts
+- `5fe0a967` — docs(adaptive): document responsive layout contract
+- `9a4637fa` — ci(a11y): add touch target regression validator
+- `ffeadd51` — test(a11y): cover touch target validator
+- `414c0876` — ci(a11y): validate shared touch target contracts
+
 ## 2026-08-19 — Continuation Pass
 
 ### Scope
