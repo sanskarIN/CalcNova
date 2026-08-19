@@ -96,4 +96,39 @@ public sealed class GraphPlotControlHeadlessTests
             window.Close();
         }
     }
+
+    [AvaloniaFact]
+    public void MultiSeries_FitsCombinedFiniteData()
+    {
+        var plot = new GraphPlotControl
+        {
+            Series =
+            [
+                new GraphExpressionSample(
+                    new GraphExpressionDefinition("series-1", "f1", "x"),
+                    [new GraphSegment([new GraphPoint(-5d, -1d), new GraphPoint(0d, 0d)])],
+                    0),
+                new GraphExpressionSample(
+                    new GraphExpressionDefinition("series-2", "f2", "x ^ 2"),
+                    [new GraphSegment([new GraphPoint(0d, 0d), new GraphPoint(4d, 16d)])],
+                    0)
+            ]
+        };
+        var window = new Window { Width = 600, Height = 400, Content = plot };
+
+        window.Show();
+        try
+        {
+            plot.FitToData();
+
+            Assert.True(plot.Viewport.MinimumX < -5d);
+            Assert.True(plot.Viewport.MaximumX > 4d);
+            Assert.True(plot.Viewport.MinimumY < -1d);
+            Assert.True(plot.Viewport.MaximumY > 16d);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
 }
