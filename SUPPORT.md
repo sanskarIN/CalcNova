@@ -1,5 +1,7 @@
 # CalcNova Support
 
+**Current supported product baseline: CalcNova 2.8.03.**
+
 CalcNova is an open-source project. Choose the support channel that matches the issue so requests can be handled efficiently.
 
 ## Bugs
@@ -27,6 +29,8 @@ https://github.com/sanskarIN/CalcNova/issues/new/choose
 
 Explain the user problem first, then the proposed solution and platform/accessibility implications.
 
+Feature requests are optional post-2.8.03 enhancements unless they address a confirmed correctness, security, or compatibility defect.
+
 ## Security vulnerabilities
 
 Do not publish sensitive vulnerability details in a public issue. Follow `SECURITY.md` and contact:
@@ -47,7 +51,7 @@ Do not publish sensitive vulnerability details in a public issue. Follow `SECURI
 - Repository: https://github.com/sanskarIN/CalcNova
 - Profile: https://www.github.com/sanskarIN
 
-## Support development
+## Support CalcNova maintenance and optional improvements
 
 Enjoying CalcNova? Optional support is available at:
 
