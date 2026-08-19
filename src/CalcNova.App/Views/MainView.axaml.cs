@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -7,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using CalcNova.App.Controls;
 using CalcNova.App.Infrastructure;
 using CalcNova.App.Localization;
 using CalcNova.App.Services;
@@ -28,6 +30,8 @@ public partial class MainView : UserControl
     private TabControl? _localizationTabControl;
     private TextBox? _calculatorExpressionTextBox;
     private CalculatorViewModel? _calculatorEditorViewModel;
+    private GraphPlotControl? _graphPlotControl;
+    private GraphingViewModel? _graphPlotViewModel;
     private bool _onboardingWasVisible;
 
     public MainView()
@@ -87,10 +91,12 @@ public partial class MainView : UserControl
 
         AttachLocalization(viewModel);
         AttachCalculatorExpressionEditor(viewModel.Calculator);
+        EnsureGraphPlot(viewModel.Graphing);
 
         await viewModel.InitializeAsync();
         CaptureLocalizedControls();
         ApplyLocalization();
+        EnsureGraphPlot(viewModel.Graphing);
         _onboardingWasVisible = viewModel.Settings.ShouldShowOnboarding;
         if (_onboardingWasVisible)
         {
@@ -105,6 +111,7 @@ public partial class MainView : UserControl
             clipboardService.Attach(null);
         }
 
+        DetachGraphPlot();
         DetachLocalization();
         DetachCalculatorExpressionEditor();
 
@@ -225,8 +232,14 @@ public partial class MainView : UserControl
 
     private void HandleCultureChanged(CultureInfo culture) => RefreshLocalizationTargets();
 
-    private void HandleLocalizationSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs) =>
+    private void HandleLocalizationSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
+    {
         RefreshLocalizationTargets();
+        if (_subscribedViewModel is not null)
+        {
+            EnsureGraphPlot(_subscribedViewModel.Graphing);
+        }
+    }
 
     private void RefreshLocalizationTargets()
     {
@@ -304,6 +317,64 @@ public partial class MainView : UserControl
         for (var index = 0; index < tabs.Length; index++)
         {
             tabs[index].Header = modeHeaders[index];
+        }
+    }
+
+    private void EnsureGraphPlot(GraphingViewModel graphing)
+    {
+        if (_graphPlotControl is not null && ReferenceEquals(_graphPlotViewModel, graphing))
+        {
+            return;
+        }
+
+        var graphPanel = this.GetVisualDescendants()
+            .OfType<StackPanel>()
+            .FirstOrDefault(panel => ReferenceEquals(panel.DataContext, graphing));
+        if (graphPanel is null)
+        {
+            return;
+        }
+
+        DetachGraphPlot();
+
+        var plot = new GraphPlotControl
+        {
+            MinHeight = 300,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            Segments = graphing.Segments
+        };
+        ToolTip.SetTip(plot, "Interactive graph: drag to pan, wheel or numpad +/- to zoom, Home to reset, F to fit data.");
+
+        var insertionIndex = Math.Min(8, graphPanel.Children.Count);
+        graphPanel.Children.Insert(insertionIndex, plot);
+        _graphPlotControl = plot;
+        _graphPlotViewModel = graphing;
+        graphing.PropertyChanged += HandleGraphingPropertyChanged;
+    }
+
+    private void DetachGraphPlot()
+    {
+        if (_graphPlotViewModel is not null)
+        {
+            _graphPlotViewModel.PropertyChanged -= HandleGraphingPropertyChanged;
+        }
+
+        if (_graphPlotControl?.Parent is Panel panel)
+        {
+            panel.Children.Remove(_graphPlotControl);
+        }
+
+        _graphPlotControl = null;
+        _graphPlotViewModel = null;
+    }
+
+    private void HandleGraphingPropertyChanged(object? sender, PropertyChangedEventArgs eventArgs)
+    {
+        if (eventArgs.PropertyName == nameof(GraphingViewModel.Segments) &&
+            _graphPlotControl is not null &&
+            _graphPlotViewModel is not null)
+        {
+            _graphPlotControl.Segments = _graphPlotViewModel.Segments;
         }
     }
 
