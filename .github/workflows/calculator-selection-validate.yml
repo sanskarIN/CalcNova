@@ -3,17 +3,23 @@ name: Calculator Selection Validate
 on:
   push:
     paths:
+      - 'src/CalcNova.App/Infrastructure/CalculatorSelectionEditor.cs'
       - 'src/CalcNova.App/ViewModels/CalculatorViewModel.cs'
       - 'src/CalcNova.App/Views/MainView.axaml.cs'
       - 'tests/CalcNova.App.Tests/CalculatorSelectionEditingTests.cs'
+      - 'tests/CalcNova.App.Tests/CalculatorSelectionEditorTests.cs'
+      - 'tests/CalcNova.App.Tests/CalculatorFunctionSelectionViewModelTests.cs'
       - 'tools/validate_calculator_selection_editing.py'
       - 'tools/tests/test_validate_calculator_selection_editing.py'
       - '.github/workflows/calculator-selection-validate.yml'
   pull_request:
     paths:
+      - 'src/CalcNova.App/Infrastructure/CalculatorSelectionEditor.cs'
       - 'src/CalcNova.App/ViewModels/CalculatorViewModel.cs'
       - 'src/CalcNova.App/Views/MainView.axaml.cs'
       - 'tests/CalcNova.App.Tests/CalculatorSelectionEditingTests.cs'
+      - 'tests/CalcNova.App.Tests/CalculatorSelectionEditorTests.cs'
+      - 'tests/CalcNova.App.Tests/CalculatorFunctionSelectionViewModelTests.cs'
       - 'tools/validate_calculator_selection_editing.py'
       - 'tools/tests/test_validate_calculator_selection_editing.py'
       - '.github/workflows/calculator-selection-validate.yml'
