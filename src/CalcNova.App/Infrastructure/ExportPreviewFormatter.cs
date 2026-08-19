@@ -31,7 +31,7 @@ public static class ExportPreviewFormatter
             return string.Empty;
         }
 
-        if (content.Length <= maximumCharacters && CountLines(content, maximumLines) <= maximumLines)
+        if (content.Length <= maximumCharacters && !ExceedsLineLimit(content, maximumLines))
         {
             return content;
         }
@@ -41,20 +41,22 @@ public static class ExportPreviewFormatter
         using var reader = new StringReader(content);
 
         var lineCount = 0;
+        var hasWrittenLine = false;
         while (lineCount < maximumLines && reader.ReadLine() is { } line)
         {
-            var separatorLength = builder.Length == 0 ? 0 : Environment.NewLine.Length;
+            var separatorLength = hasWrittenLine ? Environment.NewLine.Length : 0;
             var remaining = contentBudget - builder.Length - separatorLength;
             if (remaining <= 0)
             {
                 break;
             }
 
-            if (separatorLength > 0)
+            if (hasWrittenLine)
             {
                 builder.Append(Environment.NewLine);
             }
 
+            hasWrittenLine = true;
             if (line.Length <= remaining)
             {
                 builder.Append(line);
@@ -68,7 +70,7 @@ public static class ExportPreviewFormatter
             lineCount++;
         }
 
-        if (builder.Length > 0)
+        if (hasWrittenLine)
         {
             builder.Append(Environment.NewLine);
         }
@@ -77,24 +79,18 @@ public static class ExportPreviewFormatter
         return builder.ToString();
     }
 
-    private static int CountLines(string content, int stopAfter)
+    private static bool ExceedsLineLimit(string content, int maximumLines)
     {
-        var lineCount = 1;
-        foreach (var character in content)
+        using var reader = new StringReader(content);
+        for (var lineIndex = 0; lineIndex < maximumLines; lineIndex++)
         {
-            if (character != '\n')
+            if (reader.ReadLine() is null)
             {
-                continue;
-            }
-
-            lineCount++;
-            if (lineCount > stopAfter)
-            {
-                return lineCount;
+                return false;
             }
         }
 
-        return lineCount;
+        return reader.ReadLine() is not null;
     }
 
     private static string SafePrefix(string value, int maximumLength)
