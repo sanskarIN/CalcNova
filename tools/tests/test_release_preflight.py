@@ -44,6 +44,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools/validate_ui_contracts.py",
             "tools/validate_navigation_contracts.py",
             "tools/validate_keyboard_contracts.py",
+            "tools/validate_graph_keyboard.py",
             "tools/validate_accessibility_markup.py",
             "tools/validate_focus_visibility.py",
             "tools/validate_adaptive_layout.py",
@@ -66,9 +67,11 @@ class ReleasePreflightContractTests(unittest.TestCase):
         expected_modules = {
             "tools.tests.test_validate_focus_visibility",
             "tools.tests.test_validate_keyboard_contracts",
+            "tools.tests.test_validate_graph_keyboard",
             "tools.tests.test_validate_localization_catalog",
             "tools.tests.test_validate_adaptive_layout",
             "tools.tests.test_validate_touch_targets",
+            "tools.tests.test_validate_packaging_metadata",
         }
 
         self.assertTrue(expected_modules.issubset(configured_modules))
