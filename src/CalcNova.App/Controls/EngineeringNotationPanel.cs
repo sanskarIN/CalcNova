@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using CalcNova.App.ViewModels;
+using CalcNova.Core.Numerics;
 
 namespace CalcNova.App.Controls;
 
@@ -16,6 +17,7 @@ public sealed class EngineeringNotationPanel : Border
         var input = new TextBox
         {
             Watermark = "Finite value or engineering notation",
+            MaxLength = EngineeringNotationFormatter.MaximumInputCharacters,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch
         };
         input.Bind(TextBox.TextProperty, new Binding(nameof(EngineeringNotationViewModel.InputText))
