@@ -38,6 +38,8 @@ class CompletionStatusValidatorTests(unittest.TestCase):
                 "PROJECT_STATE.md",
                 "CHANGELOG.md",
                 "what_changed.md",
+                "SECURITY.md",
+                "SUPPORT.md",
                 "docs/README.md",
                 "docs/FEATURES.md",
                 "docs/ROADMAP.md",
@@ -55,6 +57,7 @@ class CompletionStatusValidatorTests(unittest.TestCase):
         validator = load_validator()
         forbidden = set(validator.FORBIDDEN_CURRENT_STATUS_MARKERS)
         self.assertIn("under active development", forbidden)
+        self.assertIn("active pre-release development", forbidden)
         self.assertIn("## [unreleased]", forbidden)
         self.assertIn("remaining product/runtime work", forbidden)
         self.assertIn("remaining high-priority work", forbidden)
