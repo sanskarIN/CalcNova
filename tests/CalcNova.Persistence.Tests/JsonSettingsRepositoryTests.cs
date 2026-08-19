@@ -33,6 +33,7 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
 
         var settings = await repository.LoadAsync();
 
+        Assert.Equal(AppSettingsSchema.CurrentVersion, settings.SchemaVersion);
         Assert.Equal(ThemePreference.System, settings.Theme);
         Assert.Equal(AngleUnit.Degrees, settings.AngleUnit);
         Assert.Equal("en", settings.CultureName);
@@ -68,6 +69,7 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
         await repository.SaveAsync(expected);
         var actual = await repository.LoadAsync();
 
+        Assert.Equal(AppSettingsSchema.CurrentVersion, actual.SchemaVersion);
         Assert.Equal(expected.Theme, actual.Theme);
         Assert.Equal(expected.AngleUnit, actual.AngleUnit);
         Assert.Equal(expected.CultureName, actual.CultureName);
@@ -82,6 +84,49 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
         Assert.Equal(expected.ConverterRecentPairs, actual.ConverterRecentPairs);
         Assert.Equal(expected.ConverterFavoritePairs, actual.ConverterFavoritePairs);
         Assert.Equal(expected.CompletedOnboardingVersion, actual.CompletedOnboardingVersion);
+    }
+
+    [Fact]
+    public async Task Load_LegacySchemaVersionZero_MigratesToCurrentVersion()
+    {
+        await File.WriteAllTextAsync(
+            _filePath,
+            """
+            {
+              "schemaVersion": 0,
+              "cultureName": "hi-IN",
+              "historyLimit": 321,
+              "converterSignificantDigits": 12,
+              "converterRecentPairs": [],
+              "converterFavoritePairs": []
+            }
+            """);
+        var repository = new JsonSettingsRepository(_filePath);
+
+        var settings = await repository.LoadAsync();
+
+        Assert.Equal(AppSettingsSchema.CurrentVersion, settings.SchemaVersion);
+        Assert.Equal("hi-IN", settings.CultureName);
+        Assert.Equal(321, settings.HistoryLimit);
+        Assert.Equal(12, settings.ConverterSignificantDigits);
+    }
+
+    [Fact]
+    public async Task Load_FutureSchemaVersion_IsRejected()
+    {
+        await File.WriteAllTextAsync(
+            _filePath,
+            $$"""
+            {
+              "schemaVersion": {{AppSettingsSchema.CurrentVersion + 1}},
+              "cultureName": "en",
+              "converterRecentPairs": [],
+              "converterFavoritePairs": []
+            }
+            """);
+        var repository = new JsonSettingsRepository(_filePath);
+
+        await Assert.ThrowsAsync<InvalidDataException>(() => repository.LoadAsync());
     }
 
     [Fact]
