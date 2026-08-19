@@ -68,11 +68,6 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         await Settings.LoadAsync(cancellationToken);
-        Calculator.ApplyAngleUnit(Settings.AngleUnit);
-        Converter.RestorePersistedState(
-            Settings.ConverterRecentPairs,
-            Settings.ConverterFavoritePairs,
-            Settings.ConverterSignificantDigits);
         await History.InitializeAsync(cancellationToken);
         _isInitialized = true;
     }
@@ -80,6 +75,10 @@ public sealed class MainViewModel : ViewModelBase
     private void HandleSettingsChanged(AppSettings settings)
     {
         Calculator.ApplyAngleUnit(settings.AngleUnit);
+        Converter.RestorePersistedState(
+            settings.ConverterRecentPairs,
+            settings.ConverterFavoritePairs,
+            settings.ConverterSignificantDigits);
         SettingsChanged?.Invoke(settings);
     }
 
