@@ -6,13 +6,15 @@ namespace CalcNova.App.Tests;
 public sealed class AppLocalizerTests
 {
     [Fact]
-    public void EnglishCatalog_CoversEverySemanticKey()
+    public void EverySupportedCatalog_CoversEverySemanticKey()
     {
-        var localizer = new AppLocalizer();
-
-        foreach (var key in Enum.GetValues<AppStringKey>())
+        foreach (var culture in new[] { "en", "hi" })
         {
-            Assert.False(string.IsNullOrWhiteSpace(localizer[key]));
+            var localizer = new AppLocalizer(culture);
+            foreach (var key in Enum.GetValues<AppStringKey>())
+            {
+                Assert.False(string.IsNullOrWhiteSpace(localizer[key]));
+            }
         }
     }
 
@@ -22,8 +24,7 @@ public sealed class AppLocalizerTests
         var localizer = new AppLocalizer();
 
         Assert.Equal("en", localizer.Culture.Name);
-        Assert.Single(localizer.SupportedCultures);
-        Assert.Equal("en", localizer.SupportedCultures[0].Name);
+        Assert.Equal(["en", "hi"], localizer.SupportedCultures.Select(culture => culture.Name).ToArray());
     }
 
     [Fact]
@@ -38,9 +39,22 @@ public sealed class AppLocalizerTests
         Assert.Equal("Calculator", localizer[AppStringKey.ModeCalculator]);
     }
 
+    [Fact]
+    public void HindiRegionalCulture_IsAcceptedAndUsesHindiCatalog()
+    {
+        var localizer = new AppLocalizer();
+
+        var accepted = localizer.TrySetCulture("hi-IN");
+
+        Assert.True(accepted);
+        Assert.Equal("hi-IN", localizer.Culture.Name);
+        Assert.Equal("कैलकुलेटर", localizer[AppStringKey.ModeCalculator]);
+        Assert.Equal("परिणाम", localizer[AppStringKey.LabelResult]);
+    }
+
     [Theory]
-    [InlineData("hi-IN")]
     [InlineData("fr-FR")]
+    [InlineData("de-DE")]
     [InlineData("not-a-real-culture")]
     [InlineData("")]
     public void UnsupportedOrInvalidCulture_IsRejectedAndPreservesEnglish(string cultureName)
@@ -60,10 +74,11 @@ public sealed class AppLocalizerTests
         var changed = new List<string>();
         localizer.CultureChanged += culture => changed.Add(culture.Name);
 
-        Assert.True(localizer.TrySetCulture("en-IN"));
+        Assert.True(localizer.TrySetCulture("hi-IN"));
+        Assert.True(localizer.TrySetCulture("hi-IN"));
         Assert.True(localizer.TrySetCulture("en-IN"));
         Assert.False(localizer.TrySetCulture("de-DE"));
 
-        Assert.Equal(["en-IN"], changed);
+        Assert.Equal(["hi-IN", "en-IN"], changed);
     }
 }
