@@ -31,61 +31,61 @@
                   <Button Content="Paste expression" Command="{Binding PasteCommand}" Margin="0,0,6,6" />
                   <Button Content="Copy result" Command="{Binding CopyResultCommand}" Margin="0,0,0,6" />
                 </WrapPanel>
-                <Button Command="{Binding UseResultCommand}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Right">
+                <Button Command="{Binding UseResultCommand}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Right" AutomationProperties.Name="Use current result">
                   <TextBlock Text="{Binding Result}" FontSize="32" FontWeight="SemiBold" TextWrapping="Wrap" />
                 </Button>
                 <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" Opacity="0.75" />
               </StackPanel>
             </Border>
             <Grid ColumnDefinitions="*,*,*">
-              <Button Content="DEG" Command="{Binding SetAngleUnitCommand}" CommandParameter="Degrees" Margin="2" />
-              <Button Grid.Column="1" Content="RAD" Command="{Binding SetAngleUnitCommand}" CommandParameter="Radians" Margin="2" />
-              <Button Grid.Column="2" Content="GRAD" Command="{Binding SetAngleUnitCommand}" CommandParameter="Gradians" Margin="2" />
+              <Button Content="DEG" Command="{Binding SetAngleUnitCommand}" CommandParameter="Degrees" Margin="2" AutomationProperties.Name="Degrees" />
+              <Button Grid.Column="1" Content="RAD" Command="{Binding SetAngleUnitCommand}" CommandParameter="Radians" Margin="2" AutomationProperties.Name="Radians" />
+              <Button Grid.Column="2" Content="GRAD" Command="{Binding SetAngleUnitCommand}" CommandParameter="Gradians" Margin="2" AutomationProperties.Name="Gradians" />
             </Grid>
             <Grid ColumnDefinitions="*,*,*,*,*">
-              <Button Content="MC" Command="{Binding MemoryClearCommand}" Margin="2" />
-              <Button Grid.Column="1" Content="MR" Command="{Binding MemoryRecallCommand}" Margin="2" />
-              <Button Grid.Column="2" Content="MS" Command="{Binding MemoryStoreCommand}" Margin="2" />
-              <Button Grid.Column="3" Content="M+" Command="{Binding MemoryAddCommand}" Margin="2" />
-              <Button Grid.Column="4" Content="M−" Command="{Binding MemorySubtractCommand}" Margin="2" />
+              <Button Content="MC" Command="{Binding MemoryClearCommand}" Margin="2" AutomationProperties.Name="Memory clear" />
+              <Button Grid.Column="1" Content="MR" Command="{Binding MemoryRecallCommand}" Margin="2" AutomationProperties.Name="Memory recall" />
+              <Button Grid.Column="2" Content="MS" Command="{Binding MemoryStoreCommand}" Margin="2" AutomationProperties.Name="Memory store" />
+              <Button Grid.Column="3" Content="M+" Command="{Binding MemoryAddCommand}" Margin="2" AutomationProperties.Name="Memory add" />
+              <Button Grid.Column="4" Content="M−" Command="{Binding MemorySubtractCommand}" Margin="2" AutomationProperties.Name="Memory subtract" />
             </Grid>
             <TextBlock Text="{Binding MemoryIndicator}" HorizontalAlignment="Right" Opacity="0.6" />
             <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto,Auto">
-              <Button Classes="function-key" Content="sin" Command="{Binding AppendCommand}" CommandParameter="sin(" />
-              <Button Classes="function-key" Grid.Column="1" Content="cos" Command="{Binding AppendCommand}" CommandParameter="cos(" />
-              <Button Classes="function-key" Grid.Column="2" Content="tan" Command="{Binding AppendCommand}" CommandParameter="tan(" />
-              <Button Classes="function-key" Grid.Column="3" Content="ln" Command="{Binding AppendCommand}" CommandParameter="ln(" />
-              <Button Classes="function-key" Grid.Column="4" Content="log" Command="{Binding AppendCommand}" CommandParameter="log10(" />
-              <Button Classes="function-key" Grid.Row="1" Content="√" Command="{Binding AppendCommand}" CommandParameter="sqrt(" />
-              <Button Classes="function-key" Grid.Row="1" Grid.Column="1" Content="x²" Command="{Binding AppendCommand}" CommandParameter="sqr(" />
-              <Button Classes="function-key" Grid.Row="1" Grid.Column="2" Content="xʸ" Command="{Binding AppendCommand}" CommandParameter="^" />
-              <Button Classes="function-key" Grid.Row="1" Grid.Column="3" Content="π" Command="{Binding AppendCommand}" CommandParameter="pi" />
-              <Button Classes="function-key" Grid.Row="1" Grid.Column="4" Content="e" Command="{Binding AppendCommand}" CommandParameter="e" />
-              <Button Classes="function-key" Grid.Row="2" Content="(" Command="{Binding AppendCommand}" CommandParameter="(" />
-              <Button Classes="function-key" Grid.Row="2" Grid.Column="1" Content=")" Command="{Binding AppendCommand}" CommandParameter=")" />
-              <Button Classes="function-key" Grid.Row="2" Grid.Column="2" Content="%" Command="{Binding PercentageCommand}" />
-              <Button Classes="function-key" Grid.Row="2" Grid.Column="3" Content="fact" Command="{Binding AppendCommand}" CommandParameter="factorial(" />
-              <Button Classes="function-key" Grid.Row="2" Grid.Column="4" Content="1/x" Command="{Binding AppendCommand}" CommandParameter="reciprocal(" />
+              <Button Classes="function-key" Content="sin" Command="{Binding AppendCommand}" CommandParameter="sin(" AutomationProperties.Name="Sine" />
+              <Button Classes="function-key" Grid.Column="1" Content="cos" Command="{Binding AppendCommand}" CommandParameter="cos(" AutomationProperties.Name="Cosine" />
+              <Button Classes="function-key" Grid.Column="2" Content="tan" Command="{Binding AppendCommand}" CommandParameter="tan(" AutomationProperties.Name="Tangent" />
+              <Button Classes="function-key" Grid.Column="3" Content="ln" Command="{Binding AppendCommand}" CommandParameter="ln(" AutomationProperties.Name="Natural logarithm" />
+              <Button Classes="function-key" Grid.Column="4" Content="log" Command="{Binding AppendCommand}" CommandParameter="log10(" AutomationProperties.Name="Base ten logarithm" />
+              <Button Classes="function-key" Grid.Row="1" Content="√" Command="{Binding AppendCommand}" CommandParameter="sqrt(" AutomationProperties.Name="Square root" />
+              <Button Classes="function-key" Grid.Row="1" Grid.Column="1" Content="x²" Command="{Binding AppendCommand}" CommandParameter="sqr(" AutomationProperties.Name="Square" />
+              <Button Classes="function-key" Grid.Row="1" Grid.Column="2" Content="xʸ" Command="{Binding AppendCommand}" CommandParameter="^" AutomationProperties.Name="Power" />
+              <Button Classes="function-key" Grid.Row="1" Grid.Column="3" Content="π" Command="{Binding AppendCommand}" CommandParameter="pi" AutomationProperties.Name="Pi" />
+              <Button Classes="function-key" Grid.Row="1" Grid.Column="4" Content="e" Command="{Binding AppendCommand}" CommandParameter="e" AutomationProperties.Name="Euler number" />
+              <Button Classes="function-key" Grid.Row="2" Content="(" Command="{Binding AppendCommand}" CommandParameter="(" AutomationProperties.Name="Open parenthesis" />
+              <Button Classes="function-key" Grid.Row="2" Grid.Column="1" Content=")" Command="{Binding AppendCommand}" CommandParameter=")" AutomationProperties.Name="Close parenthesis" />
+              <Button Classes="function-key" Grid.Row="2" Grid.Column="2" Content="%" Command="{Binding PercentageCommand}" AutomationProperties.Name="Percentage" />
+              <Button Classes="function-key" Grid.Row="2" Grid.Column="3" Content="fact" Command="{Binding AppendCommand}" CommandParameter="factorial(" AutomationProperties.Name="Factorial" />
+              <Button Classes="function-key" Grid.Row="2" Grid.Column="4" Content="1/x" Command="{Binding AppendCommand}" CommandParameter="reciprocal(" AutomationProperties.Name="Reciprocal" />
             </Grid>
             <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-              <Button Classes="calc-key" Content="AC" Command="{Binding ClearCommand}" />
-              <Button Classes="calc-key" Grid.Column="1" Content="⌫" Command="{Binding BackspaceCommand}" />
-              <Button Classes="calc-key" Grid.Column="2" Content="÷" Command="{Binding AppendCommand}" CommandParameter="/" />
-              <Button Classes="calc-key" Grid.Column="3" Content="×" Command="{Binding AppendCommand}" CommandParameter="*" />
-              <Button Classes="calc-key" Grid.Row="1" Content="7" Command="{Binding AppendCommand}" CommandParameter="7" />
-              <Button Classes="calc-key" Grid.Row="1" Grid.Column="1" Content="8" Command="{Binding AppendCommand}" CommandParameter="8" />
-              <Button Classes="calc-key" Grid.Row="1" Grid.Column="2" Content="9" Command="{Binding AppendCommand}" CommandParameter="9" />
-              <Button Classes="calc-key" Grid.Row="1" Grid.Column="3" Content="−" Command="{Binding AppendCommand}" CommandParameter="-" />
-              <Button Classes="calc-key" Grid.Row="2" Content="4" Command="{Binding AppendCommand}" CommandParameter="4" />
-              <Button Classes="calc-key" Grid.Row="2" Grid.Column="1" Content="5" Command="{Binding AppendCommand}" CommandParameter="5" />
-              <Button Classes="calc-key" Grid.Row="2" Grid.Column="2" Content="6" Command="{Binding AppendCommand}" CommandParameter="6" />
-              <Button Classes="calc-key" Grid.Row="2" Grid.Column="3" Content="+" Command="{Binding AppendCommand}" CommandParameter="+" />
-              <Button Classes="calc-key" Grid.Row="3" Content="1" Command="{Binding AppendCommand}" CommandParameter="1" />
-              <Button Classes="calc-key" Grid.Row="3" Grid.Column="1" Content="2" Command="{Binding AppendCommand}" CommandParameter="2" />
-              <Button Classes="calc-key" Grid.Row="3" Grid.Column="2" Content="3" Command="{Binding AppendCommand}" CommandParameter="3" />
-              <Button Classes="calc-key" Grid.Row="3" Grid.Column="3" Grid.RowSpan="2" Content="=" Command="{Binding EvaluateCommand}" />
-              <Button Classes="calc-key" Grid.Row="4" Grid.ColumnSpan="2" Content="0" Command="{Binding AppendCommand}" CommandParameter="0" />
-              <Button Classes="calc-key" Grid.Row="4" Grid.Column="2" Content="." Command="{Binding AppendCommand}" CommandParameter="." />
+              <Button Classes="calc-key" Content="AC" Command="{Binding ClearCommand}" AutomationProperties.Name="Clear all" />
+              <Button Classes="calc-key" Grid.Column="1" Content="⌫" Command="{Binding BackspaceCommand}" AutomationProperties.Name="Backspace" />
+              <Button Classes="calc-key" Grid.Column="2" Content="÷" Command="{Binding AppendCommand}" CommandParameter="/" AutomationProperties.Name="Divide" />
+              <Button Classes="calc-key" Grid.Column="3" Content="×" Command="{Binding AppendCommand}" CommandParameter="*" AutomationProperties.Name="Multiply" />
+              <Button Classes="calc-key" Grid.Row="1" Content="7" Command="{Binding AppendCommand}" CommandParameter="7" AutomationProperties.Name="Seven" />
+              <Button Classes="calc-key" Grid.Row="1" Grid.Column="1" Content="8" Command="{Binding AppendCommand}" CommandParameter="8" AutomationProperties.Name="Eight" />
+              <Button Classes="calc-key" Grid.Row="1" Grid.Column="2" Content="9" Command="{Binding AppendCommand}" CommandParameter="9" AutomationProperties.Name="Nine" />
+              <Button Classes="calc-key" Grid.Row="1" Grid.Column="3" Content="−" Command="{Binding AppendCommand}" CommandParameter="-" AutomationProperties.Name="Subtract" />
+              <Button Classes="calc-key" Grid.Row="2" Content="4" Command="{Binding AppendCommand}" CommandParameter="4" AutomationProperties.Name="Four" />
+              <Button Classes="calc-key" Grid.Row="2" Grid.Column="1" Content="5" Command="{Binding AppendCommand}" CommandParameter="5" AutomationProperties.Name="Five" />
+              <Button Classes="calc-key" Grid.Row="2" Grid.Column="2" Content="6" Command="{Binding AppendCommand}" CommandParameter="6" AutomationProperties.Name="Six" />
+              <Button Classes="calc-key" Grid.Row="2" Grid.Column="3" Content="+" Command="{Binding AppendCommand}" CommandParameter="+" AutomationProperties.Name="Add" />
+              <Button Classes="calc-key" Grid.Row="3" Content="1" Command="{Binding AppendCommand}" CommandParameter="1" AutomationProperties.Name="One" />
+              <Button Classes="calc-key" Grid.Row="3" Grid.Column="1" Content="2" Command="{Binding AppendCommand}" CommandParameter="2" AutomationProperties.Name="Two" />
+              <Button Classes="calc-key" Grid.Row="3" Grid.Column="2" Content="3" Command="{Binding AppendCommand}" CommandParameter="3" AutomationProperties.Name="Three" />
+              <Button Classes="calc-key" Grid.Row="3" Grid.Column="3" Grid.RowSpan="2" Content="=" Command="{Binding EvaluateCommand}" AutomationProperties.Name="Evaluate" />
+              <Button Classes="calc-key" Grid.Row="4" Grid.ColumnSpan="2" Content="0" Command="{Binding AppendCommand}" CommandParameter="0" AutomationProperties.Name="Zero" />
+              <Button Classes="calc-key" Grid.Row="4" Grid.Column="2" Content="." Command="{Binding AppendCommand}" CommandParameter="." AutomationProperties.Name="Decimal point" />
             </Grid>
           </StackPanel>
         </ScrollViewer>
@@ -103,14 +103,14 @@
             <CheckBox Content="Signed two's-complement interpretation" IsChecked="{Binding Signed, Mode=TwoWay}" />
             <WrapPanel>
               <Button Content="Convert" Command="{Binding ConvertCommand}" Margin="0,0,6,6" />
-              <Button Content="NOT" Command="{Binding NotCommand}" Margin="0,0,6,6" />
+              <Button Content="NOT" Command="{Binding NotCommand}" Margin="0,0,6,6" AutomationProperties.Name="Bitwise NOT" />
             </WrapPanel>
             <TextBlock Text="Second operand (same radix)" Opacity="0.62" />
             <TextBox Text="{Binding Operand, Mode=TwoWay}" Watermark="Second operand" />
             <WrapPanel>
-              <Button Content="AND" Command="{Binding AndCommand}" Margin="0,0,6,6" />
-              <Button Content="OR" Command="{Binding OrCommand}" Margin="0,0,6,6" />
-              <Button Content="XOR" Command="{Binding XorCommand}" Margin="0,0,6,6" />
+              <Button Content="AND" Command="{Binding AndCommand}" Margin="0,0,6,6" AutomationProperties.Name="Bitwise AND" />
+              <Button Content="OR" Command="{Binding OrCommand}" Margin="0,0,6,6" AutomationProperties.Name="Bitwise OR" />
+              <Button Content="XOR" Command="{Binding XorCommand}" Margin="0,0,6,6" AutomationProperties.Name="Bitwise XOR" />
             </WrapPanel>
             <TextBlock Text="Shift count" Opacity="0.62" />
             <TextBox Text="{Binding ShiftCount, Mode=TwoWay}" Watermark="Shift count" />
