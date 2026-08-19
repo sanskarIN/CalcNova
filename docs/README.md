@@ -11,6 +11,7 @@ Use this index to find the authoritative guide for each area of the project.
 - [Release process](RELEASE.md)
 - [Release readiness checklist](RELEASE_READINESS_CHECKLIST.md)
 - [SDK-independent source preflight](SOURCE_PREFLIGHT.md)
+- [Settings migration](SETTINGS_MIGRATION.md)
 - [Platform support](PLATFORM_SUPPORT.md)
 
 ## Calculation and feature contracts
@@ -20,12 +21,14 @@ Use this index to find the authoritative guide for each area of the project.
 - [Programmer mode](PROGRAMMER_MODE.md)
 - [Converter mode](CONVERTER_MODE.md)
 - [Graph numerical analysis](NUMERICAL_ANALYSIS.md)
+- [Graph interaction](GRAPH_INTERACTION.md)
 - [Feature status](FEATURES.md)
 - [Keyboard shortcuts](KEYBOARD_SHORTCUTS.md)
 
 ## Product quality
 
 - [Accessibility](ACCESSIBILITY.md)
+- [Accessibility runtime test matrix](ACCESSIBILITY_TEST_MATRIX.md)
 - [Focus visibility contract](FOCUS_VISIBILITY.md)
 - [Adaptive layout](ADAPTIVE_LAYOUT.md)
 - [Design system](DESIGN_SYSTEM.md)
