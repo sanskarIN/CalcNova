@@ -271,7 +271,10 @@ public sealed class ProgrammerViewModel : ViewModelBase
 
     private void ApplyResult(BigInteger result, string operationLabel)
     {
-        Input = RadixConverter.Format(result, InputBase);
+        var unsigned = BitwiseCalculator.ToUnsigned(result, WordSize);
+        var signed = BitwiseCalculator.ToSigned(result, WordSize);
+        var inputValue = InputBase == 10 && Signed ? signed : unsigned;
+        Input = RadixConverter.Format(inputValue, InputBase);
         UpdateRepresentations(result);
         LastOperation = operationLabel;
         ErrorMessage = string.Empty;
@@ -279,16 +282,15 @@ public sealed class ProgrammerViewModel : ViewModelBase
 
     private void UpdateRepresentations(BigInteger value)
     {
-        Binary = RadixConverter.Format(value, 2);
-        Octal = RadixConverter.Format(value, 8);
-        Decimal = RadixConverter.Format(value, 10);
-        Hexadecimal = RadixConverter.Format(value, 16);
-        BitPattern = BitwiseCalculator.ToBitString(value, WordSize);
-        var interpreted = Signed
-            ? BitwiseCalculator.ToSigned(value, WordSize)
-            : BitwiseCalculator.ToUnsigned(value, WordSize);
-        InterpretedValue = interpreted.ToString();
-        UpdateBits(value);
+        var unsigned = BitwiseCalculator.ToUnsigned(value, WordSize);
+        var signed = BitwiseCalculator.ToSigned(value, WordSize);
+        Binary = RadixConverter.Format(unsigned, 2);
+        Octal = RadixConverter.Format(unsigned, 8);
+        Decimal = RadixConverter.Format(Signed ? signed : unsigned, 10);
+        Hexadecimal = RadixConverter.Format(unsigned, 16);
+        BitPattern = BitwiseCalculator.ToBitString(unsigned, WordSize);
+        InterpretedValue = (Signed ? signed : unsigned).ToString();
+        UpdateBits(unsigned);
     }
 
     private void UpdateBits(BigInteger value)
