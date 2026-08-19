@@ -71,17 +71,32 @@ public sealed class MainViewModel : ViewModelBase
     public int SelectedModeIndex
     {
         get => _selectedModeIndex;
-        set => SetField(ref _selectedModeIndex, value);
+        set => SetField(ref _selectedModeIndex, NormalizeModeIndex(value));
+    }
+
+    public void SelectMode(int index)
+    {
+        SelectedModeIndex = index;
+    }
+
+    public void SelectFirstMode()
+    {
+        SelectedModeIndex = 0;
+    }
+
+    public void SelectLastMode()
+    {
+        SelectedModeIndex = ModeCount - 1;
     }
 
     public void SelectNextMode()
     {
-        SelectedModeIndex = NormalizeModeIndex(SelectedModeIndex + 1);
+        SelectedModeIndex++;
     }
 
     public void SelectPreviousMode()
     {
-        SelectedModeIndex = NormalizeModeIndex(SelectedModeIndex - 1);
+        SelectedModeIndex--;
     }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
