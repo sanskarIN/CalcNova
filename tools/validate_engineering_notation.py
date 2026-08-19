@@ -34,6 +34,7 @@ def validate(root: Path) -> list[str]:
         "public static double Parse(string? text)",
         "if (exponent % 3 != 0)",
         "if (exponent is < MinimumEngineeringExponent or > MaximumEngineeringExponent)",
+        "if (mantissa != 0d && value == 0d)",
         "Math.Floor(decimalExponent / 3d) * 3d",
         "private static double ScaleByPowerOfTen",
         "var step = Math.Clamp(remaining, -300, 300);",
@@ -50,6 +51,7 @@ def validate(root: Path) -> list[str]:
         "Parse_AcceptsCanonicalEngineeringNotation",
         "Parse_RejectsInvalidEngineeringNotation",
         "Parse_RejectsExponentOutsideFiniteEngineeringRange",
+        "Parse_RejectsUnderflowingNonZeroEngineeringValue",
         "FormatAndParse_RoundTripRepresentativeFiniteValues",
         "double.Epsilon",
         "double.MaxValue",
@@ -72,7 +74,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated finite engineering formatting/parsing, exponent bounds, significant digits, and edge-case coverage.")
+    print("Validated finite engineering formatting/parsing, exponent/underflow bounds, significant digits, and edge-case coverage.")
     return 0
 
 
