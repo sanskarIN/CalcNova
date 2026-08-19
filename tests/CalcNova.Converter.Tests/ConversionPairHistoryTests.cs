@@ -22,7 +22,7 @@ public sealed class ConversionPairHistoryTests
         history.Record(metersToCentimeters);
         history.Record(metersToKilometers);
 
-        Assert.Equal([metersToKilometers, metersToCentimeters], history.Recent);
+        Assert.Equal(new[] { metersToKilometers, metersToCentimeters }, history.Recent);
     }
 
     [Fact]
