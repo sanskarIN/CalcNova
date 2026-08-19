@@ -10,7 +10,10 @@ namespace CalcNova.Core.Parsing;
 /// </summary>
 public static class ExpressionTextSanitizer
 {
-    public static string Sanitize(string? text, int maximumLength = EvaluationOptions.DefaultMaximumExpressionLength)
+    public static string Sanitize(string? text) =>
+        Sanitize(text, EvaluationOptions.Default.MaximumExpressionLength);
+
+    public static string Sanitize(string? text, int maximumLength)
     {
         if (maximumLength <= 0)
         {
@@ -23,7 +26,7 @@ public static class ExpressionTextSanitizer
         }
 
         var trimmed = text.Trim();
-        if (trimmed.StartsWith('=', StringComparison.Ordinal))
+        if (trimmed.StartsWith('='))
         {
             trimmed = trimmed[1..].TrimStart();
         }
