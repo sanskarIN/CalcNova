@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Semantic version tag, for example v0.1.0"
+        description: "Normalized semantic version tag, for example v2.8.3 (product display version 2.8.03)"
         required: true
         type: string
 
@@ -38,6 +38,13 @@ jobs:
         run: |
           git rev-parse -q --verify "refs/tags/$RELEASE_TAG^{commit}" >/dev/null
           git checkout --detach "$RELEASE_TAG"
+
+      - name: Verify tag matches source package version
+        shell: bash
+        run: |
+          SOURCE_VERSION="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props | head -n 1)"
+          test -n "$SOURCE_VERSION"
+          test "$RELEASE_TAG" = "v$SOURCE_VERSION"
 
       - name: Run tagged source preflight
         run: python tools/release_preflight.py --tag "$RELEASE_TAG"
@@ -153,8 +160,6 @@ jobs:
         if: steps.signing.outputs.configured == 'true'
         shell: bash
         run: |
-          TAG="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
-          VERSION="${TAG#v}"
           dotnet publish src/CalcNova.Android/CalcNova.Android.csproj \
             --configuration Release \
             -p:AndroidPackageFormats=aab \
@@ -162,9 +167,7 @@ jobs:
             -p:AndroidSigningKeyStore="$RUNNER_TEMP/calcnova-release.keystore" \
             -p:AndroidSigningKeyAlias="$KEY_ALIAS" \
             -p:AndroidSigningKeyPass="$KEY_PASSWORD" \
-            -p:AndroidSigningStorePass="$STORE_PASSWORD" \
-            -p:ApplicationDisplayVersion="$VERSION" \
-            -p:ApplicationVersion="${{ github.run_number }}"
+            -p:AndroidSigningStorePass="$STORE_PASSWORD"
           AAB="$(find src/CalcNova.Android/bin/Release -type f -name '*.aab' | head -n 1)"
           test -n "$AAB"
           cp "$AAB" CalcNova-android.aab
