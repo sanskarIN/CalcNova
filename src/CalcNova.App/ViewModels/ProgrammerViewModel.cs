@@ -29,6 +29,8 @@ public sealed class ProgrammerViewModel : ViewModelBase
 
     public IReadOnlyList<int> CommonBases { get; } = [2, 8, 10, 16, 36];
 
+    public IReadOnlyList<int> SupportedBases { get; } = Enumerable.Range(2, 35).ToArray();
+
     public IReadOnlyList<int> WordSizes { get; } = [8, 16, 32, 64, 128];
 
     public string Input
@@ -40,7 +42,15 @@ public sealed class ProgrammerViewModel : ViewModelBase
     public int InputBase
     {
         get => _inputBase;
-        set => SetField(ref _inputBase, value);
+        set
+        {
+            if (value is < 2 or > 36)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Input base must be between 2 and 36.");
+            }
+
+            SetField(ref _inputBase, value);
+        }
     }
 
     public int WordSize
