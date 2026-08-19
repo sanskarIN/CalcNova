@@ -43,7 +43,7 @@ def validate(root: Path) -> list[str]:
         "public sealed record CalculatorSelectionEdit",
         "public static CalculatorSelectionEdit ApplyToken",
         "if (hasSelection && IsWrapperToken(token))",
-        "var replacement = token + selected + \"\)\"".replace("\\)", ")"),
+        'var replacement = token + selected + ")";',
         "EnsureWithinLimit",
         "public static bool IsWrapperToken",
     ):
