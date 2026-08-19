@@ -13,33 +13,52 @@ REQUIRED_MARKERS: dict[str, tuple[str, ...]] = {
         "python tools/release_preflight.py --tag v0.1.0",
         "Manual release dispatch must reference an already-existing valid tag",
         "preserve the existing release/notes",
-        "PASS / FAIL / NOT RUN",
+        "PASS / FAIL / BLOCKED / NOT RUN",
+        "ACCESSIBILITY_TEST_MATRIX.md",
+        "SETTINGS_MIGRATION.md",
     ),
     "docs/RELEASE_READINESS_CHECKLIST.md": (
-        "Source preflight: PASS / FAIL / NOT RUN",
-        ".NET restore/format/build/test: PASS / FAIL / NOT RUN",
-        "Windows: PASS / FAIL / NOT RUN",
-        "Linux: PASS / FAIL / NOT RUN",
-        "macOS: PASS / FAIL / NOT RUN",
-        "Browser: PASS / FAIL / NOT RUN",
-        "Android: PASS / FAIL / NOT RUN",
-        "iOS: PASS / FAIL / NOT RUN",
-        "Accessibility audit: PASS / FAIL / NOT RUN",
-        "Responsive-layout audit: PASS / FAIL / NOT RUN",
+        "Source preflight: PASS / FAIL / BLOCKED / NOT RUN",
+        ".NET restore/format/build/test: PASS / FAIL / BLOCKED / NOT RUN",
+        "Windows: PASS / FAIL / BLOCKED / NOT RUN",
+        "Linux: PASS / FAIL / BLOCKED / NOT RUN",
+        "macOS: PASS / FAIL / BLOCKED / NOT RUN",
+        "Browser: PASS / FAIL / BLOCKED / NOT RUN",
+        "Android: PASS / FAIL / BLOCKED / NOT RUN",
+        "iOS: PASS / FAIL / BLOCKED / NOT RUN",
+        "Accessibility audit: PASS / FAIL / BLOCKED / NOT RUN",
+        "Responsive-layout audit: PASS / FAIL / BLOCKED / NOT RUN",
+        "Settings-schema migration contracts pass.",
+        "ACCESSIBILITY_TEST_MATRIX.md",
         "Never replace `NOT RUN` with `PASS`",
     ),
     "PROJECT_STATE.md": (
-        "## Current validation evidence",
+        "## Validation Status",
         "**NOT RUN**",
-        "GitHub Actions result for the latest direct-push checkpoint",
-        "never convert unexecuted checks into PASS",
+        "A check is never marked PASS unless",
     ),
     "what_changed.md": (
-        "## Validation boundary for this continuation",
+        "# What Changed",
+        "Validation Status",
         "**NOT RUN**",
-        "Their existence is not treated here as proof that GitHub Actions has passed.",
     ),
 }
+
+
+def validate(root: Path) -> list[str]:
+    failures: list[str] = []
+    for relative_path, markers in REQUIRED_MARKERS.items():
+        path = root / relative_path
+        if not path.is_file():
+            failures.append(f"Missing release evidence document: {relative_path}")
+            continue
+
+        source = path.read_text(encoding="utf-8")
+        for marker in markers:
+            if marker not in source:
+                failures.append(f"{relative_path} is missing required release-evidence marker: {marker}")
+
+    return failures
 
 
 def main() -> int:
@@ -49,28 +68,14 @@ def main() -> int:
     parser.add_argument("root", nargs="?", default=".", help="Repository root")
     args = parser.parse_args()
 
-    root = Path(args.root).resolve()
-    failures: list[str] = []
-    checked_markers = 0
-
-    for relative_path, markers in REQUIRED_MARKERS.items():
-        path = root / relative_path
-        if not path.is_file():
-            failures.append(f"Missing release evidence document: {relative_path}")
-            continue
-
-        source = path.read_text(encoding="utf-8")
-        for marker in markers:
-            checked_markers += 1
-            if marker not in source:
-                failures.append(f"{relative_path} is missing required release-evidence marker: {marker}")
-
+    failures = validate(Path(args.root).resolve())
     if failures:
         print("Release documentation validation failed:", file=sys.stderr)
         for failure in failures:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
+    checked_markers = sum(len(markers) for markers in REQUIRED_MARKERS.values())
     print(
         f"Validated {checked_markers} release evidence markers across "
         f"{len(REQUIRED_MARKERS)} documentation/state files."
