@@ -8,6 +8,8 @@ public sealed record AppSettings
 
     public AngleUnit AngleUnit { get; init; } = AngleUnit.Degrees;
 
+    public string CultureName { get; init; } = "en";
+
     public int DecimalPrecision { get; init; } = 15;
 
     public bool UseGroupingSeparators { get; init; } = true;
