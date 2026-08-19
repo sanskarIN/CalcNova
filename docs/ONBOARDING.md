@@ -1,34 +1,40 @@
 # CalcNova Onboarding
 
-CalcNova onboarding is optional, local-first, skippable, and versioned. It must help a new user understand important capabilities without blocking calculator use or requiring an account.
+CalcNova onboarding is optional, local-first, skippable, and versioned. It helps a new user understand important capabilities without requiring an account or repeatedly interrupting returning users.
 
 ## Current implementation state
 
-The persistence and view-model foundation is implemented:
+The persistence, view-model, and shared visual foundation are implemented:
 
 - `AppSettings.CompletedOnboardingVersion` stores the locally completed onboarding version;
 - `OnboardingPolicy.CurrentVersion` defines the current first-run content generation;
 - invalid negative stored versions are normalized to zero;
-- `SettingsViewModel.ShouldShowOnboarding` reports whether the current onboarding version still needs to be shown;
+- `SettingsViewModel.IsLoaded` prevents the first-run surface from appearing before persisted settings have loaded successfully;
+- `SettingsViewModel.ShouldShowOnboarding` reports whether the loaded settings still require the current onboarding version;
+- failed/corrupt settings loading does not raise the onboarding surface and therefore does not trap startup behind first-run UI;
 - `CompleteOnboardingCommand` and `SkipOnboardingCommand` both persist the current completion boundary;
 - completion and skipping use the existing settings repository abstraction, so they follow each platform's local settings storage path;
 - resetting ordinary settings preserves onboarding completion instead of unexpectedly forcing the first-run experience again;
-- unit tests cover new-user, completion, skip, and invalid-version behavior;
-- a source-level CI validator protects the persistence and command contracts.
+- `OnboardingOverlay.axaml` provides the shared first-run visual surface used by the shared application shell;
+- the overlay introduces major modes, keyboard/touch behavior, local-first storage, optional currency networking, and the no-account requirement;
+- both **Skip** and **Start calculating** have explicit accessible names;
+- the main shell suppresses calculator/mode keyboard shortcuts while onboarding is visible so background actions do not fire through the overlay;
+- unit tests cover pre-load state, new-user state, failed settings loading, completion, skip, and invalid-version behavior;
+- a source-level CI validator protects persistence, deferred display, visual bindings, accessible actions, and shell attachment.
 
-A dedicated visual onboarding surface is still pending. The project must not claim that onboarding UI is complete until that surface has been implemented and validated on supported targets.
+The shared onboarding UI is therefore implemented, but it is **not yet target-platform validated**. Platform release readiness still requires actual Desktop, Browser, Android, and iOS build/runtime checks plus keyboard/screen-reader/large-text testing.
 
-## Product requirements
+## Current visual flow
 
-The eventual visual flow should remain short and dismissible. Suggested pages are:
+The initial implementation intentionally uses one concise, scrollable surface instead of several forced pages. It includes:
 
-1. **Welcome to CalcNova** — explain fast, private, local-first calculation.
-2. **Choose a mode** — briefly introduce Calculator, Programmer, Converter, Graphing, Statistics, Equations, Matrices, Date/Duration, Currency, and History.
-3. **Keyboard and touch** — show essential input, `Ctrl+PageUp/PageDown` mode cycling on supported keyboard targets, and touch-friendly interaction.
-4. **Privacy and history** — explain local history/settings and optional network-backed currency-rate behavior without implying an account is required.
-5. **Ready** — enter the calculator immediately.
+1. **Welcome to CalcNova** — fast, precise, private positioning.
+2. **Calculate your way** — overview of the standard/scientific and advanced modes.
+3. **Keyboard and touch friendly** — current mode cycling and hardware number-pad guidance.
+4. **Local-first by default** — local history/preferences, offline physical units, and optional network-enhanced currency behavior.
+5. **Ready** — immediate **Skip** and **Start calculating** actions.
 
-Every page must provide a visible **Skip** action. Completing or skipping the current flow records the same version boundary so the user is not repeatedly interrupted.
+This avoids making users traverse multiple pages just to reach the calculator. Future onboarding expansion should remain similarly concise and justified by a real first-run need.
 
 ## Versioning contract
 
@@ -39,39 +45,50 @@ Increase the version only when a materially important new first-run explanation 
 Rules:
 
 - stored version `0` means onboarding has not been completed;
-- stored versions below zero are treated as `0`;
+- stored versions below zero are treated as `0` at the application policy boundary;
+- storage repositories reject negative versions as malformed persisted state;
 - stored versions equal to or above the current version do not trigger onboarding;
+- onboarding is hidden until settings load succeeds;
 - skipping counts as completing the current version;
 - unsupported or corrupt settings must fail safely without blocking calculator startup.
 
 ## Privacy
 
-Onboarding state must remain local. It must not require sign-in, telemetry, advertising identifiers, contacts, location, or any unrelated permission.
+Onboarding state remains local. It does not require sign-in, telemetry, advertising identifiers, contacts, location, or unrelated permissions.
 
-The onboarding flow must not include deceptive consent patterns or make optional support/donation actions look required for use.
+The onboarding surface does not include donation/payment prompts and does not make optional support actions look required for use.
 
 ## Accessibility
 
-The eventual UI must support:
+The implemented shared surface includes:
+
+- visible text actions for both completion and skipping;
+- explicit automation names on the two first-run actions;
+- scrollability for constrained heights;
+- wrapped explanatory text;
+- a maximum content width to preserve readable line lengths on larger displays;
+- suppression of background calculator/mode keyboard shortcuts while the overlay is active;
+- immediate access to Skip without traversing decorative content.
+
+Target-platform validation is still required for:
 
 - keyboard-only completion and skipping;
-- visible focus;
-- screen-reader names and page context;
+- initial focus placement and visible focus;
+- screen-reader page context and action announcements;
 - text scaling and long localized strings;
-- reduced-motion preferences;
-- high-contrast behavior;
+- reduced-motion/high-contrast interaction with future visual refinements;
 - narrow portrait and landscape layouts;
-- immediate access to Skip without traversing decorative content.
+- focus restoration after dismissal.
 
 No essential explanation should exist only in an illustration or animation.
 
 ## Localization
 
-Onboarding prose must use semantic localization keys once the shared XAML localization binding path is established. New language packs require review for mathematical, privacy, and accessibility terminology before being listed as supported.
+The current onboarding copy is English source text. It must migrate to semantic localization keys as the shared XAML localization binding path is expanded. New language packs require review for mathematical, privacy, and accessibility terminology before being listed as supported.
 
 ## Testing still required
 
-Before the visual flow is considered release-ready:
+Before onboarding is considered release-ready:
 
 - verify first launch on clean native storage;
 - verify first launch on Browser storage;
@@ -79,5 +96,8 @@ Before the visual flow is considered release-ready:
 - verify Skip persists across restart;
 - verify ordinary settings reset does not re-trigger onboarding;
 - verify a deliberate `CurrentVersion` increment re-triggers the new flow;
-- verify keyboard, screen reader, large text, and compact layouts;
+- verify settings-load failure leaves the calculator usable;
+- verify keyboard, screen reader, large text, high contrast, and compact layouts;
+- verify background calculator shortcuts do not activate while onboarding is visible;
+- verify focus returns predictably after dismissal;
 - verify no onboarding surface blocks calculation after dismissal.
