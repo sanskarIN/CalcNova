@@ -25,6 +25,7 @@ public sealed class SettingsViewModel : ViewModelBase
     private string[] _converterRecentPairs = [];
     private string[] _converterFavoritePairs = [];
     private int _completedOnboardingVersion;
+    private bool _isLoaded;
     private string _statusMessage = string.Empty;
 
     public SettingsViewModel(ISettingsRepository? repository, IAppLocalizer? localizer = null)
@@ -116,7 +117,9 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public int CompletedOnboardingVersion => _completedOnboardingVersion;
 
-    public bool ShouldShowOnboarding => OnboardingPolicy.ShouldShow(_completedOnboardingVersion);
+    public bool IsLoaded => _isLoaded;
+
+    public bool ShouldShowOnboarding => _isLoaded && OnboardingPolicy.ShouldShow(_completedOnboardingVersion);
 
     public string StatusMessage
     {
@@ -140,6 +143,9 @@ public sealed class SettingsViewModel : ViewModelBase
                 ? new AppSettings()
                 : await _repository.LoadAsync(cancellationToken);
             Apply(settings);
+            _isLoaded = true;
+            OnPropertyChanged(nameof(IsLoaded));
+            OnPropertyChanged(nameof(ShouldShowOnboarding));
             StatusMessage = _repository is null
                 ? "Settings storage is not configured for this platform yet; defaults are active."
                 : string.Empty;
