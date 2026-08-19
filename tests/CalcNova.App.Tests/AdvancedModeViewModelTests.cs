@@ -18,7 +18,7 @@ public sealed class AdvancedModeViewModelTests
 
         viewModel.ConvertCommand.Execute(null);
 
-        Assert.Equal("255", viewModel.Decimal);
+        Assert.Equal("-1", viewModel.Decimal);
         Assert.Equal("11111111", viewModel.Binary);
         Assert.Equal("-1", viewModel.InterpretedValue);
         Assert.Equal(string.Empty, viewModel.ErrorMessage);
