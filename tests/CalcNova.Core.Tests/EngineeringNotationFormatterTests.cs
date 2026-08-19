@@ -79,6 +79,16 @@ public sealed class EngineeringNotationFormatterTests
         Assert.ThrowsAny<Exception>(() => EngineeringNotationFormatter.Parse(text));
     }
 
+    [Theory]
+    [InlineData("1e+309")]
+    [InlineData("1e-327")]
+    [InlineData("0e+309")]
+    [InlineData("0e-327")]
+    public void Parse_RejectsExponentOutsideFiniteEngineeringRange(string text)
+    {
+        Assert.Throws<OverflowException>(() => EngineeringNotationFormatter.Parse(text));
+    }
+
     [Fact]
     public void FormatAndParse_RoundTripRepresentativeFiniteValues()
     {
