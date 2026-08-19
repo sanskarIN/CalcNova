@@ -13,7 +13,10 @@ public sealed class MainViewModel : ViewModelBase
         dependencies ??= AppDependencies.Empty;
 
         Settings = new SettingsViewModel(dependencies.SettingsRepository);
-        History = new HistoryViewModel(dependencies.HistoryRepository, () => Settings.HistoryLimit);
+        History = new HistoryViewModel(
+            dependencies.HistoryRepository,
+            () => Settings.HistoryLimit,
+            dependencies.ClipboardService);
         Calculator = new CalculatorViewModel(
             recordCalculationAsync: (expression, result) => History.RecordAsync(expression, result),
             historyEnabledProvider: () => Settings.HistoryEnabled,
