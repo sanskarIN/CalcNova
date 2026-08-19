@@ -24,6 +24,8 @@ public sealed class MainViewModel : ViewModelBase
         Programmer = new ProgrammerViewModel(dependencies.ClipboardService);
         CodePoint = new CodePointViewModel(dependencies.ClipboardService);
         Converter = new ConverterViewModel(dependencies.ClipboardService);
+        Statistics = new StatisticsViewModel(dependencies.ClipboardService);
+        Matrices = new MatricesViewModel(dependencies.ClipboardService);
         Graphing = new GraphingViewModel(dependencies.ClipboardService);
         Currency = new CurrencyViewModel(dependencies.CurrencyRateCache, dependencies.CurrencyRateProvider);
         About = new AboutViewModel(dependencies.ExternalLinkService);
@@ -42,11 +44,11 @@ public sealed class MainViewModel : ViewModelBase
 
     public ConverterViewModel Converter { get; }
 
-    public StatisticsViewModel Statistics { get; } = new();
+    public StatisticsViewModel Statistics { get; }
 
     public EquationsViewModel Equations { get; } = new();
 
-    public MatricesViewModel Matrices { get; } = new();
+    public MatricesViewModel Matrices { get; }
 
     public GraphingViewModel Graphing { get; }
 
