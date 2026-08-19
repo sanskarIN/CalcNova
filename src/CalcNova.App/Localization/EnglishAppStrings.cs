@@ -69,6 +69,13 @@ internal static class EnglishAppStrings
             [AppStringKey.ActionCopyExport] = "Copy export",
             [AppStringKey.ActionOpenRepository] = "Open CalcNova repository",
             [AppStringKey.ActionOpenGitHubProfile] = "Open GitHub profile",
+            [AppStringKey.ActionGraphPanLeft] = "Pan left",
+            [AppStringKey.ActionGraphPanRight] = "Pan right",
+            [AppStringKey.ActionGraphPanUp] = "Pan up",
+            [AppStringKey.ActionGraphPanDown] = "Pan down",
+            [AppStringKey.ActionGraphZoomIn] = "Zoom in",
+            [AppStringKey.ActionGraphZoomOut] = "Zoom out",
+            [AppStringKey.ActionGraphFit] = "Fit graph",
 
             [AppStringKey.LabelExpression] = "Expression",
             [AppStringKey.LabelResult] = "Result",
