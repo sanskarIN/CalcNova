@@ -75,6 +75,31 @@ public sealed class BrowserSettingsRepository : ISettingsRepository
             throw new InvalidDataException("History limit must be between 1 and 5000.");
         }
 
+        ValidateConverterState(settings);
         return settings;
+    }
+
+    private static void ValidateConverterState(AppSettings settings)
+    {
+        if (settings.ConverterSignificantDigits is < 1 or > 17)
+        {
+            throw new InvalidDataException("Converter precision must be between 1 and 17 significant digits.");
+        }
+
+        ValidatePairTokens(settings.ConverterRecentPairs, 12, "recent");
+        ValidatePairTokens(settings.ConverterFavoritePairs, 100, "favorite");
+    }
+
+    private static void ValidatePairTokens(string[]? tokens, int maximumCount, string label)
+    {
+        if (tokens is null || tokens.Length > maximumCount)
+        {
+            throw new InvalidDataException($"The stored converter {label} pair list is invalid.");
+        }
+
+        if (tokens.Any(token => string.IsNullOrWhiteSpace(token) || token.Length > 128))
+        {
+            throw new InvalidDataException($"A stored converter {label} pair token is invalid.");
+        }
     }
 }
