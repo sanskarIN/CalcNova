@@ -17,6 +17,7 @@ on:
       - "tests/CalcNova.App.Tests/SettingsLocalizationViewModelTests.cs"
       - "tests/CalcNova.Persistence.Tests/JsonSettingsRepositoryTests.cs"
       - "tools/validate_localization_catalog.py"
+      - "tools/tests/test_validate_localization_catalog.py"
       - "docs/LOCALIZATION.md"
       - ".github/workflows/localization-validate.yml"
   pull_request:
@@ -34,6 +35,7 @@ on:
       - "tests/CalcNova.App.Tests/SettingsLocalizationViewModelTests.cs"
       - "tests/CalcNova.Persistence.Tests/JsonSettingsRepositoryTests.cs"
       - "tools/validate_localization_catalog.py"
+      - "tools/tests/test_validate_localization_catalog.py"
       - "docs/LOCALIZATION.md"
       - ".github/workflows/localization-validate.yml"
   workflow_dispatch:
@@ -54,5 +56,8 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Validate localization catalog
+      - name: Validate localization catalogs
         run: python tools/validate_localization_catalog.py .
+
+      - name: Run localization validator regression tests
+        run: python -m unittest tools.tests.test_validate_localization_catalog
