@@ -1,6 +1,6 @@
 # CalcNova SDK-Independent Source Preflight
 
-CalcNova includes a deterministic source-level validation command for environments where the .NET SDK or platform workloads are not available.
+CalcNova includes a deterministic source-level validation command for environments where the .NET SDK or target-platform workloads are unavailable.
 
 ## Run it
 
@@ -18,61 +18,73 @@ python tools/release_preflight.py --tag v0.1.0
 
 ## What it runs
 
-The integrated preflight currently executes these source-contract groups:
+The integrated preflight is intentionally broader than any one focused workflow. Its current source-contract inventory covers:
 
-1. repository structure, structured-file, contact-link, and secret-file guards;
-2. Avalonia XAML XML parsing;
-3. shared XAML/view-model UI contracts;
-4. mode-navigation contracts;
-5. calculator and shared-shell keyboard-input contracts;
-6. graph keyboard pan/zoom/reset/fit contracts;
-7. Avalonia headless UI-test package/bootstrap/scenario/workflow contracts;
-8. source-level accessibility markup contracts;
-9. shared and high-contrast focus-visibility contracts;
-10. runtime-accessibility evidence/status-discipline contracts;
-11. compact/medium/expanded adaptive-layout contracts;
-12. shared touch-target contracts;
-13. English/Hindi localization catalog and preference contracts;
-14. versioned native/Browser settings-schema migration contracts;
-15. onboarding persistence/visual/focus contracts;
-16. cross-platform packaging metadata contracts;
-17. Desktop/Browser/Android/iOS build-workflow and shared SDK-policy contracts;
-18. tag-first release-workflow contracts;
-19. release-documentation evidence contracts;
-20. release-tag validator tests;
-21. regression tests for release workflow/documentation validators;
-22. regression tests for the headless UI source validator;
-23. regression tests for focus/accessibility-evidence validators;
-24. regression tests for keyboard/graph-keyboard validators;
-25. regression tests for localization/settings-schema validators;
-26. regression tests for adaptive-layout/touch-target validators;
-27. regression tests for packaging/platform-workflow validators;
-28. regression tests for the integrated preflight inventory itself;
-29. optional validation of the requested release tag.
+### Repository and shared UI
 
-Each underlying validator remains independently runnable. The integrated command exists to catch interactions between contracts and give maintainers one reproducible preflight entry point.
+- repository structure/security and structured-file checks;
+- Avalonia XAML XML parsing;
+- shared UI command/property contracts;
+- mode-navigation contracts;
+- calculator/shared-shell keyboard contracts, including printable operators;
+- selection-aware calculator editing and function wrapping;
+- graph keyboard interaction;
+- graph surface integration;
+- deterministic multi-series graph presentation.
+
+### Numerical and data correctness
+
+- graph numerical-analysis safety;
+- graph numerical workload budgets;
+- Unicode scalar metadata contracts;
+- exact rational normalization, default-value safety, parsing, arithmetic, and workload budgets;
+- engineering-notation formatting/parsing and finite exponent bounds;
+- bounded export previews and full-content copy contracts;
+- bivariate covariance/correlation/regression contracts.
+
+### UI quality and accessibility
+
+- Avalonia headless UI-test source/execution-path contracts;
+- accessibility markup;
+- focus visibility;
+- accessibility runtime-evidence discipline;
+- dynamically inserted shared-control accessibility and touch-target coverage;
+- adaptive layout;
+- shared touch-target baselines;
+- English/Hindi localization catalog/preferences and reviewed live localization surfaces.
+
+### Settings, platform, and release infrastructure
+
+- converter default-pair and preference-notice contracts;
+- versioned settings schema/shared codec/shared validation;
+- onboarding persistence/visual/focus behavior;
+- cross-platform packaging metadata;
+- Desktop/Browser/Android/iOS build-workflow contracts;
+- exact-tag unsigned iOS simulator release-workflow contracts;
+- tag-first release workflow contracts;
+- release documentation/evidence contracts;
+- artifact-manifest and SHA-256 integrity infrastructure;
+- machine-readable release-evidence model, runner, verifier, and infrastructure.
+
+### Regression inventory
+
+The preflight also runs the Python regression suites for the focused validators and release tooling, including:
+
+- release workflow/documentation/iOS workflow validators;
+- headless UI, keyboard, selection, graph, numerical, Unicode, rational, engineering, export, statistics, localization, settings, adaptive, accessibility, packaging, and platform validators;
+- artifact manifest generation/verification/integrity tooling;
+- structured release-evidence model/runner/verifier/infrastructure;
+- the integrated preflight inventory itself.
+
+The optional `--tag` argument additionally invokes the release-tag validator against the requested tag.
+
+Each underlying validator remains independently runnable. The integrated command exists to catch interactions between contracts and give maintainers one reproducible SDK-independent entry point.
 
 ## CI
 
-`.github/workflows/source-preflight.yml` runs the integrated command for relevant pushes and pull requests and also supports manual dispatch.
+`.github/workflows/source-preflight.yml` runs the integrated command for relevant pushes and pull requests and supports manual dispatch.
 
-Its path filters cover the App/UI sources, App/platform/persistence tests relevant to the contracts, central package/SDK policy, package metadata, validator tooling, validation documentation, platform build workflows, the headless UI workflow, and the release workflow.
-
-Specialized workflows remain in place because they provide narrower failure signals and path filtering. Current focused gates include:
-
-- keyboard navigation;
-- graph keyboard interaction;
-- Avalonia headless UI execution;
-- focus visibility;
-- adaptive layout;
-- touch targets;
-- accessibility evidence;
-- localization;
-- settings schema;
-- onboarding;
-- packaging metadata;
-- platform workflow contracts;
-- release workflow contracts.
+Specialized workflows remain in place because they provide narrower failure signals and path filtering. Current focused gates include keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bivariate statistics, bounded exports, headless UI setup/execution, focus/accessibility/adaptive/touch contracts, localization, settings/converter preferences, packaging/platform workflows, dynamic controls accessibility, iOS release-tag validation, artifact integrity, structured release evidence, and release workflow/documentation contracts.
 
 The integrated workflow is an additional cross-contract gate, not a replacement for focused checks.
 
@@ -81,6 +93,16 @@ The integrated workflow is an additional cross-contract gate, not a replacement 
 The SDK-independent preflight validates that headless UI testing is correctly configured and that the expected scenarios/workflow commands remain present.
 
 It does **not** execute `Avalonia.Headless.XUnit` tests because that requires the .NET SDK. Real headless test execution occurs in `.github/workflows/headless-ui-validate.yml` and through normal solution-level `dotnet test` runs. See [UI_AUTOMATION.md](UI_AUTOMATION.md).
+
+## Artifact integrity and structured evidence
+
+Artifact integrity and release evidence are separate but complementary contracts:
+
+- artifact tooling generates/verifies manifests with SHA-256 checks and repository/commit identity safeguards;
+- structured release evidence records whether commands actually passed, failed, were blocked, or were not run;
+- source validation verifies that those toolchains and their tests remain present and wired correctly.
+
+See [VALIDATION_EVIDENCE.md](VALIDATION_EVIDENCE.md) for the machine-readable evidence model.
 
 ## What this does not prove
 
@@ -91,17 +113,17 @@ A successful source preflight does **not** mean CalcNova compiled or ran success
 - Android/iOS workloads;
 - WebAssembly tooling;
 - Windows/macOS/Linux packaging tools;
-- signing/notarization tools;
+- signing/notarization/provisioning tools;
 - screen readers or accessibility inspection tools.
 
 Full release evidence still requires the build/test/platform checks documented in [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md), [FOCUS_VISIBILITY.md](FOCUS_VISIBILITY.md), and [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
 
 Settings migration behavior is documented in [SETTINGS_MIGRATION.md](SETTINGS_MIGRATION.md). Graph keyboard/pointer behavior is documented in [GRAPH_INTERACTION.md](GRAPH_INTERACTION.md).
 
-If an environment cannot run a required check, record it as `NOT RUN` instead of treating source presence as a pass.
+If an environment cannot run a required check, record it as `NOT RUN` or `BLOCKED` as appropriate instead of treating source presence as a pass.
 
 ## Failure behavior
 
 The preflight runs every configured source check so one invocation can surface multiple independent problems. It exits non-zero if any check fails.
 
-Fix the first concrete failures, rerun the command, and then continue to the .NET/platform validation layer.
+Fix concrete failures, rerun the command, and then continue to the .NET/platform validation layer. A source-level success is only one release-evidence layer.
