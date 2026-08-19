@@ -54,6 +54,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools/validate_settings_schema.py",
             "tools/validate_onboarding_contracts.py",
             "tools/validate_packaging_metadata.py",
+            "tools/validate_platform_workflows.py",
             "tools/validate_release_workflow.py",
             "tools/validate_release_docs.py",
             "tools/tests/test_validate_release_tag.py",
@@ -79,6 +80,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools.tests.test_validate_adaptive_layout",
             "tools.tests.test_validate_touch_targets",
             "tools.tests.test_validate_packaging_metadata",
+            "tools.tests.test_validate_platform_workflows",
         }
         self.assertTrue(expected_modules.issubset(configured_modules))
 
