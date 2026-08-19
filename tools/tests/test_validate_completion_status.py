@@ -43,6 +43,10 @@ class CompletionStatusValidatorTests(unittest.TestCase):
                 "docs/ROADMAP.md",
                 "docs/FINAL_SOURCE_AUDIT_2026-08-19.md",
                 "docs/VERSIONING.md",
+                "docs/RELEASE.md",
+                "docs/RELEASE_READINESS_CHECKLIST.md",
+                "docs/PLATFORM_SUPPORT.md",
+                "docs/SOURCE_PREFLIGHT.md",
             },
             set(validator.CURRENT_STATUS_CONTRACTS),
         )
@@ -54,6 +58,8 @@ class CompletionStatusValidatorTests(unittest.TestCase):
         self.assertIn("## [unreleased]", forbidden)
         self.assertIn("remaining product/runtime work", forbidden)
         self.assertIn("remaining high-priority work", forbidden)
+        self.assertIn("suggested development milestones", forbidden)
+        self.assertIn("development mobile display version", forbidden)
 
 
 if __name__ == "__main__":
