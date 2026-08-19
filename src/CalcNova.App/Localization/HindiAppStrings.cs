@@ -36,6 +36,8 @@ internal static class HindiAppStrings
             [AppStringKey.OnboardingPrivacyBody] = "गणना इतिहास और प्राथमिकताएँ स्थानीय ऐप स्टोरेज में रहती हैं। भौतिक इकाई रूपांतरण ऑफ़लाइन है। मुद्रा दरें वैकल्पिक नेटवर्क सुविधा हैं और उपलब्ध होने पर कैश डेटा का उपयोग कर सकती हैं।",
             [AppStringKey.OnboardingNoAccount] = "CalcNova की मुख्य सुविधाओं के लिए खाते की आवश्यकता नहीं है। आप इस परिचय को तुरंत छोड़ सकते हैं।",
 
+            [AppStringKey.ConverterPreferencesTitle] = "सहेजी गई कन्वर्टर प्राथमिकताएँ",
+            [AppStringKey.ConverterPreferencesBody] = "परिशुद्धता, हाल की जोड़ियाँ और पसंदीदा जोड़ियाँ केवल स्थानीय ऐप सेटिंग्स में संग्रहीत होती हैं। निश्चित इकाई रूपांतरण ऑफ़लाइन रहता है।",
             [AppStringKey.CurrencyTitle] = "मुद्रा कन्वर्टर",
             [AppStringKey.CurrencyPrivacyBody] = "यह वैकल्पिक नेटवर्क-सहायित मॉड्यूल है। CalcNova API कुंजियाँ एम्बेड नहीं करता; कैश की गई दरें ऑफ़लाइन भी उपयोग की जा सकती हैं।",
             [AppStringKey.HistoryTitle] = "गणना इतिहास",
