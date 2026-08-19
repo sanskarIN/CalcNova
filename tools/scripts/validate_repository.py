@@ -35,6 +35,7 @@ REQUIRED_FILES = [
     "docs/TROUBLESHOOTING.md",
     "docs/DESIGN_SYSTEM.md",
     "docs/LOCALIZATION.md",
+    "docs/ONBOARDING.md",
     "docs/ROADMAP.md",
     "assets/branding/calcnova-logo.svg",
     "assets/icons/calcnova-icon.svg",
