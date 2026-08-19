@@ -9,6 +9,8 @@ Use this index to find the authoritative guide for each area of the project.
 - [Testing](TESTING.md)
 - [Troubleshooting](TROUBLESHOOTING.md)
 - [Release process](RELEASE.md)
+- [Release readiness checklist](RELEASE_READINESS_CHECKLIST.md)
+- [SDK-independent source preflight](SOURCE_PREFLIGHT.md)
 - [Platform support](PLATFORM_SUPPORT.md)
 
 ## Calculation and feature contracts
@@ -24,6 +26,8 @@ Use this index to find the authoritative guide for each area of the project.
 ## Product quality
 
 - [Accessibility](ACCESSIBILITY.md)
+- [Focus visibility contract](FOCUS_VISIBILITY.md)
+- [Adaptive layout](ADAPTIVE_LAYOUT.md)
 - [Design system](DESIGN_SYSTEM.md)
 - [Localization](LOCALIZATION.md)
 - [Privacy](PRIVACY.md)
