@@ -1,0 +1,62 @@
+name: Release iOS Validate
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing CalcNova release tag, for example v0.1.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  ios-release-validation:
+    runs-on: macos-latest
+    timeout-minutes: 35
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+    steps:
+      - name: Checkout workflow source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Verify release tag exists
+        shell: bash
+        run: |
+          git rev-parse -q --verify "refs/tags/$RELEASE_TAG^{commit}" >/dev/null
+          git checkout --detach "$RELEASE_TAG"
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install iOS workload
+        run: dotnet workload install ios
+
+      - name: Select simulator runtime identifier
+        shell: bash
+        run: |
+          case "$(uname -m)" in
+            arm64) echo "IOS_RID=iossimulator-arm64" >> "$GITHUB_ENV" ;;
+            x86_64) echo "IOS_RID=iossimulator-x64" >> "$GITHUB_ENV" ;;
+            *) echo "Unsupported macOS runner architecture: $(uname -m)" >&2; exit 1 ;;
+          esac
+
+      - name: Restore tagged iOS head
+        run: dotnet restore src/CalcNova.iOS/CalcNova.iOS.csproj -p:RuntimeIdentifier=${{ env.IOS_RID }}
+
+      - name: Build tagged iOS simulator head
+        run: dotnet build src/CalcNova.iOS/CalcNova.iOS.csproj --configuration Release --no-restore -p:RuntimeIdentifier=${{ env.IOS_RID }}
+
+      - name: Record validation boundary
+        shell: bash
+        run: |
+          echo "Validated unsigned iOS simulator compilation for $RELEASE_TAG on $IOS_RID."
+          echo "This workflow does not claim device signing, provisioning, archive, notarization, or App Store readiness."
