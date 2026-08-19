@@ -10,7 +10,7 @@
 
 ## Current Phase
 
-Broad feature completion + cross-platform validation hardening. The main calculator, scientific, programmer, converter, graphing, utility, persistence, and platform-composition foundations are implemented. Recent continuation work repaired app-layer contracts, completed productivity backends, exposed them in shared Avalonia XAML, and strengthened source-level UI validation. Remaining work is now concentrated on adaptive/mobile polish, deeper accessibility validation, automated UI/integration coverage, observed build/test results, platform/package validation, localization, onboarding, and release hardening.
+Broad feature completion + cross-platform validation hardening. Core calculator, scientific, programmer, converter, graphing, statistics, matrix, history, utility, persistence, and platform-composition foundations are implemented. Recent continuation work repaired app-layer contracts, completed productivity backends, exposed them in shared Avalonia XAML, added history export preview/copy and advanced result-copy workflows, and strengthened source-level UI validation. Remaining work is concentrated on adaptive/mobile polish, deeper accessibility validation, automated UI/integration coverage, observed build/test results, platform/package validation, localization, onboarding, and release hardening.
 
 ## Master Technical Direction
 
@@ -52,12 +52,11 @@ Broad feature completion + cross-platform validation hardening. The main calcula
 - Left, logical-right, and arithmetic-right shifts
 - Fixed-width bit-string visualization
 - Full word-size interactive bit grid for 8/16/32/64/128-bit presets
-- Byte-grouped bit view-model collections for 8/16/32/64/128-bit presets
+- Byte-grouped shared bit presentation for 8/16/32/64/128-bit presets
 - Shared copy actions for binary/octal/decimal/hex/fixed-width bit representations
 - Accessible bit-cell labels
 - Unicode scalar/code-point parsing, formatting, text conversion, and bounded sequence inspection
 - Shared Unicode decode/inspection copy actions
-- Dedicated Unicode code-point shared UI
 
 ### Conversion and utilities
 
@@ -80,8 +79,10 @@ Broad feature completion + cross-platform validation hardening. The main calcula
 ### Advanced mathematics
 
 - Statistics module and shared view model
+- Shared statistics-summary copy action
 - Equation-solving module and shared view model
 - Matrix utilities and shared view model
+- Shared matrix-result copy action
 - Graph sampling with discontinuity segmentation
 - Explicit graph viewport model
 - Interactive Avalonia plot control
@@ -96,59 +97,59 @@ Broad feature completion + cross-platform validation hardening. The main calcula
 - Shared bounded multi-expression sampling using stable generated series identities
 - Shared identified multi-expression CSV export/copy workflow
 
-### Persistence and application architecture
+### History and persistence
 
 - Calculation-history repository abstraction
 - SQLite-backed native history implementation
 - Browser-compatible history/storage path
 - Search, recent history, favorites, delete, and clear flows
-- TXT/CSV/JSON history export engine
+- Bounded TXT/CSV/JSON history export engine
+- Shared export-format selection, preview, and clipboard-copy workflow for currently loaded/search-matching entries
 - Settings/preferences abstraction and shared settings view model
 - Serialized converter preferences in shared settings
 - Settings validation for converter precision/token bounds
+
+### Application and platform architecture
+
 - Shared application composition root
 - About/external-link abstraction
 - Shared clipboard abstraction and Avalonia adapter
-- Shared clipboard dependency injection into Calculator, Programmer, Unicode, Converter, and Graphing modes
+- Shared clipboard dependency injection into Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History modes
 - Desktop composition
-- Browser composition
+- Browser/WebAssembly composition
 - Android composition
 - iOS composition
 
-### Platform and repository infrastructure
+### Repository infrastructure
 
-- Desktop Avalonia head
-- Browser/WebAssembly head
-- Android head
-- iOS head
 - GitHub Actions workflows for core validation, formatting, docs, coverage, security, advanced utilities, release, UI contracts, and platform-target builds
 - Dependency vulnerability audit workflow
 - Repository/documentation/branding validation helpers
 - Source-level Avalonia XML well-formedness validation
-- Source-level shared command/property binding validation
+- Source-level shared command/property binding validation covering Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History
 - Release workflow foundation
 - Original branding asset source and verification helpers
 
 ## Shared UI Status
 
-The shared Avalonia shell currently exposes these principal modes or utilities:
+The shared Avalonia shell currently exposes:
 
 - Standard + Scientific calculator
 - Sanitized paste and copy-result actions
 - Programmer calculator with full radix selector, bitwise operations, shifts, byte-grouped bit grid, and radix/fixed-width copy actions
 - Unicode code-point tools with result-copy actions
 - Offline unit converter with precision, search, search-result assignment, recents, favorites, clear-recents, and result copy
-- Statistics
+- Statistics with analysis-summary copy
 - Equations
-- Matrices
+- Matrices with result copy
 - Graphing with sampling, preview/table copy, nearest-point trace, derivative/root/integral analysis, bounded multi-expression sampling/export, and accessible SVG generation/copy
 - Date/time utilities
 - Currency conversion
-- History
+- History with search/favorite/delete/clear plus TXT/CSV/JSON preview/copy export
 - Settings
 - About/support
 
-The new productivity controls are source-wired and protected by the shared UI contract validator. They are **not** considered runtime-validated until Avalonia compilation/UI tests and target accessibility checks are observed.
+These controls are source-wired and protected by the shared UI contract validator. They are **not** considered runtime-validated until Avalonia compilation/UI tests and target accessibility checks are observed.
 
 ## Remaining High-Priority Work
 
@@ -156,7 +157,7 @@ The new productivity controls are source-wired and protected by the shared UI co
 2. Perform a full accessibility pass: keyboard traversal, screen-reader behavior, focus visibility, contrast, target sizes, large text, and reduced-motion behavior.
 3. Add stable UI/integration automation for the shared Avalonia shell.
 4. Observe real GitHub Actions/build/test output from a suitable execution path and fix any compiler/analyzer/test failures.
-5. Validate all platform heads with their required SDK/workload environments and fix any target-specific compilation/packaging issues.
+5. Validate all platform heads with their required SDK/workload environments and fix target-specific compilation/packaging issues.
 6. Complete Android/iOS store packaging metadata, signing guidance, and release documentation.
 7. Complete Windows/Linux/macOS packaging validation and release artifact checks.
 8. Expand localization infrastructure and reviewed language packs.
@@ -171,8 +172,9 @@ The new productivity controls are source-wired and protected by the shared UI co
 4. Clipboard integration is explicitly user-triggered and attached to Avalonia `TopLevel`; target-specific runtime behavior still requires platform validation.
 5. Numerical graph analysis is intentionally approximate and bounded; UI and documentation must continue labeling it as approximate.
 6. Converter pair persistence uses versioned unit-ID tokens. Unknown/obsolete tokens are ignored by the converter restore layer, while settings storage also enforces count/length bounds.
-7. Large 64/128-bit interactive grids may require additional compact-layout or virtualization polish on narrow/mobile screens even though byte grouping is now exposed in shared XAML.
+7. Large 64/128-bit interactive grids may require additional compact-layout or virtualization polish on narrow/mobile screens even though byte grouping is exposed in shared XAML.
 8. Source-level XAML/XML and binding-contract checks reduce regression risk but do not replace Avalonia XAML compilation, real UI automation, or screen-reader/touch testing.
+9. History preview/copy export is implemented; platform-native file-save/share UX remains separate release polish.
 
 ## Validation Status
 
@@ -190,6 +192,8 @@ The new productivity controls are source-wired and protected by the shared UI co
 - Currency tests: IMPLEMENTED
 - Date/time tests: IMPLEMENTED
 - Platform abstraction tests: IMPLEMENTED
+- History export view-model tests: IMPLEMENTED
+- Shared clipboard composition tests: IMPLEMENTED
 - Shared XAML command/property contract validator: IMPLEMENTED
 - Avalonia XAML XML well-formedness validator: IMPLEMENTED
 
@@ -204,7 +208,7 @@ The new productivity controls are source-wired and protected by the shared UI co
 - iOS build/package validation: **NOT RUN in this execution**
 - Browser/WebAssembly build validation: **NOT RUN in this execution**
 - Desktop OS packaging validation: **NOT RUN in this execution**
-- GitHub Actions result observation for current direct-push commits: **NOT CONFIRMED in this execution**
+- GitHub combined status checks for inspected direct-push commits: **NO STATUS CHECKS EXPOSED**
 
 A check is never marked PASS unless it actually ran and its result was observed.
 
@@ -212,11 +216,11 @@ A check is never marked PASS unless it actually ran and its result was observed.
 
 The next development pass should begin with the first still-incomplete item below rather than recreating completed modules:
 
-1. Adaptive/mobile layout pass for Calculator, Programmer, Converter, Graph, Date, FX, and advanced modes.
-2. Accessibility audit and screen-reader/focus/keyboard refinements, especially the large bit grid and graph experience.
+1. Adaptive/mobile layout pass for Calculator, Programmer, Converter, Graph, Date, FX, History, and advanced modes.
+2. Accessibility audit and screen-reader/focus/keyboard refinements, especially the large bit grid, long exports, and graph experience.
 3. Inspect actual GitHub Actions/check results and fix any real compile/analyzer/test failures.
 4. Add reliable shared-shell UI/integration tests where the Avalonia test stack is stable.
-5. Add remaining low-risk productivity polish such as export/copy actions only where the user flow and platform abstraction are clear.
+5. Improve cursor/selection-aware calculator editing and broader keyboard/numpad shortcuts.
 6. Expand localization/onboarding only after core UI validation is stable.
 7. Continue store/package/release hardening only after observed CI/platform validation.
 
