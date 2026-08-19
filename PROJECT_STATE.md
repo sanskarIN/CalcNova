@@ -10,7 +10,7 @@
 
 ## Current Phase
 
-Broad feature completion + cross-platform validation hardening. Core calculator, scientific, programmer, converter, graphing, statistics, matrix, history, utility, persistence, and platform-composition foundations are implemented. Recent continuation work repaired app-layer contracts, completed productivity backends, exposed them in shared Avalonia XAML, added history export preview/copy and advanced result-copy workflows, and strengthened source-level UI validation. Remaining work is concentrated on adaptive/mobile polish, deeper accessibility validation, automated UI/integration coverage, observed build/test results, platform/package validation, localization, onboarding, and release hardening.
+Broad feature completion + cross-platform validation hardening. Core calculator, scientific, programmer, converter, graphing, statistics, matrix, history, utility, persistence, and platform-composition foundations are implemented. Recent continuation work repaired app-layer contracts, completed productivity backends, exposed them in shared Avalonia XAML, added history export preview/copy and advanced result-copy workflows, strengthened source-level UI validation, and added dedicated adaptive-layout and touch-target regression validation. Remaining work is concentrated on runtime adaptive/mobile polish, deeper accessibility validation, automated UI/integration coverage, observed build/test results, platform/package validation, localization, onboarding, and release hardening.
 
 ## Master Technical Direction
 
@@ -127,6 +127,9 @@ Broad feature completion + cross-platform validation hardening. Core calculator,
 - Repository/documentation/branding validation helpers
 - Source-level Avalonia XML well-formedness validation
 - Source-level shared command/property binding validation covering Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History
+- Source-level adaptive layout validator covering compact/medium/expanded classes, mode reachability, focus bring-into-view behavior, and narrow-layout scrolling contracts
+- Dedicated touch-target validator protecting the shared 44-DIP minimum interaction baseline and rejecting obvious view-level regressions
+- Dedicated adaptive-layout and touch-target GitHub Actions workflows plus Python regression tests
 - Release workflow foundation
 - Original branding asset source and verification helpers
 
@@ -149,11 +152,11 @@ The shared Avalonia shell currently exposes:
 - Settings
 - About/support
 
-These controls are source-wired and protected by the shared UI contract validator. They are **not** considered runtime-validated until Avalonia compilation/UI tests and target accessibility checks are observed.
+These controls are source-wired and protected by the shared UI contract validator. Compact/medium/expanded source contracts and the 44-DIP shared touch baseline are additionally guarded by dedicated SDK-independent validators. They are **not** considered runtime-validated until Avalonia compilation/UI tests and target accessibility/device checks are observed.
 
 ## Remaining High-Priority Work
 
-1. Finish adaptive navigation and compact/mobile layouts across every mode.
+1. Finish runtime adaptive navigation and compact/mobile layouts across every mode, especially long result surfaces and 64/128-bit programmer grids.
 2. Perform a full accessibility pass: keyboard traversal, screen-reader behavior, focus visibility, contrast, target sizes, large text, and reduced-motion behavior.
 3. Add stable UI/integration automation for the shared Avalonia shell.
 4. Observe real GitHub Actions/build/test output from a suitable execution path and fix any compiler/analyzer/test failures.
@@ -173,7 +176,7 @@ These controls are source-wired and protected by the shared UI contract validato
 5. Numerical graph analysis is intentionally approximate and bounded; UI and documentation must continue labeling it as approximate.
 6. Converter pair persistence uses versioned unit-ID tokens. Unknown/obsolete tokens are ignored by the converter restore layer, while settings storage also enforces count/length bounds.
 7. Large 64/128-bit interactive grids may require additional compact-layout or virtualization polish on narrow/mobile screens even though byte grouping is exposed in shared XAML.
-8. Source-level XAML/XML and binding-contract checks reduce regression risk but do not replace Avalonia XAML compilation, real UI automation, or screen-reader/touch testing.
+8. Source-level XAML/XML, binding, adaptive-layout, and touch-target checks reduce regression risk but do not replace Avalonia XAML compilation, real UI automation, screen-reader/touch testing, or large-text validation.
 9. History preview/copy export is implemented; platform-native file-save/share UX remains separate release polish.
 
 ## Validation Status
@@ -196,6 +199,10 @@ These controls are source-wired and protected by the shared UI contract validato
 - Shared clipboard composition tests: IMPLEMENTED
 - Shared XAML command/property contract validator: IMPLEMENTED
 - Avalonia XAML XML well-formedness validator: IMPLEMENTED
+- Adaptive layout contract validator: IMPLEMENTED
+- Adaptive layout validator Python tests: IMPLEMENTED
+- Touch-target regression validator: IMPLEMENTED
+- Touch-target validator Python tests: IMPLEMENTED
 
 ### This continuation execution
 
@@ -216,7 +223,7 @@ A check is never marked PASS unless it actually ran and its result was observed.
 
 The next development pass should begin with the first still-incomplete item below rather than recreating completed modules:
 
-1. Adaptive/mobile layout pass for Calculator, Programmer, Converter, Graph, Date, FX, History, and advanced modes.
+1. Runtime adaptive/mobile layout polish for Calculator, Programmer, Converter, Graph, Date, FX, History, and advanced modes; prioritize long outputs and narrow touch interaction.
 2. Accessibility audit and screen-reader/focus/keyboard refinements, especially the large bit grid, long exports, and graph experience.
 3. Inspect actual GitHub Actions/check results and fix any real compile/analyzer/test failures.
 4. Add reliable shared-shell UI/integration tests where the Avalonia test stack is stable.
