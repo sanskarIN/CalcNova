@@ -305,17 +305,22 @@ public sealed class CalculatorViewModel : ViewModelBase
         }
 
         var (start, end) = NormalizedSelection();
-        var replacedLength = end - start;
-        var nextLength = Expression.Length - replacedLength + token.Length;
-        if (nextLength > EvaluationOptions.Default.MaximumExpressionLength)
+        try
         {
-            StatusMessage = "Expression limit reached.";
-            return;
+            var edit = CalculatorSelectionEditor.ApplyToken(
+                Expression,
+                start,
+                end,
+                token,
+                EvaluationOptions.Default.MaximumExpressionLength);
+            Expression = edit.Expression;
+            StatusMessage = string.Empty;
+            RequestSelection(edit.CaretIndex);
         }
-
-        Expression = Expression[..start] + token + Expression[end..];
-        StatusMessage = string.Empty;
-        RequestSelection(start + token.Length);
+        catch (InvalidOperationException exception)
+        {
+            StatusMessage = exception.Message;
+        }
     }
 
     private void ImportExpression(object? parameter)
