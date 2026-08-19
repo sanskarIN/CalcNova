@@ -66,15 +66,17 @@ This document distinguishes implemented source/shared-app integration from remai
 - signed/unsigned two's-complement interpretation;
 - fixed-width bit-string visualization;
 - full 8/16/32/64/128-bit interactive bit grid;
+- byte-grouped shared presentation for large bit grids;
+- explicit copy actions for binary/octal/decimal/hex/fixed-width bit representations;
 - accessible bit-cell state names;
 - fixed-width masked non-decimal output with signed decimal interpretation;
 - Unicode scalar/code-point parsing, formatting, scalar-to-text, and bounded text inspection;
-- visible shared Unicode code-point workflow.
+- visible shared Unicode code-point workflow;
+- explicit copy actions for decoded code-point and inspected-text results.
 
 ### Remaining product work
 
-- byte/nibble grouping and compact-layout polish for large bit grids;
-- accessible copy actions for radix representations;
+- compact-layout/virtualization polish for 64/128-bit grids;
 - screen-reader and keyboard validation on supported platforms.
 
 ## Unit converter
@@ -94,15 +96,17 @@ Additional implemented source/app behavior:
 - 1–17 significant-digit output precision with shared presets;
 - versioned pair persistence tokens;
 - persisted precision/recent/favorite state through shared settings;
-- automatic restore and deliberate-change autosave.
+- automatic restore and deliberate-change autosave;
+- category-scoped unit search;
+- selected search-result assignment to From/To units;
+- explicit result copy;
+- change-aware clear-recents management.
 
 ### Remaining product work
 
-- searchable unit/category selectors;
-- result copy action;
 - optional per-category default pairs;
-- clear-recents management;
-- compact responsive layout refinement.
+- compact responsive layout refinement;
+- target-platform clipboard/accessibility validation.
 
 ## Currency converter
 
@@ -144,12 +148,15 @@ Additional implemented source/app behavior:
 - delete one/clear all;
 - history-limit/settings integration;
 - shared history UI/view model;
-- TXT/CSV/JSON export.
+- bounded TXT/CSV/JSON export engine;
+- explicit export-format selection;
+- export preview for currently loaded/search-matching entries;
+- explicit clipboard-copy export action.
 
 ### Remaining product work
 
 - richer grouped/multi-select management where it improves usability;
-- platform-specific export/share polish;
+- platform-specific file-save/share polish;
 - additional UI/integration automation.
 
 ## Graphing
@@ -161,26 +168,33 @@ Additional implemented source/app behavior:
 - invalid-sample/discontinuity segmentation;
 - graph viewport model;
 - interactive Avalonia plot control;
-- deterministic SVG export;
+- deterministic accessible SVG export;
+- explicit SVG generation/copy workflow;
 - central-difference derivative approximation;
 - bracketed bisection root finding;
 - composite Simpson definite integration;
 - bounded numerical-analysis options;
-- visible derivative/root/integral controls with approximate-result labeling.
+- visible derivative/root/integral controls with approximate-result labeling;
+- nearest sampled-point tracing;
+- bounded single-expression table-of-values CSV preview/copy;
+- bounded newline-separated multi-expression sampling;
+- stable generated series identities;
+- identified multi-expression CSV preview/copy.
 
 ### Remaining product work
 
-- multiple-expression UX;
-- trace/table-of-values;
+- deterministic multi-series color assignment by theme;
 - final pan/zoom/reset controls and labels;
-- richer export UI;
+- compact/mobile graph-control refinement;
 - expanded numerical edge-case coverage.
 
 ## Statistics
 
 ### Implemented source/app integration
 
-Statistics module and shared view model are present with dataset analysis flows and tests.
+- statistics module and shared view model;
+- dataset analysis flows and tests;
+- explicit clipboard copy for the current analysis summary.
 
 ### Later expansion
 
@@ -205,13 +219,18 @@ Equation-solving module and shared view model are present, including quadratic w
 
 ### Implemented source/app integration
 
-Matrix module and shared view model include determinant, inverse, rank, and linear-system solving workflows with tests.
+- determinant;
+- inverse;
+- rank;
+- linear-system solving;
+- shared view model/tests;
+- explicit clipboard copy for the current matrix result.
 
 ### Later expansion
 
 - richer matrix editing;
 - additional vector operations;
-- copy/import/export ergonomics.
+- file import/export ergonomics.
 
 ## Settings and support
 
@@ -240,8 +259,12 @@ Matrix module and shared view model include determinant, inverse, rank, and line
 - 54-pixel standard calculator keys;
 - keyboard Enter/Escape/Backspace handling for the primary calculator workflow;
 - accessible names for programmer bit cells;
+- byte-grouped programmer presentation;
 - textual alternatives for bit patterns and graph-analysis results;
-- reduced-motion/high-contrast preference fields in settings.
+- graph CSV output and accessible SVG export paths;
+- reduced-motion/high-contrast preference fields in settings;
+- source-level shared XAML command/property contract validation;
+- source-level Avalonia XML well-formedness validation.
 
 ### Remaining validation/polish
 
@@ -250,17 +273,19 @@ Matrix module and shared view model include determinant, inverse, rank, and line
 - high-contrast/theme verification;
 - large-text/narrow-window validation;
 - compact mobile layout pass;
-- graph accessibility/table-of-values improvements.
+- real Avalonia UI automation and target accessibility validation.
 
 ## Privacy baseline
 
 - local calculation;
 - local fixed conversion;
 - local history/settings paths;
+- local history export generation;
 - no account required for ordinary use;
 - no advertising SDK by default;
 - no behavioral analytics by default;
 - user-triggered clipboard reads only;
+- user-triggered clipboard writes only;
 - network-enhanced features optional.
 
 ## Platforms
