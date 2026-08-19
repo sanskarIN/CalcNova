@@ -1,449 +1,262 @@
 # What Changed
 
-## Active continuation — 2026-08-19
+## Final source-audit checkpoint — 2026-08-19
 
-This file is the current continuation checkpoint for CalcNova. The previous cumulative `what_changed.md` was preserved **verbatim** before this checkpoint at:
+This file is the live continuation checkpoint for CalcNova after the final source/documentation hardening pass.
 
-- `docs/history/what_changed_through_full_source_hardening_2026-08-19.md`
+Historical detail is preserved verbatim at:
 
-Nothing from the older cumulative log was discarded; it was archived unchanged so the active continuation file can remain practical to read and update while the repository continues to receive many small commits.
+- `docs/history/what_changed_through_full_source_hardening_2026-08-19.md` — earlier cumulative history;
+- `docs/history/what_changed_through_pre_final_audit_2026-08-19.md` — the complete active continuation immediately before this final audit.
 
-## Scope of this continuation
+The detailed final review is documented at:
 
-Work resumed from the actual current `main` branch and deliberately avoided recreating source modules already implemented. The continuation concentrated on remaining source/product polish that could be completed safely without pretending that unavailable platform/runtime evidence exists.
+- `docs/FINAL_SOURCE_AUDIT_2026-08-19.md`.
 
-The main completed areas in this pass are:
+## Final audit scope
 
-- graph multi-series presentation hardening;
-- local Unicode scalar metadata and its shared UI;
-- Unicode metadata copy workflows;
-- graph numerical-analysis extreme-value safety;
-- graph workload-budget regressions;
-- dedicated source validators/workflows and release-preflight integration;
-- additional visible localization migration for reviewed product surfaces;
-- documentation/roadmap synchronization.
+The final pass inspected the current `main` source/documentation/release-contract state rather than recreating already completed modules.
 
-## Graphing — deterministic multi-series presentation
+Work concentrated on:
 
-### Added active plot presentation state
+- concrete correctness bugs discovered by comparing source, tests, validators, and documentation;
+- missing entries in the integrated SDK-independent release preflight;
+- stale feature/roadmap/public documentation;
+- preserving conservative validation/evidence semantics;
+- leaving a clean continuation boundary for the first real compiled/platform evidence pass.
 
-- Added `GraphPlotMode` to distinguish the active single-expression plot from the active multi-expression plot.
-- `GraphingViewModel.PlotCommand` explicitly restores single-series presentation.
-- `GraphingViewModel.PlotMultipleCommand` explicitly activates multi-series presentation after successful sampling.
-- Failed single-series plotting keeps the single-series presentation contract deterministic.
-- Multi-expression state remains separately represented by `MultiSeries`, `MultiTableRows`, and `MultiTableCsv`.
+## Concrete bugs fixed
 
-### Added multi-series rendering to the interactive plot
+### Exact rational validator mismatch
 
-- Extended `GraphPlotControl` with a `Series` property for multiple `GraphExpressionSample` values.
-- Multi-series rendering uses the graph-domain presentation catalog rather than depending on color alone.
-- Single-series rendering retains a solid presentation.
-- `FitToData()` includes finite points across every active series when multi-series data is supplied.
-- The existing viewport interaction remains available:
-  - pointer drag pan;
-  - pointer-wheel zoom;
-  - keyboard arrow-key pan;
-  - numpad Add/Subtract zoom;
-  - Home reset;
-  - `F` fit-to-data;
-  - double-tap/double-click fit behavior.
+`tools/validate_rational_numbers.py` expected a stale magnitude-check text marker that did not match the current implementation. The validator was aligned with the real `GetBitLength()` guard.
 
-### Centralized non-color series differentiation
+This prevents the validator's own repository-validity test from failing because of a stale source marker.
 
-During concurrent graph work, the initial App-local pattern catalog was superseded by a graph-domain implementation. The duplicate App-local pattern adapter was removed so there is one canonical series-pattern contract.
+### `default(RationalNumber)` canonicalization
 
-Current graph-domain presentation includes:
+`RationalNumber` is a C# value type, so callers can always create `default(RationalNumber)` without invoking its validating constructor.
 
-- deterministic series-index-to-pattern mapping;
-- distinct representative pattern masks;
-- human-readable line-pattern labels;
-- stable series identity/label/expression information;
-- valid/invalid sampled-point counts in presentation metadata;
-- text legend generation that does not require color perception.
+The previous auto-property representation therefore allowed a default value to expose denominator zero even though normal construction rejects zero denominators.
 
-### Shared graph synchronization
+The type now uses backing fields and exposes denominator `1` for the zero-initialized backing state. The default value therefore behaves as canonical exact zero rather than an invalid synthetic `0/0` value.
 
-`MainView` now synchronizes the shared graph control with the active `GraphingViewModel` presentation:
+Added regression coverage verifies:
 
-- single mode supplies `Segments`;
-- multi mode supplies `MultiSeries`;
-- stale inactive plot data is removed from the renderer;
-- the multi-series legend is shown only when multi-series presentation is active;
-- graph property-change notifications keep the renderer and legend synchronized.
+- equality with `RationalNumber.Zero`;
+- numerator `0`;
+- denominator `1`;
+- integer classification;
+- string representation `0`;
+- arithmetic with `One`;
+- exact comparison with zero.
 
-### Graph presentation tests and validation
+The source validator now protects this default-value contract.
 
-Added or expanded coverage for:
+### Exact-rational raw input budget bypass
 
-- multi-series combined viewport fitting;
-- deterministic pattern assignment;
-- pattern-mask distinction;
-- presentation legend content;
-- active plot-mode switching;
-- shared-shell multi-series graph integration;
-- graph presentation source contracts.
+The exact-rational documentation required the character workload limit to be applied before trimming input, but the parser checked `trimmed.Length`.
 
-Dedicated graph-series presentation validation and its regression tests are included in the SDK-independent release preflight.
+That allowed a tiny valid number to be surrounded by arbitrarily large whitespace and evade the intended raw-input budget.
 
-## Unicode — local scalar metadata
+The parser now checks `text.Length` before trimming.
 
-### Added `UnicodeScalarMetadata`
+Added regression coverage rejects oversized whitespace-padded rational input, and the source validator now requires both the pre-trim guard and its regression test.
 
-Added a domain record containing:
+### Engineering-notation exponent contract mismatch
 
-- scalar integer value;
-- canonical `U+XXXX` code-point text;
-- rendered scalar text;
-- Unicode plane number;
-- .NET Unicode general category;
-- UTF-8 byte count;
-- UTF-16 code-unit count;
-- compact human-readable summary.
+The engineering-notation validator/documentation required explicit finite engineering exponent bounds while the formatter/parser and tests had not fully implemented that contract.
 
-### Extended `UnicodeCodePointHelper`
+The implementation now defines:
 
-Added local-only metadata APIs:
+- `MinimumEngineeringExponent = -324`;
+- `MaximumEngineeringExponent = 306`.
 
-- `Describe(int codePoint)`;
-- `DescribeText(string?, int maximumRunes = 64)`.
+Exponent-form parsing rejects values outside that range with `OverflowException`.
 
-The helper continues to use Unicode scalar semantics rather than treating UTF-16 code units as independent characters.
+Regression coverage includes both non-zero and zero mantissas outside the allowed range so inputs such as `0e+309` cannot bypass the exponent workload policy simply because their mathematical result would be zero.
 
-Important behavior:
+## Integrated release-preflight hardening
 
-- surrogate code points remain invalid standalone scalar values;
-- supplementary-plane characters are enumerated as one scalar;
-- UTF-8 byte width is derived locally;
-- UTF-16 width reflects one or two code units as appropriate;
-- the existing bounded inspection limit is shared by metadata inspection;
-- non-positive inspection limits are rejected;
-- metadata derivation does not require network access.
+`tools/release_preflight.py` was audited against focused validators added during the broader continuation.
 
-Representative regression expectations include:
+The integrated source gate now explicitly includes the recent critical validator families and regression suites for:
 
-- `U+0041` → plane 0, `UppercaseLetter`, UTF-8 1 byte, UTF-16 1 unit;
-- `U+1F600` → plane 1, `OtherSymbol`, UTF-8 4 bytes, UTF-16 2 units.
+- exact rational arithmetic;
+- engineering notation;
+- artifact manifest/integrity infrastructure;
+- machine-readable release-evidence infrastructure;
+- dynamic shared-control accessibility;
+- exact-tag unsigned iOS simulator release workflow.
 
-### Exposed metadata through `CodePointViewModel`
+The preflight inventory regression was expanded at the same time so these checks cannot silently disappear from the unified source gate.
 
-Added:
+The current preflight remains a source-contract gate. It does not replace compiled/runtime/platform validation.
 
-- `CodePointMetadata`;
-- `TextMetadata`;
-- `CopyCodePointMetadataCommand`;
-- `CopyTextMetadataCommand`.
+## Completed capabilities synchronized into documentation
 
-Decode behavior now projects metadata while preserving the existing decode result format.
+The public documentation now reflects source capabilities already implemented on `main`, including:
 
-Text inspection now projects one metadata summary per Unicode scalar while preserving the existing code-point-list result format.
+### Calculator and numeric utilities
 
-Invalid input clears stale metadata instead of leaving previous metadata visible.
-
-### Added shared Unicode metadata UI
-
-Added reusable `CodePointMetadataPanel` and injected it into the real shared Code mode.
-
-The panel provides:
-
-- local metadata explanation;
-- decoded scalar metadata;
-- inspected-text metadata;
-- `Copy scalar metadata` action;
-- `Copy inspected metadata` action.
-
-The panel explicitly explains that the category/plane/encoding-width information is derived locally without a network lookup.
-
-### Added Unicode metadata tests
-
-Coverage now includes:
-
-- Basic Latin metadata;
-- supplementary-plane metadata;
-- surrogate-pair-safe text inspection;
-- inspection-limit enforcement;
-- surrogate rejection;
-- view-model metadata projection;
-- stale-metadata clearing after invalid input;
-- metadata clipboard commands;
-- shared metadata-panel rendering;
-- metadata-panel command bindings.
-
-### Added Unicode metadata source validation
-
-Added:
-
-- `tools/validate_unicode_metadata.py`;
-- `tools/tests/test_validate_unicode_metadata.py`;
-- `.github/workflows/unicode-metadata-validate.yml`.
-
-The validator protects:
-
-- metadata record fields;
-- helper APIs;
-- local encoding/category derivation;
-- view-model metadata projection;
-- metadata copy commands;
-- shared panel wiring;
-- headless UI regression presence;
-- the local-first core contract by rejecting HTTP client/URL markers from the metadata implementation.
-
-The Unicode metadata validator and its regression test are included in `tools/release_preflight.py`.
-
-## Graph numerical-analysis hardening
-
-A parallel numerical-safety review found real extreme-finite-value risks in approximate graph analysis and hardened the implementation instead of merely adding tests around the previous arithmetic.
-
-### Hardened derivative analysis
-
-- Derivative sample points are required to remain finite.
-- Sample points that collapse to the requested X value because the step is too small relative to floating-point magnitude are rejected.
-- Non-finite derivative results are rejected deterministically.
-
-### Hardened root analysis
-
-- Added overflow-safe midpoint arithmetic.
-- Endpoint roots are returned immediately when within tolerance.
-- Midpoint collapse caused by floating-point resolution terminates deterministically using the better endpoint.
-- Non-finite evaluated values remain rejected.
-- Root search still fails when the interval does not bracket a sign change.
-- Root search fails deterministically when `MaximumRootIterations` is exhausted.
-
-### Hardened Simpson integration
-
-- Equal bounds return zero.
-- Reversed bounds preserve sign by evaluating the forward interval and negating the result.
-- Integration interval width is computed with reduced intermediate-overflow risk.
-- Sample positions use interpolation between the endpoints instead of an overflow-prone `minimum + width * index` form.
-- Non-finite sample points/results are rejected.
-
-### Added graph numerical edge-case regressions
-
-Added `GraphNumericalEdgeCaseTests.cs` covering:
-
-- left-endpoint root;
-- right-endpoint root;
-- non-finite root bounds;
-- configured root-iteration exhaustion;
-- equal integration bounds;
-- non-finite integration bounds;
-- non-finite derivative X.
-
-### Added graph workload-budget regressions
-
-Added `GraphWorkloadBudgetTests.cs` covering:
-
-- graph sample count above `GraphSampler.MaximumSamples`;
-- root iteration count below/above the supported range;
-- Simpson interval count above the configured maximum;
-- maximum integration budget above the hard cap;
-- invalid `MaximumAbsoluteY` values;
-- invalid discontinuity-jump thresholds.
-
-These tests complement the existing numerical baseline, extreme-bound, and options-boundary test suites.
-
-### Added graph workload source validation
-
-Added:
-
-- `tools/validate_graph_numerical_budgets.py`;
-- `tools/tests/test_validate_graph_numerical_budgets.py`;
-- `.github/workflows/graph-numerical-budgets-validate.yml`.
-
-The validator protects:
-
-- graph sample hard cap;
-- root iteration range;
-- integration hard/configured limits;
-- Simpson even-interval requirement;
-- maximum-absolute-Y guard;
-- discontinuity-threshold guard;
-- edge-case regression presence;
-- workload regression presence.
-
-This validator and its regression suite are included in the integrated SDK-independent release preflight alongside the separate extreme numerical-analysis safety validator.
-
-## Localization — reviewed product surfaces
-
-The localization continuation expanded the semantic catalog and live literal mapping beyond the earlier shell/calculator/onboarding foundation.
-
-### Added semantic product-surface keys/catalog entries
-
-The current branch added reviewed English/Hindi strings for settings, history, currency, About/support, and related product surfaces.
-
-### Expanded live localization mapping
-
-Reviewed shared product-surface literals are mapped into `ShellLocalization` so culture changes can update more visible content without duplicating translation logic in individual modes.
-
-### Added settings checkbox localization
-
-The live localization capture/apply path now includes settings checkbox content in addition to TextBlock/Button/TextBox watermark targets.
-
-Regression coverage includes Hindi settings checkbox labels and Hindi product-surface mappings.
-
-### Localization limitation remains explicit
-
-CalcNova still does **not** claim that every visible XAML string has been migrated or that Hindi compact/large-text layout has been runtime validated. Remaining hard-coded English must continue to be migrated in compile-verified increments.
-
-## Release-source preflight integration
-
-The integrated preflight now includes the current graph/Unicode contracts in addition to the existing repository, UI, accessibility, settings, packaging, platform, localization, and release validators.
-
-Newly represented checks include:
-
-- graph-series presentation;
-- numerical-analysis safety;
-- graph workload budgets;
-- Unicode metadata contracts;
-- their Python validator regression suites.
-
-`tools/tests/test_release_preflight.py` now requires these validators and test modules in the inventory so they cannot silently disappear from the release-source gate.
-
-## Documentation added/updated
+- selection/caret-aware keypad editing and selection-preserving wrapping;
+- safe printable/shifted operator mappings outside active text-editing fields;
+- bounded exact rational arithmetic;
+- Calculator exact-rational panel/workflow;
+- bounded engineering-notation formatting/parsing;
+- Calculator engineering-notation panel/workflow.
+
+### Programmer and Unicode
+
+- base 2–36 programmer workflows;
+- 8/16/32/64/128-bit fixed-width tools;
+- local Unicode scalar metadata;
+- shared Unicode metadata/result copy workflows.
+
+### Statistics
+
+- bounded paired X/Y parsing;
+- population/sample covariance;
+- Pearson correlation when defined;
+- ordinary least-squares regression;
+- coefficient of determination when defined;
+- regression prediction;
+- degenerate/non-finite/oversized input handling;
+- shared paired-statistics panel and copy workflow.
+
+### Graphing
+
+- deterministic multi-series line-pattern differentiation that does not rely on color alone;
+- synchronized multi-series text legend;
+- combined-series fit-to-data behavior;
+- derivative/root/integration numerical hardening;
+- explicit graph workload-budget regressions;
+- bounded export previews with complete private copy payloads.
+
+### Accessibility/adaptive/localization
+
+- dynamic graph-control focus/touch-target regression/source contracts;
+- compact/medium/expanded adaptive source profiles;
+- reviewed English/Hindi runtime mappings beyond the earlier shell/calculator/onboarding subset;
+- explicit conservative runtime accessibility evidence vocabulary.
+
+### Release/integrity/evidence tooling
+
+- broad SDK-independent source validators and Python regressions;
+- unified source preflight;
+- artifact manifest generation/verification and SHA-256 integrity infrastructure;
+- machine-readable validation evidence schema/model/runner/verifier;
+- platform workflow source contracts;
+- exact-tag unsigned iOS simulator release validation.
+
+## Documentation completed/synchronized in the final pass
 
 ### Added
 
-- `docs/UNICODE_METADATA.md`
-- `docs/GRAPH_NUMERICAL_SAFETY.md`
-- `docs/history/what_changed_through_full_source_hardening_2026-08-19.md` — exact archived copy of the previous cumulative change log.
+- `docs/FINAL_SOURCE_AUDIT_2026-08-19.md`
+- `docs/history/what_changed_through_pre_final_audit_2026-08-19.md`
 
 ### Updated
 
-- `docs/README.md` — indexes the new Unicode and graph-safety guides.
-- `docs/ROADMAP.md` — moves completed Unicode metadata, deterministic multi-series presentation, and graph workload hardening out of the future-work list.
-- `what_changed.md` — current continuation checkpoint.
+- `README.md` — current public capability/evidence overview;
+- `CHANGELOG.md` — current Unreleased feature/fix/security/validation inventory;
+- `docs/README.md` — indexes exact rationals, engineering notation, bivariate statistics, validation evidence, and final audit;
+- `docs/FEATURES.md` — removes already-completed work from future lists and documents current feature contracts;
+- `docs/ROADMAP.md` — moves exact rational, engineering notation, covariance/correlation/regression, printable keyboard operators, graph presentation, and numerical hardening to completed work;
+- `docs/SOURCE_PREFLIGHT.md` — documents the current integrated validator inventory and its limits;
+- `docs/EXACT_RATIONALS.md` — documents default-value canonicalization and pre-trim input-budget enforcement;
+- `what_changed.md` — this final checkpoint.
 
-## Validation status
+## Key final-audit commits
+
+The final audit deliberately used multiple focused commits. Important commits include:
+
+- `cf2597fc` — fix(core): align rational source validator with magnitude guard
+- `59d75449` — fix(core): canonicalize default rational values
+- `20e2240a` — test(core): cover default rational canonicalization
+- `a810fc2f` — ci(core): guard default rational canonicalization
+- `d332aab1` — ci(release): include exact rational validation in preflight
+- `6b9e0097` — test(release): require exact rational preflight coverage
+- engineering-notation implementation/test commits enforcing explicit finite exponent bounds
+- release-preflight commits integrating engineering notation, artifact integrity, structured evidence, dynamic controls accessibility, and iOS release workflow validation
+- `a5339118` — fix(core): enforce rational budget before trimming
+- `9c8d532d` — test(core): cover padded rational input budget
+- `cab5e6ef` — ci(core): guard pre-trim rational workload budget
+- `e76a427c` — docs(core): document rational default safety contract
+- `a1856f78` — docs(release): synchronize complete source preflight inventory
+- `9a12dde8` — docs: index completed math and release-evidence guides
+- `50321d45` — docs: synchronize implemented feature inventory
+- `9c8d1391` — docs: move completed math and keyboard work out of roadmap
+- `e70161a5` — docs(audit): record final source hardening review
+- `22a43f21` — docs(audit): index final source audit
+- `beb27a29` — docs: refresh public capability overview
+- `5cbecf9c` — docs: finalize unreleased changelog
+- `57474c57` — docs(history): archive pre-final continuation checkpoint
+
+## Validation evidence status
 
 The evidence policy remains conservative.
 
-### Not observed locally
+### NOT RUN locally in the final audit environment
 
-The active assistant execution environment does not provide the required .NET 10 SDK, so the following are **NOT RUN** locally:
+The required .NET 10 SDK/toolchains are unavailable here, so the following are **NOT RUN** locally:
 
 - `dotnet restore`;
 - `dotnet format --verify-no-changes`;
-- compiled builds;
+- compiled solution builds;
 - compiled unit/integration tests;
-- Avalonia headless tests;
-- target-platform package builds.
+- Avalonia compiled-XAML/headless execution;
+- target-platform application/package builds;
+- signing/notarization/provisioning/store submission checks;
+- real device/browser accessibility and adaptive-layout audits.
 
-### Independent repository clone attempt
+### Integrated source preflight
 
-An independent container clone was attempted in order to run the Python validators against a fresh `main` snapshot. The container environment could not resolve `github.com`, so that clone/validator run did not execute and is **not** treated as PASS.
+The final current repository tree was inspected and its source contracts/preflight inventory were hardened through GitHub source/commit access.
 
-### GitHub status observation
+The complete `python tools/release_preflight.py` command was **not re-executed locally against a materialized final repository tree** in this environment, because the environment used for local execution could not materialize the repository from GitHub.
 
-A combined-status lookup performed earlier in this continuation exposed no status contexts for the checked commit. An empty status list is not treated as a successful CI result.
+Therefore this file does **not** record the final integrated source preflight as PASS solely because its source exists.
 
-The source validators/workflows are implemented, but an observable successful run is still required before recording CI PASS evidence.
+### GitHub/CI evidence
+
+GitHub status/workflow results must be observed for the exact current commit before being recorded as PASS. An absent/empty status list is not a successful CI result.
 
 ### Commit identity
 
-Current live branch metadata reports recent commits with author/committer identity `Sanskar <sanskarin@outlook.in>`.
+The repository commit metadata inspected during this continuation uses:
 
-## Remaining high-priority work
+`Sanskar <sanskarin@outlook.in>`
 
-The remaining work is increasingly dependent on observed execution rather than missing source modules:
+for author/committer identity on the created commits.
 
-1. observe real .NET 10 restore/format/build/analyzer/test results and fix every concrete failure;
-2. observe the Avalonia headless workflow and fix compiled-XAML/headless failures;
-3. validate Desktop launch/clipboard/persistence/keyboard/scaling/packaging on Windows, Linux, and macOS;
-4. validate Browser publish/load/storage/clipboard/keyboard/accessibility behavior;
-5. validate Android workload build, emulator/device layouts, clipboard/persistence, TalkBack/large text, signing, and AAB/store behavior;
-6. validate iOS simulator/device layout, clipboard/persistence, Dynamic Type/VoiceOver, signing, archive, TestFlight, and App Store behavior;
-7. perform the runtime accessibility matrix with observed evidence;
-8. validate compact/medium/expanded layouts on real target sizes, especially programmer 64/128-bit surfaces and long exports;
-9. continue remaining visible-XAML localization migration and validate Hindi Devanagari layout;
-10. improve graph axis/grid labels and optional explicit viewport controls only after current interaction behavior is runtime validated;
-11. add native file-save/share export UX only after target platform abstractions are validated;
-12. run the final release-candidate gate with observed source, compiled, platform, accessibility, privacy, signing, and packaging evidence.
+## Remaining work is evidence-dependent
 
-## Focused commits in this continuation
+No new core source module should be recreated simply to make the project appear more complete.
 
-### Graph presentation
+The remaining high-priority work is:
 
-- `54b30045` — feat(graph): define deterministic series line patterns (initial App-local increment; later superseded by the graph-domain catalog).
-- `27977d58` — test(graph): cover deterministic series patterns.
-- `fba0e88f` — feat(graph): render multi-series with non-color patterns.
-- `b116dfdd` — test(graph): cover multi-series plot viewport.
-- `b960b246` — feat(graph): model active plot presentation mode.
-- `9eb55d95` — feat(graph): track active single or multi-series plot.
-- `7c82942b` — refactor(graph): remove superseded app-local pattern adapter.
-- `8f42bc0d` and subsequent graph-domain commits — centralize deterministic line-pattern/presentation behavior.
-- `72908853` — feat(graph): synchronize single and multi-series plot with text legend.
-- `39127179` — headless graph presentation integration coverage.
-- `40fea338` — test(release): require graph-series presentation in preflight.
-
-### Unicode metadata
-
-- `b5c41302` — feat(unicode): add local scalar metadata model.
-- `9bec3855` — feat(unicode): describe scalar category and encodings locally.
-- `2b26abb2` — test(unicode): cover local scalar metadata.
-- `2f2dcf51` — feat(unicode): expose scalar metadata in code-point view model.
-- `44692f5c` — test(unicode): cover metadata view-model projection.
-- `a9c3742e` — ci(unicode): validate local scalar metadata contracts.
-- `e39d4707` — test(unicode): cover scalar metadata source validator.
-- `7f271e78` — ci(unicode): run scalar metadata source validation.
-- `d53b0817` — ci(release): include Unicode metadata validation.
-- `8d211e4f` — test(release): require Unicode metadata preflight coverage.
-- `b042687f` — feat(unicode): add reusable scalar metadata panel.
-- `75f255f0` — feat(unicode): surface local scalar metadata in shared UI.
-- `a7f8766e` — test(unicode): cover shared metadata panel rendering.
-- `0f2cf2e4` — ci(unicode): validate shared metadata panel wiring.
-- `61d98914` — ci(unicode): watch metadata UI integration paths.
-- `3ed07e3b` — feat(unicode): add metadata clipboard commands.
-- `c39426f6` — test(unicode): cover metadata clipboard commands.
-- `18c54d89` — feat(unicode): add metadata copy controls.
-- `958abf8c` — test(unicode): cover metadata panel copy bindings.
-- `08f618a8` — ci(unicode): guard metadata copy workflow.
-- `2f03502f` — ci(unicode): watch metadata copy tests.
-
-### Numerical analysis / workload hardening
-
-- `0cda98e4` — fix(graph): harden numerical analysis against extreme finite bounds.
-- `6e003ab3` — fix(graph): avoid overflow in numerical sample interpolation.
-- `ac8e4af6` — test(graph): cover extreme numerical-analysis boundaries.
-- `0ea5fbfd` — test(graph): cover numerical-analysis workload option boundaries.
-- `9ace1754` — ci(graph): add numerical-analysis hardening validator.
-- `3c2050a9` — test(graph): cover numerical-analysis validator.
-- `a888d75f` — ci(graph): validate numerical-analysis safety contracts.
-- `d29e35a9` — ci(release): include numerical-analysis safety validation.
-- `df0907eb` — test(release): require numerical-analysis safety in preflight.
-- `9db3d929` — test(graph): cover numerical analysis edge cases.
-- `781432ad` — test(graph): cover graph workload budgets.
-- `65618d2a` — ci(graph): validate numerical workload budget contracts.
-- `8a3aa112` — test(graph): cover numerical budget source validator.
-- `938969af` — ci(graph): run numerical budget validation.
-- `eba84798` — ci(release): include graph workload budget validation.
-- `a9ea2f08` — test(release): require graph workload budgets in preflight.
-
-### Localization continuation
-
-- `2a9e635b` — feat(localization): add settings/history/currency/About keys.
-- `3a658326` — feat(localization): add English product surface strings.
-- `635f4e97` — feat(localization): add Hindi product surface strings.
-- `c6fb2f3f` — feat(localization): map reviewed product surface literals.
-- `2737bb7c` — test(localization): cover Hindi currency/history/settings/About surfaces.
-- `bacaa67a` — feat(localization): localize settings checkbox content live.
-- `68df2f90` — test(localization): cover Hindi settings checkbox labels.
-- `c3f7a0d2` — ci(localization): validate reviewed product surfaces and checkbox wiring.
-- `871cac32` — ci(localization): trigger checks for product surface localization.
-
-### Documentation/checkpoint
-
-- `e28f3306` — docs(roadmap): mark Unicode and graph hardening milestones complete.
-- `5451e498` — docs(unicode): document local scalar metadata workflow.
-- `ca55bc6e` — docs(graph): document numerical safety and workload bounds.
-- `6e5dfb28` — docs: index Unicode and graph safety guides.
-- `7489a970` — docs(changelog): archive cumulative change history verbatim.
+1. observe real .NET 10 restore/format/analyzer/build/test output and fix any concrete failures;
+2. observe the Avalonia headless workflow and fix any compiled-XAML/headless failures;
+3. validate Windows/Linux/macOS Desktop launch, clipboard, persistence, keyboard, scaling, and packaging;
+4. validate Browser/WebAssembly publish/load/storage/clipboard/keyboard/accessibility behavior;
+5. validate Android workload builds, emulator/device layouts, persistence, clipboard, TalkBack/large text, signing, AAB, and store behavior;
+6. validate iOS simulator/device behavior, Dynamic Type/VoiceOver, persistence/clipboard, signing/provisioning/archive/TestFlight/App Store behavior;
+7. execute and populate the runtime accessibility matrix with observed keyboard/screen-reader/contrast/large-text/touch/reduced-motion evidence;
+8. validate compact/medium/expanded layouts on real target sizes, especially wide programmer grids and long export/statistics/calculator-extension surfaces;
+9. migrate the remaining hard-coded English shared XAML to the semantic localization layer in compile-verified increments and validate Hindi/Devanagari layouts;
+10. verify real produced release artifacts with the artifact manifest/checksum tooling;
+11. generate and verify structured release evidence from the exact release-candidate commit;
+12. run the final release gate with actual packaging/signing/store requirements for each claimed platform.
 
 ## Continuation rule
 
-For the next continuation:
+The next continuation must begin from observed evidence rather than duplicating completed source work:
 
 1. read `PROJECT_STATE.md`;
-2. read this active `what_changed.md`;
-3. use the archived historical change log only when older implementation detail is needed;
-4. inspect current `main` before writing because parallel continuations may still be active;
-5. do not recreate completed graph/Unicode/localization source work;
-6. do not report unavailable or unobserved runtime checks as passing.
+2. read this file;
+3. read `docs/FINAL_SOURCE_AUDIT_2026-08-19.md`;
+4. inspect the actual current `main` commit;
+5. inspect CI/workflow results or run the required commands in a suitable environment;
+6. fix only concrete failures or clearly evidenced remaining product gaps;
+7. never convert source presence, workflow presence, or unavailable checks into PASS evidence.
