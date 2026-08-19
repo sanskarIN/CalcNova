@@ -1,12 +1,15 @@
 using System.Numerics;
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Services;
+using CalcNova.Platform.Clipboard;
 using CalcNova.Programmer;
 
 namespace CalcNova.App.ViewModels;
 
 public sealed class ProgrammerViewModel : ViewModelBase
 {
+    private readonly IClipboardService? _clipboardService;
     private string _input = "42";
     private string _operand = "15";
     private int _inputBase = 10;
@@ -22,9 +25,11 @@ public sealed class ProgrammerViewModel : ViewModelBase
     private string _lastOperation = string.Empty;
     private string _errorMessage = string.Empty;
     private IReadOnlyList<BitCellViewModel> _bits = Array.Empty<BitCellViewModel>();
+    private IReadOnlyList<BitGroupViewModel> _bitGroups = Array.Empty<BitGroupViewModel>();
 
-    public ProgrammerViewModel()
+    public ProgrammerViewModel(IClipboardService? clipboardService = null)
     {
+        _clipboardService = clipboardService;
         ConvertCommand = new RelayCommand(_ => Convert());
         ToggleBitCommand = new RelayCommand(ToggleBit);
         AndCommand = new RelayCommand(_ => ApplyBinaryOperation("AND", BitwiseCalculator.And));
@@ -34,6 +39,7 @@ public sealed class ProgrammerViewModel : ViewModelBase
         ShiftLeftCommand = new RelayCommand(_ => ApplyShift("SHL", BitwiseCalculator.ShiftLeft));
         LogicalShiftRightCommand = new RelayCommand(_ => ApplyShift("LSHR", BitwiseCalculator.LogicalShiftRight));
         ArithmeticShiftRightCommand = new RelayCommand(_ => ApplyShift("ASHR", BitwiseCalculator.ArithmeticShiftRight));
+        CopyRepresentationCommand = new AsyncRelayCommand(CopyRepresentationAsync);
         Convert();
     }
 
@@ -74,6 +80,11 @@ public sealed class ProgrammerViewModel : ViewModelBase
         get => _wordSize;
         set
         {
+            if (!WordSizes.Contains(value))
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Word size must be one of 8, 16, 32, 64, or 128 bits.");
+            }
+
             if (SetField(ref _wordSize, value))
             {
                 Convert();
@@ -161,6 +172,12 @@ public sealed class ProgrammerViewModel : ViewModelBase
         private set => SetField(ref _bits, value);
     }
 
+    public IReadOnlyList<BitGroupViewModel> BitGroups
+    {
+        get => _bitGroups;
+        private set => SetField(ref _bitGroups, value);
+    }
+
     public ICommand ConvertCommand { get; }
 
     public ICommand ToggleBitCommand { get; }
@@ -179,10 +196,9 @@ public sealed class ProgrammerViewModel : ViewModelBase
 
     public ICommand ArithmeticShiftRightCommand { get; }
 
-    public void ToggleBit(int bitIndex)
-    {
-        ToggleBit((object?)bitIndex);
-    }
+    public ICommand CopyRepresentationCommand { get; }
+
+    public void ToggleBit(int bitIndex) => ToggleBit((object?)bitIndex);
 
     private void Convert()
     {
@@ -218,9 +234,7 @@ public sealed class ProgrammerViewModel : ViewModelBase
         }
     }
 
-    private void ApplyBinaryOperation(
-        string label,
-        Func<BigInteger, BigInteger, int, BigInteger> operation)
+    private void ApplyBinaryOperation(string label, Func<BigInteger, BigInteger, int, BigInteger> operation)
     {
         try
         {
@@ -234,9 +248,7 @@ public sealed class ProgrammerViewModel : ViewModelBase
         }
     }
 
-    private void ApplyUnaryOperation(
-        string label,
-        Func<BigInteger, int, BigInteger> operation)
+    private void ApplyUnaryOperation(string label, Func<BigInteger, int, BigInteger> operation)
     {
         try
         {
@@ -249,9 +261,7 @@ public sealed class ProgrammerViewModel : ViewModelBase
         }
     }
 
-    private void ApplyShift(
-        string label,
-        Func<BigInteger, int, int, BigInteger> operation)
+    private void ApplyShift(string label, Func<BigInteger, int, int, BigInteger> operation)
     {
         try
         {
@@ -299,18 +309,37 @@ public sealed class ProgrammerViewModel : ViewModelBase
         {
             Bits = Enumerable.Range(0, WordSize)
                 .Select(offset => WordSize - offset - 1)
-                .Select(index => new BitCellViewModel(
-                    index,
-                    BitwiseCalculator.IsBitSet(value, index, WordSize),
-                    ToggleBit))
+                .Select(index => new BitCellViewModel(index, BitwiseCalculator.IsBitSet(value, index, WordSize), ToggleBit))
                 .ToArray();
-            return;
+        }
+        else
+        {
+            foreach (var bit in Bits)
+            {
+                bit.Update(BitwiseCalculator.IsBitSet(value, bit.Index, WordSize));
+            }
         }
 
-        foreach (var bit in Bits)
+        BitGroups = Bits
+            .Chunk(8)
+            .Select((bits, index) => new BitGroupViewModel((WordSize / 8) - index - 1, bits))
+            .ToArray();
+    }
+
+    private async Task CopyRepresentationAsync(object? parameter)
+    {
+        var key = parameter as string;
+        var text = key?.ToLowerInvariant() switch
         {
-            bit.Update(BitwiseCalculator.IsBitSet(value, bit.Index, WordSize));
-        }
+            "binary" => Binary,
+            "octal" => Octal,
+            "decimal" => Decimal,
+            "hexadecimal" => Hexadecimal,
+            "bits" => BitPattern,
+            _ => string.Empty
+        };
+
+        ErrorMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, text, "programmer value");
     }
 
     private static bool TryGetBitIndex(object? parameter, out int bitIndex)
