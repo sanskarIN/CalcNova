@@ -16,6 +16,7 @@ public sealed class ConverterViewModel : ViewModelBase
     private string _input = "1";
     private string _result = string.Empty;
     private string _errorMessage = string.Empty;
+    private int _significantDigits = 15;
     private bool _suppressPairRecording;
 
     public ConverterViewModel()
@@ -31,6 +32,8 @@ public sealed class ConverterViewModel : ViewModelBase
     }
 
     public IReadOnlyList<UnitCategory> Categories { get; } = Enum.GetValues<UnitCategory>();
+
+    public IReadOnlyList<int> PrecisionOptions { get; } = [6, 9, 12, 15, 17];
 
     public UnitCategory SelectedCategory
     {
@@ -86,6 +89,23 @@ public sealed class ConverterViewModel : ViewModelBase
         set => SetField(ref _input, value ?? string.Empty);
     }
 
+    public int SignificantDigits
+    {
+        get => _significantDigits;
+        set
+        {
+            if (value is < 1 or > 17)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Precision must be between 1 and 17 significant digits.");
+            }
+
+            if (SetField(ref _significantDigits, value))
+            {
+                Convert();
+            }
+        }
+    }
+
     public string Result
     {
         get => _result;
@@ -126,7 +146,7 @@ public sealed class ConverterViewModel : ViewModelBase
         try
         {
             var converted = _converter.Convert(input, FromUnit.Id, ToUnit.Id);
-            Result = $"{converted.ToString("G15", CultureInfo.InvariantCulture)} {ToUnit.Symbol}";
+            Result = $"{converted.ToString($"G{SignificantDigits}", CultureInfo.InvariantCulture)} {ToUnit.Symbol}";
             ErrorMessage = string.Empty;
             if (!_suppressPairRecording)
             {
