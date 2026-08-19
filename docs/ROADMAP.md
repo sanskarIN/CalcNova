@@ -54,9 +54,9 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 
 ### Advanced modes
 
-- Statistics source module/view model.
+- Statistics source module/view model and shared summary-copy action.
 - Equation source module/view model.
-- Matrix source module/view model.
+- Matrix source module/view model and shared result-copy action.
 - Graph sampling and discontinuity segmentation.
 - Graph viewport and interactive plot control.
 - SVG graph export engine plus shared generation/copy workflow.
@@ -73,11 +73,12 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Browser-safe history/storage path.
 - Search/favorite/delete/clear history flows.
 - TXT/CSV/JSON history export engine.
+- Shared history export-format selection, preview, and clipboard copy.
 - Settings/preferences abstraction.
 - Converter preference persistence through shared settings.
 - Desktop, Browser/WebAssembly, Android, and iOS heads/composition.
 - Shared Avalonia `TopLevel` clipboard service attachment.
-- Shared clipboard dependency injection into Calculator, Programmer, Unicode, Converter, and Graphing modes.
+- Shared clipboard dependency injection into Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History modes.
 - Repository validation, format, test/build, coverage, security, advanced-utility, release, UI-contract, and platform workflow foundations.
 - Source-level shared-XAML command/property contract validation.
 - Source-level Avalonia XML well-formedness validation.
@@ -89,7 +90,7 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Replace remaining desktop-first assumptions with compact/mobile layouts.
 - Improve navigation when many modes are present on narrow screens.
 - Audit focus order and visible focus states.
-- Verify screen-reader behavior for the programmer bit grid, graph analysis, and dynamic results.
+- Verify screen-reader behavior for the programmer bit grid, graph analysis, long exports, and dynamic results.
 - Verify touch target sizes, large-text behavior, and high-contrast behavior.
 - Add reduced-motion behavior where animation is introduced.
 - Evaluate virtualization or alternative compact presentation for 64/128-bit programmer grids on narrow devices.
@@ -106,10 +107,10 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 ### Interaction polish
 
 - Improve cursor/selection-aware expression editing.
-- Add direct copy-result support to matrix/statistics outputs where useful.
-- Connect the existing history export engine to an explicit user-facing export workflow.
+- Add broader physical keyboard/numpad shortcuts.
 - Improve empty/error/loading states without hiding calculation details.
-- Refine graph controls for compact layouts without weakening workload bounds.
+- Refine graph controls and large export previews for compact layouts without weakening workload bounds.
+- Evaluate native file-save/share UX for history/graph exports after platform abstractions are validated.
 
 ## Next
 
