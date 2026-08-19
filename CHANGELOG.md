@@ -17,7 +17,7 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Selection-aware calculator keypad editing that inserts at the tracked caret, replaces selections, performs caret-aware Backspace, restores the requested TextBox caret, and supports selection-preserving function/parenthesis wrapping.
 - Safe top-row/numpad and printable/shifted calculator operator mappings outside active text-editing fields.
 - Bounded exact `BigInteger` rational arithmetic with canonical normalization, exact decimal/scientific parsing, arithmetic/comparison, workload limits, Calculator utility UI, tests, focused source validation, and release-preflight integration.
-- Bounded engineering-notation formatter/parser with 1–15 significant digits, explicit -324..306 engineering exponent limits, extreme-finite-value scaling, Calculator utility UI, tests, focused source validation, and release-preflight integration.
+- Bounded engineering-notation formatter/parser with 1–15 significant digits, explicit -324..306 engineering exponent limits, a 4,096-character input budget, non-zero-underflow rejection, extreme-finite-value scaling, Calculator utility UI, tests, focused source validation, and release-preflight integration.
 - Programmer mode with full base 2–36 selection, signed/unsigned fixed-width interpretation, bitwise operations, shifts, and 8/16/32/64/128-bit interactive grids.
 - Programmer byte-group presentation plus explicit binary/octal/decimal/hex/fixed-width bit copy actions.
 - Unicode scalar/code-point conversion, bounded text inspection, local general-category/plane/UTF-8/UTF-16 metadata, and explicit result/metadata copy workflows.
@@ -30,7 +30,7 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Graph sampling, discontinuity segmentation, viewport/plot support, derivative approximation, bracketed root finding, and Simpson integration.
 - Graph nearest-sample trace, bounded table-of-values CSV, bounded multi-expression sampling/identified CSV, and accessible SVG generation/copy workflows.
 - Deterministic multi-series graph line patterns and synchronized text legend so series identification does not depend on color alone.
-- Graph keyboard viewport interaction: arrow-key pan, numpad zoom, Home reset, and `F` fit-to-data.
+- Graph keyboard viewport interaction: arrow-key pan, numpad Add/Subtract zoom, Home reset, and `F` fit-to-data.
 - Extreme-finite-value graph numerical-analysis hardening plus explicit sampling/root/integration workload-budget regressions.
 - Read-only graph viewport state for deterministic UI integration assertions.
 - Reusable bounded export-preview formatter with line/character limits, newline normalization, UTF-16 boundary safety, and complete private copy payloads.
@@ -47,11 +47,12 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Runtime accessibility evidence matrix using PASS / FAIL / BLOCKED / NOT RUN status discipline.
 - Avalonia headless xUnit v3 test foundation using the repository-matched `Avalonia.Headless.XUnit` package.
 - Headless shared-shell tests for mode inventory, calculator command binding, selection-aware keypad editing, compact layout class, keyboard mode navigation, high-contrast state, onboarding, graph interaction, supplemental Calculator utilities, paired statistics, and dynamic controls.
-- SDK-independent source validators for repository/XAML/UI/navigation/keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bounded exports, bivariate statistics, headless UI, accessibility/focus/dynamic controls/adaptive layout/touch targets, localization, converter preferences, settings schema, onboarding, packaging/platform workflows, iOS release validation, release workflow/documentation, artifact integrity, and structured release evidence.
+- SDK-independent source validators for repository/XAML/UI/navigation/keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bounded exports, bivariate statistics, headless UI, accessibility/focus/dynamic controls/adaptive layout/touch targets, localization, converter preferences, settings schema, onboarding, packaging/platform workflows, the Source Preflight workflow itself, iOS release validation, release workflow/documentation, artifact integrity, and structured release evidence.
 - Python regression tests for release-critical source validators and release tooling.
 - Integrated SDK-independent release/source preflight covering the current critical validation inventory.
 - Cross-platform validation workflows for Desktop, Browser, Android, and iOS source heads.
 - Cross-platform workflow source-contract validation protecting runner/workload/build configuration and keeping signing secrets out of normal validation builds.
+- Source Preflight workflow self-validation protecting broad trigger coverage, least-privilege permissions, runner/toolchain setup, and the integrated command.
 - Tag-first release workflow validation that detaches at the requested release tag before source preflight and `.NET` validation.
 - Exact-release-tag iOS simulator validation workflow that intentionally remains unsigned and does not claim device/App Store readiness.
 - Artifact manifest generation/verification and SHA-256 integrity infrastructure.
@@ -80,8 +81,10 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Platform support documentation reflects the implemented Browser, Android, and iOS heads/workflows instead of describing them as absent.
 - Release documentation treats integrated source preflight as the authoritative first source gate and documents machine-readable validation evidence separately from runtime/manual proof.
 - Release workflow validates tagged source before restore/format/build/test and preserves existing GitHub Release notes/history on reruns.
-- Source-preflight inventory now includes recent rational, engineering, statistics, dynamic-control, iOS-release, artifact-integrity, and structured-evidence contracts instead of relying on focused workflows alone.
-- Feature, roadmap, README, preflight, exact-rational, changelog, and audit documentation are synchronized with the current source scope.
+- Source-preflight inventory includes rational, engineering, statistics, dynamic-control, iOS-release, artifact-integrity, structured-evidence, and Source Preflight workflow self-validation contracts instead of relying on focused workflows alone.
+- `.github/workflows/source-preflight.yml` now watches the broad source/test/tool/docs/packaging/workflow surfaces that the integrated gate actually validates rather than a narrow selected-file subset.
+- `.github/workflows/engineering-notation-validate.yml` watches the shared engineering view model, panel, and App/headless tests in addition to core formatter/test/validator paths.
+- Feature, roadmap, README, preflight, exact-rational, engineering-notation, changelog, project-state, checkpoint, and final-audit documentation are synchronized with the current source scope.
 - Package management remains centralized through `Directory.Packages.props`.
 - Nullable reference types, analyzers, warnings-as-errors, and deterministic build settings remain enabled centrally.
 
@@ -107,8 +110,12 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Exact-rational source validation no longer looks for a stale/nonexistent magnitude-check marker.
 - `default(RationalNumber)` is treated as canonical zero instead of exposing an invalid zero denominator.
 - Exact-rational raw input workload limits are enforced before trimming, closing an oversized whitespace-padding bypass.
-- Engineering-notation source/tests now enforce the documented finite engineering exponent range, including zero-mantissa inputs.
-- Integrated release preflight no longer omits the recent exact-rational, engineering-notation, artifact-integrity, structured-evidence, dynamic-control-accessibility, or exact-tag iOS workflow validators.
+- Engineering-notation source/tests enforce the documented finite engineering exponent range, including zero-mantissa inputs.
+- Non-zero engineering inputs that underflow to floating-point zero, such as `1e-324`, are rejected instead of silently becoming `0`.
+- Engineering Parse/Format input text is bounded to 4,096 characters before whitespace/numeric parsing, and the shared TextBox applies the same limit.
+- Integrated release preflight no longer omits recent exact-rational, engineering-notation, artifact-integrity, structured-evidence, dynamic-control-accessibility, exact-tag iOS workflow, or Source Preflight workflow-contract validators.
+- The focused engineering workflow no longer misses App view-model/panel/test changes protected by the engineering validator.
+- The master Source Preflight workflow no longer misses ordinary domain-library/test/docs/workflow changes because of a narrow path filter.
 - Documentation no longer lists already-implemented exact rationals, engineering notation, covariance/correlation/regression, printable calculator operators, deterministic graph series differentiation, or numerical edge hardening as future features.
 
 ### Security / Privacy
@@ -116,7 +123,7 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Expression evaluation uses project-owned parsing/evaluation rather than arbitrary code execution.
 - Input and expensive integer/numerical operations include bounded workload controls.
 - Exact-rational raw input, decimal exponent/scale, and reduced magnitude are bounded.
-- Engineering-notation exponent input is explicitly bounded.
+- Engineering-notation input text and exponent scaling are explicitly bounded, and non-zero floating-point underflow is rejected.
 - Clipboard reads are explicit user actions; pasted text is sanitized and is not automatically evaluated.
 - Clipboard writes occur only after explicit copy actions.
 - History/graph exports are generated locally and copied only after explicit user action.
@@ -125,6 +132,7 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Currency networking is optional and contains no embedded provider credential.
 - Repository ignore rules exclude common signing credentials and local secret files.
 - Ordinary Android/iOS validation workflows intentionally keep signing secrets out of source.
+- Source Preflight uses read-only repository contents permission and rejects `pull_request_target`/write-permission drift through source validation.
 - Android release signing is conditional on external secrets and uses temporary signing material that is removed afterward.
 - iOS release-tag validation is simulator-only unless a future externally secured signing/archive path is added.
 - Unsupported future settings schemas fail closed instead of being silently overwritten by an older build.
