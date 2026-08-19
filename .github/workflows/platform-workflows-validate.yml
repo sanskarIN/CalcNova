@@ -1,0 +1,45 @@
+name: Platform Workflows Validate
+
+on:
+  push:
+    paths:
+      - 'global.json'
+      - '.github/workflows/build-desktop.yml'
+      - '.github/workflows/build-browser.yml'
+      - '.github/workflows/build-android.yml'
+      - '.github/workflows/build-ios.yml'
+      - 'tools/validate_platform_workflows.py'
+      - 'tools/tests/test_validate_platform_workflows.py'
+      - '.github/workflows/platform-workflows-validate.yml'
+  pull_request:
+    paths:
+      - 'global.json'
+      - '.github/workflows/build-desktop.yml'
+      - '.github/workflows/build-browser.yml'
+      - '.github/workflows/build-android.yml'
+      - '.github/workflows/build-ios.yml'
+      - 'tools/validate_platform_workflows.py'
+      - 'tools/tests/test_validate_platform_workflows.py'
+      - '.github/workflows/platform-workflows-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  platform-workflow-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Validate platform workflow contracts
+        run: python tools/validate_platform_workflows.py
+
+      - name: Run platform workflow validator tests
+        run: python -m unittest tools.tests.test_validate_platform_workflows
