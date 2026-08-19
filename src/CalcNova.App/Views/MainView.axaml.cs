@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -7,6 +8,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Localization;
 using CalcNova.App.Services;
 using CalcNova.App.ViewModels;
 using CalcNova.Platform.Settings;
@@ -18,7 +20,12 @@ public partial class MainView : UserControl
     private static readonly string[] AdaptiveStyleClasses = ["compact", "medium", "expanded"];
     private static readonly string[] AccessibilityStyleClasses = ["high-contrast", "reduced-motion"];
 
+    private readonly Dictionary<TextBlock, AppStringKey> _localizedTextBlocks = new();
+    private readonly Dictionary<Button, AppStringKey> _localizedButtons = new();
+    private readonly Dictionary<TextBox, AppStringKey> _localizedWatermarks = new();
     private MainViewModel? _subscribedViewModel;
+    private MainViewModel? _localizationViewModel;
+    private TabControl? _localizationTabControl;
     private TextBox? _calculatorExpressionTextBox;
     private CalculatorViewModel? _calculatorEditorViewModel;
     private bool _onboardingWasVisible;
@@ -78,9 +85,12 @@ public partial class MainView : UserControl
             viewModel.SettingsChanged += HandleSettingsChanged;
         }
 
+        AttachLocalization(viewModel);
         AttachCalculatorExpressionEditor(viewModel.Calculator);
 
         await viewModel.InitializeAsync();
+        CaptureLocalizedControls();
+        ApplyLocalization();
         _onboardingWasVisible = viewModel.Settings.ShouldShowOnboarding;
         if (_onboardingWasVisible)
         {
@@ -95,6 +105,7 @@ public partial class MainView : UserControl
             clipboardService.Attach(null);
         }
 
+        DetachLocalization();
         DetachCalculatorExpressionEditor();
 
         if (_subscribedViewModel is null)
@@ -174,6 +185,122 @@ public partial class MainView : UserControl
             case ShellNavigationAction.LastMode:
                 viewModel.SelectLastMode();
                 break;
+        }
+    }
+
+    private void AttachLocalization(MainViewModel viewModel)
+    {
+        DetachLocalization();
+
+        _localizationViewModel = viewModel;
+        viewModel.Localizer.CultureChanged += HandleCultureChanged;
+        _localizationTabControl = this.GetVisualDescendants().OfType<TabControl>().FirstOrDefault();
+        if (_localizationTabControl is not null)
+        {
+            _localizationTabControl.SelectionChanged += HandleLocalizationSelectionChanged;
+        }
+
+        CaptureLocalizedControls();
+        ApplyLocalization();
+    }
+
+    private void DetachLocalization()
+    {
+        if (_localizationViewModel is not null)
+        {
+            _localizationViewModel.Localizer.CultureChanged -= HandleCultureChanged;
+        }
+
+        if (_localizationTabControl is not null)
+        {
+            _localizationTabControl.SelectionChanged -= HandleLocalizationSelectionChanged;
+        }
+
+        _localizationViewModel = null;
+        _localizationTabControl = null;
+        _localizedTextBlocks.Clear();
+        _localizedButtons.Clear();
+        _localizedWatermarks.Clear();
+    }
+
+    private void HandleCultureChanged(CultureInfo culture)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            CaptureLocalizedControls();
+            ApplyLocalization();
+        });
+    }
+
+    private void HandleLocalizationSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            CaptureLocalizedControls();
+            ApplyLocalization();
+        });
+    }
+
+    private void CaptureLocalizedControls()
+    {
+        foreach (var textBlock in this.GetVisualDescendants().OfType<TextBlock>())
+        {
+            if (!_localizedTextBlocks.ContainsKey(textBlock) &&
+                ShellLocalization.TryGetLiteralKey(textBlock.Text, out var key))
+            {
+                _localizedTextBlocks[textBlock] = key;
+            }
+        }
+
+        foreach (var button in this.GetVisualDescendants().OfType<Button>())
+        {
+            if (!_localizedButtons.ContainsKey(button) &&
+                button.Content is string literal &&
+                ShellLocalization.TryGetLiteralKey(literal, out var key))
+            {
+                _localizedButtons[button] = key;
+            }
+        }
+
+        foreach (var textBox in this.GetVisualDescendants().OfType<TextBox>())
+        {
+            if (!_localizedWatermarks.ContainsKey(textBox) &&
+                textBox.Watermark is string literal &&
+                ShellLocalization.TryGetLiteralKey(literal, out var key))
+            {
+                _localizedWatermarks[textBox] = key;
+            }
+        }
+    }
+
+    private void ApplyLocalization()
+    {
+        var localizer = _localizationViewModel?.Localizer;
+        if (localizer is null)
+        {
+            return;
+        }
+
+        foreach (var (textBlock, key) in _localizedTextBlocks)
+        {
+            textBlock.Text = localizer[key];
+        }
+
+        foreach (var (button, key) in _localizedButtons)
+        {
+            button.Content = localizer[key];
+        }
+
+        foreach (var (textBox, key) in _localizedWatermarks)
+        {
+            textBox.Watermark = localizer[key];
+        }
+
+        var modeHeaders = ShellLocalization.GetModeHeaders(localizer);
+        var tabs = this.GetVisualDescendants().OfType<TabItem>().Take(modeHeaders.Count).ToArray();
+        for (var index = 0; index < tabs.Length; index++)
+        {
+            tabs[index].Header = modeHeaders[index];
         }
     }
 
