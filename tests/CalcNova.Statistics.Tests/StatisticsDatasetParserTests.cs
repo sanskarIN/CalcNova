@@ -8,9 +8,9 @@ public sealed class StatisticsDatasetParserTests
     [Fact]
     public void Parse_AcceptsSupportedSeparatorsAndInvariantNumbers()
     {
-        var values = StatisticsDatasetParser.Parse("1, 2;3\n4\t5.5");
+        var values = StatisticsDatasetParser.Parse("1, 2;3\n4\t5.5 6");
 
-        Assert.Equal([1d, 2d, 3d, 4d, 5.5d], values);
+        Assert.Equal([1d, 2d, 3d, 4d, 5.5d, 6d], values);
     }
 
     [Fact]
