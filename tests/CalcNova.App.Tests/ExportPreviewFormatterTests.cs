@@ -41,6 +41,30 @@ public sealed class ExportPreviewFormatterTests
     }
 
     [Fact]
+    public void Create_PreservesLeadingBlankLinesWhenTruncated()
+    {
+        const string content = "\n\nthird\nfourth";
+
+        var preview = ExportPreviewFormatter.Create(content, maximumCharacters: 1_000, maximumLines: 3);
+
+        Assert.StartsWith(Environment.NewLine + Environment.NewLine + "third", preview, StringComparison.Ordinal);
+        Assert.DoesNotContain("fourth", preview, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Create_RecognizesCarriageReturnOnlyLineBoundaries()
+    {
+        const string content = "one\rtwo\rthree\rfour";
+
+        var preview = ExportPreviewFormatter.Create(content, maximumCharacters: 1_000, maximumLines: 2);
+
+        Assert.Contains("one", preview, StringComparison.Ordinal);
+        Assert.Contains("two", preview, StringComparison.Ordinal);
+        Assert.DoesNotContain("three", preview, StringComparison.Ordinal);
+        Assert.Contains("preview truncated", preview, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Create_DoesNotSplitUtf16SurrogatePairAtCharacterBoundary()
     {
         var content = new string('a', 95) + "😀" + new string('b', 100);
