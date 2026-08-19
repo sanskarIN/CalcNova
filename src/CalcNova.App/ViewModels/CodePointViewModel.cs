@@ -24,6 +24,8 @@ public sealed class CodePointViewModel : ViewModelBase
         InspectTextCommand = new RelayCommand(_ => InspectText());
         CopyCodePointResultCommand = new AsyncRelayCommand(_ => CopyCodePointResultAsync());
         CopyTextResultCommand = new AsyncRelayCommand(_ => CopyTextResultAsync());
+        CopyCodePointMetadataCommand = new AsyncRelayCommand(_ => CopyCodePointMetadataAsync());
+        CopyTextMetadataCommand = new AsyncRelayCommand(_ => CopyTextMetadataAsync());
     }
 
     public string CodePointInput
@@ -76,6 +78,10 @@ public sealed class CodePointViewModel : ViewModelBase
 
     public ICommand CopyTextResultCommand { get; }
 
+    public ICommand CopyCodePointMetadataCommand { get; }
+
+    public ICommand CopyTextMetadataCommand { get; }
+
     private void DecodeCodePoint()
     {
         try
@@ -122,5 +128,15 @@ public sealed class CodePointViewModel : ViewModelBase
     private async Task CopyTextResultAsync()
     {
         ErrorMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, TextResult, "text inspection result");
+    }
+
+    private async Task CopyCodePointMetadataAsync()
+    {
+        ErrorMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, CodePointMetadata, "code point metadata");
+    }
+
+    private async Task CopyTextMetadataAsync()
+    {
+        ErrorMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, TextMetadata, "text metadata");
     }
 }
