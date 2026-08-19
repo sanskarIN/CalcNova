@@ -26,6 +26,7 @@ public sealed class GraphingViewModel : ViewModelBase
     private IReadOnlyList<GraphTableRow> _tableRows = Array.Empty<GraphTableRow>();
     private IReadOnlyList<GraphExpressionSample> _multiSeries = Array.Empty<GraphExpressionSample>();
     private IReadOnlyList<MultiGraphTableRow> _multiTableRows = Array.Empty<MultiGraphTableRow>();
+    private GraphPlotMode _plotMode = GraphPlotMode.Single;
     private string _summary = string.Empty;
     private string _preview = string.Empty;
     private string _analysisResult = string.Empty;
@@ -120,6 +121,12 @@ public sealed class GraphingViewModel : ViewModelBase
     {
         get => _multiTableRows;
         private set => SetField(ref _multiTableRows, value);
+    }
+
+    public GraphPlotMode PlotMode
+    {
+        get => _plotMode;
+        private set => SetField(ref _plotMode, value);
     }
 
     public string Summary
@@ -222,6 +229,7 @@ public sealed class GraphingViewModel : ViewModelBase
             if (!result.Success)
             {
                 ClearPlotOutputs();
+                PlotMode = GraphPlotMode.Single;
                 ErrorMessage = result.ErrorMessage ?? "Graph sampling failed.";
                 return;
             }
@@ -232,6 +240,7 @@ public sealed class GraphingViewModel : ViewModelBase
             var pointCount = result.Segments.Sum(segment => segment.Points.Count);
             Summary = $"{result.Segments.Count} segment(s) • {pointCount} valid point(s) • {result.InvalidSampleCount} invalid sample(s)";
             Preview = BuildPreview(result.Segments);
+            PlotMode = GraphPlotMode.Single;
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is ArgumentException or FormatException or OverflowException)
@@ -240,6 +249,7 @@ public sealed class GraphingViewModel : ViewModelBase
             SvgExport = string.Empty;
             CopyStatus = string.Empty;
             ClearPlotOutputs();
+            PlotMode = GraphPlotMode.Single;
             ErrorMessage = exception.Message;
         }
     }
@@ -265,6 +275,7 @@ public sealed class GraphingViewModel : ViewModelBase
             var pointCount = result.Series.Sum(series => series.ValidPointCount);
             var invalidCount = result.Series.Sum(series => series.InvalidSampleCount);
             MultiSummary = $"{result.Series.Count} expression(s) • {pointCount} valid point(s) • {invalidCount} invalid sample(s)";
+            PlotMode = GraphPlotMode.Multiple;
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is ArgumentException or FormatException or OverflowException)
