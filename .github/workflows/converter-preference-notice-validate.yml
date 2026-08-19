@@ -1,0 +1,45 @@
+name: Converter Preference Notice Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.App/Localization/**"
+      - "src/CalcNova.App/Views/MainView.CheckBoxLocalization.cs"
+      - "tests/CalcNova.App.Tests/ConverterPreferenceNoticeHeadlessTests.cs"
+      - "tools/validate_converter_preference_notice.py"
+      - "tools/tests/test_validate_converter_preference_notice.py"
+      - "docs/CONVERTER_MODE.md"
+      - ".github/workflows/converter-preference-notice-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.App/Localization/**"
+      - "src/CalcNova.App/Views/MainView.CheckBoxLocalization.cs"
+      - "tests/CalcNova.App.Tests/ConverterPreferenceNoticeHeadlessTests.cs"
+      - "tools/validate_converter_preference_notice.py"
+      - "tools/tests/test_validate_converter_preference_notice.py"
+      - "docs/CONVERTER_MODE.md"
+      - ".github/workflows/converter-preference-notice-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  converter-preference-notice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate converter preference notice
+        run: python tools/validate_converter_preference_notice.py .
+
+      - name: Run converter preference-notice validator tests
+        run: python -m unittest tools.tests.test_validate_converter_preference_notice
