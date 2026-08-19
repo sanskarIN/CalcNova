@@ -98,35 +98,37 @@
             <ComboBox ItemsSource="{Binding WordSizes}" SelectedItem="{Binding WordSize, Mode=TwoWay}" />
             <CheckBox Content="Signed two's-complement interpretation" IsChecked="{Binding Signed, Mode=TwoWay}" />
             <Button Content="Convert" Command="{Binding ConvertCommand}" HorizontalAlignment="Left" />
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-              <TextBlock Text="BIN" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="Auto,*">
+              <TextBlock Text="BIN" FontWeight="SemiBold" Margin="0,0,10,0" />
               <TextBlock Grid.Column="1" Text="{Binding Binary}" TextWrapping="Wrap" />
             </Grid>
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-              <TextBlock Text="OCT" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="Auto,*">
+              <TextBlock Text="OCT" FontWeight="SemiBold" Margin="0,0,10,0" />
               <TextBlock Grid.Column="1" Text="{Binding Octal}" TextWrapping="Wrap" />
             </Grid>
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-              <TextBlock Text="DEC" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="Auto,*">
+              <TextBlock Text="DEC" FontWeight="SemiBold" Margin="0,0,10,0" />
               <TextBlock Grid.Column="1" Text="{Binding Decimal}" TextWrapping="Wrap" />
             </Grid>
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-              <TextBlock Text="HEX" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="Auto,*">
+              <TextBlock Text="HEX" FontWeight="SemiBold" Margin="0,0,10,0" />
               <TextBlock Grid.Column="1" Text="{Binding Hexadecimal}" TextWrapping="Wrap" />
             </Grid>
             <TextBlock Text="Fixed-width bit pattern" FontWeight="SemiBold" />
             <TextBlock Text="{Binding BitPattern}" TextWrapping="Wrap" />
-            <TextBlock Text="Quick-toggle low byte (b7 … b0)" Opacity="0.62" />
-            <WrapPanel>
-              <Button Content="b7" Command="{Binding ToggleBitCommand}" CommandParameter="7" Margin="0,0,6,6" />
-              <Button Content="b6" Command="{Binding ToggleBitCommand}" CommandParameter="6" Margin="0,0,6,6" />
-              <Button Content="b5" Command="{Binding ToggleBitCommand}" CommandParameter="5" Margin="0,0,6,6" />
-              <Button Content="b4" Command="{Binding ToggleBitCommand}" CommandParameter="4" Margin="0,0,6,6" />
-              <Button Content="b3" Command="{Binding ToggleBitCommand}" CommandParameter="3" Margin="0,0,6,6" />
-              <Button Content="b2" Command="{Binding ToggleBitCommand}" CommandParameter="2" Margin="0,0,6,6" />
-              <Button Content="b1" Command="{Binding ToggleBitCommand}" CommandParameter="1" Margin="0,0,6,6" />
-              <Button Content="b0" Command="{Binding ToggleBitCommand}" CommandParameter="0" Margin="0,0,6,6" />
-            </WrapPanel>
+            <TextBlock Text="Interactive bit grid — most-significant bit first" Opacity="0.62" />
+            <ItemsControl ItemsSource="{Binding Bits}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Button Content="{Binding Label}" Command="{Binding ToggleCommand}" Margin="0,0,6,6" MinWidth="58" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
             <TextBlock Text="Interpreted value" FontWeight="SemiBold" />
             <TextBlock Text="{Binding InterpretedValue}" FontSize="19" />
             <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
