@@ -96,6 +96,22 @@ public sealed class EngineeringNotationFormatterTests
     }
 
     [Fact]
+    public void Parse_RejectsInputAboveCharacterBudget()
+    {
+        var text = new string('1', EngineeringNotationFormatter.MaximumInputCharacters + 1);
+
+        Assert.Throws<ArgumentException>(() => EngineeringNotationFormatter.Parse(text));
+    }
+
+    [Fact]
+    public void Parse_RejectsOversizedWhitespaceBeforeScanningForBlankInput()
+    {
+        var text = new string(' ', EngineeringNotationFormatter.MaximumInputCharacters + 1);
+
+        Assert.Throws<ArgumentException>(() => EngineeringNotationFormatter.Parse(text));
+    }
+
+    [Fact]
     public void FormatAndParse_RoundTripRepresentativeFiniteValues()
     {
         double[] values =
