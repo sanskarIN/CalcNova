@@ -32,6 +32,8 @@ def validate(root: Path) -> list[str]:
         "public const int DefaultMaximumCharacters = 4_096;",
         "public const int DefaultMaximumLines = 80;",
         "preview truncated; full content is preserved for copy/export",
+        "private static bool ExceedsLineLimit",
+        "var hasWrittenLine = false;",
         "private static string SafePrefix",
         "char.IsHighSurrogate",
     ):
@@ -56,6 +58,8 @@ def validate(root: Path) -> list[str]:
         "Create_ReturnsShortContentUnchanged",
         "Create_TruncatesContentAboveCharacterBudget",
         "Create_TruncatesContentAboveLineBudget",
+        "Create_PreservesLeadingBlankLinesWhenTruncated",
+        "Create_RecognizesCarriageReturnOnlyLineBoundaries",
         "Create_DoesNotSplitUtf16SurrogatePairAtCharacterBoundary",
     ):
         if marker not in formatter_tests:
@@ -85,7 +89,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated bounded history previews and preservation of full copy/export content.")
+    print("Validated bounded history previews, newline-safe truncation, and preservation of full copy/export content.")
     return 0
 
 
