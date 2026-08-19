@@ -16,6 +16,7 @@ def validate(root: Path) -> list[str]:
     main_view_path = root / "src" / "CalcNova.App" / "Views" / "MainView.axaml.cs"
     core_tests_path = root / "tests" / "CalcNova.Programmer.Tests" / "UnicodeScalarMetadataTests.cs"
     app_tests_path = root / "tests" / "CalcNova.App.Tests" / "CodePointMetadataViewModelTests.cs"
+    copy_tests_path = root / "tests" / "CalcNova.App.Tests" / "CodePointCopyViewModelTests.cs"
     headless_tests_path = root / "tests" / "CalcNova.App.Tests" / "CodePointMetadataPanelHeadlessTests.cs"
 
     paths = (
@@ -26,6 +27,7 @@ def validate(root: Path) -> list[str]:
         main_view_path,
         core_tests_path,
         app_tests_path,
+        copy_tests_path,
         headless_tests_path,
     )
     failures: list[str] = []
@@ -43,6 +45,7 @@ def validate(root: Path) -> list[str]:
     main_view = main_view_path.read_text(encoding="utf-8")
     core_tests = core_tests_path.read_text(encoding="utf-8")
     app_tests = app_tests_path.read_text(encoding="utf-8")
+    copy_tests = copy_tests_path.read_text(encoding="utf-8")
     headless_tests = headless_tests_path.read_text(encoding="utf-8")
 
     for marker in (
@@ -70,6 +73,10 @@ def validate(root: Path) -> list[str]:
         "public string TextMetadata",
         "UnicodeCodePointHelper.Describe(value).CompactSummary",
         "UnicodeCodePointHelper.DescribeText(TextInput)",
+        "public ICommand CopyCodePointMetadataCommand",
+        "public ICommand CopyTextMetadataCommand",
+        "CopyCodePointMetadataAsync",
+        "CopyTextMetadataAsync",
         "CodePointMetadata = string.Empty",
         "TextMetadata = string.Empty",
     ):
@@ -80,6 +87,8 @@ def validate(root: Path) -> list[str]:
         "public sealed class CodePointMetadataPanel",
         "nameof(CodePointViewModel.CodePointMetadata)",
         "nameof(CodePointViewModel.TextMetadata)",
+        "nameof(CodePointViewModel.CopyCodePointMetadataCommand)",
+        "nameof(CodePointViewModel.CopyTextMetadataCommand)",
         "derived locally without a network lookup",
     ):
         if marker not in panel:
@@ -113,7 +122,15 @@ def validate(root: Path) -> list[str]:
             failures.append(f"App Unicode metadata tests are missing marker: {marker}")
 
     for marker in (
+        "CopyCodePointMetadataCommand_CopiesLocalScalarDetails",
+        "CopyTextMetadataCommand_CopiesOneLinePerInspectedScalar",
+    ):
+        if marker not in copy_tests:
+            failures.append(f"Unicode metadata copy tests are missing marker: {marker}")
+
+    for marker in (
         "CodePointMode_SurfacesLocalScalarMetadataPanel",
+        "CodePointMetadataPanel_BindsBothCopyCommands",
         "OfType<CodePointMetadataPanel>().Single()",
         "Assert.Same(viewModel.CodePoint, panel.DataContext)",
         "UTF-8 4 byte",
@@ -141,7 +158,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated local Unicode scalar metadata, shared UI projection, and regression coverage.")
+    print("Validated local Unicode scalar metadata, shared UI projection, copy workflow, and regression coverage.")
     return 0
 
 
