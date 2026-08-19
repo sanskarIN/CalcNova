@@ -1,46 +1,41 @@
 # CalcNova Features
 
-This document distinguishes implemented source from planned product scope. `PROJECT_STATE.md` is the authoritative short-form continuation status.
+This document distinguishes implemented source, shared-app integration, and remaining product work. [`PROJECT_STATE.md`](../PROJECT_STATE.md) is the authoritative short-form continuation status.
 
 ## Standard calculator
 
-### Implemented source
+### Implemented
 
 - addition, subtraction, multiplication, division;
 - modulo/remainder expression operator;
-- decimal input;
-- parentheses;
-- unary plus/minus;
-- exponentiation;
-- operator precedence;
-- scientific notation;
-- clear/backspace/evaluate UI actions;
-- result reuse;
-- typed divide-by-zero/syntax/domain errors.
+- decimal and scientific-notation input;
+- parentheses and unary plus/minus;
+- right-associative exponentiation and explicit precedence;
+- typed divide-by-zero/syntax/domain/workload errors;
+- clear, backspace, evaluate, and result reuse;
+- calculator-style percentage transformation;
+- repeated-equals session behavior;
+- MC, MR, MS, M+, M- memory behavior;
+- sanitized imported expression text with common calculator-glyph normalization.
 
-### Planned completion work
+### Remaining product work
 
-- calculator-style percentage semantics;
-- repeated equals;
-- memory buttons/state;
-- richer cursor-aware editing;
-- clipboard service;
-- physical numpad routing beyond the initial key actions;
-- history/favorites UI;
-- configurable result formatting.
+- cursor/selection-aware calculator editing;
+- explicit sanitized clipboard service/event wiring;
+- broader physical keyboard/numpad shortcuts;
+- configurable result-presentation modes beyond current feature-specific formatting.
 
 ## Scientific calculator
 
-### Implemented source
+### Implemented
 
 - square/cube/power;
 - square/cube/nth root;
 - reciprocal and absolute value;
 - ln/log/log10/log2;
 - exp;
-- trigonometric functions;
-- inverse trigonometric functions;
-- hyperbolic/inverse hyperbolic functions;
+- trigonometric and inverse-trigonometric functions;
+- hyperbolic/inverse-hyperbolic functions;
 - degree/radian/gradian modes;
 - floor/ceil/round/truncate/sign;
 - min/max;
@@ -48,42 +43,43 @@ This document distinguishes implemented source from planned product scope. `PROJ
 - GCD/LCM;
 - combinations/permutations;
 - π, e, τ constants;
-- initial scientific keypad controls.
+- shared scientific keypad controls.
 
-### Planned completion work
+### Remaining product work
 
-- polished grouped keypad/layout;
+- more compact/adaptive function grouping;
 - function discovery/search;
-- additional numeric precision modes;
-- optional engineering/fraction presentation after numeric review.
+- optional engineering/fraction presentation after numeric-design review.
 
 ## Programmer calculator
 
-### Implemented source
+### Implemented
 
 - base 2–36 parse/format;
-- arbitrary-precision integers;
+- arbitrary-precision radix conversion;
+- common binary/octal/decimal/hex representations in the app view model;
 - AND/OR/XOR/NOT;
 - left shift;
 - logical/arithmetic right shift;
-- word-size masking;
+- bounded word-size masking;
 - signed/unsigned two's-complement interpretation;
-- bit-string visualization.
+- fixed-width bit-string visualization;
+- bounded bit inspection/toggling;
+- app view-model bit-toggle command with synchronized representation refresh;
+- Unicode scalar/code-point parsing, formatting, scalar-to-text, and bounded text inspection.
 
-### Planned UI
+### Remaining product work
 
-- binary/octal/decimal/hex synchronized display;
-- custom-radix UI;
-- word-size selector;
-- signed/unsigned selector;
-- bit toggle grid;
-- optional character/code-point helper.
+- visible accessible bit-toggle grid;
+- visible Unicode code-point helper;
+- custom radix selector UI for the full 2–36 range;
+- accessible copy actions.
 
 ## Unit converter
 
-### Implemented source
+### Implemented
 
-Offline fixed conversions include current definitions in these categories:
+Offline fixed categories include:
 
 - length;
 - area;
@@ -100,139 +96,161 @@ Offline fixed conversions include current definitions in these categories:
 - force;
 - angle.
 
-The engine supports search and prevents cross-category conversion.
+Additional implemented source/app behavior:
 
-### Planned UI
+- category safety;
+- unit swapping;
+- reusable validated conversion pairs;
+- bounded recent-pair tracking;
+- favorite pairs;
+- pair restoration command;
+- 1–17 significant-digit output precision with common presets.
 
-- searchable category/unit selectors;
-- recent pairs;
-- favorites;
-- swap;
-- copy;
-- precision controls.
+### Remaining product work
+
+- visible recent/favorite-pair controls;
+- visible precision selector;
+- searchable unit/category selectors;
+- result copy action;
+- persistence semantics for pair state.
 
 ## Currency converter
 
-Planned optional network-enhanced feature.
-
-Requirements before implementation:
+### Implemented source
 
 - replaceable provider interface;
-- no embedded secret key;
-- cached last successful rates;
-- visible rate timestamp;
-- offline handling;
-- manual refresh;
-- ability to disable network features;
-- mocked provider tests.
+- provider/cache integration;
+- local cache support;
+- offline fallback semantics;
+- no embedded provider secret requirement;
+- shared currency view model and shell integration;
+- mocked/provider-focused tests.
+
+### Remaining product work
+
+- final provider/release policy;
+- visible freshness/source semantics refinement;
+- full network/privacy UX validation per platform.
+
+## Date and duration utilities
+
+### Implemented
+
+- date difference;
+- calendar arithmetic;
+- business-day utilities;
+- fixed-duration conversion;
+- shared date/time view model and shell integration.
 
 ## History
 
-### Implemented source
+### Implemented
 
-Native SQLite repository supports:
+- history repository abstraction;
+- SQLite native implementation;
+- browser-safe storage path;
+- initialization/add/recent/search;
+- favorite state;
+- delete one/clear all;
+- history-limit/settings integration;
+- shared history UI/view model;
+- TXT/CSV/JSON export.
 
-- initialization;
-- add;
-- recent entries;
-- search;
-- favorite flag;
-- delete one;
-- clear all.
+### Remaining product work
 
-### Planned
-
-- application service/composition;
-- grouped history UI;
-- multi-select delete;
-- clear confirmation;
-- history limits/auto-cleanup;
-- export;
-- browser-compatible storage implementation.
-
-## Memory
-
-Planned: MC, MR, M+, M−, MS with clear state indication. Multiple named slots are optional later work.
+- richer grouped/multi-select management where it improves usability;
+- platform-specific export/share polish;
+- additional UI/integration automation.
 
 ## Graphing
 
-Planned module:
+### Implemented
 
-- `y = f(x)`;
-- multiple expressions;
-- show/hide;
-- pan/zoom/reset;
-- axes/grid/labels;
-- discontinuity handling;
-- workload safeguards;
-- trace/table-of-values.
+- `y = f(x)` sampling through the core expression engine;
+- configurable bounded X range/sample count;
+- invalid-sample/discontinuity segmentation;
+- graph viewport model;
+- interactive Avalonia plot control;
+- deterministic SVG export;
+- central-difference derivative approximation;
+- bracketed bisection root finding;
+- composite Simpson definite integration;
+- bounded numerical-analysis options;
+- graph-analysis commands in the shared view model.
 
-Advanced analysis such as roots, extrema, numerical derivative/integral, polar, and parametric plots remains later scope until core graphing is tested.
+### Remaining product work
+
+- visible derivative/root/integral controls in shared XAML;
+- multiple expression UX;
+- trace/table-of-values;
+- final pan/zoom/reset controls and labels;
+- richer export UI;
+- expanded numerical edge-case coverage.
 
 ## Statistics
 
-Planned:
+### Implemented source/app integration
 
-- count/sum/mean/median/mode;
-- min/max/range;
-- variance;
-- population/sample standard deviation;
-- quartiles/percentiles;
-- editable/pasteable dataset.
+Statistics module and shared view model are present with dataset analysis flows and tests.
 
-Optional later: covariance, correlation, regression.
+### Later expansion
+
+- covariance;
+- correlation;
+- regression;
+- richer statistical visualizations where justified.
 
 ## Equations
 
-Planned:
+### Implemented source/app integration
 
-- linear equation in one variable;
-- simultaneous linear equations;
-- quadratic equations;
-- numeric root finding;
-- matrix-backed systems where appropriate.
+Equation-solving module and shared view model are present, including quadratic workflows exercised by app tests.
 
-Exact/approximate results must be clearly distinguished.
+### Later expansion
 
-## Matrices/vectors
+- richer simultaneous-system UX;
+- explicit exact-versus-approximate presentation where applicable;
+- additional numeric root workflows integrated with graph analysis where useful.
 
-Planned:
+## Matrices
 
-- creation/editing;
-- add/subtract/multiply/scalar operations;
-- transpose;
-- determinant;
-- inverse where defined;
-- rank;
-- linear-system solving;
-- magnitude/dot/cross for supported vector dimensions.
+### Implemented source/app integration
 
-## Settings
+Matrix module and shared view model include determinant, inverse, rank, and linear-system solving workflows with tests.
 
-Planned settings categories:
+### Later expansion
 
-- appearance;
-- calculator;
-- history;
-- accessibility;
-- advanced;
-- privacy/network;
-- help;
-- support;
-- about.
+- richer matrix editing;
+- additional vector operations;
+- copy/import/export ergonomics.
 
-## Privacy
+## Settings and support
 
-Product baseline:
+### Implemented source/app integration
+
+- settings repository abstraction;
+- shared settings view model;
+- theme/angle/history-related settings integration;
+- About/support view model;
+- external-link abstraction.
+
+### Remaining product work
+
+- final settings information architecture;
+- onboarding/feature discovery;
+- localization expansion;
+- complete accessibility review.
+
+## Privacy baseline
 
 - local calculation;
-- local history;
-- local settings;
+- local fixed conversion;
+- local history/settings paths;
 - no account required for ordinary use;
 - no advertising SDK by default;
 - no behavioral analytics by default;
-- network features optional.
+- network-enhanced features optional.
 
 ## Platforms
 
-See `docs/PLATFORM_SUPPORT.md` for implemented versus planned platform status.
+Desktop, Browser/WebAssembly, Android, and iOS source heads/composition exist. Platform source presence does not automatically imply a validated package/store build. See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md) and [`PROJECT_STATE.md`](../PROJECT_STATE.md) for validation status.
