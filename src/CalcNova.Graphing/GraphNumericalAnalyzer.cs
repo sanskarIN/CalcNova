@@ -1,0 +1,173 @@
+using CalcNova.Core.Evaluation;
+using CalcNova.Core.Numerics;
+
+namespace CalcNova.Graphing;
+
+public sealed class GraphNumericalAnalyzer
+{
+    private readonly ExpressionEvaluator _evaluator;
+
+    public GraphNumericalAnalyzer(ExpressionEvaluator? evaluator = null)
+    {
+        _evaluator = evaluator ?? new ExpressionEvaluator();
+    }
+
+    public double Derivative(
+        string expression,
+        double x,
+        NumericalAnalysisOptions? options = null,
+        AngleUnit angleUnit = AngleUnit.Radians)
+    {
+        options ??= new NumericalAnalysisOptions();
+        options.Validate();
+        ValidateFinite(x, nameof(x));
+
+        var compiled = _evaluator.Compile(expression);
+        var step = options.DerivativeStep;
+        var left = EvaluateAt(compiled, x - step, angleUnit);
+        var right = EvaluateAt(compiled, x + step, angleUnit);
+        return RequireFinite((right - left) / (2d * step), "Derivative result is outside the supported numeric range.");
+    }
+
+    public double FindRoot(
+        string expression,
+        double minimumX,
+        double maximumX,
+        NumericalAnalysisOptions? options = null,
+        AngleUnit angleUnit = AngleUnit.Radians)
+    {
+        options ??= new NumericalAnalysisOptions();
+        options.Validate();
+        ValidateInterval(minimumX, maximumX);
+
+        var compiled = _evaluator.Compile(expression);
+        var left = minimumX;
+        var right = maximumX;
+        var leftValue = EvaluateAt(compiled, left, angleUnit);
+        var rightValue = EvaluateAt(compiled, right, angleUnit);
+
+        if (Math.Abs(leftValue) <= options.RootTolerance)
+        {
+            return left;
+        }
+
+        if (Math.Abs(rightValue) <= options.RootTolerance)
+        {
+            return right;
+        }
+
+        if (Math.Sign(leftValue) == Math.Sign(rightValue))
+        {
+            throw new InvalidOperationException("Root interval must bracket a sign change.");
+        }
+
+        for (var iteration = 0; iteration < options.MaximumRootIterations; iteration++)
+        {
+            var middle = left + ((right - left) / 2d);
+            var middleValue = EvaluateAt(compiled, middle, angleUnit);
+            if (Math.Abs(middleValue) <= options.RootTolerance ||
+                Math.Abs(right - left) <= options.RootTolerance)
+            {
+                return middle;
+            }
+
+            if (Math.Sign(leftValue) == Math.Sign(middleValue))
+            {
+                left = middle;
+                leftValue = middleValue;
+            }
+            else
+            {
+                right = middle;
+                rightValue = middleValue;
+            }
+        }
+
+        throw new InvalidOperationException("Root search did not converge within the configured iteration limit.");
+    }
+
+    public double Integrate(
+        string expression,
+        double minimumX,
+        double maximumX,
+        NumericalAnalysisOptions? options = null,
+        AngleUnit angleUnit = AngleUnit.Radians)
+    {
+        options ??= new NumericalAnalysisOptions();
+        options.Validate();
+        ValidateFinite(minimumX, nameof(minimumX));
+        ValidateFinite(maximumX, nameof(maximumX));
+
+        if (minimumX == maximumX)
+        {
+            return 0d;
+        }
+
+        if (minimumX > maximumX)
+        {
+            return -Integrate(expression, maximumX, minimumX, options, angleUnit);
+        }
+
+        var compiled = _evaluator.Compile(expression);
+        var intervals = options.IntegrationIntervals;
+        var width = (maximumX - minimumX) / intervals;
+        var sum = EvaluateAt(compiled, minimumX, angleUnit) + EvaluateAt(compiled, maximumX, angleUnit);
+
+        for (var index = 1; index < intervals; index++)
+        {
+            var x = minimumX + (index * width);
+            var weight = (index & 1) == 0 ? 2d : 4d;
+            sum += weight * EvaluateAt(compiled, x, angleUnit);
+        }
+
+        return RequireFinite((width / 3d) * sum, "Integral result is outside the supported numeric range.");
+    }
+
+    private double EvaluateAt(CompiledExpression expression, double x, AngleUnit angleUnit)
+    {
+        var variables = new Dictionary<string, NumberValue>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["x"] = NumberValue.FromDouble(x)
+        };
+        var evaluation = _evaluator.Evaluate(expression, new EvaluationOptions
+        {
+            AngleUnit = angleUnit,
+            Variables = variables
+        });
+
+        if (!evaluation.Success)
+        {
+            throw new InvalidOperationException(evaluation.ErrorMessage ?? "Graph expression could not be evaluated.");
+        }
+
+        return RequireFinite(evaluation.Value.ToDouble(), "Graph expression produced a non-finite value.");
+    }
+
+    private static void ValidateInterval(double minimumX, double maximumX)
+    {
+        ValidateFinite(minimumX, nameof(minimumX));
+        ValidateFinite(maximumX, nameof(maximumX));
+        if (minimumX >= maximumX)
+        {
+            throw new ArgumentException("Root interval minimum must be less than maximum.");
+        }
+    }
+
+    private static void ValidateFinite(double value, string parameterName)
+    {
+        if (!double.IsFinite(value))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, value, "Value must be finite.");
+        }
+    }
+
+    private static double RequireFinite(double value, string message)
+    {
+        if (!double.IsFinite(value))
+        {
+            throw new InvalidOperationException(message);
+        }
+
+        return value;
+    }
+}
