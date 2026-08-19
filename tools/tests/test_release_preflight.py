@@ -65,6 +65,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             if len(arguments) >= 3 and arguments[0:2] == ("-m", "unittest")
         }
         expected_modules = {
+            "tools.tests.test_validate_release_docs",
             "tools.tests.test_validate_focus_visibility",
             "tools.tests.test_validate_accessibility_evidence",
             "tools.tests.test_validate_keyboard_contracts",
