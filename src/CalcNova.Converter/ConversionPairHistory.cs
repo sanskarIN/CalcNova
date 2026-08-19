@@ -21,15 +21,18 @@ public sealed class ConversionPairHistory
     public IReadOnlyList<ConversionPair> Favorites =>
         _favorites.OrderBy(pair => pair.Category).ThenBy(pair => pair.DisplayName, StringComparer.Ordinal).ToArray();
 
-    public void Record(ConversionPair pair)
+    public bool Record(ConversionPair pair)
     {
         ArgumentNullException.ThrowIfNull(pair);
+        var wasFirst = _recent.Count > 0 && _recent[0] == pair;
         _recent.Remove(pair);
         _recent.Insert(0, pair);
         if (_recent.Count > _maximumRecentPairs)
         {
             _recent.RemoveRange(_maximumRecentPairs, _recent.Count - _maximumRecentPairs);
         }
+
+        return !wasFirst;
     }
 
     public bool IsFavorite(ConversionPair pair)
@@ -48,6 +51,30 @@ public sealed class ConversionPairHistory
 
         _favorites.Add(pair);
         return true;
+    }
+
+    public void Restore(
+        IEnumerable<ConversionPair>? recentPairs,
+        IEnumerable<ConversionPair>? favoritePairs)
+    {
+        _recent.Clear();
+        _favorites.Clear();
+
+        if (recentPairs is not null)
+        {
+            foreach (var pair in recentPairs.Reverse())
+            {
+                Record(pair);
+            }
+        }
+
+        if (favoritePairs is not null)
+        {
+            foreach (var pair in favoritePairs)
+            {
+                _favorites.Add(pair);
+            }
+        }
     }
 
     public void ClearRecent() => _recent.Clear();
