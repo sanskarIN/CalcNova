@@ -7,7 +7,7 @@ public static class StatisticsDatasetParser
     public const int MaximumValueCount = 100_000;
     public const int MaximumInputCharacters = 2_000_000;
 
-    private static readonly char[] Separators = [',', ';', '\n', '\r', '\t'];
+    private static readonly char[] Separators = [',', ';', ' ', '\n', '\r', '\t'];
 
     public static IReadOnlyList<double> Parse(string? text, int maximumValues = MaximumValueCount)
     {
