@@ -16,10 +16,19 @@ CHECKS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Navigation contracts", ("tools/validate_navigation_contracts.py", ".")),
     ("Keyboard contracts", ("tools/validate_keyboard_contracts.py", ".")),
     ("Accessibility markup", ("tools/validate_accessibility_markup.py", ".")),
+    ("Focus visibility", ("tools/validate_focus_visibility.py", ".")),
+    ("Adaptive layout", ("tools/validate_adaptive_layout.py", ".")),
+    ("Touch targets", ("tools/validate_touch_targets.py", ".")),
     ("Localization catalog", ("tools/validate_localization_catalog.py", ".")),
     ("Onboarding contracts", ("tools/validate_onboarding_contracts.py", ".")),
     ("Packaging metadata", ("tools/validate_packaging_metadata.py", ".")),
+    ("Release documentation", ("tools/validate_release_docs.py", ".")),
     ("Release-tag validator tests", ("tools/tests/test_validate_release_tag.py",)),
+    ("Focus validator tests", ("-m", "unittest", "tools.tests.test_validate_focus_visibility")),
+    ("Keyboard validator tests", ("-m", "unittest", "tools.tests.test_validate_keyboard_contracts")),
+    ("Localization validator tests", ("-m", "unittest", "tools.tests.test_validate_localization_catalog")),
+    ("Adaptive validator tests", ("-m", "unittest", "tools.tests.test_validate_adaptive_layout")),
+    ("Touch-target validator tests", ("-m", "unittest", "tools.tests.test_validate_touch_targets")),
 )
 
 
