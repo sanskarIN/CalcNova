@@ -10,92 +10,109 @@
 
 ## Current Phase
 
-Broad feature completion + cross-platform validation hardening. Core calculator, scientific, programmer, converter, graphing, statistics, matrix, history, utility, persistence, and platform-composition foundations are implemented. Recent continuation work repaired app-layer contracts, completed productivity backends, exposed them in shared Avalonia XAML, added history export preview/copy and advanced result-copy workflows, strengthened source-level UI validation, added dedicated adaptive-layout and touch-target regression validation, and hardened keyboard-first shared-shell navigation. Remaining work is concentrated on runtime adaptive/mobile polish, deeper accessibility validation, automated UI/integration coverage, observed build/test results, platform/package validation, localization, onboarding, and release hardening.
+Source implementation and release-contract hardening are substantially complete for the current `0.1.0-dev` scope. Core calculation, scientific, programmer, converter, date/time, currency, statistics, equations, matrices, graphing, history, settings, onboarding, localization foundations, platform composition, source validation, release workflows, and focused Avalonia headless UI automation are implemented in source.
+
+The dominant remaining blockers are no longer missing core modules. They are **observed execution evidence**: real .NET restore/build/test results, compiled Avalonia/headless results, target-platform builds, device/browser accessibility and adaptive-layout validation, signing/archive/store checks, and the broader visible-XAML localization migration.
 
 ## Master Technical Direction
 
 - C# / .NET 10
 - Avalonia UI 12.1.1
 - Feature-first modular solution
-- Pure C# calculation/domain projects independent of Avalonia UI
-- Thin platform-specific composition heads
-- Native SQLite persistence behind abstractions
-- Browser-safe storage implementations separated from native SQLite
-- Optional network-enhanced currency conversion with no embedded credentials
+- Project-owned parser/evaluator rather than arbitrary code execution
+- Pure calculation/domain libraries kept independent of Avalonia where practical
+- Thin Desktop, Browser/WebAssembly, Android, and iOS composition heads
+- Native SQLite history behind abstractions
+- Browser-safe history/settings storage separated from native SQLite
+- Versioned local settings schema with explicit migration behavior
+- Optional network-enhanced currency conversion with no embedded provider credentials
 - Apache-2.0
 
 ## Implemented Source Foundations
 
-### Core calculator
+### Core calculator and scientific mode
 
 - Typed calculation errors and workload limits
-- Mixed numeric representation using `BigInteger`, `decimal`, and bounded `double` fallback
+- Mixed numeric representation using `BigInteger`, `decimal`, and bounded floating-point fallback
 - Safe tokenizer and recursive-descent parser
 - Standard arithmetic, parentheses, unary operators, and right-associative exponentiation
 - Scientific constants/functions and degree/radian/gradian angle modes
-- Repeated-equals calculation session behavior
 - Calculator-style percentage transformation separate from expression-language modulo
+- Repeated-equals calculation-session behavior
 - Classic memory operations: MC, MR, MS, M+, M-
-- Sanitized imported expression text with normalization for common calculator glyphs
-- Platform-safe clipboard contract
-- User-triggered sanitized paste and result-copy commands
-- Avalonia `TopLevel` clipboard adapter composed on Desktop, Browser, Android, and iOS
+- Sanitized imported expression text with common calculator-glyph normalization
+- User-triggered sanitized clipboard paste
+- Explicit result copy
+- Top-row/numpad digit and numpad arithmetic mappings outside active text fields
+- Selection-aware keypad editing:
+  - insertion at the tracked caret;
+  - replacement of forward/reversed selections;
+  - Backspace selection deletion;
+  - Backspace before caret;
+  - bounded/clamped selection indexes;
+  - post-edit caret restoration to the shared TextBox
+- Shared TextBox selection synchronization after keyboard and pointer selection changes
 
-### Programmer mode
+### Programmer and Unicode tools
 
 - Base 2–36 parsing and formatting
 - Full base 2–36 selector in the shared UI
-- Binary/octal/decimal/hex synchronized representation support
+- Binary/octal/decimal/hex synchronized representations
 - Fixed-width signed/unsigned interpretation
-- Correct two's-complement signed decimal display with masked non-decimal representations
+- Correct masked non-decimal presentation with signed-decimal interpretation
 - AND, OR, XOR, NOT
 - Left, logical-right, and arithmetic-right shifts
 - Fixed-width bit-string visualization
-- Full word-size interactive bit grid for 8/16/32/64/128-bit presets
-- Byte-grouped shared bit presentation for 8/16/32/64/128-bit presets
-- Shared copy actions for binary/octal/decimal/hex/fixed-width bit representations
-- Accessible bit-cell labels
+- Full 8/16/32/64/128-bit interactive bit grid
+- Byte-grouped shared presentation
+- Copy actions for binary/octal/decimal/hex/fixed-width bits
+- Accessible bit-cell state labels
 - Unicode scalar/code-point parsing, formatting, text conversion, and bounded sequence inspection
-- Shared Unicode decode/inspection copy actions
+- Shared Unicode result-copy actions
 
-### Conversion and utilities
+### Converter and utility modules
 
 - Offline fixed-unit conversion catalog across major physical/data categories
 - Swap workflow
-- Reusable validated conversion-pair model
-- Bounded recent conversion-pair tracking
+- Validated conversion-pair model
+- Bounded recent-pair tracking
 - Favorite conversion pairs
-- Versioned persisted conversion-pair tokens
-- Persisted recent/favorite converter state across launches
-- User-selectable and persisted 1–17 significant-digit result precision
-- Shared UI for recents, favorites, precision, and pair restoration
-- Shared category-scoped unit search workflow
-- Shared search-result assignment to From/To units
-- Shared change-aware clear-recents action
-- Shared conversion-result clipboard copy action
-- Optional currency-rate provider/cache architecture with offline fallback semantics
+- Versioned pair-persistence tokens
+- Persisted recent/favorite converter state
+- User-selectable/persisted 1–17 significant-digit result precision
+- Shared recents/favorites/precision restoration controls
+- Category-scoped unit search
+- Search-result assignment to From/To units
+- Change-aware clear-recents action
+- Conversion-result clipboard copy
+- Optional currency provider/cache architecture with offline fallback semantics
 - Date difference, calendar arithmetic, business-day, and fixed-duration utilities
 
-### Advanced mathematics
+### Advanced mathematics and graphing
 
 - Statistics module and shared view model
-- Shared statistics-summary copy action
+- Statistics-summary copy action
 - Equation-solving module and shared view model
 - Matrix utilities and shared view model
-- Shared matrix-result copy action
+- Matrix-result copy action
 - Graph sampling with discontinuity segmentation
 - Explicit graph viewport model
-- Interactive Avalonia plot control
-- Deterministic accessible SVG graph export engine
-- Shared SVG generation/copy workflow
+- Interactive/focusable Avalonia plot control
+- Pointer drag pan, wheel zoom, and double-tap/double-click fit-to-data
+- Keyboard arrow-key panning
+- Keyboard numpad Add/Subtract zoom
+- Keyboard Home reset
+- Keyboard `F` fit-to-data
+- Read-only viewport snapshot for deterministic UI assertions
+- Deterministic accessible SVG export engine and copy workflow
 - Bounded central-difference derivative analysis
 - Bracketed bisection root finding
 - Bounded Simpson numerical integration
-- Shared derivative/root/integral controls with approximate-result labeling
-- Shared nearest sampled-point graph trace workflow
-- Shared bounded graph table-of-values CSV workflow
-- Shared bounded multi-expression sampling using stable generated series identities
-- Shared identified multi-expression CSV export/copy workflow
+- Shared approximate derivative/root/integral controls
+- Nearest sampled-point tracing
+- Bounded single-expression table-of-values CSV
+- Bounded multi-expression sampling with stable generated identities
+- Identified multi-expression CSV export/copy
 
 ### History and persistence
 
@@ -104,144 +121,223 @@ Broad feature completion + cross-platform validation hardening. Core calculator,
 - Browser-compatible history/storage path
 - Search, recent history, favorites, delete, and clear flows
 - Bounded TXT/CSV/JSON history export engine
-- Shared export-format selection, preview, and clipboard-copy workflow for currently loaded/search-matching entries
-- Settings/preferences abstraction and shared settings view model
-- Serialized converter preferences in shared settings
-- Settings validation for converter precision/token bounds
+- Shared export-format selection, preview, and clipboard-copy workflow
+- Settings repository abstraction
+- Shared settings view model
+- Persisted converter and culture preferences
+- Explicit `AppSettingsSchema` version boundary
+- Legacy schema-zero migration
+- Detection/migration of truly historical JSON with **no** `schemaVersion` property
+- Fail-closed rejection of corrupt negative and unsupported future schema versions
+- Shared `AppSettingsJson` decoder used by native and Browser storage
+- Shared `AppSettingsValidator` used by native and Browser storage
+- Central validation of culture, decimal precision, history bounds, onboarding version, converter precision, and converter-token bounds
+- Native JSON temporary-file replacement behavior retained
+
+### Localization
+
+- Stable semantic `AppStringKey` catalog
+- Complete English semantic catalog for the current key set
+- Complete Hindi semantic catalog for the current key set
+- English/Hindi regional culture selection including forms such as `en-IN` and `hi-IN`
+- Persisted culture preference
+- Multi-catalog completeness/duplicate/unknown-key validation
+
+The shared XAML remains predominantly English. The Hindi semantic catalog is therefore an implemented localization foundation, **not** a claim that the complete visible UI is already translated.
+
+### Accessibility, adaptive layout, and onboarding
+
+- Shared 44-DIP minimum interaction-target baseline
+- 54-DIP standard calculator-key baseline
+- Compact/medium/expanded available-width profiles
+- Compact horizontal-overflow fallback for wide shared surfaces
+- Focus-change bring-into-view behavior on shared scroll containers
+- Explicit focused-state border emphasis for common keyboard controls
+- Stronger focused-state emphasis under CalcNova high contrast
+- High-contrast and reduced-motion shell state classes
+- Shared keyboard mode navigation using Ctrl+PageUp/PageDown/Home/End
+- Accessible symbol/button names and programmer bit-state names
+- Onboarding shortcut suppression while the overlay is visible
+- Onboarding focus handoff and calculator focus restoration source behavior
+- Onboarding copy now documents cyclic and first/last keyboard mode navigation
+- Runtime accessibility evidence matrix with PASS / FAIL / BLOCKED / NOT RUN vocabulary
 
 ### Application and platform architecture
 
 - Shared application composition root
 - About/external-link abstraction
 - Shared clipboard abstraction and Avalonia adapter
-- Shared clipboard dependency injection into Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History modes
+- Clipboard dependency injection into current copy-enabled modes
 - Desktop composition
 - Browser/WebAssembly composition
 - Android composition
 - iOS composition
-- Shared mode-selection API with cyclic normalization and first/last navigation
-- Invalid `TabControl` binding indexes are ignored instead of wrapping to another mode
-- Keyboard-first shell navigation through `Ctrl+PageUp`, `Ctrl+PageDown`, `Ctrl+Home`, and `Ctrl+End`
-- Shell navigation requires exactly the Control modifier and remains suppressed while onboarding is visible
+- Shared mode-selection API with cyclic normalization and deterministic first/last selection
+- Transient invalid `TabControl` selection values ignored rather than wrapped into another mode
 
-### Repository infrastructure
+## UI Automation Status
 
-- GitHub Actions workflows for core validation, formatting, docs, coverage, security, advanced utilities, release, UI contracts, and platform-target builds
-- Dependency vulnerability audit workflow
-- Repository/documentation/branding validation helpers
-- Source-level Avalonia XML well-formedness validation
-- Source-level shared command/property binding validation covering Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History
-- Source-level adaptive layout validator covering compact/medium/expanded classes, mode reachability, focus bring-into-view behavior, and narrow-layout scrolling contracts
-- Dedicated touch-target validator protecting the shared 44-DIP minimum interaction baseline and rejecting obvious view-level regressions
-- Dedicated keyboard contract validator covering calculator hardware mappings, shared-shell navigation mappings, and view wiring
-- Dedicated adaptive-layout, touch-target, and keyboard GitHub Actions workflows plus Python regression tests
-- Release workflow foundation
-- Original branding asset source and verification helpers
+Focused Avalonia headless UI automation is implemented in `CalcNova.App.Tests` using the repository-matched `Avalonia.Headless.XUnit` 12.1.1 package and xUnit v3.
+
+Current headless source scenarios include:
+
+- shared shell loads every primary mode;
+- Calculator clear control executes its real bound command;
+- selection-aware keypad replacement restores the TextBox caret;
+- compact-width window applies the compact adaptive class;
+- Ctrl+PageDown advances shared mode selection;
+- high-contrast preference applies the shell class;
+- onboarding is visible for a new/default state and hides after Skip;
+- graph arrow-key panning updates viewport state;
+- graph numpad zoom updates viewport span;
+- graph Home resets the viewport;
+- graph `F` fits finite sampled data.
+
+A dedicated `.NET 10` workflow restores and runs the App test project. The headless test source and CI execution path are additionally protected by SDK-independent source validation.
+
+These tests are **not considered PASS** merely because they exist. A compiled/headless execution result still needs to be observed.
+
+## Repository and CI Infrastructure
+
+Implemented SDK-independent validators/workflows cover:
+
+- repository structure/security source checks;
+- Avalonia XAML XML well-formedness;
+- shared UI command/property contracts;
+- navigation contracts;
+- calculator/shared-shell keyboard contracts;
+- calculator selection-editing contracts;
+- graph keyboard contracts;
+- headless UI-test setup/scenario/execution-path contracts;
+- accessibility markup;
+- focus visibility;
+- accessibility runtime-evidence discipline;
+- adaptive layout;
+- touch targets;
+- localization catalogs/preferences;
+- settings schema/shared codec/shared validator architecture;
+- onboarding persistence/visual/focus contracts;
+- packaging metadata;
+- Desktop/Browser/Android/iOS build-workflow contracts;
+- tag-first release workflow contracts;
+- release documentation/evidence contracts;
+- release-tag validation;
+- Python regression tests for the source validators;
+- integrated SDK-independent source preflight inventory.
+
+Additional release/platform source hardening includes:
+
+- release workflow validates the exact detached release tag before .NET restore/build/test;
+- Desktop release artifacts for Windows/Linux/macOS source paths;
+- Browser release publish path;
+- Android signed-AAB path only when external signing secrets are configured;
+- temporary Android keystore cleanup;
+- tag-specific unsigned iOS simulator validation workflow on macOS;
+- focused contract validation for the iOS release-tag workflow;
+- checksum generation for release artifacts;
+- existing GitHub Release notes/history preserved on reruns while intended assets are replaced.
 
 ## Shared UI Status
 
-The shared Avalonia shell currently exposes:
+The shared Avalonia shell exposes:
 
 - Standard + Scientific calculator
 - Sanitized paste and copy-result actions
-- Programmer calculator with full radix selector, bitwise operations, shifts, byte-grouped bit grid, and radix/fixed-width copy actions
-- Unicode code-point tools with result-copy actions
-- Offline unit converter with precision, search, search-result assignment, recents, favorites, clear-recents, and result copy
-- Statistics with analysis-summary copy
+- Selection-aware calculator keypad editing
+- Programmer calculator with full radix selector, bitwise operations, shifts, grouped bit grid, and copy actions
+- Unicode code-point tools
+- Offline unit converter with precision/search/recents/favorites/clear/copy
+- Statistics
 - Equations
-- Matrices with result copy
-- Graphing with sampling, preview/table copy, nearest-point trace, derivative/root/integral analysis, bounded multi-expression sampling/export, and accessible SVG generation/copy
+- Matrices
+- Graphing with pointer/keyboard viewport interaction, tracing, numerical analysis, CSV, multi-expression export, and SVG export
 - Date/time utilities
 - Currency conversion
-- History with search/favorite/delete/clear plus TXT/CSV/JSON preview/copy export
+- History with search/favorite/delete/clear and TXT/CSV/JSON preview/copy
 - Settings
 - About/support
-- Keyboard mode cycling and deterministic first/last mode navigation
-
-These controls are source-wired and protected by the shared UI contract validator. Compact/medium/expanded source contracts, the 44-DIP shared touch baseline, and keyboard-navigation mappings are additionally guarded by dedicated SDK-independent validators. They are **not** considered runtime-validated until Avalonia compilation/UI tests and target accessibility/device checks are observed.
+- First-run onboarding
 
 ## Remaining High-Priority Work
 
-1. Finish runtime adaptive navigation and compact/mobile layouts across every mode, especially long result surfaces and 64/128-bit programmer grids.
-2. Perform a full accessibility pass: keyboard traversal, screen-reader behavior, focus visibility, contrast, target sizes, large text, and reduced-motion behavior. Keyboard shortcut source contracts are improved, but actual traversal/assistive-technology behavior remains unverified.
-3. Add stable UI/integration automation for the shared Avalonia shell.
-4. Observe real GitHub Actions/build/test output from a suitable execution path and fix any compiler/analyzer/test failures.
-5. Validate all platform heads with their required SDK/workload environments and fix target-specific compilation/packaging issues.
-6. Complete Android/iOS store packaging metadata, signing guidance, and release documentation.
-7. Complete Windows/Linux/macOS packaging validation and release artifact checks.
-8. Expand localization infrastructure and reviewed language packs.
-9. Complete onboarding/first-run polish and final design-system consolidation.
-10. Run the final release-gate audit covering build, tests, formatting, security, docs, assets, accessibility, privacy, and packaging.
+The following work cannot be honestly marked complete from source presence alone:
+
+1. Observe real `.NET 10` restore, format, build, analyzer, and full test results and fix every concrete failure.
+2. Observe the dedicated Avalonia headless UI workflow and fix any compiled-XAML/headless failures.
+3. Validate Desktop on real Windows/Linux/macOS environments, including launch, clipboard, persistence, keyboard, scaling, and packaging.
+4. Validate Browser/WebAssembly publish/load/storage/clipboard/keyboard/accessibility behavior in supported browsers.
+5. Validate Android workload build, emulator/device launch, portrait/landscape/tablet layouts, persistence, clipboard, TalkBack/large text, and signed AAB/store checks.
+6. Validate iOS workload/simulator/device behavior, Dynamic Type/VoiceOver/layout, persistence/clipboard, signing/provisioning/archive/distribution. The tag-time simulator workflow is source-implemented but still requires an observed run.
+7. Perform the full runtime accessibility matrix: keyboard traversal, screen readers, focus visibility, measured contrast, target sizes, large text, reduced motion, and system accessibility composition.
+8. Perform real compact/medium/expanded device/window validation, especially 64/128-bit programmer grids and long result/export surfaces.
+9. Migrate predominantly English visible XAML to the semantic localization layer in compile-verified increments and validate Hindi long-string/Devanagari layouts.
+10. Complete native file-save/share polish for exported history/graph data only after platform abstractions are runtime-validated.
+11. Run the final release-candidate gate across source preflight, compiled tests, security, docs, assets, accessibility, privacy, platform packaging, signing, and store requirements.
 
 ## Known Issues / Risks
 
-1. **The .NET SDK is unavailable in the active execution environment used for this continuation.** New changes made here have therefore not been locally compiled or tested.
-2. A source change or test file is never treated as validated merely because it exists; actual workflow/build/test results still need to be observed.
-3. Avalonia XAML and platform-specific package/workload integration must be validated by actual workflows or suitable target machines before release readiness is claimed.
-4. Clipboard integration is explicitly user-triggered and attached to Avalonia `TopLevel`; target-specific runtime behavior still requires platform validation.
-5. Numerical graph analysis is intentionally approximate and bounded; UI and documentation must continue labeling it as approximate.
-6. Converter pair persistence uses versioned unit-ID tokens. Unknown/obsolete tokens are ignored by the converter restore layer, while settings storage also enforces count/length bounds.
-7. Large 64/128-bit interactive grids may require additional compact-layout or virtualization polish on narrow/mobile screens even though byte grouping is exposed in shared XAML.
-8. Source-level XAML/XML, binding, adaptive-layout, touch-target, and keyboard checks reduce regression risk but do not replace Avalonia XAML compilation, real UI automation, screen-reader/touch testing, or large-text validation.
-9. History preview/copy export is implemented; platform-native file-save/share UX remains separate release polish.
-10. `Ctrl+PageUp`, `Ctrl+PageDown`, `Ctrl+Home`, and `Ctrl+End` are protected by source/unit contracts, but browser/OS/accessibility-tool shortcut conflicts still require target runtime verification.
+1. **The required .NET SDK is unavailable in the active assistant execution environment used for this continuation.** No local compiled build/test PASS is claimed.
+2. Source/test/workflow presence is never treated as equivalent to observed execution.
+3. Avalonia XAML and platform workload integration still require actual compiled runs.
+4. Browser storage, native filesystem storage, clipboard APIs, and optional network behavior need target runtime evidence.
+5. Numerical graph analysis is intentionally approximate and bounded; documentation/UI must keep that distinction visible.
+6. Large 64/128-bit programmer grids may still need further compact-layout refinement if device testing proves the current grouped layout inadequate.
+7. The Hindi semantic catalog exists, but the predominantly English shared XAML prevents any claim of complete Hindi UI localization.
+8. Headless UI tests improve shared-shell confidence but do not emulate screen readers, real touch/IME behavior, native permission prompts, GPU rendering, mobile layout engines, signing, or package lifecycles.
+9. Settings schema migration source tests now model truly unversioned historical JSON; native/Browser runtime storage migration must still be observed on target environments.
+10. iOS release-tag simulator validation does not claim signing, provisioning, archive, TestFlight, App Store processing, or device readiness.
 
 ## Validation Status
 
-### Source/test coverage present
+### Implemented source/test coverage
 
-- Core tests: IMPLEMENTED
-- App/view-model tests: IMPLEMENTED
+- Core/domain tests: IMPLEMENTED
 - Programmer tests: IMPLEMENTED
 - Converter tests: IMPLEMENTED
-- Persistence/settings tests: IMPLEMENTED
+- Persistence/history tests: IMPLEMENTED
+- Shared settings schema/decoder/validator tests: IMPLEMENTED
 - Graphing tests: IMPLEMENTED
 - Statistics tests: IMPLEMENTED
-- Equations tests: IMPLEMENTED
-- Matrices tests: IMPLEMENTED
+- Equation tests: IMPLEMENTED
+- Matrix tests: IMPLEMENTED
 - Currency tests: IMPLEMENTED
 - Date/time tests: IMPLEMENTED
-- Platform abstraction tests: IMPLEMENTED
-- History export view-model tests: IMPLEMENTED
-- Shared clipboard composition tests: IMPLEMENTED
-- Shared XAML command/property contract validator: IMPLEMENTED
-- Avalonia XAML XML well-formedness validator: IMPLEMENTED
-- Adaptive layout contract validator: IMPLEMENTED
-- Adaptive layout validator Python tests: IMPLEMENTED
-- Touch-target regression validator: IMPLEMENTED
-- Touch-target validator Python tests: IMPLEMENTED
-- Main view navigation boundary/invalid-index tests: IMPLEMENTED
-- Shared shell keyboard shortcut tests: IMPLEMENTED
-- Keyboard contract validator: IMPLEMENTED
-- Keyboard contract validator Python tests: IMPLEMENTED
-- Dedicated keyboard validation workflow: IMPLEMENTED
+- App/view-model tests: IMPLEMENTED
+- Calculator selection-editing tests: IMPLEMENTED
+- Avalonia headless shared-shell tests: IMPLEMENTED IN SOURCE
+- Avalonia headless graph viewport tests: IMPLEMENTED IN SOURCE
+- SDK-independent validator regression tests: IMPLEMENTED
+- Platform/release workflow source contracts: IMPLEMENTED
 
-### This continuation execution
+### Execution evidence in this continuation
 
-- Local restore: **NOT RUN — .NET SDK unavailable**
+- Local `.NET restore`: **NOT RUN — .NET SDK unavailable**
 - Local formatting verification: **NOT RUN — .NET SDK unavailable**
-- Local build: **NOT RUN — .NET SDK unavailable**
-- Local tests: **NOT RUN — .NET SDK unavailable**
-- Local repository UI validators: **NOT RUN against a local checkout in this execution**
-- Android build/package validation: **NOT RUN in this execution**
-- iOS build/package validation: **NOT RUN in this execution**
-- Browser/WebAssembly build validation: **NOT RUN in this execution**
-- Desktop OS packaging validation: **NOT RUN in this execution**
-- GitHub workflow lookup for the inspected keyboard-validator commit: **NO WORKFLOW RUNS EXPOSED**
+- Local compiled build: **NOT RUN — .NET SDK unavailable**
+- Local compiled tests: **NOT RUN — .NET SDK unavailable**
+- Local Avalonia headless tests: **NOT RUN — .NET SDK unavailable**
+- Windows launch/package validation: **NOT RUN**
+- Linux launch/package validation: **NOT RUN**
+- macOS launch/sign/notarization validation: **NOT RUN**
+- Browser/WebAssembly runtime validation: **NOT RUN**
+- Android device/signed package validation: **NOT RUN**
+- iOS simulator/device/sign/archive validation: **NOT RUN**
+- Screen-reader/large-text/measured-contrast target audit: **NOT RUN**
 
-A check is never marked PASS unless it actually ran and its result was observed.
+The SDK-independent source preflight command was invoked against a downloaded `main` snapshot during this continuation, but its output is not being promoted here as release evidence. The authoritative release status remains conservative until an observable CI/local result is captured.
+
+**A check is never marked PASS unless it actually ran and its result was observed.**
 
 ## Continuation Priorities
 
-The next development pass should begin with the first still-incomplete item below rather than recreating completed modules:
+The next continuation must start from execution evidence rather than recreating completed source modules:
 
-1. Runtime focus traversal and adaptive/mobile layout polish for Calculator, Programmer, Converter, Graph, Date, FX, History, and advanced modes; prioritize long outputs, narrow touch interaction, and 64/128-bit programmer grids.
-2. Screen-reader/focus/high-contrast/large-text accessibility refinements on top of the new keyboard navigation contract.
-3. Inspect actual GitHub Actions/check results and fix any real compile/analyzer/test failures.
-4. Add reliable shared-shell UI/integration tests where the Avalonia test stack is stable.
-5. Improve cursor/selection-aware calculator editing and locale-aware keyboard/numpad shortcuts without breaking text-box editing or browser conventions.
-6. Expand localization/onboarding only after core UI validation is stable.
-7. Continue store/package/release hardening only after observed CI/platform validation.
+1. Inspect/observe GitHub Actions or run `.NET 10` locally and fix actual restore/build/test/headless failures.
+2. Record real platform results in `docs/ACCESSIBILITY_TEST_MATRIX.md` and the release readiness checklist.
+3. Fix target-specific adaptive/accessibility/platform issues discovered by those runs.
+4. Continue visible-XAML localization only in compile-verified increments.
+5. Add native file-save/share UX only after platform behavior is validated.
+6. Complete signing/store/release-candidate work only with the required target tooling and external credentials.
 
 ## Important Paths
 
@@ -263,10 +359,11 @@ The next development pass should begin with the first still-incomplete item belo
 - `src/CalcNova.Android/`
 - `src/CalcNova.iOS/`
 - `tests/`
+- `tools/`
 - `.github/workflows/`
 - `docs/`
 - `what_changed.md`
 
 ## Continuation Rule
 
-Before new development, read this file and `what_changed.md`, inspect current `main`, and continue the first incomplete task. Do not recreate completed files, reset the repository, or report unexecuted validation as passing.
+Before new development, read this file and `what_changed.md`, inspect current `main`, and continue the first incomplete task. Do not recreate completed files, reset the repository, or report unavailable/unobserved validation as passing.
