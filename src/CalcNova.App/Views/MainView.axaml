@@ -462,6 +462,8 @@
             <TextBlock Text="Settings" FontSize="21" FontWeight="SemiBold" />
             <TextBlock Text="Theme" /><ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme, Mode=TwoWay}" />
             <TextBlock Text="Angle unit" /><ComboBox ItemsSource="{Binding AngleUnits}" SelectedItem="{Binding AngleUnit, Mode=TwoWay}" />
+            <TextBlock Text="Language" /><ComboBox ItemsSource="{Binding SupportedCultureNames}" SelectedItem="{Binding CultureName, Mode=TwoWay}" />
+            <TextBlock Text="Only reviewed languages are listed. English is the current source language." Opacity="0.62" TextWrapping="Wrap" />
             <TextBlock Text="Decimal precision (1–29)" /><TextBox Text="{Binding DecimalPrecision, Mode=TwoWay}" />
             <TextBlock Text="History limit (1–5000)" /><TextBox Text="{Binding HistoryLimit, Mode=TwoWay}" />
             <CheckBox Content="Enable history" IsChecked="{Binding HistoryEnabled, Mode=TwoWay}" />
