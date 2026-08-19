@@ -5,6 +5,7 @@ using CalcNova.Core.Evaluation;
 using CalcNova.Core.Memory;
 using CalcNova.Core.Numerics;
 using CalcNova.Core.Parsing;
+using CalcNova.Platform.Clipboard;
 
 namespace CalcNova.App.ViewModels;
 
@@ -16,6 +17,7 @@ public sealed class CalculatorViewModel : ViewModelBase
     private readonly CalculatorMemory _memory = new();
     private readonly Func<string, string, Task>? _recordCalculationAsync;
     private readonly Func<bool> _historyEnabledProvider;
+    private readonly IClipboardService? _clipboardService;
     private string? _lastEvaluatedExpression;
     private string _expression = string.Empty;
     private string _result = "0";
@@ -25,13 +27,15 @@ public sealed class CalculatorViewModel : ViewModelBase
     public CalculatorViewModel(
         ExpressionEvaluator? evaluator = null,
         Func<string, string, Task>? recordCalculationAsync = null,
-        Func<bool>? historyEnabledProvider = null)
+        Func<bool>? historyEnabledProvider = null,
+        IClipboardService? clipboardService = null)
     {
         _evaluator = evaluator ?? new ExpressionEvaluator();
         _session = new CalculationSession(_evaluator);
         _percentageTransformer = new CalculatorPercentageTransformer(_evaluator);
         _recordCalculationAsync = recordCalculationAsync;
         _historyEnabledProvider = historyEnabledProvider ?? (() => true);
+        _clipboardService = clipboardService;
 
         AppendCommand = new RelayCommand(Append);
         EvaluateCommand = new AsyncRelayCommand(_ => EvaluateAsync());
@@ -46,6 +50,8 @@ public sealed class CalculatorViewModel : ViewModelBase
         MemoryAddCommand = new RelayCommand(_ => MemoryAdd());
         MemorySubtractCommand = new RelayCommand(_ => MemorySubtract());
         ImportExpressionCommand = new RelayCommand(ImportExpression);
+        PasteCommand = new AsyncRelayCommand(_ => PasteAsync());
+        CopyResultCommand = new AsyncRelayCommand(_ => CopyResultAsync());
     }
 
     public string Expression
@@ -125,6 +131,10 @@ public sealed class CalculatorViewModel : ViewModelBase
 
     public ICommand ImportExpressionCommand { get; }
 
+    public ICommand PasteCommand { get; }
+
+    public ICommand CopyResultCommand { get; }
+
     public async Task EvaluateAsync()
     {
         var options = CreateOptions();
@@ -173,6 +183,64 @@ public sealed class CalculatorViewModel : ViewModelBase
             StatusMessage = string.Empty;
         }
         catch (ArgumentException exception)
+        {
+            StatusMessage = exception.Message;
+        }
+    }
+
+    public async Task PasteAsync(CancellationToken cancellationToken = default)
+    {
+        if (_clipboardService?.IsAvailable != true)
+        {
+            StatusMessage = "Clipboard access is unavailable on this platform.";
+            return;
+        }
+
+        try
+        {
+            var text = await _clipboardService.GetTextAsync(cancellationToken);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                StatusMessage = "The clipboard does not contain expression text.";
+                return;
+            }
+
+            ImportExpression(text);
+        }
+        catch (OperationCanceledException)
+        {
+            StatusMessage = "Clipboard paste was cancelled.";
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or NotSupportedException)
+        {
+            StatusMessage = exception.Message;
+        }
+    }
+
+    public async Task CopyResultAsync(CancellationToken cancellationToken = default)
+    {
+        if (_clipboardService?.IsAvailable != true)
+        {
+            StatusMessage = "Clipboard access is unavailable on this platform.";
+            return;
+        }
+
+        if (Result is "Error" || string.IsNullOrWhiteSpace(Result))
+        {
+            StatusMessage = "There is no valid result to copy.";
+            return;
+        }
+
+        try
+        {
+            await _clipboardService.SetTextAsync(Result, cancellationToken);
+            StatusMessage = "Result copied.";
+        }
+        catch (OperationCanceledException)
+        {
+            StatusMessage = "Clipboard copy was cancelled.";
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or NotSupportedException)
         {
             StatusMessage = exception.Message;
         }
