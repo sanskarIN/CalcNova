@@ -4,8 +4,8 @@
     <OutputType>Exe</OutputType>
     <ApplicationId>in.sanskar.calcnova</ApplicationId>
     <ApplicationTitle>CalcNova</ApplicationTitle>
-    <ApplicationVersion>1</ApplicationVersion>
-    <ApplicationDisplayVersion>0.1.0-dev</ApplicationDisplayVersion>
+    <ApplicationVersion>20803</ApplicationVersion>
+    <ApplicationDisplayVersion>$(ProductDisplayVersion)</ApplicationDisplayVersion>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
   </PropertyGroup>
