@@ -120,6 +120,14 @@ def validate(root: Path) -> list[str]:
         "AppStringKey.CalculatorTitle",
         '"Enter an expression"',
         "AppStringKey.PromptEnterExpression",
+        '"Welcome to CalcNova"',
+        "AppStringKey.OnboardingWelcome",
+        '"Calculate your way"',
+        "AppStringKey.OnboardingCalculateTitle",
+        '"Skip"',
+        "AppStringKey.ActionSkip",
+        '"Start calculating"',
+        "AppStringKey.ActionStartCalculating",
         "GetModeHeaders",
         "TryGetLiteralKey",
     ):
@@ -143,6 +151,10 @@ def validate(root: Path) -> list[str]:
         '"कैलकुलेटर"',
         '"मानक + वैज्ञानिक"',
         '"अभिव्यक्ति दर्ज करें"',
+        "HindiCulture_LocalizesVisibleOnboardingCopy",
+        '"CalcNova में आपका स्वागत है"',
+        '"छोड़ें"',
+        '"गणना शुरू करें"',
     ):
         if marker not in headless_tests_source:
             failures.append(f"Headless UI tests are missing live localization scenario marker: {marker}")
@@ -169,7 +181,7 @@ def main() -> int:
     key_count = 0 if enum_match is None else len(re.findall(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*,?\s*$", enum_match.group("body"), re.MULTILINE))
     print(
         f"Validated {key_count} semantic localization keys across {len(CATALOG_FILES)} catalogs, "
-        "persisted culture preferences, and live shared-shell localization wiring."
+        "persisted culture preferences, and live shared-shell/onboarding localization wiring."
     )
     return 0
 
