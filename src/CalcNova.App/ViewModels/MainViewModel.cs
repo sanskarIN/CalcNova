@@ -29,6 +29,8 @@ public sealed class MainViewModel : ViewModelBase
 
     public ProgrammerViewModel Programmer { get; } = new();
 
+    public CodePointViewModel CodePoint { get; } = new();
+
     public ConverterViewModel Converter { get; } = new();
 
     public StatisticsViewModel Statistics { get; } = new();
