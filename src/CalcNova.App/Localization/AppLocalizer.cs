@@ -5,21 +5,15 @@ namespace CalcNova.App.Localization;
 public sealed class AppLocalizer : IAppLocalizer
 {
     private static readonly CultureInfo EnglishCulture = CultureInfo.GetCultureInfo("en");
-    private static readonly IReadOnlyList<CultureInfo> Cultures = [EnglishCulture];
+    private static readonly CultureInfo HindiCulture = CultureInfo.GetCultureInfo("hi");
+    private static readonly IReadOnlyList<CultureInfo> Cultures = [EnglishCulture, HindiCulture];
 
     private CultureInfo _culture = EnglishCulture;
 
     static AppLocalizer()
     {
-        var missingKeys = Enum.GetValues<AppStringKey>()
-            .Where(key => !EnglishAppStrings.Values.ContainsKey(key))
-            .ToArray();
-
-        if (missingKeys.Length > 0)
-        {
-            throw new InvalidOperationException(
-                $"English localization catalog is missing: {string.Join(", ", missingKeys)}");
-        }
+        ValidateCatalog("English", EnglishAppStrings.Values);
+        ValidateCatalog("Hindi", HindiAppStrings.Values);
     }
 
     public AppLocalizer(string? initialCultureName = null)
@@ -36,7 +30,10 @@ public sealed class AppLocalizer : IAppLocalizer
 
     public IReadOnlyList<CultureInfo> SupportedCultures => Cultures;
 
-    public string this[AppStringKey key] => EnglishAppStrings.Values[key];
+    public string this[AppStringKey key] =>
+        string.Equals(_culture.TwoLetterISOLanguageName, HindiCulture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase)
+            ? HindiAppStrings.Values[key]
+            : EnglishAppStrings.Values[key];
 
     public bool TrySetCulture(string? cultureName)
     {
@@ -55,10 +52,10 @@ public sealed class AppLocalizer : IAppLocalizer
             return false;
         }
 
-        if (!string.Equals(
+        if (!Cultures.Any(culture => string.Equals(
                 requestedCulture.TwoLetterISOLanguageName,
-                EnglishCulture.TwoLetterISOLanguageName,
-                StringComparison.OrdinalIgnoreCase))
+                culture.TwoLetterISOLanguageName,
+                StringComparison.OrdinalIgnoreCase)))
         {
             return false;
         }
@@ -71,5 +68,18 @@ public sealed class AppLocalizer : IAppLocalizer
         _culture = requestedCulture;
         CultureChanged?.Invoke(_culture);
         return true;
+    }
+
+    private static void ValidateCatalog(string name, IReadOnlyDictionary<AppStringKey, string> values)
+    {
+        var missingKeys = Enum.GetValues<AppStringKey>()
+            .Where(key => !values.TryGetValue(key, out var value) || string.IsNullOrWhiteSpace(value))
+            .ToArray();
+
+        if (missingKeys.Length > 0)
+        {
+            throw new InvalidOperationException(
+                $"{name} localization catalog is missing: {string.Join(", ", missingKeys)}");
+        }
     }
 }
