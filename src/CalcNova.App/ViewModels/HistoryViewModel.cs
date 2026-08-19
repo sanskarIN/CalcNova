@@ -1,5 +1,7 @@
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Services;
+using CalcNova.Platform.Clipboard;
 using CalcNova.Platform.History;
 
 namespace CalcNova.App.ViewModels;
@@ -8,20 +10,30 @@ public sealed class HistoryViewModel : ViewModelBase
 {
     private readonly ICalculationHistoryRepository? _repository;
     private readonly Func<int> _historyLimitProvider;
+    private readonly IClipboardService? _clipboardService;
+    private readonly HistoryExportService _exportService = new();
     private IReadOnlyList<HistoryEntry> _entries = Array.Empty<HistoryEntry>();
     private HistoryEntry? _selectedEntry;
     private string _searchQuery = string.Empty;
     private string _statusMessage = string.Empty;
+    private HistoryExportFormat _selectedExportFormat = HistoryExportFormat.PlainText;
+    private string _exportPreview = string.Empty;
     private bool _isInitialized;
 
-    public HistoryViewModel(ICalculationHistoryRepository? repository, Func<int>? historyLimitProvider = null)
+    public HistoryViewModel(
+        ICalculationHistoryRepository? repository,
+        Func<int>? historyLimitProvider = null,
+        IClipboardService? clipboardService = null)
     {
         _repository = repository;
         _historyLimitProvider = historyLimitProvider ?? (() => 500);
+        _clipboardService = clipboardService;
         RefreshCommand = new AsyncRelayCommand(_ => RefreshAsync());
         ClearCommand = new AsyncRelayCommand(_ => ClearAsync());
         DeleteCommand = new AsyncRelayCommand(DeleteAsync);
         ToggleFavoriteCommand = new AsyncRelayCommand(ToggleFavoriteAsync);
+        GenerateExportCommand = new RelayCommand(_ => GenerateExport());
+        CopyExportCommand = new AsyncRelayCommand(_ => CopyExportAsync());
     }
 
     public IReadOnlyList<HistoryEntry> Entries
@@ -48,6 +60,26 @@ public sealed class HistoryViewModel : ViewModelBase
         private set => SetField(ref _statusMessage, value);
     }
 
+    public IReadOnlyList<HistoryExportFormat> ExportFormats { get; } = Enum.GetValues<HistoryExportFormat>();
+
+    public HistoryExportFormat SelectedExportFormat
+    {
+        get => _selectedExportFormat;
+        set
+        {
+            if (SetField(ref _selectedExportFormat, value))
+            {
+                ExportPreview = string.Empty;
+            }
+        }
+    }
+
+    public string ExportPreview
+    {
+        get => _exportPreview;
+        private set => SetField(ref _exportPreview, value);
+    }
+
     public bool IsAvailable => _repository is not null;
 
     public ICommand RefreshCommand { get; }
@@ -57,6 +89,10 @@ public sealed class HistoryViewModel : ViewModelBase
     public ICommand DeleteCommand { get; }
 
     public ICommand ToggleFavoriteCommand { get; }
+
+    public ICommand GenerateExportCommand { get; }
+
+    public ICommand CopyExportCommand { get; }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -116,6 +152,7 @@ public sealed class HistoryViewModel : ViewModelBase
         {
             Entries = Array.Empty<HistoryEntry>();
             SelectedEntry = null;
+            ExportPreview = string.Empty;
             StatusMessage = "History storage is not configured for this platform yet.";
             return;
         }
@@ -129,6 +166,7 @@ public sealed class HistoryViewModel : ViewModelBase
                 SelectedEntry = null;
             }
 
+            ExportPreview = string.Empty;
             StatusMessage = Entries.Count == 0 ? "No matching history entries." : string.Empty;
         }
         catch (Exception exception)
@@ -149,6 +187,7 @@ public sealed class HistoryViewModel : ViewModelBase
             await _repository.ClearAsync(cancellationToken);
             Entries = Array.Empty<HistoryEntry>();
             SelectedEntry = null;
+            ExportPreview = string.Empty;
             StatusMessage = "History cleared.";
         }
         catch (Exception exception)
@@ -207,5 +246,31 @@ public sealed class HistoryViewModel : ViewModelBase
         {
             StatusMessage = $"Favorite state could not be updated: {exception.Message}";
         }
+    }
+
+    private void GenerateExport()
+    {
+        try
+        {
+            ExportPreview = _exportService.Export(Entries, SelectedExportFormat);
+            StatusMessage = Entries.Count == 0
+                ? "Export preview is empty because there are no matching history entries."
+                : $"Prepared {SelectedExportFormat} export for {Entries.Count} history entr{(Entries.Count == 1 ? "y" : "ies")}.";
+        }
+        catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
+        {
+            ExportPreview = string.Empty;
+            StatusMessage = $"History export could not be generated: {exception.Message}";
+        }
+    }
+
+    private async Task CopyExportAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ExportPreview))
+        {
+            GenerateExport();
+        }
+
+        StatusMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, ExportPreview, "history export");
     }
 }
