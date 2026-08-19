@@ -36,6 +36,8 @@ internal static class EnglishAppStrings
             [AppStringKey.OnboardingPrivacyBody] = "Calculation history and preferences stay in local app storage. Physical unit conversion is offline. Currency rates are the optional network-enhanced feature and can use cached data when available.",
             [AppStringKey.OnboardingNoAccount] = "No account is required for core CalcNova features. You can skip this introduction immediately.",
 
+            [AppStringKey.ConverterPreferencesTitle] = "Saved converter preferences",
+            [AppStringKey.ConverterPreferencesBody] = "Precision, recent pairs, and favorites are stored only in local app settings. Fixed unit conversion remains offline.",
             [AppStringKey.CurrencyTitle] = "Currency Converter",
             [AppStringKey.CurrencyPrivacyBody] = "Optional network-enhanced module. CalcNova never embeds API keys; cached rates remain usable offline.",
             [AppStringKey.HistoryTitle] = "Calculation History",
