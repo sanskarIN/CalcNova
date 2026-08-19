@@ -20,9 +20,13 @@ is_valid_release_tag = MODULE.is_valid_release_tag
 
 class ReleaseTagValidationTests(unittest.TestCase):
     def test_accepts_stable_semantic_versions(self) -> None:
-        for tag in ("v0.1.0", "v1.0.0", "v10.25.300"):
+        for tag in ("v0.1.0", "v1.0.0", "v2.8.3", "v10.25.300"):
             with self.subTest(tag=tag):
                 self.assertTrue(is_valid_release_tag(tag))
+
+    def test_product_display_version_2_8_03_uses_normalized_semver_tag(self) -> None:
+        self.assertTrue(is_valid_release_tag("v2.8.3"))
+        self.assertFalse(is_valid_release_tag("v2.8.03"))
 
     def test_accepts_semver_prerelease_versions(self) -> None:
         for tag in ("v1.0.0-alpha", "v1.0.0-alpha.1", "v2.4.0-rc.12"):
