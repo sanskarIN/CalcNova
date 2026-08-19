@@ -7,8 +7,14 @@ on:
       - "src/CalcNova.App/Localization/**"
       - "src/CalcNova.App/Services/AppDependencies.cs"
       - "src/CalcNova.App/ViewModels/MainViewModel.cs"
+      - "src/CalcNova.App/ViewModels/SettingsViewModel.cs"
+      - "src/CalcNova.Platform/Settings/AppSettings.cs"
+      - "src/CalcNova.Persistence/Settings/JsonSettingsRepository.cs"
+      - "src/CalcNova.Browser/Services/BrowserSettingsRepository.cs"
       - "tests/CalcNova.App.Tests/AppLocalizerTests.cs"
       - "tests/CalcNova.App.Tests/MainViewModelLocalizationTests.cs"
+      - "tests/CalcNova.App.Tests/SettingsLocalizationViewModelTests.cs"
+      - "tests/CalcNova.Persistence.Tests/JsonSettingsRepositoryTests.cs"
       - "tools/validate_localization_catalog.py"
       - "docs/LOCALIZATION.md"
       - ".github/workflows/localization-validate.yml"
@@ -17,8 +23,14 @@ on:
       - "src/CalcNova.App/Localization/**"
       - "src/CalcNova.App/Services/AppDependencies.cs"
       - "src/CalcNova.App/ViewModels/MainViewModel.cs"
+      - "src/CalcNova.App/ViewModels/SettingsViewModel.cs"
+      - "src/CalcNova.Platform/Settings/AppSettings.cs"
+      - "src/CalcNova.Persistence/Settings/JsonSettingsRepository.cs"
+      - "src/CalcNova.Browser/Services/BrowserSettingsRepository.cs"
       - "tests/CalcNova.App.Tests/AppLocalizerTests.cs"
       - "tests/CalcNova.App.Tests/MainViewModelLocalizationTests.cs"
+      - "tests/CalcNova.App.Tests/SettingsLocalizationViewModelTests.cs"
+      - "tests/CalcNova.Persistence.Tests/JsonSettingsRepositoryTests.cs"
       - "tools/validate_localization_catalog.py"
       - "docs/LOCALIZATION.md"
       - ".github/workflows/localization-validate.yml"
@@ -36,7 +48,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses:
+          actions/setup-python@v5
         with:
           python-version: "3.13"
 
