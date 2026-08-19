@@ -31,6 +31,8 @@ public partial class MainView : UserControl
     private TabControl? _localizationTabControl;
     private TextBox? _calculatorExpressionTextBox;
     private CalculatorViewModel? _calculatorEditorViewModel;
+    private CodePointMetadataPanel? _codePointMetadataPanel;
+    private CodePointViewModel? _codePointMetadataViewModel;
     private GraphPlotControl? _graphPlotControl;
     private TextBlock? _graphLegendTextBlock;
     private GraphingViewModel? _graphPlotViewModel;
@@ -93,11 +95,13 @@ public partial class MainView : UserControl
 
         AttachLocalization(viewModel);
         AttachCalculatorExpressionEditor(viewModel.Calculator);
+        EnsureCodePointMetadataPanel(viewModel.CodePoint);
         EnsureGraphPlot(viewModel.Graphing);
 
         await viewModel.InitializeAsync();
         CaptureLocalizedControls();
         ApplyLocalization();
+        EnsureCodePointMetadataPanel(viewModel.CodePoint);
         EnsureGraphPlot(viewModel.Graphing);
         _onboardingWasVisible = viewModel.Settings.ShouldShowOnboarding;
         if (_onboardingWasVisible)
@@ -114,6 +118,7 @@ public partial class MainView : UserControl
         }
 
         DetachGraphPlot();
+        DetachCodePointMetadataPanel();
         DetachLocalization();
         DetachCalculatorExpressionEditor();
 
@@ -239,6 +244,7 @@ public partial class MainView : UserControl
         RefreshLocalizationTargets();
         if (_subscribedViewModel is not null)
         {
+            EnsureCodePointMetadataPanel(_subscribedViewModel.CodePoint);
             EnsureGraphPlot(_subscribedViewModel.Graphing);
         }
     }
@@ -320,6 +326,44 @@ public partial class MainView : UserControl
         {
             tabs[index].Header = modeHeaders[index];
         }
+    }
+
+    private void EnsureCodePointMetadataPanel(CodePointViewModel codePoint)
+    {
+        if (_codePointMetadataPanel is not null && ReferenceEquals(_codePointMetadataViewModel, codePoint))
+        {
+            return;
+        }
+
+        var codePointPanel = this.GetVisualDescendants()
+            .OfType<StackPanel>()
+            .FirstOrDefault(panel => ReferenceEquals(panel.DataContext, codePoint));
+        if (codePointPanel is null)
+        {
+            return;
+        }
+
+        DetachCodePointMetadataPanel();
+
+        var metadataPanel = new CodePointMetadataPanel
+        {
+            DataContext = codePoint
+        };
+        var insertionIndex = Math.Max(0, codePointPanel.Children.Count - 1);
+        codePointPanel.Children.Insert(insertionIndex, metadataPanel);
+        _codePointMetadataPanel = metadataPanel;
+        _codePointMetadataViewModel = codePoint;
+    }
+
+    private void DetachCodePointMetadataPanel()
+    {
+        if (_codePointMetadataPanel?.Parent is Panel panel)
+        {
+            panel.Children.Remove(_codePointMetadataPanel);
+        }
+
+        _codePointMetadataPanel = null;
+        _codePointMetadataViewModel = null;
     }
 
     private void EnsureGraphPlot(GraphingViewModel graphing)
