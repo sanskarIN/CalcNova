@@ -1,0 +1,47 @@
+name: Source Hardening Suite
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "tools/**"
+      - "docs/**"
+      - ".github/workflows/**"
+      - "PROJECT_STATE.md"
+      - "what_changed.md"
+      - "CHANGELOG.md"
+  pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "tools/**"
+      - "docs/**"
+      - ".github/workflows/**"
+      - "PROJECT_STATE.md"
+      - "what_changed.md"
+      - "CHANGELOG.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-hardening:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Run source hardening suite
+        run: python tools/source_hardening_suite.py
+
+      - name: Validate hardening-suite inventory
+        run: python -m unittest tools.tests.test_source_hardening_suite
