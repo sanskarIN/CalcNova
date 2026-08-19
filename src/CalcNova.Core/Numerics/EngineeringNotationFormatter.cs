@@ -4,6 +4,7 @@ namespace CalcNova.Core.Numerics;
 
 public static class EngineeringNotationFormatter
 {
+    public const int MaximumInputCharacters = 4_096;
     public const int MinimumSignificantDigits = 1;
     public const int MaximumSignificantDigits = 15;
     public const int MinimumEngineeringExponent = -324;
@@ -41,6 +42,18 @@ public static class EngineeringNotationFormatter
 
     public static double Parse(string? text)
     {
+        if (text is null)
+        {
+            throw new FormatException("Engineering notation text is required.");
+        }
+
+        if (text.Length > MaximumInputCharacters)
+        {
+            throw new ArgumentException(
+                $"Engineering notation input may contain at most {MaximumInputCharacters} characters.",
+                nameof(text));
+        }
+
         if (string.IsNullOrWhiteSpace(text))
         {
             throw new FormatException("Engineering notation text is required.");
