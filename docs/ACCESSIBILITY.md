@@ -14,11 +14,18 @@ Current source/UI measures include:
 - compact-width horizontal scroll fallback for mode content that still contains wide fixed-column control groups;
 - focus-change bring-into-view behavior on shared mode scroll containers;
 - keyboard Enter/Escape/Backspace support in the primary calculator mode;
+- `Ctrl+PageUp` / `Ctrl+PageDown` shared mode cycling;
+- deterministic top-row/numpad digit and numpad arithmetic-key handling outside text fields;
+- explicit automation names for symbol-heavy calculator controls including memory, angle, scientific, operator, digit, decimal, and evaluation keys;
+- explicit automation names for programmer bitwise AND/OR/XOR/NOT controls;
 - accessible state names for programmer bit cells such as `Bit 7, set`;
 - textual programmer bit patterns in addition to the interactive bit grid;
 - textual graph sampling/analysis output in addition to graphical presentation;
+- a shared first-run surface with accessible Skip/Start actions;
+- onboarding focus queued to the visible action surface, with focus returned to the calculator input after dismissal;
 - reduced-motion and high-contrast preference fields in settings;
-- scrollable shared-mode layouts rather than fixed-height content clipping.
+- scrollable shared-mode layouts rather than fixed-height content clipping;
+- source-level accessibility markup validation in the shared UI workflow.
 
 ## Adaptive layout baseline
 
@@ -31,6 +38,18 @@ The shared shell now selects an available-width profile instead of relying on de
 Compact mode reduces non-essential padding while preserving minimum interactive target heights. It also enables horizontal scrolling inside shared mode scroll containers as a safe fallback for wide calculator/function/date grids that have not yet received a deeper structural reflow. Focus changes are configured to bring the focused control into view where the Avalonia scroll container supports that behavior.
 
 This is an implementation baseline, not a claim that every mode is fully optimized for phones. The final mobile pass must still verify actual portrait/landscape behavior, text scaling, tab-header navigation, screen-reader order, and 64/128-bit programmer interaction on target devices.
+
+## Source-level accessibility gate
+
+`tools/validate_accessibility_markup.py` is wired into `UI Contract Validate` and currently checks deterministic source rules that do not require an accessibility runtime:
+
+- symbol-heavy calculator/programmer buttons covered by the contract have an explicit `AutomationProperties.Name`;
+- common control styles retain the shared 44-pixel minimum-height baseline;
+- normal calculator keys retain the 54-pixel baseline;
+- compact calculator keys retain at least a 50-pixel minimum height;
+- CheckBox touch-target styling remains present.
+
+This gate catches accidental source regressions only. It cannot prove screen-reader wording, focus order, contrast, text scaling, or target-platform accessibility behavior.
 
 ## Requirements
 
@@ -47,9 +66,12 @@ This is an implementation baseline, not a claim that every mode is fully optimiz
 - All essential desktop/browser functions must be reachable without a mouse.
 - Tab order must follow the visual/logical workflow.
 - Focus must always be visible.
-- Dialogs must trap focus only while open and restore focus when closed.
+- Dialogs/overlays must contain navigation appropriately while open and restore focus when closed.
 - No calculator interaction may create an unrecoverable keyboard trap.
 - Large programmer bit grids must preserve predictable focus order.
+- Background calculator/mode shortcuts must not activate through the onboarding overlay.
+
+The current onboarding implementation queues focus to its first visible action and returns focus to the calculator input after dismissal. This behavior still requires runtime verification on each supported keyboard target.
 
 ### Touch targets
 
@@ -64,6 +86,7 @@ Dense scientific/programmer layouts should adapt rather than shrinking important
 - Layouts should not depend on one fixed font size.
 - Important labels must not disappear solely because text is enlarged.
 - Tab/navigation presentation must remain usable when labels scale.
+- Onboarding content must remain scrollable and keep Skip/Start reachable when text grows.
 
 ### Contrast
 
@@ -71,6 +94,7 @@ Dense scientific/programmer layouts should adapt rather than shrinking important
 - Focus states must remain visible in each theme.
 - Disabled state must remain distinguishable without becoming unreadable.
 - High-contrast preference behavior must be validated rather than inferred from a stored setting.
+- The current onboarding color treatment requires explicit target high-contrast testing before stable release.
 
 ### Color
 
@@ -110,6 +134,20 @@ Graphing requires:
 
 The shared UI now provides textual sample/analysis output, nearest-point trace output, bounded table-of-values CSV, multi-expression CSV, and accessible SVG generation/copy. Full graph keyboard pan/zoom interaction and target-platform screen-reader validation remain future work.
 
+## Onboarding accessibility
+
+The shared onboarding overlay is implemented as a short, scrollable surface rather than a multi-page forced tour. Both dismissal actions are text buttons with explicit automation names. The shell suppresses its global calculator/mode shortcuts while onboarding is visible, then queues focus back to the Calculator input after dismissal.
+
+Still validate:
+
+- actual initial focus on Desktop and Browser keyboard targets;
+- Android/iOS screen-reader traversal;
+- focus restoration timing after the overlay collapses;
+- compact landscape/portrait behavior;
+- large text and display scaling;
+- high-contrast behavior;
+- whether assistive technology announces enough page context when the overlay appears.
+
 ## Clipboard accessibility and privacy
 
 Clipboard operations are explicit buttons. Paste reads clipboard text only after user action, sanitizes it, and reports errors through calculator status text. Copy reports successful result copying through status text.
@@ -122,6 +160,7 @@ Before a stable release, test representative workflows with:
 
 - keyboard only;
 - screen reader on available supported platforms;
+- onboarding first run, Skip, Complete, and focus restoration;
 - large text/text scaling;
 - light theme;
 - dark theme;
