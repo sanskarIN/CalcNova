@@ -4,6 +4,7 @@ using CalcNova.Core.Errors;
 using CalcNova.Core.Evaluation;
 using CalcNova.Core.Memory;
 using CalcNova.Core.Numerics;
+using CalcNova.Core.Parsing;
 
 namespace CalcNova.App.ViewModels;
 
@@ -44,6 +45,7 @@ public sealed class CalculatorViewModel : ViewModelBase
         MemoryStoreCommand = new RelayCommand(_ => MemoryStore());
         MemoryAddCommand = new RelayCommand(_ => MemoryAdd());
         MemorySubtractCommand = new RelayCommand(_ => MemorySubtract());
+        ImportExpressionCommand = new RelayCommand(ImportExpression);
     }
 
     public string Expression
@@ -121,6 +123,8 @@ public sealed class CalculatorViewModel : ViewModelBase
 
     public ICommand MemorySubtractCommand { get; }
 
+    public ICommand ImportExpressionCommand { get; }
+
     public async Task EvaluateAsync()
     {
         var options = CreateOptions();
@@ -161,6 +165,19 @@ public sealed class CalculatorViewModel : ViewModelBase
 
     public void ApplyAngleUnit(AngleUnit angleUnit) => AngleUnit = angleUnit;
 
+    public void ImportExpression(string? text)
+    {
+        try
+        {
+            Expression = ExpressionTextSanitizer.Sanitize(text);
+            StatusMessage = string.Empty;
+        }
+        catch (ArgumentException exception)
+        {
+            StatusMessage = exception.Message;
+        }
+    }
+
     public void Clear()
     {
         _expression = string.Empty;
@@ -196,6 +213,11 @@ public sealed class CalculatorViewModel : ViewModelBase
 
         Expression += token;
         StatusMessage = string.Empty;
+    }
+
+    private void ImportExpression(object? parameter)
+    {
+        ImportExpression(parameter as string);
     }
 
     private void SetAngleUnit(object? parameter)
