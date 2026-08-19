@@ -1,0 +1,37 @@
+name: Accessibility Evidence Validate
+
+on:
+  push:
+    paths:
+      - 'docs/ACCESSIBILITY_TEST_MATRIX.md'
+      - 'tools/validate_accessibility_evidence.py'
+      - 'tools/tests/test_validate_accessibility_evidence.py'
+      - '.github/workflows/accessibility-evidence-validate.yml'
+  pull_request:
+    paths:
+      - 'docs/ACCESSIBILITY_TEST_MATRIX.md'
+      - 'tools/validate_accessibility_evidence.py'
+      - 'tools/tests/test_validate_accessibility_evidence.py'
+      - '.github/workflows/accessibility-evidence-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  accessibility-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Validate accessibility evidence matrix
+        run: python tools/validate_accessibility_evidence.py
+
+      - name: Run accessibility evidence validator tests
+        run: python -m unittest tools.tests.test_validate_accessibility_evidence
