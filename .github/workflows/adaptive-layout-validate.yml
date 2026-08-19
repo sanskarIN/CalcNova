@@ -1,0 +1,41 @@
+name: Adaptive layout validation
+
+on:
+  push:
+    paths:
+      - "src/CalcNova.App/App.axaml"
+      - "src/CalcNova.App/Views/**"
+      - "src/CalcNova.App/Infrastructure/AdaptiveLayoutProfile.cs"
+      - "tools/validate_adaptive_layout.py"
+      - "tools/tests/test_validate_adaptive_layout.py"
+      - ".github/workflows/adaptive-layout-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.App/App.axaml"
+      - "src/CalcNova.App/Views/**"
+      - "src/CalcNova.App/Infrastructure/AdaptiveLayoutProfile.cs"
+      - "tools/validate_adaptive_layout.py"
+      - "tools/tests/test_validate_adaptive_layout.py"
+      - ".github/workflows/adaptive-layout-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  adaptive-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate adaptive layout contracts
+        run: python tools/validate_adaptive_layout.py
+
+      - name: Test adaptive validator
+        run: python -m unittest tools.tests.test_validate_adaptive_layout
