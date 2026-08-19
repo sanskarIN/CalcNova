@@ -27,4 +27,6 @@ public sealed record AppSettings
     public string[] ConverterRecentPairs { get; init; } = [];
 
     public string[] ConverterFavoritePairs { get; init; } = [];
+
+    public int CompletedOnboardingVersion { get; init; }
 }
