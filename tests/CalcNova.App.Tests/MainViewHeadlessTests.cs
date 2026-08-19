@@ -2,7 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
+using CalcNova.App.Controls;
 using CalcNova.App.ViewModels;
 using CalcNova.App.Views;
 using Xunit;
@@ -127,6 +129,35 @@ public sealed class MainViewHeadlessTests
             window.KeyPressQwerty(PhysicalKey.PageDown, RawInputModifiers.Control);
 
             Assert.Equal(1, viewModel.SelectedModeIndex);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task GraphMode_SurfacesInteractivePlotAndTracksSampledSegments()
+    {
+        var viewModel = await CreateReadyViewModelAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 980, Height = 780, Content = view };
+
+        window.Show();
+        try
+        {
+            viewModel.SelectMode(7);
+            Dispatcher.UIThread.RunJobs();
+
+            var plot = view.GetVisualDescendants().OfType<GraphPlotControl>().Single();
+            Assert.True(plot.Focusable);
+            Assert.Equal(viewModel.Graphing.Segments.Count, plot.Segments?.Count);
+
+            viewModel.Graphing.Expression = "x * x";
+            viewModel.Graphing.PlotCommand.Execute(null);
+
+            Assert.Same(viewModel.Graphing.Segments, plot.Segments);
+            Assert.NotEmpty(plot.Segments ?? []);
         }
         finally
         {
