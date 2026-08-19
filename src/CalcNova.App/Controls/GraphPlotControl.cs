@@ -51,6 +51,8 @@ public sealed class GraphPlotControl : Control
         private set => SetValue(CoordinateTextProperty, value);
     }
 
+    public GraphViewport Viewport => new(_minimumX, _maximumX, _minimumY, _maximumY);
+
     public override void Render(DrawingContext context)
     {
         base.Render(context);
