@@ -5,6 +5,8 @@ namespace CalcNova.App.ViewModels;
 
 public sealed class MainViewModel : ViewModelBase
 {
+    public const int ModeCount = 13;
+
     private bool _isInitialized;
     private int _selectedModeIndex;
 
@@ -68,6 +70,16 @@ public sealed class MainViewModel : ViewModelBase
         set => SetField(ref _selectedModeIndex, value);
     }
 
+    public void SelectNextMode()
+    {
+        SelectedModeIndex = NormalizeModeIndex(SelectedModeIndex + 1);
+    }
+
+    public void SelectPreviousMode()
+    {
+        SelectedModeIndex = NormalizeModeIndex(SelectedModeIndex - 1);
+    }
+
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         if (_isInitialized)
@@ -78,6 +90,12 @@ public sealed class MainViewModel : ViewModelBase
         await Settings.LoadAsync(cancellationToken);
         await History.InitializeAsync(cancellationToken);
         _isInitialized = true;
+    }
+
+    private static int NormalizeModeIndex(int index)
+    {
+        var normalized = index % ModeCount;
+        return normalized < 0 ? normalized + ModeCount : normalized;
     }
 
     private void HandleSettingsChanged(AppSettings settings)
