@@ -1,0 +1,43 @@
+name: Bivariate Statistics Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Statistics/BivariateStatisticsSummary.cs"
+      - "src/CalcNova.Statistics/BivariateStatisticsCalculator.cs"
+      - "tests/CalcNova.Statistics.Tests/BivariateStatisticsCalculatorTests.cs"
+      - "tools/validate_bivariate_statistics.py"
+      - "tools/tests/test_validate_bivariate_statistics.py"
+      - ".github/workflows/bivariate-statistics-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.Statistics/BivariateStatisticsSummary.cs"
+      - "src/CalcNova.Statistics/BivariateStatisticsCalculator.cs"
+      - "tests/CalcNova.Statistics.Tests/BivariateStatisticsCalculatorTests.cs"
+      - "tools/validate_bivariate_statistics.py"
+      - "tools/tests/test_validate_bivariate_statistics.py"
+      - ".github/workflows/bivariate-statistics-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bivariate-statistics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate bivariate statistics contracts
+        run: python tools/validate_bivariate_statistics.py .
+
+      - name: Run bivariate validator tests
+        run: python -m unittest tools.tests.test_validate_bivariate_statistics
