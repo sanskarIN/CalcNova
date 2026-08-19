@@ -95,6 +95,18 @@ def validate(root: Path) -> list[str]:
     require(linux_desktop, f"Icon={APP_ID}", "Linux desktop entry", failures)
     require(linux_meta, f"<id>{APP_ID}</id>", "Linux AppStream metadata", failures)
     require(linux_meta, "<name>CalcNova</name>", "Linux AppStream metadata", failures)
+    require(
+        linux_meta,
+        f'<release version="{DISPLAY_VERSION}" date="2026-08-19" type="stable">',
+        "Linux AppStream metadata",
+        failures,
+    )
+    require(
+        linux_meta,
+        f"CalcNova {DISPLAY_VERSION} completed cross-platform product baseline.",
+        "Linux AppStream metadata",
+        failures,
+    )
 
     require(macos_plist, f"<string>{APP_ID}</string>", "macOS plist template", failures)
     require(macos_plist, "<string>__VERSION__</string>", "macOS plist template", failures)
