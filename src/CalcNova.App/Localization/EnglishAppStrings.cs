@@ -23,6 +23,10 @@ internal static class EnglishAppStrings
             [AppStringKey.ModeSettings] = "Settings",
             [AppStringKey.ModeAbout] = "About",
 
+            [AppStringKey.CalculatorTitle] = "Standard + Scientific",
+            [AppStringKey.CalculatorSubtitle] = "Safe local expression evaluation",
+            [AppStringKey.PromptEnterExpression] = "Enter an expression",
+
             [AppStringKey.ActionEvaluate] = "Evaluate",
             [AppStringKey.ActionPasteExpression] = "Paste expression",
             [AppStringKey.ActionCopyResult] = "Copy result",
