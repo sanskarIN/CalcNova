@@ -92,6 +92,20 @@ CONTRACTS: dict[str, dict[str, tuple[str, ...]]] = {
             "Result",
         ),
     },
+    "StatisticsViewModel": {
+        "commands": ("AnalyzeCommand", "CopySummaryCommand"),
+        "properties": ("DatasetText", "Summary", "CopyStatus"),
+    },
+    "MatricesViewModel": {
+        "commands": (
+            "DeterminantCommand",
+            "InverseCommand",
+            "RankCommand",
+            "SolveCommand",
+            "CopyResultCommand",
+        ),
+        "properties": ("MatrixText", "RightHandSideText", "Result", "CopyStatus"),
+    },
     "GraphingViewModel": {
         "commands": (
             "PlotCommand",
@@ -127,6 +141,25 @@ CONTRACTS: dict[str, dict[str, tuple[str, ...]]] = {
             "CopyStatus",
         ),
     },
+    "HistoryViewModel": {
+        "commands": (
+            "RefreshCommand",
+            "ClearCommand",
+            "DeleteCommand",
+            "ToggleFavoriteCommand",
+            "GenerateExportCommand",
+            "CopyExportCommand",
+        ),
+        "properties": (
+            "SearchQuery",
+            "Entries",
+            "SelectedEntry",
+            "ExportFormats",
+            "SelectedExportFormat",
+            "ExportPreview",
+            "StatusMessage",
+        ),
+    },
 }
 
 XAML_CONTEXT_NAMES = {
@@ -134,7 +167,10 @@ XAML_CONTEXT_NAMES = {
     "ProgrammerViewModel": "Programmer",
     "CodePointViewModel": "CodePoint",
     "ConverterViewModel": "Converter",
+    "StatisticsViewModel": "Statistics",
+    "MatricesViewModel": "Matrices",
     "GraphingViewModel": "Graphing",
+    "HistoryViewModel": "History",
 }
 
 
