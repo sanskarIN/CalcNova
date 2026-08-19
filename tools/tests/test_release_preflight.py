@@ -53,6 +53,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools/validate_settings_schema.py",
             "tools/validate_onboarding_contracts.py",
             "tools/validate_packaging_metadata.py",
+            "tools/validate_release_workflow.py",
             "tools/validate_release_docs.py",
             "tools/tests/test_validate_release_tag.py",
         }
@@ -65,6 +66,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             if len(arguments) >= 3 and arguments[0:2] == ("-m", "unittest")
         }
         expected_modules = {
+            "tools.tests.test_validate_release_workflow",
             "tools.tests.test_validate_release_docs",
             "tools.tests.test_validate_focus_visibility",
             "tools.tests.test_validate_accessibility_evidence",
