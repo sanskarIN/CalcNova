@@ -17,6 +17,7 @@ The persistence, view-model, and shared visual foundation are implemented:
 - resetting ordinary settings preserves onboarding completion instead of unexpectedly forcing the first-run experience again;
 - `OnboardingOverlay.axaml` provides the shared first-run visual surface used by the shared application shell;
 - the overlay introduces major modes, keyboard/touch behavior, local-first storage, optional currency networking, and the no-account requirement;
+- keyboard guidance now documents Ctrl+PageUp/PageDown cycling plus Ctrl+Home/End first/last mode navigation;
 - both **Skip** and **Start calculating** have explicit accessible names;
 - the main shell suppresses calculator/mode keyboard shortcuts while onboarding is visible so background actions do not fire through the overlay;
 - unit tests cover pre-load state, new-user state, failed settings loading, completion, skip, and invalid-version behavior;
@@ -30,7 +31,7 @@ The initial implementation intentionally uses one concise, scrollable surface in
 
 1. **Welcome to CalcNova** — fast, precise, private positioning.
 2. **Calculate your way** — overview of the standard/scientific and advanced modes.
-3. **Keyboard and touch friendly** — current mode cycling and hardware number-pad guidance.
+3. **Keyboard and touch friendly** — cyclic mode navigation, first/last mode shortcuts, and hardware number-pad guidance.
 4. **Local-first by default** — local history/preferences, offline physical units, and optional network-enhanced currency behavior.
 5. **Ready** — immediate **Skip** and **Start calculating** actions.
 
@@ -52,6 +53,8 @@ Rules:
 - skipping counts as completing the current version;
 - unsupported or corrupt settings must fail safely without blocking calculator startup.
 
+The settings container itself is also schema-versioned independently of onboarding content. See [SETTINGS_MIGRATION.md](SETTINGS_MIGRATION.md).
+
 ## Privacy
 
 Onboarding state remains local. It does not require sign-in, telemetry, advertising identifiers, contacts, location, or unrelated permissions.
@@ -68,7 +71,8 @@ The implemented shared surface includes:
 - wrapped explanatory text;
 - a maximum content width to preserve readable line lengths on larger displays;
 - suppression of background calculator/mode keyboard shortcuts while the overlay is active;
-- immediate access to Skip without traversing decorative content.
+- immediate access to Skip without traversing decorative content;
+- shell focus handoff to the onboarding action surface and queued restoration to Calculator after dismissal.
 
 Target-platform validation is still required for:
 
@@ -78,13 +82,15 @@ Target-platform validation is still required for:
 - text scaling and long localized strings;
 - reduced-motion/high-contrast interaction with future visual refinements;
 - narrow portrait and landscape layouts;
-- focus restoration after dismissal.
+- focus restoration timing after dismissal.
 
-No essential explanation should exist only in an illustration or animation.
+Record actual results in [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md). No essential explanation should exist only in an illustration or animation.
 
 ## Localization
 
-The current onboarding copy is English source text. It must migrate to semantic localization keys as the shared XAML localization binding path is expanded. New language packs require review for mathematical, privacy, and accessibility terminology before being listed as supported.
+The current onboarding copy is English source text. English and Hindi semantic catalogs now exist for the current shared key set, but onboarding has not yet migrated to localized bindings. It must migrate to semantic localization keys as the shared XAML localization binding path is expanded.
+
+New language packs require review for mathematical, privacy, and accessibility terminology before being listed as supported.
 
 ## Testing still required
 
@@ -99,5 +105,6 @@ Before onboarding is considered release-ready:
 - verify settings-load failure leaves the calculator usable;
 - verify keyboard, screen reader, large text, high contrast, and compact layouts;
 - verify background calculator shortcuts do not activate while onboarding is visible;
+- verify Ctrl+Home/End and Ctrl+PageUp/PageDown remain suppressed behind onboarding;
 - verify focus returns predictably after dismissal;
 - verify no onboarding surface blocks calculation after dismissal.
