@@ -1,0 +1,41 @@
+name: Calculator Selection Validate
+
+on:
+  push:
+    paths:
+      - 'src/CalcNova.App/ViewModels/CalculatorViewModel.cs'
+      - 'src/CalcNova.App/Views/MainView.axaml.cs'
+      - 'tests/CalcNova.App.Tests/CalculatorSelectionEditingTests.cs'
+      - 'tools/validate_calculator_selection_editing.py'
+      - 'tools/tests/test_validate_calculator_selection_editing.py'
+      - '.github/workflows/calculator-selection-validate.yml'
+  pull_request:
+    paths:
+      - 'src/CalcNova.App/ViewModels/CalculatorViewModel.cs'
+      - 'src/CalcNova.App/Views/MainView.axaml.cs'
+      - 'tests/CalcNova.App.Tests/CalculatorSelectionEditingTests.cs'
+      - 'tools/validate_calculator_selection_editing.py'
+      - 'tools/tests/test_validate_calculator_selection_editing.py'
+      - '.github/workflows/calculator-selection-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  selection-editing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Validate selection-editing contracts
+        run: python tools/validate_calculator_selection_editing.py
+
+      - name: Run selection-editing validator tests
+        run: python -m unittest tools.tests.test_validate_calculator_selection_editing
