@@ -17,17 +17,44 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout workflow source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate release tag
+        run: python tools/validate_release_tag.py "$RELEASE_TAG"
+
+      - name: Verify and checkout release tag
+        shell: bash
+        run: |
+          git rev-parse -q --verify "refs/tags/$RELEASE_TAG^{commit}" >/dev/null
+          git checkout --detach "$RELEASE_TAG"
+
+      - name: Validate package metadata
+        run: python tools/validate_packaging_metadata.py .
+
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
+
       - name: Restore core solution
         run: dotnet restore CalcNova.slnx
+
       - name: Verify formatting
         run: dotnet format CalcNova.slnx --verify-no-changes --no-restore
+
       - name: Build core solution
         run: dotnet build CalcNova.slnx --configuration Release --no-restore
+
       - name: Test core solution
         run: dotnet test CalcNova.slnx --configuration Release --no-build
 
@@ -46,6 +73,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
@@ -66,6 +95,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
@@ -93,6 +124,8 @@ jobs:
       STORE_PASSWORD: ${{ secrets.CALCNOVA_ANDROID_STORE_PASSWORD }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
@@ -156,6 +189,9 @@ jobs:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+          fetch-depth: 0
       - name: Download packaged artifacts
         uses: actions/download-artifact@v4
         with:
@@ -165,10 +201,15 @@ jobs:
         run: |
           find release-assets -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
           cp SHA256SUMS.txt release-assets/SHA256SUMS.txt
-      - name: Create GitHub Release
+      - name: Create or reuse GitHub Release
         shell: bash
         run: |
-          gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --verify-tag --generate-notes
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists; preserving its notes and replacing packaged assets only."
+          else
+            gh release create "$RELEASE_TAG" --verify-tag --generate-notes
+          fi
+
           while IFS= read -r -d '' file; do
             gh release upload "$RELEASE_TAG" "$file" --clobber
           done < <(find release-assets -type f -print0)
