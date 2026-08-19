@@ -10,7 +10,11 @@ The application layer now contains an initial localization foundation:
 - `EnglishAppStrings` is the complete initial source-language catalog;
 - `IAppLocalizer` defines culture selection and lookup behavior;
 - `AppLocalizer` validates catalog completeness at startup, exposes supported cultures, accepts English regional cultures, and rejects unsupported/unreviewed cultures without changing the active culture;
-- tests cover catalog completeness, fallback behavior, regional English selection, unsupported cultures, invalid culture names, and culture-change notification behavior.
+- `AppSettings.CultureName` persists the preferred application culture through both native JSON settings storage and browser settings storage;
+- `SettingsViewModel` exposes the reviewed supported-culture list, restores a saved culture, normalizes unsupported saved preferences back to English, and rejects unsupported selections during save;
+- `MainViewModel` shares one localizer instance with the settings workflow so culture selection and application string lookup use the same active state;
+- native and browser settings validation reject malformed culture names before they reach the application layer;
+- source/test coverage checks catalog completeness, fallback behavior, regional English selection, preference persistence, unsupported cultures, invalid culture names, and culture-change behavior.
 
 This foundation is **not yet a claim that the shared XAML has been fully migrated to localized bindings**. Existing visible English strings should be migrated incrementally after the binding approach is validated with Avalonia compilation and UI tests. Until reviewed translations are added, English remains the only supported source language.
 
@@ -19,6 +23,21 @@ This foundation is **not yet a claim that the shared XAML has been fully migrate
 English is the initial source language.
 
 Additional languages should be added only when translations can be reviewed for correctness and UI fit. A new language must not be added to `SupportedCultures` merely because a machine-generated draft exists.
+
+English regional preferences such as `en-IN` can be preserved as the active culture while still using the reviewed English source catalog. This allows future locale-aware presentation work without pretending that a separate translation exists.
+
+## Persisted preference contract
+
+The preferred culture is stored in `AppSettings.CultureName` and follows the same local settings repository abstraction as other CalcNova preferences.
+
+Current rules:
+
+- default culture is `en`;
+- syntactically malformed stored culture names are rejected by persistence validation;
+- well-formed but unsupported cultures are normalized to `en` by the application localization layer;
+- supported English regional cultures may be persisted, for example `en-IN`;
+- selecting an unsupported culture through the settings view model does not overwrite a valid persisted preference;
+- parser syntax and persisted mathematical meaning do not change when the UI culture changes.
 
 ## What should be localizable
 
@@ -122,13 +141,17 @@ As localization infrastructure is expanded:
 
 ## Tests
 
-Current automated source tests cover:
+Current automated source/test coverage includes:
 
 - source-catalog completeness;
 - English fallback;
 - English regional culture selection;
 - unsupported/invalid culture rejection;
-- culture-change event behavior.
+- culture-change event behavior;
+- settings culture restore and fallback;
+- persisted regional culture round-trip on native JSON settings storage;
+- malformed persisted culture rejection;
+- localization preference source-contract validation in CI.
 
 Future localization tests should cover:
 
