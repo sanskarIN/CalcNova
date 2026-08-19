@@ -1,0 +1,45 @@
+name: Export Previews Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.App/Infrastructure/ExportPreviewFormatter.cs"
+      - "src/CalcNova.App/ViewModels/HistoryViewModel.cs"
+      - "tests/CalcNova.App.Tests/ExportPreviewFormatterTests.cs"
+      - "tests/CalcNova.App.Tests/HistoryExportPreviewViewModelTests.cs"
+      - "tools/validate_export_previews.py"
+      - "tools/tests/test_validate_export_previews.py"
+      - ".github/workflows/export-previews-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.App/Infrastructure/ExportPreviewFormatter.cs"
+      - "src/CalcNova.App/ViewModels/HistoryViewModel.cs"
+      - "tests/CalcNova.App.Tests/ExportPreviewFormatterTests.cs"
+      - "tests/CalcNova.App.Tests/HistoryExportPreviewViewModelTests.cs"
+      - "tools/validate_export_previews.py"
+      - "tools/tests/test_validate_export_previews.py"
+      - ".github/workflows/export-previews-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-previews:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate bounded export preview contracts
+        run: python tools/validate_export_previews.py .
+
+      - name: Run export preview validator tests
+        run: python -m unittest tools.tests.test_validate_export_previews
