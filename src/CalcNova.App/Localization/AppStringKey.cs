@@ -33,6 +33,8 @@ public enum AppStringKey
     OnboardingPrivacyBody,
     OnboardingNoAccount,
 
+    ConverterPreferencesTitle,
+    ConverterPreferencesBody,
     CurrencyTitle,
     CurrencyPrivacyBody,
     HistoryTitle,
