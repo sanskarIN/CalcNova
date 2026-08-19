@@ -22,6 +22,7 @@ public sealed class ProgrammerViewModel : ViewModelBase
     public ProgrammerViewModel()
     {
         ConvertCommand = new RelayCommand(_ => Convert());
+        ToggleBitCommand = new RelayCommand(ToggleBit);
     }
 
     public IReadOnlyList<int> CommonBases { get; } = [2, 8, 10, 16, 36];
@@ -96,25 +97,76 @@ public sealed class ProgrammerViewModel : ViewModelBase
 
     public ICommand ConvertCommand { get; }
 
+    public ICommand ToggleBitCommand { get; }
+
+    public void ToggleBit(int bitIndex)
+    {
+        ToggleBit((object?)bitIndex);
+    }
+
     private void Convert()
     {
         try
         {
             var value = RadixConverter.Parse(Input, InputBase);
-            Binary = RadixConverter.Format(value, 2);
-            Octal = RadixConverter.Format(value, 8);
-            Decimal = RadixConverter.Format(value, 10);
-            Hexadecimal = RadixConverter.Format(value, 16);
-            BitPattern = BitwiseCalculator.ToBitString(value, WordSize);
-            var interpreted = Signed
-                ? BitwiseCalculator.ToSigned(value, WordSize)
-                : BitwiseCalculator.ToUnsigned(value, WordSize);
-            InterpretedValue = interpreted.ToString();
+            UpdateRepresentations(value);
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is FormatException or ArgumentException or OverflowException)
         {
             ErrorMessage = exception.Message;
         }
+    }
+
+    private void ToggleBit(object? parameter)
+    {
+        if (!TryGetBitIndex(parameter, out var bitIndex))
+        {
+            ErrorMessage = "A valid bit index is required.";
+            return;
+        }
+
+        try
+        {
+            var value = RadixConverter.Parse(Input, InputBase);
+            var toggled = BitwiseCalculator.ToggleBit(value, bitIndex, WordSize);
+            Input = RadixConverter.Format(toggled, InputBase);
+            UpdateRepresentations(toggled);
+            ErrorMessage = string.Empty;
+        }
+        catch (Exception exception) when (exception is FormatException or ArgumentException or OverflowException)
+        {
+            ErrorMessage = exception.Message;
+        }
+    }
+
+    private void UpdateRepresentations(BigInteger value)
+    {
+        Binary = RadixConverter.Format(value, 2);
+        Octal = RadixConverter.Format(value, 8);
+        Decimal = RadixConverter.Format(value, 10);
+        Hexadecimal = RadixConverter.Format(value, 16);
+        BitPattern = BitwiseCalculator.ToBitString(value, WordSize);
+        var interpreted = Signed
+            ? BitwiseCalculator.ToSigned(value, WordSize)
+            : BitwiseCalculator.ToUnsigned(value, WordSize);
+        InterpretedValue = interpreted.ToString();
+    }
+
+    private static bool TryGetBitIndex(object? parameter, out int bitIndex)
+    {
+        if (parameter is int integer)
+        {
+            bitIndex = integer;
+            return true;
+        }
+
+        if (parameter is string text && int.TryParse(text, out bitIndex))
+        {
+            return true;
+        }
+
+        bitIndex = default;
+        return false;
     }
 }
