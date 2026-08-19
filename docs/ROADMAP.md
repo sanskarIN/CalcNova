@@ -1,6 +1,6 @@
 # CalcNova Roadmap
 
-This roadmap tracks planned work without promising fixed release dates. Implementation order may change when correctness, accessibility, platform constraints, or CI findings require it.
+This roadmap tracks planned work without promising fixed release dates. Implementation order may change when correctness, accessibility, platform constraints, or observed CI findings require it.
 
 ## Completed foundations
 
@@ -27,8 +27,7 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - AND/OR/XOR/NOT and left/logical-right/arithmetic-right shifts.
 - Fixed-width bit visualization.
 - Full 8/16/32/64/128-bit interactive grid.
-- Byte-grouped bit view-model collections for all supported word sizes.
-- Shared byte-group presentation.
+- Byte-grouped presentation for all supported word sizes.
 - Shared copy actions for binary/octal/decimal/hex/fixed-width bit representations.
 - Accessible bit-cell names.
 - Unicode scalar/code-point helper backend and shared UI.
@@ -59,6 +58,10 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Matrix source module/view model and shared result-copy action.
 - Graph sampling and discontinuity segmentation.
 - Graph viewport and interactive plot control.
+- Pointer pan/wheel zoom and fit-to-data interaction.
+- Keyboard graph pan using arrow keys.
+- Keyboard graph zoom using numpad Add/Subtract.
+- Keyboard graph Home reset and `F` fit-to-data.
 - SVG graph export engine plus shared generation/copy workflow.
 - Bounded numerical derivative, root, and integral analysis.
 - Shared derivative/root/integral controls with approximate-result labeling.
@@ -76,73 +79,69 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Shared history export-format selection, preview, and clipboard copy.
 - Settings/preferences abstraction.
 - Converter preference persistence through shared settings.
+- Explicit settings schema version with legacy-v0 migration and future-schema rejection.
+- Shared settings-schema normalization on native JSON and Browser storage paths.
 - Desktop, Browser/WebAssembly, Android, and iOS heads/composition.
 - Shared Avalonia `TopLevel` clipboard service attachment.
 - Shared clipboard dependency injection into Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History modes.
-- Repository validation, format, test/build, coverage, security, advanced-utility, release, UI-contract, and platform workflow foundations.
-- Source-level shared-XAML command/property contract validation.
-- Source-level Avalonia XML well-formedness validation.
 
-### Adaptive UI baseline
+### Adaptive UI and accessibility source baseline
 
 - Shared available-width profile with compact, medium, and expanded breakpoints.
 - Resize-driven shell style-class updates.
-- Compact-density styles that preserve common interactive target baselines.
+- Compact-density styles that preserve common interaction-target baselines.
 - Compact horizontal-overflow fallback for shared mode scroll containers.
 - Focus-change bring-into-view configuration on shared mode scroll containers.
-- Adaptive breakpoint unit tests.
-- Adaptive source-marker validation integrated with the UI contract workflow.
+- Shared 44-DIP minimum touch-target contract.
+- Explicit 3-DIP focused-state border emphasis on common keyboard controls.
+- Explicit 4-DIP focused-state emphasis when CalcNova high contrast is enabled.
+- Shared keyboard mode navigation using Ctrl+PageUp/PageDown/Home/End.
+- Graph keyboard viewport controls.
+- Onboarding shortcut suppression and focus-restoration source behavior.
+- Runtime accessibility evidence matrix with conservative PASS/FAIL/BLOCKED/NOT RUN vocabulary.
 
-## Now
+### Localization foundation
 
-### Adaptive design and accessibility
+- Stable semantic `AppStringKey` catalog.
+- Complete English semantic catalog.
+- Complete Hindi semantic catalog for the current key set.
+- English/Hindi regional culture selection such as `en-IN` and `hi-IN`.
+- Persisted culture preference.
+- Multi-catalog completeness/duplicate validation.
 
-- Replace remaining fixed multi-column desktop assumptions with deeper compact/mobile structural reflow where horizontal fallback is not ideal.
-- Improve navigation when many modes are present on narrow screens.
-- Audit focus order and visible focus states.
-- Verify screen-reader behavior for the programmer bit grid, graph analysis, long exports, and dynamic results.
-- Verify touch target sizes, large-text behavior, and high-contrast behavior on target platforms.
-- Add reduced-motion behavior where animation is introduced.
-- Evaluate virtualization or alternative compact presentation for 64/128-bit programmer grids on narrow devices.
+The shared XAML is still predominantly hard-coded English; semantic catalog support is therefore a foundation, not a claim of fully localized UI.
 
-### Validation hardening
+### Validation and release infrastructure
 
-- Observe actual GitHub Actions/check results for the new shared-source changes.
-- Fix compile/analyzer/format/test failures before release claims.
-- Add targeted integration/UI automation where stable and maintainable.
-- Exercise clipboard behavior on Desktop, Browser, Android, and iOS target environments.
-- Exercise settings migration/restore behavior on native and Browser storage paths.
-- Keep vulnerability, repository, XAML, UI-contract, docs, and asset validation gates active.
+- Repository validation, formatting, build/test, coverage, security, advanced-utility, release, UI-contract, and platform workflow foundations.
+- Source-level shared-XAML command/property contract validation.
+- Source-level Avalonia XML well-formedness validation.
+- Dedicated adaptive-layout, touch-target, keyboard, graph-keyboard, focus-visibility, accessibility-evidence, localization, settings-schema, onboarding, and packaging-metadata source validators/workflows.
+- Python regression tests for the source validators added during hardening.
+- Unified SDK-independent release preflight covering the current source-contract inventory.
+- Versioned release/package identity metadata for supported heads/templates.
 
-### Interaction polish
+## Now — requires real execution evidence
 
-- Improve cursor/selection-aware expression editing.
-- Add broader physical keyboard/numpad shortcuts.
-- Improve empty/error/loading states without hiding calculation details.
-- Refine graph controls and large export previews for compact layouts without weakening workload bounds.
-- Evaluate native file-save/share UX for history/graph exports after platform abstractions are validated.
+### Build and test validation
 
-## Next
+- Observe actual `dotnet restore`, build, analyzer, formatter, and test results in a suitable .NET 10 environment.
+- Fix every real compiler/analyzer/test failure found by those runs.
+- Observe GitHub Actions/check results rather than inferring PASS from workflow/source presence.
+- Add targeted Avalonia UI/integration automation where the test stack is stable and maintainable.
 
-### Converter productivity
+### Runtime adaptive design and accessibility
 
-- Add optional per-category default-pair preferences.
-- Add visible persistence/privacy explanation for saved converter preferences.
-- Keep physical conversions fully offline.
+- Test compact/mobile structural behavior on actual target sizes and devices.
+- Verify keyboard Tab/Shift+Tab order and visible focus rendering on Desktop/Browser.
+- Verify screen-reader behavior for calculator results, programmer bit grids, graph analysis, long exports, settings, and onboarding.
+- Verify 64/128-bit programmer interaction on narrow/mobile targets; introduce an alternative/virtualized presentation only if runtime evidence shows the current byte-group layout is inadequate.
+- Verify large-text/display-scaling behavior.
+- Measure representative contrast/focus/error/disabled/selected states in light, dark, and CalcNova high-contrast modes.
+- Verify Browser shortcut conflicts and graph keyboard controls.
+- Populate `ACCESSIBILITY_TEST_MATRIX.md` only with observed runtime evidence.
 
-### Programmer productivity
-
-- Evaluate user-selectable custom word sizes only if interaction and workload semantics remain clear.
-- Add additional code-point metadata only from stable local data sources.
-
-### Graphing experience
-
-- Add deterministic color assignment by theme for multiple expressions.
-- Improve pan/zoom/reset controls and axis/grid labeling.
-- Continue workload-budget and discontinuity tests.
-- Add additional numerical-analysis edge-case coverage.
-
-### Platform packaging
+### Platform and packaging validation
 
 - Validate Windows packaging on supported Windows tooling.
 - Validate Linux packaging on supported Linux tooling.
@@ -150,17 +149,46 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Validate Android application bundle/release signing pipeline.
 - Validate iOS signing/archive guidance on Apple tooling.
 - Validate Browser/WebAssembly publish output and hosting guidance.
+- Verify clipboard and settings persistence behavior on Desktop, Browser, Android, and iOS.
+
+## Next — source/product polish after observed validation
+
+### Localization UI migration
+
+- Migrate visible shared XAML strings to the semantic localization layer in compile-verified increments.
+- Localize accessibility names, onboarding, settings, units/categories, date/time labels, empty states, and About/Support text.
+- Validate Hindi long-string/Devanagari layout at compact widths and large text sizes.
+- Add further reviewed language packs only when translation quality and layout can be validated.
+
+### Interaction polish
+
+- Improve cursor/selection-aware expression editing.
+- Add locale-aware printable keyboard/operator shortcuts without breaking text-box editing, Browser conventions, or assistive technology.
+- Improve empty/error/loading states without hiding calculation details.
+- Refine long graph/history export previews for compact layouts while preserving workload bounds.
+- Evaluate native file-save/share UX for history/graph exports after platform abstractions are validated.
+
+### Converter/programmer polish
+
+- Evaluate optional per-category converter default pairs after settings migration behavior is validated in real storage environments.
+- Add visible persistence/privacy explanation for saved converter preferences.
+- Evaluate custom programmer word sizes only if interaction and workload semantics remain clear.
+- Add additional Unicode metadata only from stable local data sources.
+
+### Graph presentation
+
+- Add deterministic multi-series visual differentiation that never relies on color alone.
+- Improve axis/grid labels and optional explicit viewport controls after runtime graph interaction is validated.
+- Continue numerical-analysis edge-case coverage and workload-budget testing.
 
 ## Later
 
 ### Product polish
 
-- Finalize the original CalcNova icon/splash asset set for every platform density/format.
-- Add optional onboarding and feature discovery.
-- Consolidate the design system and reusable view primitives.
-- Add reviewed localization infrastructure and language packs.
-- Add accessibility presets where they provide real value.
-- Add repository screenshots and final social preview assets.
+- Finalize platform-density icon/splash assets after target package builds are observed.
+- Consolidate reusable visual primitives only after real UI behavior identifies duplication worth abstracting.
+- Add repository screenshots/social preview assets from validated builds.
+- Consider accessibility presets only where they provide measurable value beyond platform/system settings.
 
 ### Extended mathematics
 
