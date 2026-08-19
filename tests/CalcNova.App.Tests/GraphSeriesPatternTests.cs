@@ -1,4 +1,4 @@
-using CalcNova.App.Controls;
+using CalcNova.Graphing;
 using Xunit;
 
 namespace CalcNova.App.Tests;
@@ -8,31 +8,31 @@ public sealed class GraphSeriesPatternTests
     [Fact]
     public void FirstEightSeries_ReceiveDistinctPatterns()
     {
-        var patterns = Enumerable.Range(0, GraphSeriesPatternCatalog.PatternCount)
-            .Select(GraphSeriesPatternCatalog.ForSeriesIndex)
+        var patterns = Enumerable.Range(0, GraphSeriesLinePatternCatalog.PatternCount)
+            .Select(GraphSeriesLinePatternCatalog.ForSeriesIndex)
             .ToArray();
 
-        Assert.Equal(GraphSeriesPatternCatalog.PatternCount, patterns.Distinct().Count());
+        Assert.Equal(GraphSeriesLinePatternCatalog.PatternCount, patterns.Distinct().Count());
     }
 
     [Fact]
     public void PatternAssignment_RepeatsDeterministicallyAfterCatalogBoundary()
     {
         Assert.Equal(
-            GraphSeriesPatternCatalog.ForSeriesIndex(0),
-            GraphSeriesPatternCatalog.ForSeriesIndex(GraphSeriesPatternCatalog.PatternCount));
+            GraphSeriesLinePatternCatalog.ForSeriesIndex(0),
+            GraphSeriesLinePatternCatalog.ForSeriesIndex(GraphSeriesLinePatternCatalog.PatternCount));
         Assert.Equal(
-            GraphSeriesPatternCatalog.ForSeriesIndex(3),
-            GraphSeriesPatternCatalog.ForSeriesIndex(GraphSeriesPatternCatalog.PatternCount + 3));
+            GraphSeriesLinePatternCatalog.ForSeriesIndex(3),
+            GraphSeriesLinePatternCatalog.ForSeriesIndex(GraphSeriesLinePatternCatalog.PatternCount + 3));
     }
 
     [Fact]
     public void NonSolidPatterns_ContainVisibleAndSkippedEdges()
     {
-        foreach (var pattern in Enum.GetValues<GraphSeriesPattern>().Where(pattern => pattern != GraphSeriesPattern.Solid))
+        foreach (var pattern in Enum.GetValues<GraphSeriesLinePattern>().Where(pattern => pattern != GraphSeriesLinePattern.Solid))
         {
             var mask = Enumerable.Range(0, 40)
-                .Select(index => GraphSeriesPatternCatalog.ShouldDrawEdge(pattern, index))
+                .Select(index => GraphSeriesLinePatternCatalog.ShouldDrawEdge(pattern, index))
                 .ToArray();
 
             Assert.Contains(true, mask);
@@ -43,27 +43,27 @@ public sealed class GraphSeriesPatternTests
     [Fact]
     public void PatternMasks_AreDistinctWithinRepresentativeWindow()
     {
-        var masks = Enum.GetValues<GraphSeriesPattern>()
+        var masks = Enum.GetValues<GraphSeriesLinePattern>()
             .Select(pattern => string.Concat(Enumerable.Range(0, 40)
-                .Select(index => GraphSeriesPatternCatalog.ShouldDrawEdge(pattern, index) ? '1' : '0')))
+                .Select(index => GraphSeriesLinePatternCatalog.ShouldDrawEdge(pattern, index) ? '1' : '0')))
             .ToArray();
 
         Assert.Equal(masks.Length, masks.Distinct(StringComparer.Ordinal).Count());
     }
 
     [Theory]
-    [InlineData(GraphSeriesPattern.Solid, "solid")]
-    [InlineData(GraphSeriesPattern.LongDash, "long dash")]
-    [InlineData(GraphSeriesPattern.Dot, "dotted")]
-    [InlineData(GraphSeriesPattern.DashDot, "dash-dot")]
-    public void PatternLabels_AreHumanReadable(GraphSeriesPattern pattern, string expected)
+    [InlineData(GraphSeriesLinePattern.Solid, "solid")]
+    [InlineData(GraphSeriesLinePattern.LongDash, "long dash")]
+    [InlineData(GraphSeriesLinePattern.Dot, "dotted")]
+    [InlineData(GraphSeriesLinePattern.DashDot, "dash-dot")]
+    public void PatternLabels_AreHumanReadable(GraphSeriesLinePattern pattern, string expected)
     {
-        Assert.Equal(expected, GraphSeriesPatternCatalog.GetLabel(pattern));
+        Assert.Equal(expected, GraphSeriesLinePatternCatalog.GetLabel(pattern));
     }
 
     [Fact]
     public void NegativeSeriesIndex_IsRejected()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => GraphSeriesPatternCatalog.ForSeriesIndex(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => GraphSeriesLinePatternCatalog.ForSeriesIndex(-1));
     }
 }
