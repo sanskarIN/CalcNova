@@ -36,6 +36,9 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
         Assert.Equal(ThemePreference.System, settings.Theme);
         Assert.Equal(AngleUnit.Degrees, settings.AngleUnit);
         Assert.True(settings.HistoryEnabled);
+        Assert.Equal(15, settings.ConverterSignificantDigits);
+        Assert.Empty(settings.ConverterRecentPairs);
+        Assert.Empty(settings.ConverterFavoritePairs);
     }
 
     [Fact]
@@ -52,7 +55,10 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
             HistoryEnabled = true,
             HistoryLimit = 250,
             ReducedMotion = true,
-            HighContrast = true
+            HighContrast = true,
+            ConverterSignificantDigits = 12,
+            ConverterRecentPairs = ["v1:km>m", "v1:kg>g"],
+            ConverterFavoritePairs = ["v1:c>f"]
         };
 
         await repository.SaveAsync(expected);
@@ -66,6 +72,27 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
     {
         var repository = new JsonSettingsRepository(_filePath);
         var invalid = new AppSettings { HistoryLimit = 0 };
+
+        await Assert.ThrowsAsync<InvalidDataException>(() => repository.SaveAsync(invalid));
+    }
+
+    [Fact]
+    public async Task Save_InvalidConverterPrecision_IsRejected()
+    {
+        var repository = new JsonSettingsRepository(_filePath);
+        var invalid = new AppSettings { ConverterSignificantDigits = 18 };
+
+        await Assert.ThrowsAsync<InvalidDataException>(() => repository.SaveAsync(invalid));
+    }
+
+    [Fact]
+    public async Task Save_OversizedConverterRecentList_IsRejected()
+    {
+        var repository = new JsonSettingsRepository(_filePath);
+        var invalid = new AppSettings
+        {
+            ConverterRecentPairs = Enumerable.Range(0, 13).Select(index => $"v1:m>cm{index}").ToArray()
+        };
 
         await Assert.ThrowsAsync<InvalidDataException>(() => repository.SaveAsync(invalid));
     }
