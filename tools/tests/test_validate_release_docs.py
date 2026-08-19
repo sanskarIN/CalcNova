@@ -30,6 +30,17 @@ class ReleaseDocumentationValidatorTests(unittest.TestCase):
         release_markers = validator.REQUIRED_MARKERS["docs/RELEASE.md"]
         self.assertIn("PASS / FAIL / BLOCKED / NOT RUN", release_markers)
 
+    def test_release_contract_tracks_2_8_03_identity(self) -> None:
+        validator = load_validator()
+        release_markers = validator.REQUIRED_MARKERS["docs/RELEASE.md"]
+        self.assertIn("# CalcNova 2.8.03 Release Process", release_markers)
+        self.assertIn("python tools/release_preflight.py --tag v2.8.3", release_markers)
+        self.assertIn("normalized release tag: `v2.8.3`", release_markers)
+
+    def test_release_contract_includes_versioning_guide(self) -> None:
+        validator = load_validator()
+        self.assertIn("docs/VERSIONING.md", validator.REQUIRED_MARKERS)
+
     def test_missing_release_documents_are_reported(self) -> None:
         validator = load_validator()
         with tempfile.TemporaryDirectory() as directory:
