@@ -79,7 +79,6 @@ public sealed class GraphNumericalAnalyzer
             else
             {
                 right = middle;
-                rightValue = middleValue;
             }
         }
 
