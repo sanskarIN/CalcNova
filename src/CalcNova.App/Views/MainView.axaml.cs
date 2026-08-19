@@ -4,6 +4,7 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using CalcNova.App.Services;
 using CalcNova.App.ViewModels;
 using CalcNova.Platform.Settings;
 
@@ -22,6 +23,11 @@ public partial class MainView : UserControl
 
     private async void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs eventArgs)
     {
+        if (AppComposition.Dependencies.ClipboardService is AvaloniaClipboardService clipboardService)
+        {
+            clipboardService.Attach(TopLevel.GetTopLevel(this)?.Clipboard);
+        }
+
         if (DataContext is not MainViewModel viewModel)
         {
             return;
@@ -43,6 +49,11 @@ public partial class MainView : UserControl
 
     private void OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs eventArgs)
     {
+        if (AppComposition.Dependencies.ClipboardService is AvaloniaClipboardService clipboardService)
+        {
+            clipboardService.Attach(null);
+        }
+
         if (_subscribedViewModel is null)
         {
             return;
