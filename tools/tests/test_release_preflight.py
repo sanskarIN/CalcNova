@@ -21,7 +21,6 @@ SPEC.loader.exec_module(MODULE)
 class ReleasePreflightContractTests(unittest.TestCase):
     def test_check_labels_are_unique(self) -> None:
         labels = [label for label, _ in MODULE.CHECKS]
-
         self.assertEqual(len(labels), len(set(labels)))
 
     def test_every_configured_validator_or_test_module_exists(self) -> None:
@@ -50,12 +49,12 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools/validate_adaptive_layout.py",
             "tools/validate_touch_targets.py",
             "tools/validate_localization_catalog.py",
+            "tools/validate_settings_schema.py",
             "tools/validate_onboarding_contracts.py",
             "tools/validate_packaging_metadata.py",
             "tools/validate_release_docs.py",
             "tools/tests/test_validate_release_tag.py",
         }
-
         self.assertTrue(expected.issubset(configured_files))
 
     def test_preflight_runs_regression_suites_for_source_validators(self) -> None:
@@ -69,11 +68,11 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools.tests.test_validate_keyboard_contracts",
             "tools.tests.test_validate_graph_keyboard",
             "tools.tests.test_validate_localization_catalog",
+            "tools.tests.test_validate_settings_schema",
             "tools.tests.test_validate_adaptive_layout",
             "tools.tests.test_validate_touch_targets",
             "tools.tests.test_validate_packaging_metadata",
         }
-
         self.assertTrue(expected_modules.issubset(configured_modules))
 
 
