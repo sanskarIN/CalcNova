@@ -13,6 +13,7 @@ on:
       - "tests/CalcNova.App.Tests/OnboardingPolicyTests.cs"
       - "tests/CalcNova.App.Tests/SettingsOnboardingViewModelTests.cs"
       - "tools/validate_onboarding_contracts.py"
+      - "tools/validate_xaml.py"
       - "docs/ONBOARDING.md"
       - ".github/workflows/onboarding-validate.yml"
   pull_request:
@@ -26,6 +27,7 @@ on:
       - "tests/CalcNova.App.Tests/OnboardingPolicyTests.cs"
       - "tests/CalcNova.App.Tests/SettingsOnboardingViewModelTests.cs"
       - "tools/validate_onboarding_contracts.py"
+      - "tools/validate_xaml.py"
       - "docs/ONBOARDING.md"
       - ".github/workflows/onboarding-validate.yml"
   workflow_dispatch:
@@ -45,6 +47,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+
+      - name: Validate Avalonia XAML XML
+        run: python tools/validate_xaml.py .
 
       - name: Validate onboarding contracts
         run: python tools/validate_onboarding_contracts.py .
