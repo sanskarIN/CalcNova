@@ -13,9 +13,20 @@ The App test project uses the repository-matched `Avalonia.Headless.XUnit` packa
 `MainViewHeadlessTests` currently covers:
 
 1. the shared shell loads the expected number of primary mode tabs;
-2. the calculator evaluate control executes a real bound command through a rendered headless window;
+2. the Calculator `AC` control exposes and executes its real bound command;
 3. a compact-width window applies the shared `compact` adaptive class;
-4. first-run onboarding is visible for a new/default settings state and becomes hidden after Skip.
+4. `Ctrl+PageDown` advances shared mode selection through the real shell keyboard route;
+5. enabling CalcNova high contrast applies the shared `high-contrast` shell class;
+6. first-run onboarding is visible for a new/default settings state and becomes hidden after Skip.
+
+`GraphPlotControlHeadlessTests` currently covers:
+
+1. arrow-key panning changes the exposed graph viewport deterministically;
+2. numpad Add/Subtract keyboard zoom changes viewport span;
+3. Home resets the viewport to the documented default;
+4. `F` fits the viewport around finite sampled data.
+
+`GraphPlotControl.Viewport` is exposed as a read-only snapshot specifically so interaction behavior can be asserted without reading private rendering state.
 
 These tests supplement existing view-model/domain tests. They intentionally do not attempt to emulate screen readers, real touch input, platform clipboard permission prompts, GPU rendering, mobile layout engines, or native package lifecycles.
 
@@ -29,7 +40,9 @@ These tests supplement existing view-model/domain tests. They intentionally do n
 - restores `CalcNova.App.Tests`;
 - runs the App test project in Release configuration, including the Avalonia headless scenarios.
 
-The normal solution-level release test gate also includes `CalcNova.App.Tests`, so validated releases are expected to execute the headless tests as part of the ordinary test project once the workflow reaches the .NET test step.
+The source validator also protects these workflow commands so the real `.NET` execution path cannot be removed silently.
+
+The normal solution-level build/test and release gates include `CalcNova.App.Tests`, so validated solution test runs are expected to execute the same headless scenarios as part of the App test project.
 
 ## Source contract validation
 
@@ -38,10 +51,12 @@ The normal solution-level release test gate also includes `CalcNova.App.Tests`, 
 - Avalonia/headless package-version alignment;
 - required App test project references;
 - headless application bootstrap markers;
-- presence of the core shared-shell scenarios;
+- presence of the current shared-shell and graph scenarios;
 - use of `AvaloniaFact` for headless tests;
-- representative real-control interaction markers;
-- inclusion of `CalcNova.App.Tests` in `CalcNova.slnx`.
+- representative real-control and keyboard interaction markers;
+- graph read-only viewport assertions;
+- inclusion of `CalcNova.App.Tests` in `CalcNova.slnx`;
+- the dedicated .NET 10 restore/test workflow path.
 
 `tools/tests/test_validate_headless_ui_tests.py` regression-tests this validator. The SDK-independent release preflight includes both checks, but it does **not** execute the .NET headless tests itself.
 
@@ -55,12 +70,12 @@ Headless UI tests also do not replace the runtime evidence in [ACCESSIBILITY_TES
 
 After the initial suite is observed passing, expand it in small stable increments around:
 
-- Ctrl+PageUp/PageDown/Home/End mode navigation;
+- Ctrl+PageUp/Home/End navigation in addition to the current PageDown scenario;
 - focus restoration after onboarding dismissal;
-- high-contrast style-class application;
+- reduced-motion style-class application;
 - converter search/favorite/clear-recents workflows;
 - programmer representative bit-cell interaction;
-- graph focus and keyboard pan/zoom/reset/fit behavior;
-- history search/export preview behavior.
+- history search/export preview behavior;
+- localized-string binding refresh once visible XAML localization migration begins.
 
 Keep high-cost or platform-dependent behavior in target-specific tests rather than forcing it into a synthetic headless environment.
