@@ -20,6 +20,8 @@ def validate(root: Path) -> list[str]:
         'RELEASE_TAG: ${{ github.event_name == \'workflow_dispatch\' && inputs.tag || github.ref_name }}',
         'git rev-parse -q --verify "refs/tags/$RELEASE_TAG^{commit}"',
         'git checkout --detach "$RELEASE_TAG"',
+        'SOURCE_VERSION="$(sed -n \'s:.*<Version>\\(.*\\)</Version>.*:\\1:p\' Directory.Build.props | head -n 1)"',
+        'test "$RELEASE_TAG" = "v$SOURCE_VERSION"',
         'python tools/release_preflight.py --tag "$RELEASE_TAG"',
         'dotnet restore CalcNova.slnx',
         'dotnet format CalcNova.slnx --verify-no-changes --no-restore',
@@ -38,21 +40,31 @@ def validate(root: Path) -> list[str]:
     if source.count(ref_marker) < 4:
         failures.append("Desktop, Browser, Android, and release-publication jobs must all check out the release ref.")
 
-    preflight_position = source.find('python tools/release_preflight.py --tag "$RELEASE_TAG"')
     checkout_position = source.find('git checkout --detach "$RELEASE_TAG"')
+    version_position = source.find('test "$RELEASE_TAG" = "v$SOURCE_VERSION"')
+    preflight_position = source.find('python tools/release_preflight.py --tag "$RELEASE_TAG"')
     restore_position = source.find('dotnet restore CalcNova.slnx')
-    if not (checkout_position >= 0 and preflight_position > checkout_position and restore_position > preflight_position):
-        failures.append("Tagged source preflight must run after tag checkout and before .NET restore/build validation.")
+    if not (
+        checkout_position >= 0
+        and version_position > checkout_position
+        and preflight_position > version_position
+        and restore_position > preflight_position
+    ):
+        failures.append(
+            "Release tag/source-version consistency and tagged source preflight must run after tag checkout and before .NET validation."
+        )
 
     forbidden_markers = (
         "gh release delete",
         "git tag -f",
         "git push --force",
         "AndroidSigningKeyPass>password",
+        '-p:ApplicationDisplayVersion="$VERSION"',
+        '-p:ApplicationVersion="${{ github.run_number }}"',
     )
     for marker in forbidden_markers:
         if marker in source:
-            failures.append(f"Release workflow contains forbidden destructive/insecure marker: {marker}")
+            failures.append(f"Release workflow contains forbidden destructive/insecure/version-drift marker: {marker}")
 
     return failures
 
@@ -69,7 +81,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated tag-first release preflight, build, signing, and publication workflow contracts.")
+    print("Validated tag/source version alignment, tagged preflight, build, signing, and publication workflow contracts.")
     return 0
 
 
