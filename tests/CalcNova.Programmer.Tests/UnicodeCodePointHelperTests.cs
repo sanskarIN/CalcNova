@@ -34,7 +34,7 @@ public sealed class UnicodeCodePointHelperTests
     {
         var codePoints = UnicodeCodePointHelper.GetCodePoints("A😀");
 
-        Assert.Equal(["U+0041", "U+1F600"], codePoints);
+        Assert.Equal(new[] { "U+0041", "U+1F600" }, codePoints);
     }
 
     [Fact]
