@@ -1,0 +1,49 @@
+name: Calculator Printable Keyboard Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.App/Infrastructure/CalculatorKeyboardInput.cs"
+      - "src/CalcNova.App/Views/MainView.ModifiedCalculatorKeyboard.cs"
+      - "src/CalcNova.App/Views/MainView.axaml.cs"
+      - "tests/CalcNova.App.Tests/CalculatorKeyboardInputTests.cs"
+      - "tests/CalcNova.App.Tests/CalculatorModifiedKeyboardHeadlessTests.cs"
+      - "tools/validate_keyboard_contracts.py"
+      - "tools/tests/test_validate_keyboard_contracts.py"
+      - "docs/KEYBOARD_SHORTCUTS.md"
+      - ".github/workflows/calculator-printable-keyboard-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.App/Infrastructure/CalculatorKeyboardInput.cs"
+      - "src/CalcNova.App/Views/MainView.ModifiedCalculatorKeyboard.cs"
+      - "src/CalcNova.App/Views/MainView.axaml.cs"
+      - "tests/CalcNova.App.Tests/CalculatorKeyboardInputTests.cs"
+      - "tests/CalcNova.App.Tests/CalculatorModifiedKeyboardHeadlessTests.cs"
+      - "tools/validate_keyboard_contracts.py"
+      - "tools/tests/test_validate_keyboard_contracts.py"
+      - "docs/KEYBOARD_SHORTCUTS.md"
+      - ".github/workflows/calculator-printable-keyboard-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  printable-keyboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate keyboard contracts
+        run: python tools/validate_keyboard_contracts.py .
+
+      - name: Run keyboard validator regression tests
+        run: python -m unittest tools.tests.test_validate_keyboard_contracts
