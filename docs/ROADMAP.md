@@ -14,24 +14,33 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Calculator-style percentage transformation.
 - MC, MR, MS, M+, and M- memory behavior.
 - Sanitized external expression import.
+- User-triggered sanitized clipboard paste and result copy.
+- Shared Avalonia clipboard adapter composed on all current heads.
 
 ### Programmer mode
 
 - Base 2–36 parsing/formatting.
-- Common synchronized radix representations.
-- Word-size and signed/unsigned interpretation.
-- Bitwise operations and shifts.
+- Full base 2–36 shared selector.
+- Synchronized binary/octal/decimal/hex representations.
+- Fixed-width signed/unsigned interpretation.
+- Correct masked non-decimal and signed-decimal presentation.
+- AND/OR/XOR/NOT and left/logical-right/arithmetic-right shifts.
 - Fixed-width bit visualization.
-- Bounded bit inspection/toggle helpers.
-- Unicode scalar/code-point helper backend.
+- Full 8/16/32/64/128-bit interactive grid.
+- Accessible bit-cell names.
+- Unicode scalar/code-point helper backend and shared UI.
 
 ### Conversion and utility modules
 
 - Offline fixed-unit conversion engine.
 - Swap workflow.
 - Conversion-pair model.
-- Recent/favorite conversion-pair state.
-- Selectable significant-digit display precision.
+- Bounded recent conversion-pair state.
+- Favorite conversion pairs.
+- Versioned pair persistence tokens.
+- Persisted recent/favorite pairs across launches.
+- Selectable and persisted significant-digit display precision.
+- Shared recents/favorites/precision controls.
 - Optional currency-rate provider/cache architecture.
 - Date difference, calendar arithmetic, business-day, and duration utilities.
 
@@ -44,6 +53,7 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Graph viewport and interactive plot control.
 - SVG graph export.
 - Bounded numerical derivative, root, and integral analysis.
+- Shared derivative/root/integral controls with approximate-result labeling.
 
 ### Persistence and platform architecture
 
@@ -52,62 +62,64 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Search/favorite/delete/clear history flows.
 - TXT/CSV/JSON history export.
 - Settings/preferences abstraction.
+- Converter preference persistence through shared settings.
 - Desktop, Browser/WebAssembly, Android, and iOS heads/composition.
+- Shared Avalonia `TopLevel` clipboard service attachment.
 - Repository validation, format, test/build, coverage, security, advanced-utility, release, and platform workflow foundations.
 
 ## Now
 
-### Shared UI completion
-
-- Add visible graph-analysis controls for derivative, root, and integral actions.
-- Add a usable programmer bit-toggle grid.
-- Add Unicode code-point inspection UI with accessible labels.
-- Add converter precision control, recent-pair picker, and favorite-pair picker.
-- Add sanitized clipboard paste/copy workflow behind platform-safe services.
-- Improve expression editing and selection behavior.
-- Keep every new control usable by keyboard and touch.
-
 ### Adaptive design and accessibility
 
 - Replace remaining desktop-first assumptions with compact/mobile layouts.
+- Improve navigation when many modes are present on narrow screens.
 - Audit focus order and visible focus states.
-- Add screen-reader names/descriptions for non-text controls.
+- Verify screen-reader behavior for the programmer bit grid, graph analysis, and dynamic results.
 - Verify touch target sizes and high-contrast behavior.
 - Add reduced-motion behavior where animation is introduced.
-- Review graph and bit-grid accessibility alternatives.
+- Consider grouping/virtualization strategies for 64/128-bit programmer grids on compact devices.
 
 ### Validation hardening
 
-- Observe actual GitHub Actions results for all shared-source changes.
+- Observe actual GitHub Actions/check results for the new shared-source changes.
 - Fix compile/analyzer/format/test failures before release claims.
 - Add targeted integration/UI automation where stable and maintainable.
+- Exercise clipboard behavior on Desktop, Browser, Android, and iOS target environments.
+- Exercise settings migration/restore behavior on native and Browser storage paths.
 - Keep vulnerability, repository, docs, and asset validation gates active.
+
+### Interaction polish
+
+- Improve cursor/selection-aware expression editing.
+- Add copy actions for programmer radix representations.
+- Add direct copy-result support to converter/graph/matrix/statistics outputs where useful.
+- Improve empty/error/loading states without hiding calculation details.
 
 ## Next
 
-### Converter persistence and productivity
+### Converter productivity
 
-- Decide and document persistence semantics for favorite/recent conversion pairs.
-- Add searchable unit/category workflow.
-- Add direct copy-result action.
-- Add optional per-category default pair preferences.
+- Add searchable category/unit workflow.
+- Add optional per-category default-pair preferences.
+- Add explicit clear-recents management.
+- Add visible persistence/privacy explanation for saved converter preferences.
 - Keep physical conversions fully offline.
 
 ### Programmer productivity
 
-- Add custom radix selector covering the full 2–36 range.
-- Add bit-grid grouping for 8/16/32/64/128-bit layouts.
-- Add code-point text inspection and scalar-to-text controls.
-- Add accessible copy actions for radix representations.
+- Add grouped byte/nibble headings for large bit grids.
+- Add convenient copy actions for binary/octal/decimal/hex values.
+- Consider user-selectable custom word sizes only if interaction and workload semantics remain clear.
+- Add additional code-point metadata only from stable local data sources.
 
 ### Graphing experience
 
-- Wire numerical analysis into the visual graph tab.
 - Add trace/cursor and table-of-values UX.
 - Add multiple-expression model with deterministic color assignment by theme.
 - Improve pan/zoom/reset controls and axis/grid labeling.
 - Add export controls for SVG and tabular data.
 - Continue workload-budget and discontinuity tests.
+- Add additional numerical-analysis edge-case coverage.
 
 ### Platform packaging
 
