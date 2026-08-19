@@ -24,6 +24,15 @@ public enum AppStringKey
     CalculatorSubtitle,
     PromptEnterExpression,
 
+    OnboardingWelcome,
+    OnboardingCalculateTitle,
+    OnboardingCalculateBody,
+    OnboardingInputTitle,
+    OnboardingInputBody,
+    OnboardingPrivacyTitle,
+    OnboardingPrivacyBody,
+    OnboardingNoAccount,
+
     ActionEvaluate,
     ActionPasteExpression,
     ActionCopyResult,
@@ -35,6 +44,8 @@ public enum AppStringKey
     ActionRefresh,
     ActionSave,
     ActionReset,
+    ActionSkip,
+    ActionStartCalculating,
 
     LabelExpression,
     LabelResult,
