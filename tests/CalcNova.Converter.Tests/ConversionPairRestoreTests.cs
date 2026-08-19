@@ -37,7 +37,7 @@ public sealed class ConversionPairRestoreTests
 
         Assert.Equal(2, history.Recent.Count);
         Assert.Equal(first, history.Recent[0]);
-        Assert.Equal(third, history.Recent[1]);
+        Assert.Equal(second, history.Recent[1]);
     }
 
     [Fact]
