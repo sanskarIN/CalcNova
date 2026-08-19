@@ -16,7 +16,8 @@ public sealed class MainViewModel : ViewModelBase
         History = new HistoryViewModel(dependencies.HistoryRepository, () => Settings.HistoryLimit);
         Calculator = new CalculatorViewModel(
             recordCalculationAsync: (expression, result) => History.RecordAsync(expression, result),
-            historyEnabledProvider: () => Settings.HistoryEnabled);
+            historyEnabledProvider: () => Settings.HistoryEnabled,
+            clipboardService: dependencies.ClipboardService);
         Currency = new CurrencyViewModel(dependencies.CurrencyRateCache, dependencies.CurrencyRateProvider);
         About = new AboutViewModel(dependencies.ExternalLinkService);
 
