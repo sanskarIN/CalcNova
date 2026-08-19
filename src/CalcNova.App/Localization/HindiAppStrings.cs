@@ -23,6 +23,10 @@ internal static class HindiAppStrings
             [AppStringKey.ModeSettings] = "सेटिंग्स",
             [AppStringKey.ModeAbout] = "परिचय",
 
+            [AppStringKey.CalculatorTitle] = "मानक + वैज्ञानिक",
+            [AppStringKey.CalculatorSubtitle] = "सुरक्षित स्थानीय अभिव्यक्ति गणना",
+            [AppStringKey.PromptEnterExpression] = "अभिव्यक्ति दर्ज करें",
+
             [AppStringKey.ActionEvaluate] = "गणना करें",
             [AppStringKey.ActionPasteExpression] = "अभिव्यक्ति पेस्ट करें",
             [AppStringKey.ActionCopyResult] = "परिणाम कॉपी करें",
