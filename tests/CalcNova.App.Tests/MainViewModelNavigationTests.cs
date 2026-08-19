@@ -44,4 +44,28 @@ public sealed class MainViewModelNavigationTests
 
         Assert.Equal(MainViewModel.ModeCount - 1, viewModel.SelectedModeIndex);
     }
+
+    [Fact]
+    public void SelectMode_NormalizesIndexesOutsideSharedModeRange()
+    {
+        var viewModel = new MainViewModel();
+
+        viewModel.SelectMode(MainViewModel.ModeCount + 2);
+        Assert.Equal(2, viewModel.SelectedModeIndex);
+
+        viewModel.SelectMode(-1);
+        Assert.Equal(MainViewModel.ModeCount - 1, viewModel.SelectedModeIndex);
+    }
+
+    [Fact]
+    public void SelectFirstAndLastMode_SelectExpectedBoundaries()
+    {
+        var viewModel = new MainViewModel();
+
+        viewModel.SelectLastMode();
+        Assert.Equal(MainViewModel.ModeCount - 1, viewModel.SelectedModeIndex);
+
+        viewModel.SelectFirstMode();
+        Assert.Equal(0, viewModel.SelectedModeIndex);
+    }
 }
