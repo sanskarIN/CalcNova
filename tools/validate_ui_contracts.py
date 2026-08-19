@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate critical shared-XAML command/property contracts without .NET.
+"""Validate critical shared-XAML and adaptive-shell contracts without .NET.
 
 This is a lightweight source preflight for the shared CalcNova shell. It does
 not understand Avalonia binding semantics and does not replace compilation.
@@ -173,6 +173,30 @@ XAML_CONTEXT_NAMES = {
     "HistoryViewModel": "History",
 }
 
+ADAPTIVE_CONTRACTS: dict[str, tuple[str, ...]] = {
+    "App.axaml": (
+        'Style Selector="UserControl.compact Button"',
+        'Style Selector="UserControl.compact TabItem"',
+        'Style Selector="UserControl.medium TabItem"',
+        'Style Selector="UserControl.expanded TabItem"',
+        'Style Selector="CheckBox"',
+    ),
+    "MainView.axaml.cs": (
+        "AdaptiveLayoutProfile.ForWidth",
+        "OnSizeChanged",
+        "ScrollBarVisibility.Auto",
+        "HorizontalScrollBarVisibility",
+        "BringIntoViewOnFocusChange",
+    ),
+    "AdaptiveLayoutProfile.cs": (
+        "CompactMaximumWidth",
+        "MediumMaximumWidth",
+        '"compact"',
+        '"medium"',
+        '"expanded"',
+    ),
+}
+
 
 def public_member_exists(source: str, member: str) -> bool:
     pattern = re.compile(rf"\bpublic\s+[^\n;{{}}]+\b{re.escape(member)}\b")
@@ -181,6 +205,20 @@ def public_member_exists(source: str, member: str) -> bool:
 
 def xaml_binding_exists(xaml: str, member: str) -> bool:
     return re.search(rf"\{{Binding\s+{re.escape(member)}(?:\s*[,}}])", xaml) is not None
+
+
+def validate_markers(path: Path, markers: tuple[str, ...], failures: list[str]) -> int:
+    if not path.is_file():
+        failures.append(f"Missing adaptive UI source: {path}")
+        return 0
+
+    source = path.read_text(encoding="utf-8")
+    checked = 0
+    for marker in markers:
+        checked += 1
+        if marker not in source:
+            failures.append(f"{path.name} is missing adaptive contract marker: {marker}")
+    return checked
 
 
 def main() -> int:
@@ -215,14 +253,31 @@ def main() -> int:
                 if not xaml_binding_exists(xaml, member):
                     failures.append(f"MainView.axaml is missing binding '{member}' for {view_model}.")
 
+    adaptive_paths = {
+        "App.axaml": root / "src" / "CalcNova.App" / "App.axaml",
+        "MainView.axaml.cs": root / "src" / "CalcNova.App" / "Views" / "MainView.axaml.cs",
+        "AdaptiveLayoutProfile.cs": root
+        / "src"
+        / "CalcNova.App"
+        / "Infrastructure"
+        / "AdaptiveLayoutProfile.cs",
+    }
+    adaptive_count = sum(
+        validate_markers(adaptive_paths[name], markers, failures)
+        for name, markers in ADAPTIVE_CONTRACTS.items()
+    )
+
     if failures:
         print("Shared UI contract validation failed:", file=sys.stderr)
         for failure in failures:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    contract_count = sum(len(values) for groups in CONTRACTS.values() for values in groups.values())
-    print(f"Validated {contract_count} critical shared UI command/property contracts.")
+    binding_count = sum(len(values) for groups in CONTRACTS.values() for values in groups.values())
+    print(
+        f"Validated {binding_count} critical shared UI command/property contracts "
+        f"and {adaptive_count} adaptive-shell markers."
+    )
     return 0
 
 
