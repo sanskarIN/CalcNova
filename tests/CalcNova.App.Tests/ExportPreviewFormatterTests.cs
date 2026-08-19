@@ -30,7 +30,7 @@ public sealed class ExportPreviewFormatterTests
     [Fact]
     public void Create_TruncatesContentAboveLineBudget()
     {
-        var content = string.Join('\n', Enumerable.Range(1, 20).Select(index => $"line-{index}"));
+        var content = string.Join("\n", Enumerable.Range(1, 20).Select(index => $"line-{index}"));
 
         var preview = ExportPreviewFormatter.Create(content, maximumCharacters: 1_000, maximumLines: 3);
 
