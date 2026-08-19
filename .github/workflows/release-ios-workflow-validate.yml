@@ -1,0 +1,37 @@
+name: Release iOS Workflow Validate
+
+on:
+  push:
+    paths:
+      - '.github/workflows/release-ios-validate.yml'
+      - 'tools/validate_release_ios_workflow.py'
+      - 'tools/tests/test_validate_release_ios_workflow.py'
+      - '.github/workflows/release-ios-workflow-validate.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/release-ios-validate.yml'
+      - 'tools/validate_release_ios_workflow.py'
+      - 'tools/tests/test_validate_release_ios_workflow.py'
+      - '.github/workflows/release-ios-workflow-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-ios-workflow-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Validate release-tag iOS workflow
+        run: python tools/validate_release_ios_workflow.py
+
+      - name: Run release iOS workflow validator tests
+        run: python -m unittest tools.tests.test_validate_release_ios_workflow
