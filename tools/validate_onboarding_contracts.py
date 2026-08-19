@@ -98,6 +98,10 @@ def main() -> int:
         "new OnboardingOverlay()",
         "Grid.SetRowSpan",
         "viewModel.Settings.ShouldShowOnboarding",
+        "QueueOnboardingFocus();",
+        "QueueCalculatorFocus();",
+        "Dispatcher.UIThread.Post",
+        "ReferenceEquals(textBox.DataContext, calculator)",
     ):
         if marker not in main_view_code_source:
             failures.append(f"MainView onboarding integration is missing marker: {marker}")
@@ -109,8 +113,8 @@ def main() -> int:
         return 1
 
     print(
-        "Validated versioned onboarding persistence, deferred first-run display, "
-        "shared visual surface, complete/skip actions, and shell attachment contracts."
+        "Validated versioned onboarding persistence, deferred first-run display, shared visual surface, "
+        "complete/skip actions, shell attachment, and focus restoration contracts."
     )
     return 0
 
