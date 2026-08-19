@@ -106,6 +106,15 @@ public partial class MainView : UserControl
             return;
         }
 
+        if (eventArgs.Source is not TextBox &&
+            eventArgs.KeyModifiers == KeyModifiers.None &&
+            CalculatorKeyboardInput.TryGetToken(eventArgs.Key, out var token))
+        {
+            viewModel.Calculator.AppendCommand.Execute(token);
+            eventArgs.Handled = true;
+            return;
+        }
+
         switch (eventArgs.Key)
         {
             case Key.Enter:
