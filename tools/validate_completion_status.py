@@ -33,6 +33,16 @@ CURRENT_STATUS_CONTRACTS: dict[str, tuple[str, ...]] = {
         "CalcNova 2.8.03 product scope: **COMPLETE**",
         "Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**",
     ),
+    "SECURITY.md": (
+        "**CalcNova 2.8.03 is the current completed and supported product baseline.**",
+        "| `2.8.03` | Yes |",
+        "normalized release tag is `v2.8.3`",
+    ),
+    "SUPPORT.md": (
+        "**Current supported product baseline: CalcNova 2.8.03.**",
+        "Feature requests are optional post-2.8.03 enhancements",
+        "Support CalcNova maintenance and optional improvements",
+    ),
     "docs/README.md": (
         "# CalcNova 2.8.03 Documentation",
         "**Project status: Complete for version 2.8.03.**",
@@ -82,6 +92,7 @@ CURRENT_STATUS_CONTRACTS: dict[str, tuple[str, ...]] = {
 
 FORBIDDEN_CURRENT_STATUS_MARKERS = (
     "under active development",
+    "active pre-release development",
     "## [unreleased]",
     "## [0.1.0] - planned",
     "remaining product/runtime work",
