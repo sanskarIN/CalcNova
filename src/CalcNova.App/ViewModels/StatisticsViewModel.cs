@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Services;
+using CalcNova.Platform.Clipboard;
 using CalcNova.Statistics;
 
 namespace CalcNova.App.ViewModels;
@@ -9,13 +11,17 @@ namespace CalcNova.App.ViewModels;
 public sealed class StatisticsViewModel : ViewModelBase
 {
     private readonly StatisticsCalculator _calculator = new();
+    private readonly IClipboardService? _clipboardService;
     private string _datasetText = "1, 2, 2, 3, 4";
     private string _summary = string.Empty;
+    private string _copyStatus = string.Empty;
     private string _errorMessage = string.Empty;
 
-    public StatisticsViewModel()
+    public StatisticsViewModel(IClipboardService? clipboardService = null)
     {
+        _clipboardService = clipboardService;
         AnalyzeCommand = new RelayCommand(_ => Analyze());
+        CopySummaryCommand = new AsyncRelayCommand(_ => CopySummaryAsync());
         Analyze();
     }
 
@@ -31,6 +37,12 @@ public sealed class StatisticsViewModel : ViewModelBase
         private set => SetField(ref _summary, value);
     }
 
+    public string CopyStatus
+    {
+        get => _copyStatus;
+        private set => SetField(ref _copyStatus, value);
+    }
+
     public string ErrorMessage
     {
         get => _errorMessage;
@@ -38,6 +50,8 @@ public sealed class StatisticsViewModel : ViewModelBase
     }
 
     public ICommand AnalyzeCommand { get; }
+
+    public ICommand CopySummaryCommand { get; }
 
     private void Analyze()
     {
@@ -66,13 +80,20 @@ public sealed class StatisticsViewModel : ViewModelBase
             builder.Append($"Q3: {Format(result.ThirdQuartile)}");
 
             Summary = builder.ToString();
+            CopyStatus = string.Empty;
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is ArgumentException or FormatException)
         {
             Summary = string.Empty;
+            CopyStatus = string.Empty;
             ErrorMessage = exception.Message;
         }
+    }
+
+    private async Task CopySummaryAsync()
+    {
+        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, Summary, "statistics summary");
     }
 
     private static double[] ParseDataset(string text)
