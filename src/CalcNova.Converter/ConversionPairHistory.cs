@@ -77,5 +77,14 @@ public sealed class ConversionPairHistory
         }
     }
 
-    public void ClearRecent() => _recent.Clear();
+    public bool ClearRecent()
+    {
+        if (_recent.Count == 0)
+        {
+            return false;
+        }
+
+        _recent.Clear();
+        return true;
+    }
 }
