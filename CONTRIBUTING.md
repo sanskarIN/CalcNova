@@ -1,16 +1,18 @@
 # Contributing to CalcNova
 
-Thank you for considering a contribution to CalcNova. The project values correctness, accessibility, maintainability, privacy, and focused changes over feature count.
+Thank you for considering a contribution to CalcNova. **CalcNova 2.8.03 is the completed product baseline.** Contributions now focus on maintenance, correctness, security, compatibility, documentation, translations, tests, dependency updates, or explicitly proposed optional enhancements.
+
+The project values correctness, accessibility, maintainability, privacy, and focused changes over feature count.
 
 ## Before you start
 
-1. Read `PROJECT_STATE.md` to understand current implementation status.
+1. Read `PROJECT_STATE.md` for the current completed baseline and maintenance status.
 2. Read `docs/ARCHITECTURE.md` before changing dependency boundaries.
 3. Check existing issues before starting duplicate work.
-4. For a substantial new feature, open a feature request before investing in a large implementation.
+4. For a substantial optional feature, open a feature request before investing in a large implementation.
 5. Never place secrets, private signing material, tokens, credentials, or personal data in an issue, commit, screenshot, or pull request.
 
-## Development environment
+## Contributor setup
 
 Use the SDK selected by `global.json` and restore packages from the repository root:
 
@@ -26,21 +28,22 @@ dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
-Do not state that a check passed unless it actually completed successfully. Use `NOT RUN` and explain why when a platform or workload is unavailable.
+Do not state that a check passed unless it actually completed successfully. Use `NOT RUN` or `BLOCKED` with a reason when a platform, workload, credential, or required tool is unavailable.
 
 ## Branching
 
 - Keep `main` stable.
-- Use short-lived feature or fix branches.
+- Use short-lived feature, maintenance, or fix branches.
 - Keep each pull request focused on one logical change.
 - Do not rewrite shared history unless repository maintainers explicitly request it.
 
 Examples:
 
 ```text
-feature/programmer-bit-grid
 fix/parser-unary-power
-feature/history-search
+maintenance/dependency-refresh
+docs/versioning-clarification
+feature/optional-history-filter
 ```
 
 ## Commit messages
@@ -48,11 +51,11 @@ feature/history-search
 Use Conventional Commits when practical:
 
 ```text
-feat(scientific): add inverse trig functions
 fix(parser): handle nested unary minus
 test(converter): cover temperature boundaries
 docs(build): document Linux prerequisites
-ci: add formatting verification
+security: tighten imported-data validation
+ci: update formatting verification
 ```
 
 Each commit should represent a meaningful, reviewable unit. Do not create empty commits or artificial commit spam.
@@ -87,7 +90,7 @@ When changing parser, numeric, scientific, programmer, converter, statistics, eq
 
 ## Tests
 
-Add tests near the feature they protect.
+Add tests near the behavior they protect.
 
 Prefer tests for:
 
@@ -120,16 +123,18 @@ Document any known limitation instead of hiding it.
 
 Update documentation in the same change when behavior, commands, package versions, project paths, platform requirements, or user-facing features change.
 
-For significant implementation sessions, update:
+For significant maintenance or enhancement sessions, update as applicable:
 
 - `what_changed.md`;
-- `PROJECT_STATE.md`;
-- `CHANGELOG.md` when the change is user-visible/release-relevant;
-- `docs/ROADMAP.md` when planned work changes.
+- `PROJECT_STATE.md` when the supported baseline/status changes;
+- `CHANGELOG.md` when the change is user-visible or release-relevant;
+- `docs/ROADMAP.md` only when optional post-2.8.03 planning is intentionally changed.
+
+Do not reintroduce provisional-status wording into current authoritative documents unless a future release is explicitly being reclassified.
 
 ## Dependencies
 
-Before adding a package, consider:
+Before adding or updating a package, consider:
 
 - whether the framework already provides the needed functionality;
 - maintenance activity;
