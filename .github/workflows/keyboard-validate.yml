@@ -1,0 +1,41 @@
+name: Keyboard Contract Validate
+
+on:
+  push:
+    paths:
+      - 'src/CalcNova.App/Infrastructure/CalculatorKeyboardInput.cs'
+      - 'src/CalcNova.App/Infrastructure/ShellKeyboardShortcut.cs'
+      - 'src/CalcNova.App/Views/MainView.axaml.cs'
+      - 'tools/validate_keyboard_contracts.py'
+      - 'tools/tests/test_validate_keyboard_contracts.py'
+      - '.github/workflows/keyboard-validate.yml'
+  pull_request:
+    paths:
+      - 'src/CalcNova.App/Infrastructure/CalculatorKeyboardInput.cs'
+      - 'src/CalcNova.App/Infrastructure/ShellKeyboardShortcut.cs'
+      - 'src/CalcNova.App/Views/MainView.axaml.cs'
+      - 'tools/validate_keyboard_contracts.py'
+      - 'tools/tests/test_validate_keyboard_contracts.py'
+      - '.github/workflows/keyboard-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  keyboard-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Validate keyboard contracts
+        run: python tools/validate_keyboard_contracts.py
+
+      - name: Run keyboard validator regression tests
+        run: python -m unittest tools.tests.test_validate_keyboard_contracts
