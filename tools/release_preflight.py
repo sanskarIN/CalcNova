@@ -27,6 +27,7 @@ CHECKS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Packaging metadata", ("tools/validate_packaging_metadata.py", ".")),
     ("Release documentation", ("tools/validate_release_docs.py", ".")),
     ("Release-tag validator tests", ("tools/tests/test_validate_release_tag.py",)),
+    ("Release-documentation validator tests", ("-m", "unittest", "tools.tests.test_validate_release_docs")),
     ("Focus validator tests", ("-m", "unittest", "tools.tests.test_validate_focus_visibility")),
     ("Accessibility evidence validator tests", ("-m", "unittest", "tools.tests.test_validate_accessibility_evidence")),
     ("Keyboard validator tests", ("-m", "unittest", "tools.tests.test_validate_keyboard_contracts")),
