@@ -21,4 +21,10 @@ public sealed record AppSettings
     public bool ReducedMotion { get; init; }
 
     public bool HighContrast { get; init; }
+
+    public int ConverterSignificantDigits { get; init; } = 15;
+
+    public string[] ConverterRecentPairs { get; init; } = [];
+
+    public string[] ConverterFavoritePairs { get; init; } = [];
 }
