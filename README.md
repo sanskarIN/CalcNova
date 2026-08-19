@@ -35,39 +35,26 @@ CalcNova is an open-source, privacy-first, cross-platform calculator built with 
 - Repeated-equals session behavior
 - MC, MR, MS, M+, and M- memory operations
 - Sanitized external expression import with common calculator-glyph normalization
+- User-triggered sanitized clipboard paste and result copy
 
 ### Programmer tools
 
-- Base 2 through base 36 parsing and formatting
+- Base 2 through base 36 parsing, formatting, and shared UI selection
 - Binary/octal/decimal/hex representations
-- Configurable word size and signed/unsigned interpretation
+- 8/16/32/64/128-bit shared word-size presets
+- Signed/unsigned two's-complement interpretation
+- Correct fixed-width masked non-decimal displays
 - AND, OR, XOR, NOT
 - Left shift, logical right shift, arithmetic right shift
-- Fixed-width bit strings
-- Bounded bit inspection and toggling
-- Unicode scalar/code-point parsing and formatting helpers
-- Unicode scalar-to-text and bounded text-inspection utilities
+- Full interactive word-size bit grid with accessible bit labels
+- Unicode scalar/code-point parsing, formatting, scalar-to-text, and bounded text inspection
+- Dedicated shared Unicode code-point UI
 
 ### Offline unit conversion
 
-Fixed conversion categories include:
+Fixed conversion categories include length, area, volume, mass, speed, temperature, time, data/storage, frequency, pressure, energy, power, force, and angle.
 
-- length
-- area
-- volume
-- mass
-- speed
-- temperature
-- time
-- data/storage
-- frequency
-- pressure
-- energy
-- power
-- force
-- angle
-
-The converter also has source support for swapping units, recent conversion pairs, favorite pairs, and selectable 1–17 significant-digit result precision.
+The shared converter supports unit swapping, selectable 1–17 significant-digit result precision, recent conversion pairs, favorite pairs, pair restoration, and persisted converter preferences across launches. Fixed physical/data conversions remain local and offline.
 
 ### Currency and date/time utilities
 
@@ -82,16 +69,16 @@ The converter also has source support for swapping units, recent conversion pair
 ### Graphing and numerical analysis
 
 - `y = f(x)` sampling through the shared expression engine
-- Workload-bounded sampling
-- Discontinuity segmentation
+- Workload-bounded sampling and discontinuity segmentation
 - Explicit graph viewport model
 - Interactive Avalonia plot control
 - Deterministic SVG graph export
 - Bounded central-difference derivative approximation
 - Bracketed bisection root finding
 - Bounded Simpson numerical integration
+- Shared controls for derivative, root, and integral analysis
 
-Numerical analysis is approximate by design and must be presented as such in UI/documentation.
+Numerical analysis is approximate by design and is labeled accordingly.
 
 ### Advanced mathematics
 
@@ -99,47 +86,40 @@ Numerical analysis is approximate by design and must be presented as such in UI/
 - Equation-solving module and shared view model
 - Matrix utilities and shared view model
 
-See the source modules and [`PROJECT_STATE.md`](PROJECT_STATE.md) for the exact implemented surface.
-
 ### Local history and settings
 
 - Calculation-history abstraction
 - SQLite-backed native history
 - Browser-safe storage path
-- Search and recent-history workflows
-- Favorite history entries
-- Delete/clear operations
+- Search, favorites, delete, and clear workflows
 - TXT/CSV/JSON history export
 - Settings/preferences abstraction and view model
+- Persisted converter preferences
 - About/support external-link abstraction
 
 ## Shared application
 
-The shared Avalonia shell contains principal modes for:
+The shared Avalonia shell currently exposes:
 
 - Calculator
 - Programmer
+- Unicode code points
 - Unit conversion
 - Statistics
 - Equations
 - Matrices
-- Graphing
+- Graphing and numerical analysis
 - Date/time
 - Currency
 - History
 - Settings
 - About/support
 
-Some newer domain/view-model capabilities still need dedicated visible controls in the shared XAML shell. Those tasks are tracked in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+The next UI priorities are adaptive/mobile layout refinement, deeper accessibility validation, interaction polish, and automated UI/integration testing. See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Platform source targets
 
-The repository contains platform heads/composition for:
-
-- Desktop
-- Browser/WebAssembly
-- Android
-- iOS
+The repository contains platform heads/composition for Desktop, Browser/WebAssembly, Android, and iOS. Clipboard composition is provided through the shared Avalonia adapter and attached only when the shared view has a `TopLevel` clipboard.
 
 Platform-specific source existing in the repository does **not** by itself mean a store/package build has been validated. Exact build/packaging status is recorded in [`PROJECT_STATE.md`](PROJECT_STATE.md).
 
@@ -226,13 +206,13 @@ CalcNova does not execute arbitrary user code to evaluate expressions. Calculati
 
 A feature is not considered validated merely because source code or tests exist. Build/test/platform status must be based on commands or workflows that actually ran and whose results were observed. When an environment is unavailable, project state records `NOT RUN` instead of inventing PASS.
 
-See [`docs/CALCULATION_ENGINE.md`](docs/CALCULATION_ENGINE.md) and [`docs/TESTING.md`](docs/TESTING.md).
+See [`docs/CALCULATION_ENGINE.md`](docs/CALCULATION_ENGINE.md), [`docs/INPUT_SAFETY.md`](docs/INPUT_SAFETY.md), and [`docs/TESTING.md`](docs/TESTING.md).
 
 ## Privacy
 
 Core calculations and fixed conversions are designed to operate locally. CalcNova does not require an account for ordinary calculation features, and the open-source base does not intentionally include advertising or behavioral-tracking SDKs.
 
-Network-enhanced features such as currency-rate refresh remain optional and independently controllable.
+Clipboard text is read only after an explicit paste action in the calculator workflow; imported text is sanitized before evaluation. Network-enhanced features such as currency-rate refresh remain optional and independently controllable.
 
 See [`docs/PRIVACY.md`](docs/PRIVACY.md).
 
