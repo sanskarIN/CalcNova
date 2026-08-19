@@ -31,8 +31,9 @@ public sealed class ConverterViewModel : ViewModelBase
     {
         _clipboardService = clipboardService;
         _availableUnits = UnitCatalog.ForCategory(_selectedCategory);
-        _fromUnit = _availableUnits[0];
-        _toUnit = _availableUnits.Count > 1 ? _availableUnits[1] : _availableUnits[0];
+        var defaultPair = ConversionDefaults.ForCategory(_selectedCategory);
+        _fromUnit = UnitCatalog.Get(defaultPair.FromUnitId);
+        _toUnit = UnitCatalog.Get(defaultPair.ToUnitId);
         ConvertCommand = new RelayCommand(_ => Convert(recordPair: true));
         SwapCommand = new RelayCommand(_ => Swap());
         ToggleFavoriteCommand = new RelayCommand(_ => ToggleCurrentFavorite());
@@ -63,8 +64,7 @@ public sealed class ConverterViewModel : ViewModelBase
 
             _availableUnits = UnitCatalog.ForCategory(value);
             OnPropertyChanged(nameof(AvailableUnits));
-            FromUnit = _availableUnits[0];
-            ToUnit = _availableUnits.Count > 1 ? _availableUnits[1] : _availableUnits[0];
+            ApplyDefaultPair(value);
             SelectedSearchUnit = null;
             RefreshSearchResults();
             Convert();
@@ -255,6 +255,21 @@ public sealed class ConverterViewModel : ViewModelBase
         {
             Result = string.Empty;
             ErrorMessage = exception.Message;
+        }
+    }
+
+    private void ApplyDefaultPair(UnitCategory category)
+    {
+        var pair = ConversionDefaults.ForCategory(category);
+        _suppressPairRecording = true;
+        try
+        {
+            FromUnit = UnitCatalog.Get(pair.FromUnitId);
+            ToUnit = UnitCatalog.Get(pair.ToUnitId);
+        }
+        finally
+        {
+            _suppressPairRecording = false;
         }
     }
 
