@@ -34,6 +34,19 @@ EXPECTED_KEY_TOKENS = {
     "Multiply": "*",
     "Divide": "/",
     "Decimal": ".",
+    "OemMinus": "-",
+    "OemQuestion": "/",
+    "OemPeriod": ".",
+    "OemComma": ",",
+}
+
+EXPECTED_SHIFT_TOKENS = {
+    "OemPlus": "+",
+    "D8": "*",
+    "D9": "(",
+    "D0": ")",
+    "D6": "^",
+    "D5": "%",
 }
 
 EXPECTED_SHELL_SHORTCUTS = {
@@ -48,9 +61,13 @@ def validate(root: Path) -> list[str]:
     mapping_path = root / "src" / "CalcNova.App" / "Infrastructure" / "CalculatorKeyboardInput.cs"
     shortcut_path = root / "src" / "CalcNova.App" / "Infrastructure" / "ShellKeyboardShortcut.cs"
     view_path = root / "src" / "CalcNova.App" / "Views" / "MainView.axaml.cs"
+    modified_view_path = root / "src" / "CalcNova.App" / "Views" / "MainView.ModifiedCalculatorKeyboard.cs"
+    unit_tests_path = root / "tests" / "CalcNova.App.Tests" / "CalculatorKeyboardInputTests.cs"
+    headless_tests_path = root / "tests" / "CalcNova.App.Tests" / "CalculatorModifiedKeyboardHeadlessTests.cs"
 
+    paths = (mapping_path, shortcut_path, view_path, modified_view_path, unit_tests_path, headless_tests_path)
     failures: list[str] = []
-    for path in (mapping_path, shortcut_path, view_path):
+    for path in paths:
         if not path.is_file():
             failures.append(f"Missing keyboard source: {path}")
 
@@ -60,12 +77,26 @@ def validate(root: Path) -> list[str]:
     mapping_source = mapping_path.read_text(encoding="utf-8")
     shortcut_source = shortcut_path.read_text(encoding="utf-8")
     view_source = view_path.read_text(encoding="utf-8")
+    modified_view_source = modified_view_path.read_text(encoding="utf-8")
+    unit_tests_source = unit_tests_path.read_text(encoding="utf-8")
+    headless_tests_source = headless_tests_path.read_text(encoding="utf-8")
 
     for key, token in EXPECTED_KEY_TOKENS.items():
-        direct_marker = f"Key.{key}"
-        token_marker = f'=> "{token}"'
-        if direct_marker not in mapping_source or token_marker not in mapping_source:
+        if f"Key.{key}" not in mapping_source or f'=> "{token}"' not in mapping_source:
             failures.append(f"Calculator keyboard map is missing {key} -> {token!r}.")
+
+    for key, token in EXPECTED_SHIFT_TOKENS.items():
+        if f"Key.{key}" not in mapping_source or f'=> "{token}"' not in mapping_source:
+            failures.append(f"Calculator shifted keyboard map is missing Shift+{key} -> {token!r}.")
+
+    for marker in (
+        "modifiers != KeyModifiers.Shift",
+        "TryGetModifiedToken",
+        "KeyModifiers.Control",
+        "KeyModifiers.Alt",
+    ):
+        if marker not in mapping_source and marker not in unit_tests_source:
+            failures.append(f"Calculator modified-key safety contract is missing marker: {marker}")
 
     if "modifiers != KeyModifiers.Control" not in shortcut_source:
         failures.append("Shell shortcut policy must require exactly the Control modifier.")
@@ -86,6 +117,33 @@ def validate(root: Path) -> list[str]:
         if marker not in view_source:
             failures.append(f"MainView keyboard wiring is missing marker: {marker}")
 
+    for marker in (
+        "protected override void OnKeyDown(KeyEventArgs e)",
+        "e.Source is TextBox",
+        "viewModel.Settings.ShouldShowOnboarding",
+        "viewModel.SelectedModeIndex != 0",
+        "CalculatorKeyboardInput.TryGetModifiedToken",
+        "e.Handled = true",
+    ):
+        if marker not in modified_view_source:
+            failures.append(f"Shifted calculator keyboard wiring is missing marker: {marker}")
+
+    for marker in (
+        "TryGetModifiedToken_ShiftOperator_ReturnsCanonicalToken",
+        "TryGetModifiedToken_UnsafeOrUnknownModifierCombination_IsNotCaptured",
+    ):
+        if marker not in unit_tests_source:
+            failures.append(f"CalculatorKeyboardInputTests is missing modifier regression: {marker}")
+
+    for marker in (
+        "ShiftedTopRowOperators_AppendCanonicalCalculatorTokens",
+        "PhysicalKey.Digit9",
+        "RawInputModifiers.Shift",
+        'Assert.Equal("(*^%)"',
+    ):
+        if marker not in headless_tests_source:
+            failures.append(f"Calculator shifted-key headless coverage is missing marker: {marker}")
+
     return failures
 
 
@@ -105,8 +163,9 @@ def main() -> int:
 
     print(
         "Validated "
-        f"{len(EXPECTED_KEY_TOKENS)} calculator hardware-key mappings, "
-        f"{len(EXPECTED_SHELL_SHORTCUTS)} shared-shell shortcuts, and shell wiring."
+        f"{len(EXPECTED_KEY_TOKENS)} unmodified calculator mappings, "
+        f"{len(EXPECTED_SHIFT_TOKENS)} Shift-only operator mappings, "
+        f"{len(EXPECTED_SHELL_SHORTCUTS)} shared-shell shortcuts, and text-field/modifier safety wiring."
     )
     return 0
 
