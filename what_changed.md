@@ -1,5 +1,51 @@
 # What Changed
 
+## 2026-08-19 — Keyboard + Navigation Accessibility Continuation
+
+### Added — Shared Shell Keyboard Navigation
+
+- Added `ShellKeyboardShortcut` with a typed `ShellNavigationAction` contract.
+- Added `Ctrl+Home` to select the first CalcNova mode.
+- Added `Ctrl+End` to select the last CalcNova mode.
+- Preserved `Ctrl+PageUp` / `Ctrl+PageDown` cyclic mode navigation.
+- Required exactly the Control modifier for shared-shell navigation so extra modifier combinations do not accidentally trigger mode changes.
+- Kept all global calculator/mode shortcuts suppressed while onboarding is visible.
+
+### Changed — Mode Selection Safety
+
+- Added explicit `SelectMode`, `SelectFirstMode`, and `SelectLastMode` APIs to `MainViewModel`.
+- Preserved cyclic next/previous navigation through the shared normalization helper.
+- Hardened the two-way `SelectedModeIndex` binding against transient invalid values such as `-1`, preventing a temporary Avalonia `TabControl` state from accidentally selecting the last mode during initialization.
+
+### Added — Tests and CI
+
+- Expanded `MainViewModelNavigationTests` with direct selection, boundary selection, normalization, and transient invalid-index coverage.
+- Added `ShellKeyboardShortcutTests` for cyclic/boundary shortcuts and modifier collision behavior.
+- Extended `tools/validate_keyboard_contracts.py` to validate both calculator hardware mappings and shared-shell navigation shortcuts.
+- Added `tools/tests/test_validate_keyboard_contracts.py`.
+- Added `.github/workflows/keyboard-validate.yml` for SDK-independent keyboard contract validation and regression tests.
+- Updated `docs/KEYBOARD_SHORTCUTS.md` with the implemented shell navigation behavior and validation limitations.
+
+### Validation Status
+
+- GitHub workflow lookup for the latest keyboard-validator regression commit exposed no workflow runs at the time checked; no CI PASS is inferred from an empty run list.
+- The active continuation environment still does not expose the required .NET SDK, so local restore/build/test claims remain unverified.
+- The GitHub connector used for these commits does not expose a per-commit author-email override; authenticated repository identity was used rather than falsely claiming `sanskarin@outlook.in` was applied.
+
+### Commits Added in This Continuation
+
+- `09bb8075` — feat(navigation): harden shared mode selection semantics
+- `bc8d41b3` — test(navigation): cover direct and boundary mode selection
+- `b5b380f6` — feat(a11y): define shared keyboard mode navigation shortcuts
+- `a9a56234` — test(a11y): cover shell keyboard navigation shortcuts
+- `b598f145` — feat(a11y): wire keyboard-first shell navigation
+- `827417c4` — docs(a11y): expand keyboard navigation reference
+- `3a8a6e0c` — ci(a11y): extend keyboard contract validation to shell shortcuts
+- `056f582e` — test(ci): cover keyboard contract validator
+- `5f63850f` — ci(a11y): add dedicated keyboard contract workflow
+- `ee6038fe` — fix(navigation): ignore transient invalid tab indexes
+- `f6ad7fcc` — test(navigation): cover transient invalid tab indexes
+
 ## 2026-08-19 — Adaptive + Touch Validation Continuation
 
 ### Added — Adaptive Layout Validation
