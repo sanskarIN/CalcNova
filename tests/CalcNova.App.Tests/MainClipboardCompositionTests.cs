@@ -26,6 +26,14 @@ public sealed class MainClipboardCompositionTests
         Assert.Equal(viewModel.CodePoint.CodePointResult, await clipboard.WaitForWriteAsync());
 
         clipboard.Reset();
+        viewModel.Statistics.CopySummaryCommand.Execute(null);
+        Assert.Equal(viewModel.Statistics.Summary, await clipboard.WaitForWriteAsync());
+
+        clipboard.Reset();
+        viewModel.Matrices.CopyResultCommand.Execute(null);
+        Assert.Equal(viewModel.Matrices.Result, await clipboard.WaitForWriteAsync());
+
+        clipboard.Reset();
         viewModel.Graphing.CopyPreviewCommand.Execute(null);
         var graphText = await clipboard.WaitForWriteAsync();
         Assert.Contains(viewModel.Graphing.Summary, graphText, StringComparison.Ordinal);
