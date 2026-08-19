@@ -29,6 +29,7 @@ CHECKS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Localization validator tests", ("-m", "unittest", "tools.tests.test_validate_localization_catalog")),
     ("Adaptive validator tests", ("-m", "unittest", "tools.tests.test_validate_adaptive_layout")),
     ("Touch-target validator tests", ("-m", "unittest", "tools.tests.test_validate_touch_targets")),
+    ("Packaging validator tests", ("-m", "unittest", "tools.tests.test_validate_packaging_metadata")),
 )
 
 
