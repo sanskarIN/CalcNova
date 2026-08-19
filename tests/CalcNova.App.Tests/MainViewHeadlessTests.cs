@@ -156,6 +156,37 @@ public sealed class MainViewHeadlessTests
     }
 
     [AvaloniaFact]
+    public async Task HindiCulture_LocalizesShellHeadersAndCalculatorPrompt()
+    {
+        var viewModel = await CreateReadyViewModelAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 980, Height = 780, Content = view };
+
+        window.Show();
+        try
+        {
+            viewModel.Settings.CultureName = "hi-IN";
+            await viewModel.Settings.SaveAsync();
+
+            var tabs = view.GetVisualDescendants().OfType<TabItem>().ToArray();
+            Assert.Equal("कैलकुलेटर", tabs[0].Header?.ToString());
+            Assert.Equal("परिचय", tabs[^1].Header?.ToString());
+            Assert.Contains(
+                view.GetVisualDescendants().OfType<TextBlock>(),
+                textBlock => string.Equals(textBlock.Text, "मानक + वैज्ञानिक", StringComparison.Ordinal));
+
+            var expressionBox = view.GetVisualDescendants()
+                .OfType<TextBox>()
+                .First(textBox => ReferenceEquals(textBox.DataContext, viewModel.Calculator));
+            Assert.Equal("अभिव्यक्ति दर्ज करें", expressionBox.Watermark);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public async Task NewUser_OnboardingOverlayIsVisibleAndSkipHidesIt()
     {
         var viewModel = new MainViewModel();
