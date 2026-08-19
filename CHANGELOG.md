@@ -114,6 +114,7 @@ Mobile build code: `20803`
 - Added Android composition.
 - Added iOS composition.
 - Added shared clipboard/external-link abstractions and appropriate native/Browser storage composition.
+- Added a stable Linux AppStream release entry for version `2.8.03` dated `2026-08-19`.
 
 ### Version 2.8.03 release identity
 
@@ -122,8 +123,10 @@ Mobile build code: `20803`
 - Set assembly/file version `2.8.3.0` and informational version `2.8.03`.
 - Set Android/iOS display version from `ProductDisplayVersion`.
 - Set Android/iOS numeric build code to `20803`.
-- Updated package metadata validation to reject old development-version markers.
+- Updated package metadata validation to reject obsolete provisional mobile-version markers.
 - Documented that strict SemVer uses normalized tag `v2.8.3`; `v2.8.03` is intentionally invalid under SemVer numeric rules.
+- Added in-app About identity: `Version 2.8.03 • Complete`.
+- Added view-model and headless-shell regression source for the About release identity.
 
 ### Validation and release infrastructure
 
@@ -138,17 +141,31 @@ Mobile build code: `20803`
 - Added structured PASS / FAIL / BLOCKED / NOT RUN evidence model, runner, verifier, and schema.
 - Added release source-version consistency check so a release tag must equal `v` plus the normalized source `<Version>`.
 - Removed Android release-time display/build version overrides so publication cannot drift from the source-owned 2.8.03 identity.
+- Added `tools/validate_completion_status.py` and its regression suite to protect the completed 2.8.03 status across authoritative current-facing files and in-app About metadata.
+- Integrated the completion-status validator and regression suite into the unified source preflight.
+- Added the focused `CalcNova 2.8.03 Completion Validate` workflow with read-only permissions.
+- Updated release-document validation to require the 2.8.03 release/evidence/versioning contracts.
+- Expanded package validation to require the stable 2.8.03 Linux AppStream release entry.
 
-### Documentation
+### Documentation and support policy
 
 - Completed architecture, build, testing, UI automation, troubleshooting, security, privacy, accessibility, adaptive layout, localization, platform, feature, numerical, converter, persistence, release, source-preflight, release-evidence, versioning, and audit documentation.
 - Added the authoritative 2.8.03 completion state in `PROJECT_STATE.md`.
 - Added `docs/VERSIONING.md` for public/display versus normalized SemVer mapping.
 - Updated the root README to identify CalcNova 2.8.03 as complete.
+- Closed the 2.8.03 roadmap and replaced provisional feature-status sections with a completed feature inventory.
+- Converted release readiness documentation into a release **evidence** checklist so unexecuted environment checks are not described as missing product implementation.
+- Updated platform support documentation to classify Desktop, Browser, Android, and iOS source composition as complete while recording runtime/device/signing results separately.
+- Updated `SECURITY.md` so CalcNova 2.8.03 is the current completed and supported security baseline.
+- Updated `SUPPORT.md` so feature requests are categorized as optional post-2.8.03 enhancements unless they address correctness, security, or compatibility.
+- Updated `CONTRIBUTING.md` to describe a completed 2.8.03 baseline and contributor setup/maintenance work instead of a provisional project posture.
+- Preserved earlier audit/continuation records under `docs/history/` for historical traceability; current authoritative status is defined by the 2.8.03 completion documents.
 
 ### Evidence policy
 
 CalcNova records an execution result as PASS only when the command or platform check actually ran and was observed. `NOT RUN`/`BLOCKED` records describe execution evidence in a particular environment; they do not change the completed implementation status of version 2.8.03.
+
+A final fresh-clone attempt from the assistant container could not resolve `github.com`, so the materialized final-tree Python preflight did not execute there. This is recorded as an environment networking limitation rather than a CalcNova failure.
 
 ## Maintenance policy
 
