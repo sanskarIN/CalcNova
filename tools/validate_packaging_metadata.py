@@ -11,7 +11,9 @@ from pathlib import Path
 
 APP_ID = "in.sanskar.calcnova"
 APP_NAME = "CalcNova"
-DEV_DISPLAY_VERSION = "0.1.0-dev"
+DISPLAY_VERSION = "2.8.03"
+SEMVER_VERSION = "2.8.3"
+MOBILE_BUILD_CODE = "20803"
 
 
 def read(path: Path, failures: list[str]) -> str:
@@ -36,6 +38,7 @@ def parse_xml(path: Path, failures: list[str]) -> None:
 def validate(root: Path) -> list[str]:
     failures: list[str] = []
 
+    build_props_path = root / "Directory.Build.props"
     android_path = root / "src" / "CalcNova.Android" / "CalcNova.Android.csproj"
     ios_project_path = root / "src" / "CalcNova.iOS" / "CalcNova.iOS.csproj"
     ios_plist_path = root / "src" / "CalcNova.iOS" / "Info.plist"
@@ -46,6 +49,7 @@ def validate(root: Path) -> list[str]:
     macos_plist_path = root / "packaging" / "macos" / "Info.plist.template"
     windows_manifest_path = root / "packaging" / "windows" / "AppxManifest.xml.template"
 
+    build_props = read(build_props_path, failures)
     android = read(android_path, failures)
     ios_project = read(ios_project_path, failures)
     ios_plist = read(ios_plist_path, failures)
@@ -56,16 +60,29 @@ def validate(root: Path) -> list[str]:
     macos_plist = read(macos_plist_path, failures)
     windows_manifest = read(windows_manifest_path, failures)
 
+    for marker in (
+        f"<ProductDisplayVersion>{DISPLAY_VERSION}</ProductDisplayVersion>",
+        f"<Version>{SEMVER_VERSION}</Version>",
+        f"<VersionPrefix>{SEMVER_VERSION}</VersionPrefix>",
+        f"<PackageVersion>{SEMVER_VERSION}</PackageVersion>",
+        f"<AssemblyVersion>{SEMVER_VERSION}.0</AssemblyVersion>",
+        f"<FileVersion>{SEMVER_VERSION}.0</FileVersion>",
+        f"<InformationalVersion>{DISPLAY_VERSION}</InformationalVersion>",
+    ):
+        require(build_props, marker, "Directory.Build.props", failures)
+
     for label, source in (("Android project", android), ("iOS project", ios_project)):
         require(source, f"<ApplicationId>{APP_ID}</ApplicationId>", label, failures)
         require(source, f"<ApplicationTitle>{APP_NAME}</ApplicationTitle>", label, failures)
-        require(source, "<ApplicationVersion>1</ApplicationVersion>", label, failures)
+        require(source, f"<ApplicationVersion>{MOBILE_BUILD_CODE}</ApplicationVersion>", label, failures)
         require(
             source,
-            f"<ApplicationDisplayVersion>{DEV_DISPLAY_VERSION}</ApplicationDisplayVersion>",
+            "<ApplicationDisplayVersion>$(ProductDisplayVersion)</ApplicationDisplayVersion>",
             label,
             failures,
         )
+        if "-dev" in source.lower():
+            failures.append(f"{label} still contains a development-version marker.")
 
     require(desktop_project, "<AssemblyName>CalcNova.Desktop</AssemblyName>", "Desktop project", failures)
     require(browser_project, "<AssemblyName>CalcNova.Browser</AssemblyName>", "Browser project", failures)
@@ -120,8 +137,8 @@ def main() -> int:
         return 1
 
     print(
-        "Validated Android/iOS application metadata and Desktop/Browser/Linux/macOS/Windows "
-        "release identity contracts without requiring platform SDKs."
+        f"Validated CalcNova {DISPLAY_VERSION} identity across shared, mobile, Desktop/Browser, "
+        "Linux/macOS/Windows packaging contracts without requiring platform SDKs."
     )
     return 0
 
