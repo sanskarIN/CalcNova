@@ -1,0 +1,41 @@
+name: Incomplete Code Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "tools/validate_incomplete_code.py"
+      - "tools/tests/test_validate_incomplete_code.py"
+      - ".github/workflows/incomplete-code-validate.yml"
+  pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "tools/validate_incomplete_code.py"
+      - "tools/tests/test_validate_incomplete_code.py"
+      - ".github/workflows/incomplete-code-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  incomplete-code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate incomplete-code markers
+        run: python tools/validate_incomplete_code.py .
+
+      - name: Run validator regression tests
+        run: python -m unittest tools.tests.test_validate_incomplete_code
