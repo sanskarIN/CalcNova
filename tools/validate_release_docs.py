@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate CalcNova release documentation/evidence contracts without SDKs."""
+"""Validate CalcNova 2.8.03 release documentation/evidence contracts without SDKs."""
 
 from __future__ import annotations
 
@@ -10,14 +10,19 @@ from pathlib import Path
 
 REQUIRED_MARKERS: dict[str, tuple[str, ...]] = {
     "docs/RELEASE.md": (
-        "python tools/release_preflight.py --tag v0.1.0",
-        "Manual release dispatch must reference an already-existing valid tag",
-        "preserve the existing release/notes",
+        "# CalcNova 2.8.03 Release Process",
+        "python tools/release_preflight.py --tag v2.8.3",
+        "product/display version: `2.8.03`",
+        "normalized release tag: `v2.8.3`",
         "PASS / FAIL / BLOCKED / NOT RUN",
+        "validate_completion_status.py",
         "ACCESSIBILITY_TEST_MATRIX.md",
         "SETTINGS_MIGRATION.md",
     ),
     "docs/RELEASE_READINESS_CHECKLIST.md": (
+        "# CalcNova 2.8.03 Release Evidence Checklist",
+        "Product: CalcNova 2.8.03 — COMPLETE",
+        "Normalized tag: v2.8.3",
         "Source preflight: PASS / FAIL / BLOCKED / NOT RUN",
         ".NET restore/format/build/test: PASS / FAIL / BLOCKED / NOT RUN",
         "Windows: PASS / FAIL / BLOCKED / NOT RUN",
@@ -28,19 +33,26 @@ REQUIRED_MARKERS: dict[str, tuple[str, ...]] = {
         "iOS: PASS / FAIL / BLOCKED / NOT RUN",
         "Accessibility audit: PASS / FAIL / BLOCKED / NOT RUN",
         "Responsive-layout audit: PASS / FAIL / BLOCKED / NOT RUN",
-        "Settings-schema migration contracts pass.",
-        "ACCESSIBILITY_TEST_MATRIX.md",
-        "Never replace `NOT RUN` with `PASS`",
+        "Signing/store evidence: PASS / FAIL / BLOCKED / NOT RUN",
+        "Never convert `NOT RUN` or `BLOCKED` into PASS",
     ),
     "PROJECT_STATE.md": (
-        "## Validation Status",
-        "**NOT RUN**",
-        "A check is never marked PASS unless",
+        "**COMPLETE — CalcNova version 2.8.03**",
+        "## Environment Verification Record",
+        "`NOT RUN`",
+        "Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**",
     ),
     "what_changed.md": (
         "# What Changed",
-        "Validation Status",
-        "**NOT RUN**",
+        "**CalcNova version 2.8.03 is complete.**",
+        "## Evidence policy",
+        "`NOT RUN` or `BLOCKED`",
+        "Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**",
+    ),
+    "docs/VERSIONING.md": (
+        "**CalcNova 2.8.03** is the public/product release version.",
+        "`v2.8.3`",
+        "ApplicationVersion = 20803",
     ),
 }
 
@@ -63,7 +75,7 @@ def validate(root: Path) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Validate CalcNova release-readiness documentation contracts."
+        description="Validate CalcNova 2.8.03 release documentation/evidence contracts."
     )
     parser.add_argument("root", nargs="?", default=".", help="Repository root")
     args = parser.parse_args()
@@ -77,7 +89,7 @@ def main() -> int:
 
     checked_markers = sum(len(markers) for markers in REQUIRED_MARKERS.values())
     print(
-        f"Validated {checked_markers} release evidence markers across "
+        f"Validated {checked_markers} CalcNova 2.8.03 release/evidence markers across "
         f"{len(REQUIRED_MARKERS)} documentation/state files."
     )
     return 0
