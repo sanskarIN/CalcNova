@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "src/CalcNova.App/**"
-      - "src/CalcNova.Platform/Settings/AppSettings.cs"
+      - "src/CalcNova.Platform/Settings/**"
       - "src/CalcNova.Persistence/Settings/JsonSettingsRepository.cs"
       - "src/CalcNova.Browser/Services/BrowserSettingsRepository.cs"
       - "src/CalcNova.Android/CalcNova.Android.csproj"
@@ -15,14 +15,21 @@ on:
       - "packaging/**"
       - "tools/**"
       - "docs/ACCESSIBILITY.md"
+      - "docs/ACCESSIBILITY_TEST_MATRIX.md"
+      - "docs/ADAPTIVE_LAYOUT.md"
+      - "docs/FOCUS_VISIBILITY.md"
+      - "docs/GRAPH_INTERACTION.md"
       - "docs/LOCALIZATION.md"
       - "docs/ONBOARDING.md"
       - "docs/RELEASE.md"
+      - "docs/RELEASE_READINESS_CHECKLIST.md"
+      - "docs/SETTINGS_MIGRATION.md"
+      - "docs/SOURCE_PREFLIGHT.md"
       - ".github/workflows/source-preflight.yml"
   pull_request:
     paths:
       - "src/CalcNova.App/**"
-      - "src/CalcNova.Platform/Settings/AppSettings.cs"
+      - "src/CalcNova.Platform/Settings/**"
       - "src/CalcNova.Persistence/Settings/JsonSettingsRepository.cs"
       - "src/CalcNova.Browser/Services/BrowserSettingsRepository.cs"
       - "src/CalcNova.Android/CalcNova.Android.csproj"
@@ -32,9 +39,16 @@ on:
       - "packaging/**"
       - "tools/**"
       - "docs/ACCESSIBILITY.md"
+      - "docs/ACCESSIBILITY_TEST_MATRIX.md"
+      - "docs/ADAPTIVE_LAYOUT.md"
+      - "docs/FOCUS_VISIBILITY.md"
+      - "docs/GRAPH_INTERACTION.md"
       - "docs/LOCALIZATION.md"
       - "docs/ONBOARDING.md"
       - "docs/RELEASE.md"
+      - "docs/RELEASE_READINESS_CHECKLIST.md"
+      - "docs/SETTINGS_MIGRATION.md"
+      - "docs/SOURCE_PREFLIGHT.md"
       - ".github/workflows/source-preflight.yml"
   workflow_dispatch:
 
