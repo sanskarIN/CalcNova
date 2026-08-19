@@ -262,8 +262,12 @@
           <StackPanel DataContext="{Binding Statistics}" Margin="8" Spacing="10">
             <TextBlock Text="Statistics" FontSize="21" FontWeight="SemiBold" />
             <TextBox Text="{Binding DatasetText, Mode=TwoWay}" AcceptsReturn="True" MinHeight="130" TextWrapping="Wrap" />
-            <Button Content="Analyze" Command="{Binding AnalyzeCommand}" HorizontalAlignment="Left" />
+            <WrapPanel>
+              <Button Content="Analyze" Command="{Binding AnalyzeCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy summary" Command="{Binding CopySummaryCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
             <Border Padding="12" CornerRadius="12"><TextBlock Text="{Binding Summary}" TextWrapping="Wrap" /></Border>
+            <TextBlock Text="{Binding CopyStatus}" TextWrapping="Wrap" Opacity="0.7" />
             <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
           </StackPanel>
         </ScrollViewer>
@@ -295,8 +299,10 @@
               <Button Content="inverse" Command="{Binding InverseCommand}" Margin="0,0,6,6" />
               <Button Content="rank" Command="{Binding RankCommand}" Margin="0,0,6,6" />
               <Button Content="solve" Command="{Binding SolveCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy result" Command="{Binding CopyResultCommand}" Margin="0,0,6,6" />
             </WrapPanel>
             <TextBlock Text="{Binding Result}" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding CopyStatus}" TextWrapping="Wrap" Opacity="0.7" />
             <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
           </StackPanel>
         </ScrollViewer>
@@ -414,7 +420,7 @@
       </TabItem>
 
       <TabItem Header="History">
-        <Grid DataContext="{Binding History}" Margin="8" RowDefinitions="Auto,Auto,*,Auto">
+        <Grid DataContext="{Binding History}" Margin="8" RowDefinitions="Auto,Auto,*,Auto,Auto">
           <TextBlock Text="Calculation History" FontSize="21" FontWeight="SemiBold" />
           <StackPanel Grid.Row="1" Spacing="6">
             <TextBox Text="{Binding SearchQuery, Mode=TwoWay}" Watermark="Search" />
@@ -436,7 +442,17 @@
               </DataTemplate>
             </ListBox.ItemTemplate>
           </ListBox>
-          <TextBlock Grid.Row="3" Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+          <StackPanel Grid.Row="3" Margin="0,8,0,0" Spacing="6">
+            <TextBlock Text="Export visible history" FontWeight="SemiBold" />
+            <TextBlock Text="Exports only the currently loaded/search-matching entries and stays local until you explicitly copy it." TextWrapping="Wrap" Opacity="0.62" />
+            <ComboBox ItemsSource="{Binding ExportFormats}" SelectedItem="{Binding SelectedExportFormat, Mode=TwoWay}" />
+            <WrapPanel>
+              <Button Content="Generate export preview" Command="{Binding GenerateExportCommand}" Margin="0,0,6,6" />
+              <Button Content="Copy export" Command="{Binding CopyExportCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
+            <TextBox Text="{Binding ExportPreview}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="80" MaxHeight="140" />
+          </StackPanel>
+          <TextBlock Grid.Row="4" Text="{Binding StatusMessage}" TextWrapping="Wrap" Margin="0,6,0,0" />
         </Grid>
       </TabItem>
 
