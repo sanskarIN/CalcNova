@@ -43,7 +43,9 @@ def validate(root: Path) -> list[str]:
     localizer_path = root / "src" / "CalcNova.App" / "Localization" / "AppLocalizer.cs"
     shell_localization_path = root / "src" / "CalcNova.App" / "Localization" / "ShellLocalization.cs"
     main_view_path = root / "src" / "CalcNova.App" / "Views" / "MainView.axaml.cs"
+    check_box_localization_path = root / "src" / "CalcNova.App" / "Views" / "MainView.CheckBoxLocalization.cs"
     headless_tests_path = root / "tests" / "CalcNova.App.Tests" / "MainViewHeadlessTests.cs"
+    product_tests_path = root / "tests" / "CalcNova.App.Tests" / "ProductSurfaceLocalizationHeadlessTests.cs"
     settings_model_path = root / "src" / "CalcNova.Platform" / "Settings" / "AppSettings.cs"
     settings_view_model_path = root / "src" / "CalcNova.App" / "ViewModels" / "SettingsViewModel.cs"
     catalog_paths = {
@@ -57,7 +59,9 @@ def validate(root: Path) -> list[str]:
         localizer_path,
         shell_localization_path,
         main_view_path,
+        check_box_localization_path,
         headless_tests_path,
+        product_tests_path,
         settings_model_path,
         settings_view_model_path,
         *catalog_paths.values(),
@@ -73,7 +77,9 @@ def validate(root: Path) -> list[str]:
     localizer_source = localizer_path.read_text(encoding="utf-8")
     shell_localization_source = shell_localization_path.read_text(encoding="utf-8")
     main_view_source = main_view_path.read_text(encoding="utf-8")
+    check_box_localization_source = check_box_localization_path.read_text(encoding="utf-8")
     headless_tests_source = headless_tests_path.read_text(encoding="utf-8")
+    product_tests_source = product_tests_path.read_text(encoding="utf-8")
     settings_model_source = settings_model_path.read_text(encoding="utf-8")
     settings_view_model_source = settings_view_model_path.read_text(encoding="utf-8")
 
@@ -118,16 +124,20 @@ def validate(root: Path) -> list[str]:
         "AppStringKey.ModeAbout",
         '"Standard + Scientific"',
         "AppStringKey.CalculatorTitle",
-        '"Enter an expression"',
-        "AppStringKey.PromptEnterExpression",
         '"Welcome to CalcNova"',
         "AppStringKey.OnboardingWelcome",
-        '"Calculate your way"',
-        "AppStringKey.OnboardingCalculateTitle",
-        '"Skip"',
-        "AppStringKey.ActionSkip",
-        '"Start calculating"',
-        "AppStringKey.ActionStartCalculating",
+        '"Currency Converter"',
+        "AppStringKey.CurrencyTitle",
+        '"Calculation History"',
+        "AppStringKey.HistoryTitle",
+        '"Settings"',
+        "AppStringKey.ModeSettings",
+        '"Enable history"',
+        "AppStringKey.SettingEnableHistory",
+        '"High contrast preference"',
+        "AppStringKey.SettingHighContrast",
+        '"Open CalcNova repository"',
+        "AppStringKey.ActionOpenRepository",
         "GetModeHeaders",
         "TryGetLiteralKey",
     ):
@@ -147,17 +157,42 @@ def validate(root: Path) -> list[str]:
             failures.append(f"MainView is missing live localization wiring marker: {marker}")
 
     for marker in (
+        "Dictionary<CheckBox, AppStringKey>",
+        "protected override void OnAttachedToVisualTree",
+        "protected override void OnDetachedFromVisualTree",
+        "CultureChanged += HandleCheckBoxCultureChanged",
+        "SelectionChanged += HandleCheckBoxTabSelectionChanged",
+        "GetVisualDescendants().OfType<CheckBox>()",
+        "ShellLocalization.TryGetLiteralKey",
+        "checkBox.Content = localizer[key]",
+    ):
+        if marker not in check_box_localization_source:
+            failures.append(f"MainView checkbox localization is missing marker: {marker}")
+
+    for marker in (
         "HindiCulture_LocalizesShellHeadersAndCalculatorPrompt",
         '"कैलकुलेटर"',
         '"मानक + वैज्ञानिक"',
-        '"अभिव्यक्ति दर्ज करें"',
         "HindiCulture_LocalizesVisibleOnboardingCopy",
         '"CalcNova में आपका स्वागत है"',
-        '"छोड़ें"',
         '"गणना शुरू करें"',
     ):
         if marker not in headless_tests_source:
             failures.append(f"Headless UI tests are missing live localization scenario marker: {marker}")
+
+    for marker in (
+        "HindiCulture_LocalizesCurrencySurface",
+        '"मुद्रा कन्वर्टर"',
+        "HindiCulture_LocalizesHistorySurface",
+        '"गणना इतिहास"',
+        "HindiCulture_LocalizesSettingsTextActionsAndAccessibilityPreferences",
+        '"इतिहास सक्षम करें"',
+        '"उच्च कंट्रास्ट प्राथमिकता"',
+        "HindiCulture_LocalizesAboutSurfaceAndPersistentFooter",
+        '"CalcNova रिपॉज़िटरी खोलें"',
+    ):
+        if marker not in product_tests_source:
+            failures.append(f"Product localization headless tests are missing marker: {marker}")
 
     return failures
 
@@ -181,7 +216,7 @@ def main() -> int:
     key_count = 0 if enum_match is None else len(re.findall(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*,?\s*$", enum_match.group("body"), re.MULTILINE))
     print(
         f"Validated {key_count} semantic localization keys across {len(CATALOG_FILES)} catalogs, "
-        "persisted culture preferences, and live shared-shell/onboarding localization wiring."
+        "persisted culture preferences, shared-shell/onboarding/product surfaces, and checkbox localization wiring."
     )
     return 0
 
