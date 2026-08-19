@@ -13,12 +13,13 @@ Examples:
 
 ## Canonical representation
 
-`RationalNumber` always normalizes constructed values:
+`RationalNumber` normalizes values to one canonical representation:
 
 - denominator zero is rejected;
 - denominator sign is made positive;
 - numerator/denominator are divided by their greatest common divisor;
-- zero is represented as `0/1` internally and displayed as `0`;
+- zero is represented as `0/1` and displayed as `0`;
+- `default(RationalNumber)` is treated as canonical zero rather than exposing an invalid `0/0` state;
 - integer rationals are displayed without `/1`.
 
 Canonical normalization makes equality and hash-code behavior stable across equivalent inputs such as `2/4`, `1/2`, and `0.5`.
@@ -67,7 +68,7 @@ Exact arithmetic can grow very large, so CalcNova applies explicit limits:
 
 The raw input-length check runs before trimming so oversized whitespace-wrapped input cannot bypass the text budget.
 
-Magnitude checks use the absolute numerator magnitude and the positive normalized denominator.
+Magnitude checks apply to the reduced numerator and positive normalized denominator.
 
 Arithmetic whose final reduced numerator or denominator exceeds the bit budget fails deterministically rather than allowing unbounded exact-number growth.
 
@@ -110,7 +111,7 @@ The exact-rational implementation rejects:
 - invalid fraction/decimal syntax;
 - multiple slash or exponent markers;
 - non-integer decimal exponents;
-- input above the text budget;
+- input above the text budget, including oversized whitespace padding;
 - decimal exponent/scale outside the configured bound;
 - final reduced values above the bit-length budget.
 
@@ -143,6 +144,8 @@ Tests:
 python tools/validate_rational_numbers.py .
 python -m unittest tools.tests.test_validate_rational_numbers
 ```
+
+The exact-rational validator and its regression suite are also part of `python tools/release_preflight.py`.
 
 Focused workflow:
 
