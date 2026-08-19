@@ -12,6 +12,7 @@ Use this index to find the authoritative guide for each area of the project.
 - [Release process](RELEASE.md)
 - [Release readiness checklist](RELEASE_READINESS_CHECKLIST.md)
 - [SDK-independent source preflight](SOURCE_PREFLIGHT.md)
+- [Machine-readable validation evidence](VALIDATION_EVIDENCE.md)
 - [Settings migration](SETTINGS_MIGRATION.md)
 - [Platform support](PLATFORM_SUPPORT.md)
 
@@ -20,9 +21,12 @@ Use this index to find the authoritative guide for each area of the project.
 - [Calculation engine](CALCULATION_ENGINE.md)
 - [Calculator expression editing](CALCULATOR_EDITING.md)
 - [Input safety and expression import](INPUT_SAFETY.md)
+- [Exact rational arithmetic](EXACT_RATIONALS.md)
+- [Engineering notation](ENGINEERING_NOTATION.md)
 - [Programmer mode](PROGRAMMER_MODE.md)
 - [Unicode scalar metadata](UNICODE_METADATA.md)
 - [Converter mode](CONVERTER_MODE.md)
+- [Bivariate statistics](BIVARIATE_STATISTICS.md)
 - [Graph numerical analysis](NUMERICAL_ANALYSIS.md)
 - [Graph numerical safety and workload bounds](GRAPH_NUMERICAL_SAFETY.md)
 - [Graph interaction](GRAPH_INTERACTION.md)
@@ -41,7 +45,7 @@ Use this index to find the authoritative guide for each area of the project.
 - [Privacy](PRIVACY.md)
 - [Security engineering](SECURITY.md)
 
-## Planning
+## Planning and audit
 
 - [Roadmap](ROADMAP.md)
 - [Project state](../PROJECT_STATE.md)
