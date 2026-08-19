@@ -15,26 +15,37 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Sanitized imported-expression pipeline with normalization for common calculator glyphs.
 - Platform-safe clipboard abstraction with explicit paste and copy-result workflows.
 - Programmer mode with full base 2–36 selection, signed/unsigned fixed-width interpretation, bitwise operations, shifts, and 8/16/32/64/128-bit interactive grids.
-- Unicode scalar/code-point conversion and text inspection workflow.
-- Offline fixed-unit converter with recent pairs, favorites, selectable precision, and persisted converter preferences.
+- Programmer byte-group presentation plus explicit binary/octal/decimal/hex/fixed-width bit copy actions.
+- Unicode scalar/code-point conversion, text inspection, and explicit result-copy workflows.
+- Offline fixed-unit converter with recent pairs, favorites, selectable precision, persisted converter preferences, category-scoped unit search, clear-recents, search-result assignment, and result copy.
 - Optional currency provider/cache architecture with offline fallback semantics.
 - Date difference, calendar arithmetic, business-day, and duration utilities.
 - Statistics, equation, and matrix modules with shared view models.
-- Graph sampling, discontinuity segmentation, viewport/plot support, SVG export, derivative approximation, bracketed root finding, and Simpson integration.
-- SQLite native history, browser-safe history/storage, history search/favorites/delete/clear, and TXT/CSV/JSON export.
+- Statistics summary and matrix-result clipboard copy workflows.
+- Graph sampling, discontinuity segmentation, viewport/plot support, derivative approximation, bracketed root finding, and Simpson integration.
+- Graph nearest-sample trace, bounded table-of-values CSV, bounded multi-expression sampling/identified CSV, and accessible SVG generation/copy workflows.
+- SQLite native history, browser-safe history/storage, history search/favorites/delete/clear, and TXT/CSV/JSON export engine.
+- Explicit history export preview and clipboard-copy workflow for the currently visible/search-matching history set.
 - Shared settings, external-link, clipboard, and platform composition abstractions.
 - Global minimum touch-target sizing and accessible programmer bit-state labels.
-- GitHub Actions workflow foundations for build/test, formatting, docs, coverage, security, advanced utilities, platform builds, and release work.
+- Shared-XAML command/property contract validation for Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History.
+- Avalonia XAML XML well-formedness validation in the shared UI contract workflow.
+- GitHub Actions workflow foundations for build/test, formatting, docs, coverage, security, advanced utilities, platform builds, UI contracts, and release work.
 - Detailed feature, input-safety, programmer, converter, numerical-analysis, accessibility, build, testing, platform, privacy, and release documentation.
 
 ### Changed
 
 - Shared Avalonia shell expanded from the original calculator workspace to Calculator, Programmer, Code Points, Converter, Statistics, Equations, Matrices, Graph, Date/Time, Currency, History, Settings, and About modes.
+- Shared Programmer UI now exposes byte-grouped bits and radix/fixed-width copy actions.
+- Shared Converter UI now exposes unit search, search-result From/To assignment, result copy, and clear-recents actions.
+- Shared Graph UI now exposes trace, single-series CSV, multi-expression sampling/CSV, and accessible SVG generation/copy controls.
+- Shared Statistics and Matrix modes now expose copy actions for generated results.
+- Shared History mode now exposes TXT/CSV/JSON preview/copy controls rather than leaving the export engine hidden behind source APIs.
 - Programmer non-decimal output now consistently displays fixed-width masked values while decimal output follows signed/unsigned interpretation.
 - Converter recent-pair recording now tracks deliberate conversion/swap/restoration actions instead of noisy intermediate selector changes.
 - Converter significant-digit precision, recent pairs, and favorites now restore and autosave through shared settings.
 - Settings validation now bounds converter precision and persisted pair-token counts/lengths.
-- Project state, roadmap, README, and feature documentation were synchronized with the actual implementation rather than the earlier foundation phase.
+- Project state, roadmap, changelog, and feature documentation are being synchronized with the actual implementation rather than the earlier foundation phase.
 - Package management remains centralized through `Directory.Packages.props`.
 - Nullable reference types, analyzers, warnings-as-errors, and deterministic build settings remain enabled centrally.
 
@@ -44,23 +55,28 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Programmer radix parsing safely rejects separator-only and sign-only input.
 - Numeric equality and hash-code behavior share a compatible cross-kind representation.
 - Programmer arithmetic-right-shift and signed fixed-width result presentation preserve correct two's-complement bit patterns.
+- Stale programmer integration expectations now match signed two's-complement decimal presentation.
 - Converter saved-pair selection can be reselected after application.
 - Converter persistence restore preserves recency ordering, deduplicates entries, and respects capacity.
+- Converter recent clearing reports whether persistent state actually changed.
 - Settings reset synchronizes converter state immediately rather than waiting for the next launch.
 - Expression sanitizer uses evaluator-configured maximum length and preserves the previous expression when imported text is rejected.
+- Shared clipboard composition now reaches every currently copy-enabled Calculator, Programmer, Unicode, Converter, Statistics, Matrix, Graphing, and History workflow.
 
 ### Security / Privacy
 
 - Expression evaluation uses project-owned parsing/evaluation rather than arbitrary code execution.
 - Input and expensive integer/numerical operations include bounded workload controls.
 - Clipboard reads are explicit user actions; pasted text is sanitized and is not automatically evaluated.
+- Clipboard writes occur only after explicit copy actions.
+- History exports are generated locally from the currently loaded entries and are copied only after explicit user action.
 - Fixed-unit conversion remains offline.
 - Currency networking is optional and contains no embedded provider credential.
 - Repository ignore rules exclude common signing credentials and local secret files.
 
 ### Validation note
 
-The active continuation environment does not provide the required .NET SDK. Local restore, format, build, and test commands are therefore **NOT RUN** here. Platform packaging is also **NOT RUN** in this continuation. Source/test presence must not be interpreted as a validated release until actual CI/target-environment results are observed.
+The active continuation environment does not provide the required .NET SDK. Local restore, format, build, and test commands are therefore **NOT RUN** here. Platform packaging is also **NOT RUN** in this continuation. Source-level XAML/UI validators and workflow definitions are implemented, but their mere presence is not treated as a passing run. Source/test presence must not be interpreted as a validated release until actual CI/target-environment results are observed.
 
 ## [0.1.0] - Planned
 
