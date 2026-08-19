@@ -15,6 +15,10 @@
     <Style Selector="ComboBox">
       <Setter Property="MinHeight" Value="44" />
     </Style>
+    <Style Selector="CheckBox">
+      <Setter Property="MinHeight" Value="44" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
     <Style Selector="TabItem">
       <Setter Property="MinHeight" Value="44" />
       <Setter Property="MinWidth" Value="52" />
