@@ -1,6 +1,6 @@
 # CalcNova Features
 
-This document distinguishes implemented source, shared-app integration, and remaining product work. [`PROJECT_STATE.md`](../PROJECT_STATE.md) is the authoritative short-form continuation status.
+This document distinguishes implemented source/shared-app integration from remaining product work. [`PROJECT_STATE.md`](../PROJECT_STATE.md) is the authoritative short-form continuation status.
 
 ## Standard calculator
 
@@ -16,14 +16,16 @@ This document distinguishes implemented source, shared-app integration, and rema
 - calculator-style percentage transformation;
 - repeated-equals session behavior;
 - MC, MR, MS, M+, M- memory behavior;
-- sanitized imported expression text with common calculator-glyph normalization.
+- sanitized imported expression text with common calculator-glyph normalization;
+- user-triggered sanitized clipboard paste;
+- valid-result clipboard copy through a platform abstraction.
 
 ### Remaining product work
 
 - cursor/selection-aware calculator editing;
-- explicit sanitized clipboard service/event wiring;
 - broader physical keyboard/numpad shortcuts;
-- configurable result-presentation modes beyond current feature-specific formatting.
+- configurable result-presentation modes beyond current feature-specific formatting;
+- target-platform clipboard validation.
 
 ## Scientific calculator
 
@@ -55,46 +57,31 @@ This document distinguishes implemented source, shared-app integration, and rema
 
 ### Implemented
 
-- base 2–36 parse/format;
+- base 2–36 parse/format and shared selector;
 - arbitrary-precision radix conversion;
-- common binary/octal/decimal/hex representations in the app view model;
+- binary/octal/decimal/hex synchronized representations;
 - AND/OR/XOR/NOT;
-- left shift;
-- logical/arithmetic right shift;
+- left/logical-right/arithmetic-right shifts;
 - bounded word-size masking;
 - signed/unsigned two's-complement interpretation;
 - fixed-width bit-string visualization;
-- bounded bit inspection/toggling;
-- app view-model bit-toggle command with synchronized representation refresh;
-- Unicode scalar/code-point parsing, formatting, scalar-to-text, and bounded text inspection.
+- full 8/16/32/64/128-bit interactive bit grid;
+- accessible bit-cell state names;
+- fixed-width masked non-decimal output with signed decimal interpretation;
+- Unicode scalar/code-point parsing, formatting, scalar-to-text, and bounded text inspection;
+- visible shared Unicode code-point workflow.
 
 ### Remaining product work
 
-- visible accessible bit-toggle grid;
-- visible Unicode code-point helper;
-- custom radix selector UI for the full 2–36 range;
-- accessible copy actions.
+- byte/nibble grouping and compact-layout polish for large bit grids;
+- accessible copy actions for radix representations;
+- screen-reader and keyboard validation on supported platforms.
 
 ## Unit converter
 
 ### Implemented
 
-Offline fixed categories include:
-
-- length;
-- area;
-- volume;
-- mass;
-- speed;
-- temperature;
-- time;
-- data/storage;
-- frequency;
-- pressure;
-- energy;
-- power;
-- force;
-- angle.
+Offline fixed categories include length, area, volume, mass, speed, temperature, time, data/storage, frequency, pressure, energy, power, force, and angle.
 
 Additional implemented source/app behavior:
 
@@ -103,20 +90,23 @@ Additional implemented source/app behavior:
 - reusable validated conversion pairs;
 - bounded recent-pair tracking;
 - favorite pairs;
-- pair restoration command;
-- 1–17 significant-digit output precision with common presets.
+- visible pair restoration controls;
+- 1–17 significant-digit output precision with shared presets;
+- versioned pair persistence tokens;
+- persisted precision/recent/favorite state through shared settings;
+- automatic restore and deliberate-change autosave.
 
 ### Remaining product work
 
-- visible recent/favorite-pair controls;
-- visible precision selector;
 - searchable unit/category selectors;
 - result copy action;
-- persistence semantics for pair state.
+- optional per-category default pairs;
+- clear-recents management;
+- compact responsive layout refinement.
 
 ## Currency converter
 
-### Implemented source
+### Implemented source/app integration
 
 - replaceable provider interface;
 - provider/cache integration;
@@ -176,12 +166,11 @@ Additional implemented source/app behavior:
 - bracketed bisection root finding;
 - composite Simpson definite integration;
 - bounded numerical-analysis options;
-- graph-analysis commands in the shared view model.
+- visible derivative/root/integral controls with approximate-result labeling.
 
 ### Remaining product work
 
-- visible derivative/root/integral controls in shared XAML;
-- multiple expression UX;
+- multiple-expression UX;
 - trace/table-of-values;
 - final pan/zoom/reset controls and labels;
 - richer export UI;
@@ -230,7 +219,9 @@ Matrix module and shared view model include determinant, inverse, rank, and line
 
 - settings repository abstraction;
 - shared settings view model;
-- theme/angle/history-related settings integration;
+- theme/angle/history settings integration;
+- converter preference persistence;
+- bounded native JSON and browser settings validation;
 - About/support view model;
 - external-link abstraction.
 
@@ -239,7 +230,27 @@ Matrix module and shared view model include determinant, inverse, rank, and line
 - final settings information architecture;
 - onboarding/feature discovery;
 - localization expansion;
-- complete accessibility review.
+- complete accessibility validation.
+
+## Accessibility baseline
+
+### Implemented source/UI measures
+
+- global minimum 44-pixel heights for common interactive controls;
+- 54-pixel standard calculator keys;
+- keyboard Enter/Escape/Backspace handling for the primary calculator workflow;
+- accessible names for programmer bit cells;
+- textual alternatives for bit patterns and graph-analysis results;
+- reduced-motion/high-contrast preference fields in settings.
+
+### Remaining validation/polish
+
+- complete keyboard traversal audit;
+- screen-reader testing on target platforms;
+- high-contrast/theme verification;
+- large-text/narrow-window validation;
+- compact mobile layout pass;
+- graph accessibility/table-of-values improvements.
 
 ## Privacy baseline
 
@@ -249,6 +260,7 @@ Matrix module and shared view model include determinant, inverse, rank, and line
 - no account required for ordinary use;
 - no advertising SDK by default;
 - no behavioral analytics by default;
+- user-triggered clipboard reads only;
 - network-enhanced features optional.
 
 ## Platforms
