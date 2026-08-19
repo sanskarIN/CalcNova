@@ -13,6 +13,7 @@ public sealed class ConverterViewModel : ViewModelBase
     private IReadOnlyList<UnitDefinition> _availableUnits;
     private UnitDefinition _fromUnit;
     private UnitDefinition _toUnit;
+    private ConversionPair? _selectedPair;
     private string _input = "1";
     private string _result = string.Empty;
     private string _errorMessage = string.Empty;
@@ -63,8 +64,7 @@ public sealed class ConverterViewModel : ViewModelBase
             if (value is not null && SetField(ref _fromUnit, value))
             {
                 Convert();
-                OnPropertyChanged(nameof(CurrentPair));
-                OnPropertyChanged(nameof(IsCurrentPairFavorite));
+                NotifyPairStateChanged();
             }
         }
     }
@@ -77,9 +77,22 @@ public sealed class ConverterViewModel : ViewModelBase
             if (value is not null && SetField(ref _toUnit, value))
             {
                 Convert();
-                OnPropertyChanged(nameof(CurrentPair));
-                OnPropertyChanged(nameof(IsCurrentPairFavorite));
+                NotifyPairStateChanged();
             }
+        }
+    }
+
+    public ConversionPair? SelectedPair
+    {
+        get => _selectedPair;
+        set
+        {
+            if (!SetField(ref _selectedPair, value) || value is null)
+            {
+                return;
+            }
+
+            ApplyPair(value);
         }
     }
 
@@ -121,6 +134,8 @@ public sealed class ConverterViewModel : ViewModelBase
     public ConversionPair CurrentPair => new(FromUnit.Id, ToUnit.Id);
 
     public bool IsCurrentPairFavorite => _pairHistory.IsFavorite(CurrentPair);
+
+    public string FavoriteToggleLabel => IsCurrentPairFavorite ? "Remove favorite" : "Add favorite";
 
     public IReadOnlyList<ConversionPair> RecentPairs => _pairHistory.Recent;
 
@@ -179,17 +194,20 @@ public sealed class ConverterViewModel : ViewModelBase
     private void ToggleCurrentFavorite()
     {
         _pairHistory.ToggleFavorite(CurrentPair);
-        OnPropertyChanged(nameof(IsCurrentPairFavorite));
+        NotifyPairStateChanged();
         OnPropertyChanged(nameof(FavoritePairs));
     }
 
     private void ApplyPair(object? parameter)
     {
-        if (parameter is not ConversionPair pair)
+        if (parameter is ConversionPair pair)
         {
-            return;
+            ApplyPair(pair);
         }
+    }
 
+    private void ApplyPair(ConversionPair pair)
+    {
         _suppressPairRecording = true;
         try
         {
@@ -203,5 +221,12 @@ public sealed class ConverterViewModel : ViewModelBase
         }
 
         Convert();
+    }
+
+    private void NotifyPairStateChanged()
+    {
+        OnPropertyChanged(nameof(CurrentPair));
+        OnPropertyChanged(nameof(IsCurrentPairFavorite));
+        OnPropertyChanged(nameof(FavoriteToggleLabel));
     }
 }
