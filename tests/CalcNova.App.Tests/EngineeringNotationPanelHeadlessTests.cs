@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using CalcNova.App.Controls;
 using CalcNova.App.ViewModels;
+using CalcNova.Core.Numerics;
 using Xunit;
 
 namespace CalcNova.App.Tests;
@@ -64,6 +65,26 @@ public sealed class EngineeringNotationPanelHeadlessTests
             Assert.Equal(1m, precision.Minimum);
             Assert.Equal(15m, precision.Maximum);
             Assert.Equal(1m, precision.Increment);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Panel_BoundsInteractiveInputToFormatterCharacterBudget()
+    {
+        var panel = new EngineeringNotationPanel();
+        var window = new Window { Content = panel };
+
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var input = Assert.Single(panel.GetVisualDescendants().OfType<TextBox>());
+
+            Assert.Equal(EngineeringNotationFormatter.MaximumInputCharacters, input.MaxLength);
         }
         finally
         {
