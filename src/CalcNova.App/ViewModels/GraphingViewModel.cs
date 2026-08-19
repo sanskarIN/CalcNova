@@ -13,6 +13,7 @@ public sealed class GraphingViewModel : ViewModelBase
     private readonly GraphSampler _sampler = new();
     private readonly MultiGraphSampler _multiSampler = new();
     private readonly GraphNumericalAnalyzer _analyzer = new();
+    private readonly SvgGraphExporter _svgExporter = new();
     private readonly IClipboardService? _clipboardService;
     private string _expression = "sin(x)";
     private string _multiExpressionsText = "sin(x)\ncos(x)";
@@ -32,6 +33,7 @@ public sealed class GraphingViewModel : ViewModelBase
     private string _tableCsv = string.Empty;
     private string _multiSummary = string.Empty;
     private string _multiTableCsv = string.Empty;
+    private string _svgExport = string.Empty;
     private string _copyStatus = string.Empty;
     private string _errorMessage = string.Empty;
 
@@ -44,11 +46,13 @@ public sealed class GraphingViewModel : ViewModelBase
         FindRootCommand = new RelayCommand(_ => FindRoot());
         IntegrateCommand = new RelayCommand(_ => Integrate());
         TraceCommand = new RelayCommand(_ => Trace());
+        GenerateSvgCommand = new RelayCommand(_ => GenerateSvg());
         CopyPreviewCommand = new AsyncRelayCommand(_ => CopyPreviewAsync());
         CopyAnalysisResultCommand = new AsyncRelayCommand(_ => CopyAnalysisResultAsync());
         CopyTraceResultCommand = new AsyncRelayCommand(_ => CopyTraceResultAsync());
         CopyTableCommand = new AsyncRelayCommand(_ => CopyTableAsync());
         CopyMultiTableCommand = new AsyncRelayCommand(_ => CopyMultiTableAsync());
+        CopySvgCommand = new AsyncRelayCommand(_ => CopySvgAsync());
         Plot();
     }
 
@@ -160,6 +164,12 @@ public sealed class GraphingViewModel : ViewModelBase
         private set => SetField(ref _multiTableCsv, value);
     }
 
+    public string SvgExport
+    {
+        get => _svgExport;
+        private set => SetField(ref _svgExport, value);
+    }
+
     public string CopyStatus
     {
         get => _copyStatus;
@@ -184,6 +194,8 @@ public sealed class GraphingViewModel : ViewModelBase
 
     public ICommand TraceCommand { get; }
 
+    public ICommand GenerateSvgCommand { get; }
+
     public ICommand CopyPreviewCommand { get; }
 
     public ICommand CopyAnalysisResultCommand { get; }
@@ -194,6 +206,8 @@ public sealed class GraphingViewModel : ViewModelBase
 
     public ICommand CopyMultiTableCommand { get; }
 
+    public ICommand CopySvgCommand { get; }
+
     private void Plot()
     {
         try
@@ -202,6 +216,7 @@ public sealed class GraphingViewModel : ViewModelBase
             var result = _sampler.Sample(Expression, options);
 
             TraceResult = string.Empty;
+            SvgExport = string.Empty;
             CopyStatus = string.Empty;
 
             if (!result.Success)
@@ -222,6 +237,7 @@ public sealed class GraphingViewModel : ViewModelBase
         catch (Exception exception) when (exception is ArgumentException or FormatException or OverflowException)
         {
             TraceResult = string.Empty;
+            SvgExport = string.Empty;
             CopyStatus = string.Empty;
             ClearPlotOutputs();
             ErrorMessage = exception.Message;
@@ -246,7 +262,7 @@ public sealed class GraphingViewModel : ViewModelBase
             MultiSeries = result.Series;
             MultiTableRows = MultiGraphTableExporter.CreateRows(result.Series);
             MultiTableCsv = MultiGraphTableExporter.ToCsv(MultiTableRows);
-            var pointCount = result.Series.Sum(series => series.Segments.Sum(segment => segment.Points.Count));
+            var pointCount = result.Series.Sum(series => series.ValidPointCount);
             var invalidCount = result.Series.Sum(series => series.InvalidSampleCount);
             MultiSummary = $"{result.Series.Count} expression(s) • {pointCount} valid point(s) • {invalidCount} invalid sample(s)";
             ErrorMessage = string.Empty;
@@ -306,6 +322,26 @@ public sealed class GraphingViewModel : ViewModelBase
         }
     }
 
+    private void GenerateSvg()
+    {
+        try
+        {
+            if (Segments.Count == 0)
+            {
+                throw new InvalidOperationException("Plot a graph before generating SVG export.");
+            }
+
+            SvgExport = _svgExporter.Export(Segments);
+            CopyStatus = string.Empty;
+            ErrorMessage = string.Empty;
+        }
+        catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
+        {
+            SvgExport = string.Empty;
+            ErrorMessage = exception.Message;
+        }
+    }
+
     private async Task CopyPreviewAsync()
     {
         var text = string.IsNullOrWhiteSpace(Preview)
@@ -332,6 +368,11 @@ public sealed class GraphingViewModel : ViewModelBase
     private async Task CopyMultiTableAsync()
     {
         CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, MultiTableCsv, "multi-expression graph table");
+    }
+
+    private async Task CopySvgAsync()
+    {
+        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, SvgExport, "SVG graph export");
     }
 
     private void RunAnalysis(Func<string> operation)
@@ -366,6 +407,7 @@ public sealed class GraphingViewModel : ViewModelBase
         TableCsv = string.Empty;
         Summary = string.Empty;
         Preview = string.Empty;
+        SvgExport = string.Empty;
     }
 
     private void ClearMultiPlotOutputs()
