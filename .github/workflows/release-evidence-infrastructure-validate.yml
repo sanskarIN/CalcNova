@@ -1,0 +1,50 @@
+name: Release Evidence Infrastructure Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/release_evidence.py"
+      - "tools/run_release_evidence.py"
+      - "tools/verify_release_evidence.py"
+      - "tools/validate_release_evidence_infrastructure.py"
+      - "tools/tests/test_release_evidence.py"
+      - "tools/tests/test_run_release_evidence.py"
+      - "tools/tests/test_verify_release_evidence.py"
+      - "tools/tests/test_validate_release_evidence_infrastructure.py"
+      - "docs/release-evidence.schema.json"
+      - "docs/VALIDATION_EVIDENCE.md"
+      - ".github/workflows/validation-evidence.yml"
+      - ".github/workflows/release-evidence-infrastructure-validate.yml"
+  pull_request:
+    paths:
+      - "tools/release_evidence.py"
+      - "tools/run_release_evidence.py"
+      - "tools/verify_release_evidence.py"
+      - "tools/validate_release_evidence_infrastructure.py"
+      - "tools/tests/test_release_evidence.py"
+      - "tools/tests/test_run_release_evidence.py"
+      - "tools/tests/test_verify_release_evidence.py"
+      - "tools/tests/test_validate_release_evidence_infrastructure.py"
+      - "docs/release-evidence.schema.json"
+      - "docs/VALIDATION_EVIDENCE.md"
+      - ".github/workflows/validation-evidence.yml"
+      - ".github/workflows/release-evidence-infrastructure-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-evidence-infrastructure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Validate evidence infrastructure
+        run: python tools/validate_release_evidence_infrastructure.py .
+      - name: Run evidence model and runner tests
+        run: python -m unittest tools.tests.test_release_evidence tools.tests.test_run_release_evidence tools.tests.test_verify_release_evidence tools.tests.test_validate_release_evidence_infrastructure
