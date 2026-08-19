@@ -66,6 +66,13 @@ public enum AppStringKey
     ActionCopyExport,
     ActionOpenRepository,
     ActionOpenGitHubProfile,
+    ActionGraphPanLeft,
+    ActionGraphPanRight,
+    ActionGraphPanUp,
+    ActionGraphPanDown,
+    ActionGraphZoomIn,
+    ActionGraphZoomOut,
+    ActionGraphFit,
 
     LabelExpression,
     LabelResult,
