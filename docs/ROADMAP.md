@@ -83,15 +83,25 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Source-level shared-XAML command/property contract validation.
 - Source-level Avalonia XML well-formedness validation.
 
+### Adaptive UI baseline
+
+- Shared available-width profile with compact, medium, and expanded breakpoints.
+- Resize-driven shell style-class updates.
+- Compact-density styles that preserve common interactive target baselines.
+- Compact horizontal-overflow fallback for shared mode scroll containers.
+- Focus-change bring-into-view configuration on shared mode scroll containers.
+- Adaptive breakpoint unit tests.
+- Adaptive source-marker validation integrated with the UI contract workflow.
+
 ## Now
 
 ### Adaptive design and accessibility
 
-- Replace remaining desktop-first assumptions with compact/mobile layouts.
+- Replace remaining fixed multi-column desktop assumptions with deeper compact/mobile structural reflow where horizontal fallback is not ideal.
 - Improve navigation when many modes are present on narrow screens.
 - Audit focus order and visible focus states.
 - Verify screen-reader behavior for the programmer bit grid, graph analysis, long exports, and dynamic results.
-- Verify touch target sizes, large-text behavior, and high-contrast behavior.
+- Verify touch target sizes, large-text behavior, and high-contrast behavior on target platforms.
 - Add reduced-motion behavior where animation is introduced.
 - Evaluate virtualization or alternative compact presentation for 64/128-bit programmer grids on narrow devices.
 
