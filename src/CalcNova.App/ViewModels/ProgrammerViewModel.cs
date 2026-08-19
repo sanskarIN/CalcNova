@@ -18,11 +18,13 @@ public sealed class ProgrammerViewModel : ViewModelBase
     private string _bitPattern = BitwiseCalculator.ToBitString(new BigInteger(42), 64);
     private string _interpretedValue = "42";
     private string _errorMessage = string.Empty;
+    private IReadOnlyList<BitCellViewModel> _bits = Array.Empty<BitCellViewModel>();
 
     public ProgrammerViewModel()
     {
         ConvertCommand = new RelayCommand(_ => Convert());
         ToggleBitCommand = new RelayCommand(ToggleBit);
+        Convert();
     }
 
     public IReadOnlyList<int> CommonBases { get; } = [2, 8, 10, 16, 36];
@@ -44,13 +46,25 @@ public sealed class ProgrammerViewModel : ViewModelBase
     public int WordSize
     {
         get => _wordSize;
-        set => SetField(ref _wordSize, value);
+        set
+        {
+            if (SetField(ref _wordSize, value))
+            {
+                Convert();
+            }
+        }
     }
 
     public bool Signed
     {
         get => _signed;
-        set => SetField(ref _signed, value);
+        set
+        {
+            if (SetField(ref _signed, value))
+            {
+                Convert();
+            }
+        }
     }
 
     public string Binary
@@ -93,6 +107,12 @@ public sealed class ProgrammerViewModel : ViewModelBase
     {
         get => _errorMessage;
         private set => SetField(ref _errorMessage, value);
+    }
+
+    public IReadOnlyList<BitCellViewModel> Bits
+    {
+        get => _bits;
+        private set => SetField(ref _bits, value);
     }
 
     public ICommand ConvertCommand { get; }
@@ -151,6 +171,27 @@ public sealed class ProgrammerViewModel : ViewModelBase
             ? BitwiseCalculator.ToSigned(value, WordSize)
             : BitwiseCalculator.ToUnsigned(value, WordSize);
         InterpretedValue = interpreted.ToString();
+        UpdateBits(value);
+    }
+
+    private void UpdateBits(BigInteger value)
+    {
+        if (Bits.Count != WordSize)
+        {
+            Bits = Enumerable.Range(0, WordSize)
+                .Select(offset => WordSize - offset - 1)
+                .Select(index => new BitCellViewModel(
+                    index,
+                    BitwiseCalculator.IsBitSet(value, index, WordSize),
+                    ToggleBit))
+                .ToArray();
+            return;
+        }
+
+        foreach (var bit in Bits)
+        {
+            bit.Update(BitwiseCalculator.IsBitSet(value, bit.Index, WordSize));
+        }
     }
 
     private static bool TryGetBitIndex(object? parameter, out int bitIndex)
