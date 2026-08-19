@@ -2,23 +2,29 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Services;
 using CalcNova.Matrices;
+using CalcNova.Platform.Clipboard;
 
 namespace CalcNova.App.ViewModels;
 
 public sealed class MatricesViewModel : ViewModelBase
 {
+    private readonly IClipboardService? _clipboardService;
     private string _matrixText = "4, 7\n2, 6";
     private string _rightHandSideText = "1, 0";
     private string _result = string.Empty;
+    private string _copyStatus = string.Empty;
     private string _errorMessage = string.Empty;
 
-    public MatricesViewModel()
+    public MatricesViewModel(IClipboardService? clipboardService = null)
     {
+        _clipboardService = clipboardService;
         DeterminantCommand = new RelayCommand(_ => CalculateDeterminant());
         InverseCommand = new RelayCommand(_ => CalculateInverse());
         RankCommand = new RelayCommand(_ => CalculateRank());
         SolveCommand = new RelayCommand(_ => SolveSystem());
+        CopyResultCommand = new AsyncRelayCommand(_ => CopyResultAsync());
         CalculateDeterminant();
     }
 
@@ -40,6 +46,12 @@ public sealed class MatricesViewModel : ViewModelBase
         private set => SetField(ref _result, value);
     }
 
+    public string CopyStatus
+    {
+        get => _copyStatus;
+        private set => SetField(ref _copyStatus, value);
+    }
+
     public string ErrorMessage
     {
         get => _errorMessage;
@@ -53,6 +65,8 @@ public sealed class MatricesViewModel : ViewModelBase
     public ICommand RankCommand { get; }
 
     public ICommand SolveCommand { get; }
+
+    public ICommand CopyResultCommand { get; }
 
     private void CalculateDeterminant() => Execute(matrix => $"det(A) = {Format(matrix.Determinant())}");
 
@@ -68,11 +82,13 @@ public sealed class MatricesViewModel : ViewModelBase
             var rightHandSide = ParseVector(RightHandSideText);
             var solution = matrix.Solve(rightHandSide);
             Result = $"x = [{string.Join(", ", solution.Select(Format))}]";
+            CopyStatus = string.Empty;
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is ArgumentException or FormatException or InvalidOperationException or OverflowException)
         {
             Result = string.Empty;
+            CopyStatus = string.Empty;
             ErrorMessage = exception.Message;
         }
     }
@@ -83,13 +99,20 @@ public sealed class MatricesViewModel : ViewModelBase
         {
             var matrix = ParseMatrix(MatrixText);
             Result = operation(matrix);
+            CopyStatus = string.Empty;
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is ArgumentException or FormatException or InvalidOperationException or OverflowException)
         {
             Result = string.Empty;
+            CopyStatus = string.Empty;
             ErrorMessage = exception.Message;
         }
+    }
+
+    private async Task CopyResultAsync()
+    {
+        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, Result, "matrix result");
     }
 
     private static Matrix ParseMatrix(string text)
