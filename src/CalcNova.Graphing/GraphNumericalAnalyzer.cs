@@ -24,8 +24,20 @@ public sealed class GraphNumericalAnalyzer
 
         var compiled = _evaluator.Compile(expression);
         var step = options.DerivativeStep;
-        var left = EvaluateAt(compiled, x - step, angleUnit);
-        var right = EvaluateAt(compiled, x + step, angleUnit);
+        var leftX = x - step;
+        var rightX = x + step;
+        if (!double.IsFinite(leftX) || !double.IsFinite(rightX))
+        {
+            throw new InvalidOperationException("Derivative sample points are outside the supported numeric range.");
+        }
+
+        if (leftX == x || rightX == x || leftX == rightX)
+        {
+            throw new InvalidOperationException("Derivative step is too small relative to the requested x value.");
+        }
+
+        var left = EvaluateAt(compiled, leftX, angleUnit);
+        var right = EvaluateAt(compiled, rightX, angleUnit);
         return RequireFinite((right - left) / (2d * step), "Derivative result is outside the supported numeric range.");
     }
 
@@ -63,10 +75,15 @@ public sealed class GraphNumericalAnalyzer
 
         for (var iteration = 0; iteration < options.MaximumRootIterations; iteration++)
         {
-            var middle = left + ((right - left) / 2d);
+            var middle = SafeMidpoint(left, right);
+            if (middle == left || middle == right)
+            {
+                return middle;
+            }
+
             var middleValue = EvaluateAt(compiled, middle, angleUnit);
             if (Math.Abs(middleValue) <= options.RootTolerance ||
-                Math.Abs(right - left) <= options.RootTolerance)
+                IntervalWithinTolerance(left, right, options.RootTolerance))
             {
                 return middle;
             }
@@ -109,12 +126,22 @@ public sealed class GraphNumericalAnalyzer
 
         var compiled = _evaluator.Compile(expression);
         var intervals = options.IntegrationIntervals;
-        var width = (maximumX - minimumX) / intervals;
+        var width = (maximumX / intervals) - (minimumX / intervals);
+        if (!double.IsFinite(width) || width <= 0d)
+        {
+            throw new InvalidOperationException("Integration interval width is outside the supported numeric range.");
+        }
+
         var sum = EvaluateAt(compiled, minimumX, angleUnit) + EvaluateAt(compiled, maximumX, angleUnit);
 
         for (var index = 1; index < intervals; index++)
         {
             var x = minimumX + (index * width);
+            if (!double.IsFinite(x))
+            {
+                throw new InvalidOperationException("Integration sample point is outside the supported numeric range.");
+            }
+
             var weight = (index & 1) == 0 ? 2d : 4d;
             sum += weight * EvaluateAt(compiled, x, angleUnit);
         }
@@ -140,6 +167,18 @@ public sealed class GraphNumericalAnalyzer
         }
 
         return RequireFinite(evaluation.Value.ToDouble(), "Graph expression produced a non-finite value.");
+    }
+
+    private static double SafeMidpoint(double left, double right)
+    {
+        var midpoint = (left / 2d) + (right / 2d);
+        return RequireFinite(midpoint, "Root midpoint is outside the supported numeric range.");
+    }
+
+    private static bool IntervalWithinTolerance(double left, double right, double tolerance)
+    {
+        var halfWidth = Math.Abs((right / 2d) - (left / 2d));
+        return halfWidth <= tolerance / 2d;
     }
 
     private static void ValidateInterval(double minimumX, double maximumX)
