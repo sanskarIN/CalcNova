@@ -90,6 +90,12 @@ public sealed class EngineeringNotationFormatterTests
     }
 
     [Fact]
+    public void Parse_RejectsUnderflowingNonZeroEngineeringValue()
+    {
+        Assert.Throws<OverflowException>(() => EngineeringNotationFormatter.Parse("1e-324"));
+    }
+
+    [Fact]
     public void FormatAndParse_RoundTripRepresentativeFiniteValues()
     {
         double[] values =
