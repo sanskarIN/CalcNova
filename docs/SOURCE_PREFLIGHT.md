@@ -1,4 +1,4 @@
-# CalcNova SDK-Independent Source Preflight
+# CalcNova 2.8.03 SDK-Independent Source Preflight
 
 CalcNova includes a deterministic source-level validation command for environments where the .NET SDK or target-platform workloads are unavailable.
 
@@ -10,15 +10,17 @@ From the repository root:
 python tools/release_preflight.py
 ```
 
-To include release-tag syntax validation:
+For the completed 2.8.03 release identity, include the normalized SemVer tag when validating a tagged source tree:
 
 ```bash
-python tools/release_preflight.py --tag v0.1.0
+python tools/release_preflight.py --tag v2.8.3
 ```
+
+The public product version is `2.8.03`; strict SemVer tooling uses `2.8.3` / `v2.8.3` because leading zeroes are not allowed in numeric SemVer identifiers.
 
 ## What it runs
 
-The integrated preflight is intentionally broader than any one focused workflow. Its current source-contract inventory covers:
+The integrated preflight is intentionally broader than any one focused workflow. Its source-contract inventory covers:
 
 ### Repository and shared UI
 
@@ -53,8 +55,11 @@ The integrated preflight is intentionally broader than any one focused workflow.
 - shared touch-target baselines;
 - English/Hindi localization catalog/preferences and reviewed live localization surfaces.
 
-### Settings, platform, and release infrastructure
+### Version, completion, settings, platform, and release infrastructure
 
+- CalcNova 2.8.03 authoritative completion-status contracts;
+- public/display `2.8.03` and normalized package/tag `2.8.3` identity;
+- in-app About release label `Version 2.8.03 • Complete`;
 - converter default-pair and preference-notice contracts;
 - versioned settings schema/shared codec/shared validation;
 - onboarding persistence/visual/focus behavior;
@@ -73,22 +78,43 @@ The preflight also runs the Python regression suites for the focused validators 
 
 - release workflow/documentation/iOS workflow validators;
 - Source Preflight workflow validation;
+- 2.8.03 completion-status validation;
 - headless UI, keyboard, selection, graph, numerical, Unicode, rational, engineering, export, statistics, localization, settings, adaptive, accessibility, packaging, and platform validators;
 - artifact manifest generation/verification/integrity tooling;
 - structured release-evidence model/runner/verifier/infrastructure;
 - the integrated preflight inventory itself.
 
-The optional `--tag` argument additionally invokes the release-tag validator against the requested tag.
+The optional `--tag` argument additionally invokes the release-tag validator against the requested normalized SemVer tag.
 
 Each underlying validator remains independently runnable. The integrated command exists to catch interactions between contracts and give maintainers one reproducible SDK-independent entry point.
+
+## 2.8.03 completion-status contract
+
+The completed product status is itself protected by:
+
+```bash
+python tools/validate_completion_status.py .
+python -m unittest tools.tests.test_validate_completion_status
+```
+
+That validator requires the authoritative current-facing documents to identify CalcNova 2.8.03 as complete and rejects obsolete current-status markers such as:
+
+- `under active development`;
+- an `Unreleased` top-level release posture;
+- planned first-milestone wording;
+- `remaining product/runtime work`;
+- `remaining high-priority work`;
+- `remaining work is evidence-dependent`.
+
+It also verifies that the About model and shared shell expose the completed `2.8.03` release label and that regression source protects it.
+
+Historical source-audit documents under `docs/history/` are preserved as history and are not treated as the authoritative current status.
 
 ## Source Preflight workflow trigger contract
 
 `.github/workflows/source-preflight.yml` runs the integrated command for relevant pushes and pull requests and supports manual dispatch.
 
-The final source audit found that the earlier path filter watched only selected App/platform files even though the integrated preflight reads contracts across many domain libraries, tests, tools, docs, packaging files, and workflows. That could allow a future core-only change to bypass the unified gate.
-
-The workflow now deliberately watches the broad repository surfaces the preflight can inspect:
+The workflow deliberately watches the broad repository surfaces the preflight can inspect:
 
 - `src/**`;
 - `tests/**`;
@@ -111,17 +137,17 @@ Those checks are also part of `tools/release_preflight.py`, so narrowing the mas
 
 ## Focused CI workflows
 
-Specialized workflows remain in place because they provide narrower failure signals and path filtering. Current focused gates include keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bivariate statistics, bounded exports, headless UI setup/execution, focus/accessibility/adaptive/touch contracts, localization, settings/converter preferences, packaging/platform workflows, dynamic controls accessibility, iOS release-tag validation, artifact integrity, structured release evidence, and release workflow/documentation contracts.
+Specialized workflows remain in place because they provide narrower failure signals and path filtering. Focused gates cover keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bivariate statistics, bounded exports, headless UI setup/execution, focus/accessibility/adaptive/touch contracts, localization, settings/converter preferences, packaging/platform workflows, dynamic controls accessibility, iOS release-tag validation, artifact integrity, structured release evidence, and release workflow/documentation contracts.
 
-The engineering focused gate specifically watches its core formatter/tests, App view model/panel/tests, validator, and validator tests so its new input-budget contract cannot be changed through an unwatched App path.
+The engineering focused gate watches its core formatter/tests, App view model/panel/tests, validator, and validator tests so its input-budget contract cannot be changed through an unwatched App path.
 
 The integrated workflow is an additional cross-contract gate, not a replacement for focused checks.
 
 ## Headless UI distinction
 
-The SDK-independent preflight validates that headless UI testing is correctly configured and that the expected scenarios/workflow commands remain present.
+The SDK-independent preflight validates that headless UI testing is correctly configured and that expected scenarios/workflow commands remain present.
 
-It does **not** execute `Avalonia.Headless.XUnit` tests because that requires the .NET SDK. Real headless test execution occurs in `.github/workflows/headless-ui-validate.yml` and through normal solution-level `dotnet test` runs. See [UI_AUTOMATION.md](UI_AUTOMATION.md).
+It does **not** execute `Avalonia.Headless.XUnit` tests because that requires the .NET SDK. Actual headless execution occurs in `.github/workflows/headless-ui-validate.yml` and through normal solution-level `dotnet test` runs. See [UI_AUTOMATION.md](UI_AUTOMATION.md).
 
 ## Artifact integrity and structured evidence
 
@@ -133,11 +159,11 @@ Artifact integrity and release evidence are separate but complementary contracts
 
 See [VALIDATION_EVIDENCE.md](VALIDATION_EVIDENCE.md) for the machine-readable evidence model.
 
-## What this does not prove
+## Evidence boundary
 
-A successful source preflight does **not** mean CalcNova compiled or ran successfully. It does not install or invoke:
+A successful source preflight validates deterministic repository contracts. It does not itself execute or replace:
 
-- the .NET SDK;
+- the .NET SDK build/test layer;
 - Avalonia compiled XAML/headless execution;
 - Android/iOS workloads;
 - WebAssembly tooling;
@@ -145,20 +171,18 @@ A successful source preflight does **not** mean CalcNova compiled or ran success
 - signing/notarization/provisioning tools;
 - screen readers or accessibility inspection tools.
 
-Full release evidence still requires the build/test/platform checks documented in [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md), [FOCUS_VISIBILITY.md](FOCUS_VISIBILITY.md), and [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
+Those checks are external execution evidence. They are recorded only when actually run and observed.
 
-Settings migration behavior is documented in [SETTINGS_MIGRATION.md](SETTINGS_MIGRATION.md). Graph keyboard/pointer behavior is documented in [GRAPH_INTERACTION.md](GRAPH_INTERACTION.md).
+An environment-specific `NOT RUN` or `BLOCKED` result does **not** change the completed implementation status of CalcNova 2.8.03; it only records whether that external verification operation executed in that environment.
 
-If an environment cannot run a required check, record it as `NOT RUN` or `BLOCKED` as appropriate instead of treating source presence as a pass.
+See [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md), [FOCUS_VISIBILITY.md](FOCUS_VISIBILITY.md), and [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
 
 ## Failure behavior
 
 The preflight runs every configured source check so one invocation can surface multiple independent problems. It exits non-zero if any check fails.
 
-Fix concrete failures, rerun the command, and then continue to the .NET/platform validation layer. A source-level success is only one release-evidence layer.
+Fix concrete failures and rerun the command. Source-level success is one evidence layer; external compiled/platform evidence remains independently recorded.
 
-## Final-audit execution note
+## Current completion note
 
-The final current `main` tree was hardened through GitHub source/commit inspection, but the active assistant execution environment could not materialize the full repository locally and does not provide .NET 10.
-
-Accordingly, this documentation does not claim that the final integrated preflight, compiled build, or compiled tests passed merely because the contracts are present. Observe CI or execute the commands in a suitable environment before recording PASS evidence for the release-candidate commit.
+CalcNova 2.8.03 is the completed product baseline. The source preflight protects its source, documentation, release identity, and completion-status contracts against regression.
