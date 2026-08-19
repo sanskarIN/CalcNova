@@ -2,127 +2,158 @@
 
 This roadmap tracks planned work without promising fixed release dates. Implementation order may change when correctness, accessibility, platform constraints, or CI findings require it.
 
+## Completed foundations
+
+### Core and scientific calculation
+
+- Safe project-owned tokenizer/parser/evaluator.
+- Standard arithmetic and scientific functions.
+- Degrees, radians, and gradians.
+- Workload limits and typed calculation errors.
+- Repeated-equals semantics.
+- Calculator-style percentage transformation.
+- MC, MR, MS, M+, and M- memory behavior.
+- Sanitized external expression import.
+
+### Programmer mode
+
+- Base 2–36 parsing/formatting.
+- Common synchronized radix representations.
+- Word-size and signed/unsigned interpretation.
+- Bitwise operations and shifts.
+- Fixed-width bit visualization.
+- Bounded bit inspection/toggle helpers.
+- Unicode scalar/code-point helper backend.
+
+### Conversion and utility modules
+
+- Offline fixed-unit conversion engine.
+- Swap workflow.
+- Conversion-pair model.
+- Recent/favorite conversion-pair state.
+- Selectable significant-digit display precision.
+- Optional currency-rate provider/cache architecture.
+- Date difference, calendar arithmetic, business-day, and duration utilities.
+
+### Advanced modes
+
+- Statistics source module/view model.
+- Equation source module/view model.
+- Matrix source module/view model.
+- Graph sampling and discontinuity segmentation.
+- Graph viewport and interactive plot control.
+- SVG graph export.
+- Bounded numerical derivative, root, and integral analysis.
+
+### Persistence and platform architecture
+
+- Native SQLite calculation history behind an abstraction.
+- Browser-safe history/storage path.
+- Search/favorite/delete/clear history flows.
+- TXT/CSV/JSON history export.
+- Settings/preferences abstraction.
+- Desktop, Browser/WebAssembly, Android, and iOS heads/composition.
+- Repository validation, format, test/build, coverage, security, advanced-utility, release, and platform workflow foundations.
+
 ## Now
 
-### Baseline correctness and CI
+### Shared UI completion
 
-- Keep the calculation engine independent of UI.
-- Run the current solution through GitHub Actions on Linux, Windows, and macOS.
-- Fix compile, analyzer, formatter, and test failures before expanding platform complexity.
-- Extend parser regression coverage and numeric boundary testing.
-- Add fuzz/property-style invariant tests where practical.
+- Add visible graph-analysis controls for derivative, root, and integral actions.
+- Add a usable programmer bit-toggle grid.
+- Add Unicode code-point inspection UI with accessible labels.
+- Add converter precision control, recent-pair picker, and favorite-pair picker.
+- Add sanitized clipboard paste/copy workflow behind platform-safe services.
+- Improve expression editing and selection behavior.
+- Keep every new control usable by keyboard and touch.
 
-### Standard calculator
+### Adaptive design and accessibility
 
-- Complete expression editing behavior.
-- Add repeated-equals semantics with explicit tests.
-- Add calculator-style percentage semantics without changing the expression-language modulo operator.
-- Add classic memory operations: MC, MR, M+, M−, MS.
-- Add copy/paste services with sanitized expression import.
-- Add local history integration and favorites.
+- Replace remaining desktop-first assumptions with compact/mobile layouts.
+- Audit focus order and visible focus states.
+- Add screen-reader names/descriptions for non-text controls.
+- Verify touch target sizes and high-contrast behavior.
+- Add reduced-motion behavior where animation is introduced.
+- Review graph and bit-grid accessibility alternatives.
 
-### Application architecture
+### Validation hardening
 
-- Create adaptive multi-mode navigation.
-- Add settings/preferences abstractions.
-- Add a platform composition root.
-- Keep native SQLite out of Browser/WebAssembly dependency paths.
-- Add design-system controls and reusable view primitives.
+- Observe actual GitHub Actions results for all shared-source changes.
+- Fix compile/analyzer/format/test failures before release claims.
+- Add targeted integration/UI automation where stable and maintainable.
+- Keep vulnerability, repository, docs, and asset validation gates active.
 
 ## Next
 
-### Scientific experience
+### Converter persistence and productivity
 
-- Complete scientific keypad groups.
-- Add visible angle-mode state in every relevant layout.
-- Add additional scientific boundary tests.
-- Define and test factorial/combinatorics workload behavior.
+- Decide and document persistence semantics for favorite/recent conversion pairs.
+- Add searchable unit/category workflow.
+- Add direct copy-result action.
+- Add optional per-category default pair preferences.
+- Keep physical conversions fully offline.
 
-### Converter experience
+### Programmer productivity
 
-- Add searchable category/unit UI.
-- Add favorites and recent conversion pairs.
-- Add swap/copy/precision controls.
-- Keep fixed physical conversions fully offline.
-- Add optional replaceable currency-rate provider architecture without embedded secrets.
+- Add custom radix selector covering the full 2–36 range.
+- Add bit-grid grouping for 8/16/32/64/128-bit layouts.
+- Add code-point text inspection and scalar-to-text controls.
+- Add accessible copy actions for radix representations.
 
-### Programmer experience
+### Graphing experience
 
-- Add binary/octal/decimal/hex synchronized views.
-- Add base 2–36 custom radix workflow.
-- Add word-size selector.
-- Add signed/unsigned selector.
-- Add bit toggle grid.
-- Add code-point helper after accessibility review.
+- Wire numerical analysis into the visual graph tab.
+- Add trace/cursor and table-of-values UX.
+- Add multiple-expression model with deterministic color assignment by theme.
+- Improve pan/zoom/reset controls and axis/grid labeling.
+- Add export controls for SVG and tabular data.
+- Continue workload-budget and discontinuity tests.
 
-### Platform targets
+### Platform packaging
 
-- Browser/WebAssembly head and browser storage implementation.
-- Android head, adaptive icon, splash behavior, and package configuration.
-- iOS head and Apple-specific packaging documentation.
-- Desktop packaging guidance for Windows, Linux, and macOS.
+- Validate Windows packaging on supported Windows tooling.
+- Validate Linux packaging on supported Linux tooling.
+- Validate macOS packaging/signing guidance on Apple tooling.
+- Validate Android application bundle/release signing pipeline.
+- Validate iOS signing/archive guidance on Apple tooling.
+- Validate Browser/WebAssembly publish output and hosting guidance.
 
 ## Later
 
-### Graphing
-
-- Plot `y = f(x)` using the shared expression engine where safe.
-- Multiple expressions.
-- Pan/zoom/reset.
-- Axis/grid labels.
-- Discontinuity segmentation.
-- Adaptive sampling and workload budgets.
-- Trace/table-of-values.
-- Tested numerical roots, derivatives, and integrals if included.
-
-### Statistics
-
-- Editable datasets.
-- Count, sum, mean, median, mode, min, max, range.
-- Population/sample variance and standard deviation.
-- Quartiles and percentiles.
-- Optional covariance, correlation, and simple regression.
-
-### Equations
-
-- Linear equations in one variable.
-- Simultaneous linear equations.
-- Quadratic equations.
-- Numeric root finding with documented convergence rules.
-- Clear exact/approximate result labeling.
-
-### Matrices and vectors
-
-- Matrix editor.
-- Add/subtract/multiply/scalar operations.
-- Transpose, determinant, rank, inverse where defined.
-- Linear-system solving.
-- Vector magnitude/dot/cross product for supported dimensions.
-
 ### Product polish
 
-- Original CalcNova logo and complete icon set.
-- Splash assets.
-- Optional onboarding.
-- About/Support/Open-source licenses UI.
-- Repository screenshots and social preview.
-- Localization packs after review.
-- Accessibility presets.
+- Finalize the original CalcNova icon/splash asset set for every platform density/format.
+- Add optional onboarding and feature discovery.
+- Consolidate the design system and reusable view primitives.
+- Add reviewed localization infrastructure and language packs.
+- Add accessibility presets where they provide real value.
+- Add repository screenshots and final social preview assets.
+
+### Extended mathematics
+
+Only add these when their correctness contract, workload bounds, tests, and UX are clear:
+
+- exact rational representation;
+- recurring-decimal visualization;
+- complex-number mode;
+- engineering notation controls;
+- covariance/correlation/regression expansion;
+- richer vector workflows;
+- saved formulas and user constants;
+- deterministic local natural-language calculation patterns.
 
 ## Research
 
 These ideas are not release promises:
 
-- exact rational representation;
-- recurring-decimal visualization;
-- complex-number mode;
-- engineering notation;
-- local deterministic natural-language calculation patterns;
-- saved formulas and user constants;
-- richer graph analysis;
+- reusable high-performance numeric backends where profiling proves a need;
+- local-only formula search and tagging;
 - OS widgets and quick actions;
-- reusable experimental high-performance numeric backends if profiling demonstrates a need.
+- richer graph analysis with carefully documented numerical methods;
+- optional local backup/restore formats that remain privacy-first.
 
 ## Release gates
 
-A milestone is not complete until its implementation, tests, documentation, and supported validation checks are complete. Unavailable checks must be recorded as `NOT RUN`, not PASS.
+A milestone is not complete until its implementation, tests, documentation, supported validation checks, and relevant accessibility/privacy review are complete.
+
+Unavailable checks must be recorded as `NOT RUN`, never as PASS. Platform-specific release readiness must be based on validation in the required target environment, not inferred from source presence alone.
