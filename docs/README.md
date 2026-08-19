@@ -1,8 +1,20 @@
-# CalcNova Documentation
+# CalcNova 2.8.03 Documentation
 
-Use this index to find the authoritative guide for each area of the project.
+**Project status: Complete for version 2.8.03.**
 
-## Development
+This index links the authoritative product, engineering, quality, packaging, and release documentation for the completed CalcNova 2.8.03 baseline.
+
+## Release identity and completion
+
+- [Versioning](VERSIONING.md)
+- [Completed feature inventory](FEATURES.md)
+- [Completed roadmap](ROADMAP.md)
+- [Project state](../PROJECT_STATE.md)
+- [Changelog](../CHANGELOG.md)
+- [Final source audit — 2026-08-19](FINAL_SOURCE_AUDIT_2026-08-19.md)
+- [What changed](../what_changed.md)
+
+## Engineering and release
 
 - [Architecture](ARCHITECTURE.md)
 - [Building](BUILDING.md)
@@ -31,7 +43,6 @@ Use this index to find the authoritative guide for each area of the project.
 - [Graph numerical safety and workload bounds](GRAPH_NUMERICAL_SAFETY.md)
 - [Graph interaction](GRAPH_INTERACTION.md)
 - [Bounded export previews](EXPORT_PREVIEWS.md)
-- [Feature status](FEATURES.md)
 - [Keyboard shortcuts](KEYBOARD_SHORTCUTS.md)
 
 ## Product quality
@@ -45,20 +56,25 @@ Use this index to find the authoritative guide for each area of the project.
 - [Privacy](PRIVACY.md)
 - [Security engineering](SECURITY.md)
 
-## Planning and audit
-
-- [Roadmap](ROADMAP.md)
-- [Project state](../PROJECT_STATE.md)
-- [Final source audit — 2026-08-19](FINAL_SOURCE_AUDIT_2026-08-19.md)
-- [What changed](../what_changed.md)
-- [Changelog](../CHANGELOG.md)
-
-## Community
+## Community and maintenance
 
 - [Contributing](../CONTRIBUTING.md)
 - [Support](../SUPPORT.md)
 - [Security reporting](../SECURITY.md)
 - [Code of conduct](../CODE_OF_CONDUCT.md)
+
+## Version summary
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Android/iOS numeric build code: `20803`
+
+Strict SemVer tooling uses `2.8.3` because leading zeroes are not allowed in numeric SemVer components. The public CalcNova product version remains `2.8.03`.
+
+## Evidence note
+
+A runtime/platform check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 2.8.03 implementation is an unfinished project.
 
 ## External project links
 
