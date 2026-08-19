@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate CalcNova Avalonia headless UI-test source contracts without .NET."""
+"""Validate CalcNova Avalonia headless UI-test and CI contracts without .NET."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ def validate(root: Path) -> list[str]:
     shell_tests_path = root / "tests" / "CalcNova.App.Tests" / "MainViewHeadlessTests.cs"
     graph_tests_path = root / "tests" / "CalcNova.App.Tests" / "GraphPlotControlHeadlessTests.cs"
     graph_control_path = root / "src" / "CalcNova.App" / "Controls" / "GraphPlotControl.cs"
+    workflow_path = root / ".github" / "workflows" / "headless-ui-validate.yml"
     solution_path = root / "CalcNova.slnx"
 
     paths = (
@@ -27,6 +28,7 @@ def validate(root: Path) -> list[str]:
         shell_tests_path,
         graph_tests_path,
         graph_control_path,
+        workflow_path,
         solution_path,
     )
     failures: list[str] = []
@@ -43,6 +45,7 @@ def validate(root: Path) -> list[str]:
     shell_tests = shell_tests_path.read_text(encoding="utf-8")
     graph_tests = graph_tests_path.read_text(encoding="utf-8")
     graph_control = graph_control_path.read_text(encoding="utf-8")
+    workflow = workflow_path.read_text(encoding="utf-8")
     solution = solution_path.read_text(encoding="utf-8")
 
     avalonia_match = re.search(r'<PackageVersion Include="Avalonia" Version="([^"]+)"', packages)
@@ -123,6 +126,17 @@ def validate(root: Path) -> list[str]:
     if "public GraphViewport Viewport" not in graph_control:
         failures.append("GraphPlotControl must expose read-only viewport state for deterministic UI assertions.")
 
+    for marker in (
+        "actions/setup-dotnet@v6",
+        "dotnet-version: '10.0.x'",
+        "python tools/validate_headless_ui_tests.py",
+        "python -m unittest tools.tests.test_validate_headless_ui_tests",
+        "dotnet restore tests/CalcNova.App.Tests/CalcNova.App.Tests.csproj",
+        "dotnet test tests/CalcNova.App.Tests/CalcNova.App.Tests.csproj --configuration Release --no-restore",
+    ):
+        if marker not in workflow:
+            failures.append(f"Headless UI workflow is missing execution marker: {marker}")
+
     if '<Project Path="tests/CalcNova.App.Tests/CalcNova.App.Tests.csproj" />' not in solution:
         failures.append("CalcNova.slnx must include the headless-enabled App test project.")
 
@@ -141,7 +155,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated Avalonia headless xUnit configuration plus shared-shell and graph UI scenarios.")
+    print("Validated Avalonia headless xUnit configuration, scenarios, and dedicated CI execution path.")
     return 0
 
 
