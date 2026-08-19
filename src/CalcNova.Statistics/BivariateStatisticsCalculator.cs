@@ -100,9 +100,18 @@ public sealed class BivariateStatisticsCalculator
             rSquared);
     }
 
-    private static void EnsureFiniteState(params double[] values)
+    private static void EnsureFiniteState(
+        double meanX,
+        double meanY,
+        double sumSquaredX,
+        double sumSquaredY,
+        double coMoment)
     {
-        if (values.Any(value => !double.IsFinite(value)))
+        if (!double.IsFinite(meanX) ||
+            !double.IsFinite(meanY) ||
+            !double.IsFinite(sumSquaredX) ||
+            !double.IsFinite(sumSquaredY) ||
+            !double.IsFinite(coMoment))
         {
             throw new OverflowException("Bivariate statistics calculation exceeds the supported numeric range.");
         }
