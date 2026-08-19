@@ -18,10 +18,12 @@ public sealed class MainViewModel : ViewModelBase
             recordCalculationAsync: (expression, result) => History.RecordAsync(expression, result),
             historyEnabledProvider: () => Settings.HistoryEnabled,
             clipboardService: dependencies.ClipboardService);
+        Converter = new ConverterViewModel();
         Currency = new CurrencyViewModel(dependencies.CurrencyRateCache, dependencies.CurrencyRateProvider);
         About = new AboutViewModel(dependencies.ExternalLinkService);
 
         Settings.SettingsChanged += HandleSettingsChanged;
+        Converter.PersistenceStateChanged += HandleConverterPersistenceStateChanged;
     }
 
     public event Action<AppSettings>? SettingsChanged;
@@ -32,7 +34,7 @@ public sealed class MainViewModel : ViewModelBase
 
     public CodePointViewModel CodePoint { get; } = new();
 
-    public ConverterViewModel Converter { get; } = new();
+    public ConverterViewModel Converter { get; }
 
     public StatisticsViewModel Statistics { get; } = new();
 
@@ -67,6 +69,10 @@ public sealed class MainViewModel : ViewModelBase
 
         await Settings.LoadAsync(cancellationToken);
         Calculator.ApplyAngleUnit(Settings.AngleUnit);
+        Converter.RestorePersistedState(
+            Settings.ConverterRecentPairs,
+            Settings.ConverterFavoritePairs,
+            Settings.ConverterSignificantDigits);
         await History.InitializeAsync(cancellationToken);
         _isInitialized = true;
     }
@@ -75,5 +81,13 @@ public sealed class MainViewModel : ViewModelBase
     {
         Calculator.ApplyAngleUnit(settings.AngleUnit);
         SettingsChanged?.Invoke(settings);
+    }
+
+    private async void HandleConverterPersistenceStateChanged()
+    {
+        await Settings.PersistConverterStateAsync(
+            Converter.SignificantDigits,
+            Converter.GetRecentPairTokens(),
+            Converter.GetFavoritePairTokens());
     }
 }
