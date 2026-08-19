@@ -1,0 +1,49 @@
+name: Graph Numerical Budgets Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Graphing/GraphNumericalAnalyzer.cs"
+      - "src/CalcNova.Graphing/NumericalAnalysisOptions.cs"
+      - "src/CalcNova.Graphing/GraphSampler.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphNumericalAnalyzerTests.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphNumericalEdgeCaseTests.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphWorkloadBudgetTests.cs"
+      - "tools/validate_graph_numerical_budgets.py"
+      - "tools/tests/test_validate_graph_numerical_budgets.py"
+      - ".github/workflows/graph-numerical-budgets-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.Graphing/GraphNumericalAnalyzer.cs"
+      - "src/CalcNova.Graphing/NumericalAnalysisOptions.cs"
+      - "src/CalcNova.Graphing/GraphSampler.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphNumericalAnalyzerTests.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphNumericalEdgeCaseTests.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphWorkloadBudgetTests.cs"
+      - "tools/validate_graph_numerical_budgets.py"
+      - "tools/tests/test_validate_graph_numerical_budgets.py"
+      - ".github/workflows/graph-numerical-budgets-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  graph-numerical-budgets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate graph numerical workload contracts
+        run: python tools/validate_graph_numerical_budgets.py .
+
+      - name: Run graph numerical-budget validator tests
+        run: python -m unittest tools.tests.test_validate_graph_numerical_budgets
