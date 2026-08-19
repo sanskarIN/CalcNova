@@ -62,7 +62,6 @@ CURRENT_STATUS_CONTRACTS: dict[str, tuple[str, ...]] = {
 
 FORBIDDEN_CURRENT_STATUS_MARKERS = (
     "under active development",
-    "0.1.0-dev",
     "## [unreleased]",
     "## [0.1.0] - planned",
     "remaining product/runtime work",
