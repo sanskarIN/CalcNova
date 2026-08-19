@@ -19,6 +19,8 @@ public partial class MainView : UserControl
     private static readonly string[] AccessibilityStyleClasses = ["high-contrast", "reduced-motion"];
 
     private MainViewModel? _subscribedViewModel;
+    private TextBox? _calculatorExpressionTextBox;
+    private CalculatorViewModel? _calculatorEditorViewModel;
     private bool _onboardingWasVisible;
 
     public MainView()
@@ -76,6 +78,8 @@ public partial class MainView : UserControl
             viewModel.SettingsChanged += HandleSettingsChanged;
         }
 
+        AttachCalculatorExpressionEditor(viewModel.Calculator);
+
         await viewModel.InitializeAsync();
         _onboardingWasVisible = viewModel.Settings.ShouldShowOnboarding;
         if (_onboardingWasVisible)
@@ -90,6 +94,8 @@ public partial class MainView : UserControl
         {
             clipboardService.Attach(null);
         }
+
+        DetachCalculatorExpressionEditor();
 
         if (_subscribedViewModel is null)
         {
@@ -169,6 +175,72 @@ public partial class MainView : UserControl
                 viewModel.SelectLastMode();
                 break;
         }
+    }
+
+    private void AttachCalculatorExpressionEditor(CalculatorViewModel calculator)
+    {
+        DetachCalculatorExpressionEditor();
+
+        var textBox = this.GetVisualDescendants()
+            .OfType<TextBox>()
+            .FirstOrDefault(candidate => ReferenceEquals(candidate.DataContext, calculator));
+        if (textBox is null)
+        {
+            return;
+        }
+
+        _calculatorExpressionTextBox = textBox;
+        _calculatorEditorViewModel = calculator;
+        textBox.KeyUp += HandleCalculatorExpressionKeyUp;
+        textBox.PointerReleased += HandleCalculatorExpressionPointerReleased;
+        calculator.SelectionRequested += HandleCalculatorSelectionRequested;
+        SynchronizeCalculatorSelection();
+    }
+
+    private void DetachCalculatorExpressionEditor()
+    {
+        if (_calculatorExpressionTextBox is not null)
+        {
+            _calculatorExpressionTextBox.KeyUp -= HandleCalculatorExpressionKeyUp;
+            _calculatorExpressionTextBox.PointerReleased -= HandleCalculatorExpressionPointerReleased;
+        }
+
+        if (_calculatorEditorViewModel is not null)
+        {
+            _calculatorEditorViewModel.SelectionRequested -= HandleCalculatorSelectionRequested;
+        }
+
+        _calculatorExpressionTextBox = null;
+        _calculatorEditorViewModel = null;
+    }
+
+    private void HandleCalculatorExpressionKeyUp(object? sender, KeyEventArgs eventArgs) =>
+        SynchronizeCalculatorSelection();
+
+    private void HandleCalculatorExpressionPointerReleased(object? sender, PointerReleasedEventArgs eventArgs) =>
+        SynchronizeCalculatorSelection();
+
+    private void SynchronizeCalculatorSelection()
+    {
+        if (_calculatorExpressionTextBox is null || _calculatorEditorViewModel is null)
+        {
+            return;
+        }
+
+        _calculatorEditorViewModel.UpdateSelection(
+            _calculatorExpressionTextBox.SelectionStart,
+            _calculatorExpressionTextBox.SelectionEnd);
+    }
+
+    private void HandleCalculatorSelectionRequested(int selectionStart, int selectionEnd)
+    {
+        if (_calculatorExpressionTextBox is null)
+        {
+            return;
+        }
+
+        _calculatorExpressionTextBox.SelectionStart = selectionStart;
+        _calculatorExpressionTextBox.SelectionEnd = selectionEnd;
     }
 
     private void HandleSettingsChanged(AppSettings settings)
