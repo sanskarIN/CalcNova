@@ -29,6 +29,12 @@ public sealed class AboutViewModel : ViewModelBase
 
     public string ProjectName => "CalcNova";
 
+    public string Version => "2.8.03";
+
+    public string CompletionStatus => "Complete";
+
+    public string ReleaseLabel => $"Version {Version} • {CompletionStatus}";
+
     public string Tagline => "Fast. Precise. Private. Everywhere.";
 
     public string License => "Apache-2.0";
