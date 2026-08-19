@@ -33,6 +33,13 @@ class PackagingMetadataValidatorTests(unittest.TestCase):
         self.assertEqual("2.8.3", validator.SEMVER_VERSION)
         self.assertEqual("20803", validator.MOBILE_BUILD_CODE)
 
+    def test_linux_appstream_records_completed_release(self) -> None:
+        source = (ROOT / "packaging" / "linux" / "in.sanskar.calcnova.metainfo.xml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('<release version="2.8.03" date="2026-08-19" type="stable">', source)
+        self.assertIn("CalcNova 2.8.03 completed cross-platform product baseline.", source)
+
     def test_missing_metadata_is_reported(self) -> None:
         validator = load_validator()
         with tempfile.TemporaryDirectory() as directory:
