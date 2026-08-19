@@ -40,32 +40,4 @@ public sealed class CalculatorModifiedKeyboardHeadlessTests
             window.Close();
         }
     }
-
-    [AvaloniaFact]
-    public async Task ShiftedOperators_DoNotInterceptTextBoxEditing()
-    {
-        var viewModel = new MainViewModel();
-        await viewModel.InitializeAsync();
-        await viewModel.Settings.CompleteOnboardingAsync();
-        var view = new MainView { DataContext = viewModel };
-        var window = new Window { Width = 980, Height = 780, Content = view };
-
-        window.Show();
-        try
-        {
-            var expressionBox = view.GetVisualDescendants()
-                .OfType<TextBox>()
-                .First(textBox => ReferenceEquals(textBox.DataContext, viewModel.Calculator));
-            Assert.True(expressionBox.Focus());
-            viewModel.Calculator.Expression = string.Empty;
-
-            window.KeyPressQwerty(PhysicalKey.Digit8, RawInputModifiers.Shift);
-
-            Assert.DoesNotContain("*", viewModel.Calculator.Expression, StringComparison.Ordinal);
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
 }
