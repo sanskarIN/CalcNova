@@ -11,9 +11,11 @@ namespace CalcNova.App.ViewModels;
 public sealed class GraphingViewModel : ViewModelBase
 {
     private readonly GraphSampler _sampler = new();
+    private readonly MultiGraphSampler _multiSampler = new();
     private readonly GraphNumericalAnalyzer _analyzer = new();
     private readonly IClipboardService? _clipboardService;
     private string _expression = "sin(x)";
+    private string _multiExpressionsText = "sin(x)\ncos(x)";
     private string _minimumX = "-6.283185307179586";
     private string _maximumX = "6.283185307179586";
     private string _analysisX = "0";
@@ -21,11 +23,15 @@ public sealed class GraphingViewModel : ViewModelBase
     private int _sampleCount = 256;
     private IReadOnlyList<GraphSegment> _segments = Array.Empty<GraphSegment>();
     private IReadOnlyList<GraphTableRow> _tableRows = Array.Empty<GraphTableRow>();
+    private IReadOnlyList<GraphExpressionSample> _multiSeries = Array.Empty<GraphExpressionSample>();
+    private IReadOnlyList<MultiGraphTableRow> _multiTableRows = Array.Empty<MultiGraphTableRow>();
     private string _summary = string.Empty;
     private string _preview = string.Empty;
     private string _analysisResult = string.Empty;
     private string _traceResult = string.Empty;
     private string _tableCsv = string.Empty;
+    private string _multiSummary = string.Empty;
+    private string _multiTableCsv = string.Empty;
     private string _copyStatus = string.Empty;
     private string _errorMessage = string.Empty;
 
@@ -33,6 +39,7 @@ public sealed class GraphingViewModel : ViewModelBase
     {
         _clipboardService = clipboardService;
         PlotCommand = new RelayCommand(_ => Plot());
+        PlotMultipleCommand = new RelayCommand(_ => PlotMultiple());
         DerivativeCommand = new RelayCommand(_ => CalculateDerivative());
         FindRootCommand = new RelayCommand(_ => FindRoot());
         IntegrateCommand = new RelayCommand(_ => Integrate());
@@ -41,6 +48,7 @@ public sealed class GraphingViewModel : ViewModelBase
         CopyAnalysisResultCommand = new AsyncRelayCommand(_ => CopyAnalysisResultAsync());
         CopyTraceResultCommand = new AsyncRelayCommand(_ => CopyTraceResultAsync());
         CopyTableCommand = new AsyncRelayCommand(_ => CopyTableAsync());
+        CopyMultiTableCommand = new AsyncRelayCommand(_ => CopyMultiTableAsync());
         Plot();
     }
 
@@ -48,6 +56,12 @@ public sealed class GraphingViewModel : ViewModelBase
     {
         get => _expression;
         set => SetField(ref _expression, value ?? string.Empty);
+    }
+
+    public string MultiExpressionsText
+    {
+        get => _multiExpressionsText;
+        set => SetField(ref _multiExpressionsText, value ?? string.Empty);
     }
 
     public string MinimumX
@@ -92,6 +106,18 @@ public sealed class GraphingViewModel : ViewModelBase
         private set => SetField(ref _tableRows, value);
     }
 
+    public IReadOnlyList<GraphExpressionSample> MultiSeries
+    {
+        get => _multiSeries;
+        private set => SetField(ref _multiSeries, value);
+    }
+
+    public IReadOnlyList<MultiGraphTableRow> MultiTableRows
+    {
+        get => _multiTableRows;
+        private set => SetField(ref _multiTableRows, value);
+    }
+
     public string Summary
     {
         get => _summary;
@@ -122,6 +148,18 @@ public sealed class GraphingViewModel : ViewModelBase
         private set => SetField(ref _tableCsv, value);
     }
 
+    public string MultiSummary
+    {
+        get => _multiSummary;
+        private set => SetField(ref _multiSummary, value);
+    }
+
+    public string MultiTableCsv
+    {
+        get => _multiTableCsv;
+        private set => SetField(ref _multiTableCsv, value);
+    }
+
     public string CopyStatus
     {
         get => _copyStatus;
@@ -135,6 +173,8 @@ public sealed class GraphingViewModel : ViewModelBase
     }
 
     public ICommand PlotCommand { get; }
+
+    public ICommand PlotMultipleCommand { get; }
 
     public ICommand DerivativeCommand { get; }
 
@@ -152,18 +192,14 @@ public sealed class GraphingViewModel : ViewModelBase
 
     public ICommand CopyTableCommand { get; }
 
+    public ICommand CopyMultiTableCommand { get; }
+
     private void Plot()
     {
         try
         {
-            var minimum = ParseFinite(MinimumX, "Minimum X");
-            var maximum = ParseFinite(MaximumX, "Maximum X");
-            var result = _sampler.Sample(Expression, new GraphSamplingOptions
-            {
-                MinimumX = minimum,
-                MaximumX = maximum,
-                SampleCount = SampleCount
-            });
+            var options = CreateSamplingOptions();
+            var result = _sampler.Sample(Expression, options);
 
             TraceResult = string.Empty;
             CopyStatus = string.Empty;
@@ -188,6 +224,36 @@ public sealed class GraphingViewModel : ViewModelBase
             TraceResult = string.Empty;
             CopyStatus = string.Empty;
             ClearPlotOutputs();
+            ErrorMessage = exception.Message;
+        }
+    }
+
+    private void PlotMultiple()
+    {
+        try
+        {
+            var definitions = GraphExpressionListParser.Parse(MultiExpressionsText);
+            var result = _multiSampler.Sample(definitions, CreateSamplingOptions());
+            CopyStatus = string.Empty;
+
+            if (!result.Success)
+            {
+                ClearMultiPlotOutputs();
+                ErrorMessage = result.ErrorMessage ?? "Multi-expression graph sampling failed.";
+                return;
+            }
+
+            MultiSeries = result.Series;
+            MultiTableRows = MultiGraphTableExporter.CreateRows(result.Series);
+            MultiTableCsv = MultiGraphTableExporter.ToCsv(MultiTableRows);
+            var pointCount = result.Series.Sum(series => series.Segments.Sum(segment => segment.Points.Count));
+            var invalidCount = result.Series.Sum(series => series.InvalidSampleCount);
+            MultiSummary = $"{result.Series.Count} expression(s) • {pointCount} valid point(s) • {invalidCount} invalid sample(s)";
+            ErrorMessage = string.Empty;
+        }
+        catch (Exception exception) when (exception is ArgumentException or FormatException or OverflowException)
+        {
+            ClearMultiPlotOutputs();
             ErrorMessage = exception.Message;
         }
     }
@@ -263,6 +329,11 @@ public sealed class GraphingViewModel : ViewModelBase
         CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, TableCsv, "graph table");
     }
 
+    private async Task CopyMultiTableAsync()
+    {
+        CopyStatus = await ClipboardTextWriter.CopyAsync(_clipboardService, MultiTableCsv, "multi-expression graph table");
+    }
+
     private void RunAnalysis(Func<string> operation)
     {
         try
@@ -278,6 +349,16 @@ public sealed class GraphingViewModel : ViewModelBase
         }
     }
 
+    private GraphSamplingOptions CreateSamplingOptions()
+    {
+        return new GraphSamplingOptions
+        {
+            MinimumX = ParseFinite(MinimumX, "Minimum X"),
+            MaximumX = ParseFinite(MaximumX, "Maximum X"),
+            SampleCount = SampleCount
+        };
+    }
+
     private void ClearPlotOutputs()
     {
         Segments = Array.Empty<GraphSegment>();
@@ -285,6 +366,14 @@ public sealed class GraphingViewModel : ViewModelBase
         TableCsv = string.Empty;
         Summary = string.Empty;
         Preview = string.Empty;
+    }
+
+    private void ClearMultiPlotOutputs()
+    {
+        MultiSeries = Array.Empty<GraphExpressionSample>();
+        MultiTableRows = Array.Empty<MultiGraphTableRow>();
+        MultiTableCsv = string.Empty;
+        MultiSummary = string.Empty;
     }
 
     private static double ParseFinite(string text, string label)
