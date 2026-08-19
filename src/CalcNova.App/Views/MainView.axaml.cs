@@ -1,9 +1,11 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using CalcNova.App.Infrastructure;
 using CalcNova.App.Services;
 using CalcNova.App.ViewModels;
 using CalcNova.Platform.Settings;
@@ -12,6 +14,8 @@ namespace CalcNova.App.Views;
 
 public partial class MainView : UserControl
 {
+    private static readonly string[] AdaptiveStyleClasses = ["compact", "medium", "expanded"];
+
     private MainViewModel? _subscribedViewModel;
 
     public MainView()
@@ -21,12 +25,24 @@ public partial class MainView : UserControl
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
 
+    protected override void OnSizeChanged(SizeChangedEventArgs eventArgs)
+    {
+        base.OnSizeChanged(eventArgs);
+
+        if (eventArgs.WidthChanged)
+        {
+            ApplyAdaptiveLayout(eventArgs.NewSize.Width);
+        }
+    }
+
     private async void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs eventArgs)
     {
         if (AppComposition.Dependencies.ClipboardService is AvaloniaClipboardService clipboardService)
         {
             clipboardService.Attach(TopLevel.GetTopLevel(this)?.Clipboard);
         }
+
+        ApplyAdaptiveLayout(Bounds.Width);
 
         if (DataContext is not MainViewModel viewModel)
         {
@@ -84,6 +100,34 @@ public partial class MainView : UserControl
                 viewModel.Calculator.Backspace();
                 eventArgs.Handled = true;
                 break;
+        }
+    }
+
+    private void ApplyAdaptiveLayout(double width)
+    {
+        var profile = AdaptiveLayoutProfile.ForWidth(width);
+
+        foreach (var styleClass in AdaptiveStyleClasses)
+        {
+            Classes.Remove(styleClass);
+        }
+
+        Classes.Add(profile.StyleClass);
+
+        var shell = this.GetVisualChildren().OfType<Grid>().FirstOrDefault();
+        if (shell is not null)
+        {
+            shell.Margin = new Thickness(profile.ShellMargin);
+        }
+
+        var horizontalVisibility = profile.AllowHorizontalModeScrolling
+            ? ScrollBarVisibility.Auto
+            : ScrollBarVisibility.Disabled;
+
+        foreach (var scrollViewer in this.GetVisualDescendants().OfType<ScrollViewer>())
+        {
+            scrollViewer.HorizontalScrollBarVisibility = horizontalVisibility;
+            scrollViewer.BringIntoViewOnFocusChange = true;
         }
     }
 
