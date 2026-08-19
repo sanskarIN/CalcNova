@@ -1,4 +1,5 @@
 using CalcNova.App.ViewModels;
+using CalcNova.Core.Numerics;
 using Xunit;
 
 namespace CalcNova.App.Tests;
@@ -69,6 +70,21 @@ public sealed class EngineeringNotationViewModelTests
         Assert.Empty(viewModel.FormattedText);
         Assert.Empty(viewModel.ParsedValue);
         Assert.NotEmpty(viewModel.ErrorMessage);
+    }
+
+    [Fact]
+    public void FormatCommand_RejectsInputAboveCharacterBudget()
+    {
+        var viewModel = new EngineeringNotationViewModel
+        {
+            InputText = new string('1', EngineeringNotationFormatter.MaximumInputCharacters + 1)
+        };
+
+        viewModel.FormatCommand.Execute(null);
+
+        Assert.Empty(viewModel.FormattedText);
+        Assert.Empty(viewModel.ParsedValue);
+        Assert.Contains("at most", viewModel.ErrorMessage, StringComparison.OrdinalIgnoreCase);
     }
 
     [Theory]
