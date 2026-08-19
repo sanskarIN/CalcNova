@@ -58,6 +58,26 @@ CURRENT_STATUS_CONTRACTS: dict[str, tuple[str, ...]] = {
         "| .NET/NuGet package version | `2.8.3` |",
         "| Android/iOS numeric build code | `20803` |",
     ),
+    "docs/RELEASE.md": (
+        "# CalcNova 2.8.03 Release Process",
+        "CalcNova 2.8.03 is the completed product baseline.",
+        "python tools/release_preflight.py --tag v2.8.3",
+    ),
+    "docs/RELEASE_READINESS_CHECKLIST.md": (
+        "# CalcNova 2.8.03 Release Evidence Checklist",
+        "CalcNova 2.8.03 is the completed product baseline.",
+        "Product: CalcNova 2.8.03 — COMPLETE",
+    ),
+    "docs/PLATFORM_SUPPORT.md": (
+        "# CalcNova 2.8.03 Platform Support",
+        "**Cross-platform source composition is complete for CalcNova 2.8.03.**",
+        "Desktop source composition: **COMPLETE**",
+    ),
+    "docs/SOURCE_PREFLIGHT.md": (
+        "# CalcNova 2.8.03 SDK-Independent Source Preflight",
+        "CalcNova 2.8.03 is the completed product baseline.",
+        "python tools/release_preflight.py --tag v2.8.3",
+    ),
 }
 
 FORBIDDEN_CURRENT_STATUS_MARKERS = (
@@ -69,6 +89,8 @@ FORBIDDEN_CURRENT_STATUS_MARKERS = (
     "remaining work is evidence-dependent",
     "current phase",
     "first validated milestone will be created",
+    "suggested development milestones",
+    "development mobile display version",
 )
 
 
