@@ -1,0 +1,44 @@
+name: Localization Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.App/Localization/**"
+      - "src/CalcNova.App/Services/AppDependencies.cs"
+      - "src/CalcNova.App/ViewModels/MainViewModel.cs"
+      - "tests/CalcNova.App.Tests/AppLocalizerTests.cs"
+      - "tests/CalcNova.App.Tests/MainViewModelLocalizationTests.cs"
+      - "tools/validate_localization_catalog.py"
+      - "docs/LOCALIZATION.md"
+      - ".github/workflows/localization-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.App/Localization/**"
+      - "src/CalcNova.App/Services/AppDependencies.cs"
+      - "src/CalcNova.App/ViewModels/MainViewModel.cs"
+      - "tests/CalcNova.App.Tests/AppLocalizerTests.cs"
+      - "tests/CalcNova.App.Tests/MainViewModelLocalizationTests.cs"
+      - "tools/validate_localization_catalog.py"
+      - "docs/LOCALIZATION.md"
+      - ".github/workflows/localization-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-localization:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate localization catalog
+        run: python tools/validate_localization_catalog.py .
