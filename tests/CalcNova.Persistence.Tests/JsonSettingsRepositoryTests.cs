@@ -35,10 +35,12 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
 
         Assert.Equal(ThemePreference.System, settings.Theme);
         Assert.Equal(AngleUnit.Degrees, settings.AngleUnit);
+        Assert.Equal("en", settings.CultureName);
         Assert.True(settings.HistoryEnabled);
         Assert.Equal(15, settings.ConverterSignificantDigits);
         Assert.Empty(settings.ConverterRecentPairs);
         Assert.Empty(settings.ConverterFavoritePairs);
+        Assert.Equal(0, settings.CompletedOnboardingVersion);
     }
 
     [Fact]
@@ -49,6 +51,7 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
         {
             Theme = ThemePreference.Dark,
             AngleUnit = AngleUnit.Radians,
+            CultureName = "en-IN",
             DecimalPrecision = 20,
             UseGroupingSeparators = false,
             HapticsEnabled = false,
@@ -58,7 +61,8 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
             HighContrast = true,
             ConverterSignificantDigits = 12,
             ConverterRecentPairs = ["v1:km>m", "v1:kg>g"],
-            ConverterFavoritePairs = ["v1:c>f"]
+            ConverterFavoritePairs = ["v1:c>f"],
+            CompletedOnboardingVersion = 1
         };
 
         await repository.SaveAsync(expected);
