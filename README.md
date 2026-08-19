@@ -2,9 +2,11 @@
 
 **Fast. Precise. Private. Everywhere.**
 
-CalcNova is an open-source, privacy-first, cross-platform calculator built with C#, .NET, and Avalonia UI. It combines a project-owned expression engine with scientific, exact-rational, engineering-notation, programmer, conversion, graphing, statistics, equation, matrix, date/time, currency, history, and settings modules while keeping ordinary calculations local.
+**Current product version: 2.8.03**
 
-> CalcNova is under active development. Source presence is not the same as validated release readiness. See [`PROJECT_STATE.md`](PROJECT_STATE.md) and the [final source audit](docs/FINAL_SOURCE_AUDIT_2026-08-19.md) for exact implementation and validation status.
+CalcNova is a completed, open-source, privacy-first, cross-platform calculator built with C#, .NET, and Avalonia UI. It combines a project-owned expression engine with scientific, exact-rational, engineering-notation, programmer, Unicode, conversion, graphing, statistics, equation, matrix, date/time, currency, history, persistence, accessibility, localization, packaging, and release-validation capabilities while keeping ordinary calculations local.
+
+> **Project status: Complete for version 2.8.03.** Future repository changes may provide maintenance, compatibility updates, security fixes, translations, or optional enhancements; they are not required to complete the 2.8.03 product scope.
 
 ## Status
 
@@ -14,175 +16,292 @@ CalcNova is an open-source, privacy-first, cross-platform calculator built with 
 [![Source Preflight](https://github.com/sanskarIN/CalcNova/actions/workflows/source-preflight.yml/badge.svg)](https://github.com/sanskarIN/CalcNova/actions/workflows/source-preflight.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-## Current capabilities
+## Version 2.8.03
 
-### Standard and scientific calculator
+The public/product version is **2.8.03**. Strict SemVer tooling uses the normalized equivalent **2.8.3**, and the corresponding normalized release tag is **`v2.8.3`**. See [`docs/VERSIONING.md`](docs/VERSIONING.md) for the complete mapping.
 
-- Safe tokenizer and recursive-descent parser owned by the project
-- Explicit operator precedence and right-associative exponentiation
-- Parentheses and unary plus/minus
-- Arbitrary-precision integers with `System.Numerics.BigInteger`
-- Decimal arithmetic where appropriate with bounded floating-point fallback
-- Typed calculation errors and workload limits
-- Scientific notation parsing
-- Square/cube/power/root operations
-- Reciprocal, absolute value, logarithms, exponentials
-- Trigonometric, inverse-trigonometric, hyperbolic, and inverse-hyperbolic functions
-- Degrees, radians, and gradians
-- Floor/ceiling/truncation/rounding/sign/min/max
-- Factorial, GCD, LCM, combinations, and permutations
-- Constants including π, e, and τ
-- Calculator-style percentage handling separate from expression modulo
-- Repeated-equals session behavior
-- MC, MR, MS, M+, and M- memory operations
-- Sanitized external expression import with common calculator-glyph normalization
-- User-triggered sanitized clipboard paste and result copy
-- Top-row/numpad digit and arithmetic-key support outside active text fields
-- Safe printable/shifted operator mappings outside active text fields
-- Caret-aware insertion, selection replacement/deletion, Backspace behavior, and selection-preserving wrapping
+## Core calculator
 
-### Exact rational and engineering-notation utilities
+CalcNova includes a project-owned parser/evaluator rather than executing arbitrary user code.
 
-- Canonical bounded `BigInteger` rational arithmetic
-- Exact parsing of integers, fractions, finite decimals, and decimal scientific notation
-- Exact add/subtract/multiply/divide, comparison, reciprocal, equality, and hashing
-- Safe canonical behavior for `default(RationalNumber)`
-- Raw input, decimal scale/exponent, and reduced bit-length workload limits
-- Engineering notation with exponents divisible by three
-- Engineering exponent range from -324 through 306
-- Selectable 1–15 significant digits and extreme finite-value handling
-- Shared Calculator panels, tests, focused source validators/workflows, and integrated preflight coverage
+Implemented capabilities include:
 
-See [`docs/EXACT_RATIONALS.md`](docs/EXACT_RATIONALS.md) and [`docs/ENGINEERING_NOTATION.md`](docs/ENGINEERING_NOTATION.md).
+- safe tokenizer and recursive-descent parser;
+- explicit operator precedence and right-associative exponentiation;
+- parentheses and unary plus/minus;
+- arbitrary-precision integers through `System.Numerics.BigInteger`;
+- decimal arithmetic where appropriate with bounded floating-point fallback;
+- typed calculation errors and workload limits;
+- decimal and scientific-notation parsing;
+- square, cube, arbitrary power, square/cube/nth root;
+- reciprocal and absolute value;
+- logarithmic and exponential functions;
+- trigonometric, inverse-trigonometric, hyperbolic, and inverse-hyperbolic functions;
+- degrees, radians, and gradians;
+- floor, ceiling, truncation, rounding, sign, min, and max;
+- factorial, GCD, LCM, combinations, and permutations;
+- constants including π, e, and τ;
+- calculator-style percentage handling separate from expression modulo;
+- repeated-equals behavior;
+- MC, MR, MS, M+, and M- memory operations;
+- sanitized expression import and user-triggered clipboard paste;
+- explicit copy-result workflow;
+- top-row/numpad input and safe printable/shifted operator mappings outside active text editing;
+- caret-aware insertion, forward/reversed selection replacement, selection deletion, Backspace-before-caret behavior, and selection-preserving wrapping.
 
-### Programmer and Unicode tools
+## Exact rational arithmetic
 
-- Base 2 through base 36 parsing, formatting, and shared UI selection
-- Binary/octal/decimal/hex representations
-- 8/16/32/64/128-bit shared word-size presets
-- Signed/unsigned two's-complement interpretation
-- Correct fixed-width masked non-decimal displays
-- AND, OR, XOR, NOT
-- Left shift, logical right shift, arithmetic right shift
-- Full interactive word-size bit grid with accessible bit labels
-- Byte-grouped presentation for large word sizes
-- Copy actions for radix and fixed-width bit representations
-- Unicode scalar/code-point parsing, formatting, scalar-to-text, and bounded text inspection
-- Local Unicode general-category, plane, UTF-8-byte-width, and UTF-16-unit metadata
-- Dedicated shared Unicode UI and explicit metadata/result copy actions
+The exact-rational utility provides bounded `BigInteger` fraction arithmetic without converting finite decimal input through `double` first.
 
-### Offline unit conversion
+It includes:
 
-Fixed conversion categories include length, area, volume, mass, speed, temperature, time, data/storage, frequency, pressure, energy, power, force, and angle.
+- canonical numerator/denominator normalization;
+- positive-denominator normalization;
+- stable zero/default value semantics;
+- exact integer, fraction, finite-decimal, and decimal-scientific parsing;
+- exact addition, subtraction, multiplication, division, negation, reciprocal, comparison, equality, and hashing;
+- cross-cancellation before multiplication;
+- bounded raw input length, decimal scale/exponent magnitude, and reduced bit length;
+- Calculator panel workflows for normalize/add/subtract/multiply/divide;
+- source, application, and headless regression coverage;
+- focused and integrated SDK-independent validation.
 
-The shared converter supports unit swapping, selectable 1–17 significant-digit result precision, category-scoped search, recent conversion pairs, favorite pairs, pair restoration, clear-recents, result copy, and persisted converter preferences across launches. Fixed physical/data conversions remain local and offline.
+See [`docs/EXACT_RATIONALS.md`](docs/EXACT_RATIONALS.md).
 
-### Currency and date/time utilities
+## Engineering notation
 
-- Optional replaceable currency-rate provider architecture
-- Local currency-rate cache and offline fallback semantics
-- No embedded provider credentials
-- Date difference calculations
-- Calendar arithmetic
-- Business-day helpers
-- Fixed-duration conversion
+CalcNova includes a bounded engineering-notation formatter/parser for finite `double` values.
 
-### Graphing and numerical analysis
+It provides:
 
-- `y = f(x)` sampling through the shared expression engine
-- Workload-bounded sampling and discontinuity segmentation
-- Explicit graph viewport model
-- Focusable interactive Avalonia plot control
-- Pointer drag pan, wheel zoom, and double-tap/double-click fit-to-data
-- Keyboard arrow-key pan, numpad Add/Subtract zoom, Home reset, and `F` fit-to-data
-- Nearest sampled-point trace
-- Single- and multi-expression bounded CSV output
-- Deterministic accessible SVG graph export
-- Deterministic multi-series line-pattern differentiation that does not rely on color alone
-- Synchronized multi-series text legend
-- Bounded central-difference derivative approximation
-- Bracketed bisection root finding
-- Bounded Simpson numerical integration
-- Extreme-finite-value numerical-analysis hardening and explicit workload-budget regressions
-- Shared controls for derivative, root, and integral analysis
+- exponents in multiples of three;
+- 1–15 significant digits;
+- canonical invariant-culture parsing;
+- explicit engineering exponent bounds from -324 through 306;
+- non-zero-underflow rejection;
+- chunked power-of-ten scaling for extreme finite values;
+- a shared 4,096-character input budget across core parsing, formatting workflow, and UI text entry;
+- Calculator panel format/parse workflows;
+- focused validation and integrated source-preflight coverage.
 
-Numerical analysis is approximate by design and is labeled accordingly.
+See [`docs/ENGINEERING_NOTATION.md`](docs/ENGINEERING_NOTATION.md).
 
-### Statistics and advanced mathematics
+## Programmer and Unicode tools
 
-- Descriptive statistics and shared summary-copy workflow
-- Bounded paired X/Y dataset parsing
-- Population/sample covariance
-- Pearson correlation when defined
-- Ordinary least-squares regression, `R²`, and prediction when defined
-- Deterministic degenerate/non-finite/oversized dataset behavior
-- Shared paired-statistics panel and copy workflow
-- Equation-solving module and shared view model
-- Matrix utilities and shared view model with result copy
+Programmer features include:
+
+- base 2 through base 36 parsing, formatting, and shared UI selection;
+- binary/octal/decimal/hex synchronized representations;
+- 8/16/32/64/128-bit word-size presets;
+- signed/unsigned two's-complement interpretation;
+- fixed-width masked non-decimal displays;
+- AND, OR, XOR, and NOT;
+- left shift, logical right shift, and arithmetic right shift;
+- full interactive bit grids with accessible bit labels;
+- byte-grouped display for large word sizes;
+- copy actions for radix and fixed-width bit representations.
+
+Unicode tools include:
+
+- Unicode scalar/code-point parsing and formatting;
+- scalar-to-text conversion;
+- bounded Unicode text inspection;
+- local general-category metadata;
+- Unicode plane metadata;
+- UTF-8 byte-width and UTF-16 code-unit metadata;
+- local-first metadata derivation with no network lookup;
+- explicit result and metadata copy actions.
+
+See [`docs/PROGRAMMER_MODE.md`](docs/PROGRAMMER_MODE.md) and [`docs/UNICODE_METADATA.md`](docs/UNICODE_METADATA.md).
+
+## Unit conversion
+
+Offline fixed-unit categories include:
+
+- length;
+- area;
+- volume;
+- mass;
+- speed;
+- temperature;
+- time;
+- data/storage;
+- frequency;
+- pressure;
+- energy;
+- power;
+- force;
+- angle.
+
+The shared converter also supports:
+
+- validated conversion pairs;
+- unit swapping;
+- selectable 1–17 significant-digit precision;
+- category-scoped unit search;
+- search-result assignment to From/To;
+- bounded recent pairs;
+- favorite pairs;
+- pair restoration;
+- clear-recents;
+- result copy;
+- persisted converter preferences;
+- source contracts for preference/default behavior.
+
+Fixed physical/data conversion remains local and offline.
+
+## Currency and date/time utilities
+
+Currency infrastructure includes:
+
+- replaceable rate-provider interface;
+- local cache;
+- offline fallback semantics;
+- no embedded provider credentials.
+
+Date/time utilities include:
+
+- date difference;
+- calendar arithmetic;
+- business-day helpers;
+- fixed-duration conversion.
+
+## Statistics
+
+CalcNova provides descriptive and paired statistics.
+
+Implemented paired analysis includes:
+
+- bounded X/Y dataset parsing;
+- population covariance;
+- sample covariance;
+- Pearson correlation when mathematically defined;
+- ordinary least-squares regression slope/intercept;
+- coefficient of determination (`R²`) when defined;
+- prediction from the latest valid regression model;
+- stale-model clearing after failed analysis;
+- deterministic handling of mismatched, non-finite, oversized, constant-X, constant-Y, and single-pair datasets;
+- summary copy workflow.
 
 See [`docs/BIVARIATE_STATISTICS.md`](docs/BIVARIATE_STATISTICS.md).
 
-### Local history and settings
+## Equations and matrices
 
-- Calculation-history abstraction
-- SQLite-backed native history
-- Browser-safe storage path
-- Search, favorites, delete, and clear workflows
-- TXT/CSV/JSON history export with bounded display previews and full private copy payloads
-- Settings/preferences abstraction and view model
-- Persisted converter and culture preferences
-- Explicit settings schema version
-- Legacy/unversioned settings migration and fail-closed future-schema rejection
-- Shared settings JSON decoder/validator architecture across native and Browser storage
-- About/support external-link abstraction
+Equation tools include shared equation-solving workflows, including quadratic analysis.
 
-### Accessibility, adaptive UI, and localization source foundations
+Matrix capabilities include:
 
-- Shared 44-DIP minimum interaction-target baseline
-- 54-DIP standard calculator-key baseline
-- Explicit visible keyboard-focus emphasis, strengthened under CalcNova high contrast
-- Compact/medium/expanded layout profiles and compact overflow fallback
-- Ctrl+PageUp/PageDown cyclic mode navigation and Ctrl+Home/End first/last navigation
-- Graph keyboard viewport interaction
-- Focus bring-into-view behavior for shared scroll containers
-- Dynamic graph controls covered by focus/touch-target regressions
-- English semantic string catalog
-- Hindi semantic string catalog for the current key set
-- Regional English/Hindi culture selection such as `en-IN` and `hi-IN`
-- Reviewed runtime localization of shell/calculator/onboarding/settings/history/currency/About surfaces
-- Conservative runtime accessibility evidence matrix
+- determinant;
+- inverse;
+- rank;
+- linear-system solving;
+- shared result presentation;
+- explicit result copy.
 
-The shared XAML still contains unmigrated English, so the Hindi semantic catalog is localization infrastructure rather than a claim that the complete UI is already translated.
+## Graphing and numerical analysis
 
-## Shared application
+Graphing includes:
 
-The shared Avalonia shell currently exposes:
+- `y = f(x)` sampling through the shared expression engine;
+- workload-bounded sampling;
+- discontinuity segmentation;
+- explicit viewport model;
+- focusable interactive Avalonia plot control;
+- pointer drag panning;
+- pointer-wheel zoom;
+- double-tap/double-click fit-to-data;
+- keyboard arrow-key panning;
+- numpad Add/Subtract zoom;
+- Home reset;
+- `F` fit-to-data;
+- nearest sampled-point trace;
+- bounded single- and multi-expression CSV output;
+- stable multi-series identities;
+- deterministic non-color-only line patterns;
+- synchronized multi-series text legend;
+- accessible SVG export;
+- bounded derivative approximation;
+- bracketed bisection root finding;
+- bounded Simpson integration;
+- extreme-finite-value numerical safeguards;
+- explicit numerical workload budgets.
 
-- Calculator, including exact-rational and engineering-notation utilities
-- Programmer
-- Unicode code points and local scalar metadata
-- Unit conversion
-- Statistics, including paired covariance/correlation/regression analysis
-- Equations
-- Matrices
-- Graphing and numerical analysis
-- Date/time
-- Currency
-- History
-- Settings
-- About/support
+Numerical analysis is approximate by design and is labeled accordingly.
 
-The remaining high-priority work is dominated by real compiled/runtime evidence: .NET restore/build/test/headless results, target-device accessibility/adaptive validation, platform runtime behavior, packaging, signing, and store checks. See [`docs/ROADMAP.md`](docs/ROADMAP.md).
+See [`docs/GRAPH_INTERACTION.md`](docs/GRAPH_INTERACTION.md), [`docs/NUMERICAL_ANALYSIS.md`](docs/NUMERICAL_ANALYSIS.md), and [`docs/GRAPH_NUMERICAL_SAFETY.md`](docs/GRAPH_NUMERICAL_SAFETY.md).
 
-## Platform source targets
+## History, export, and persistence
 
-The repository contains platform heads/composition for Desktop, Browser/WebAssembly, Android, and iOS. Clipboard composition is provided through the shared Avalonia adapter and attached only when the shared view has a `TopLevel` clipboard.
+History and persistence include:
 
-Platform-specific source existing in the repository does **not** by itself mean a store/package build has been validated. Exact build/packaging status is recorded in [`PROJECT_STATE.md`](PROJECT_STATE.md).
+- calculation-history abstraction;
+- SQLite-backed native history;
+- browser-safe storage path;
+- recent/search/favorite/delete/clear workflows;
+- bounded TXT/CSV/JSON export generation;
+- bounded display previews with complete private copy payloads;
+- reusable preview formatting with character/line limits, newline normalization, and UTF-16 boundary safety;
+- settings repository abstraction;
+- shared settings view model;
+- persisted converter and culture preferences;
+- explicit settings schema version;
+- legacy and unversioned settings migration;
+- fail-closed unsupported future-schema handling;
+- shared JSON decoding/validation across native and Browser storage.
 
-## Validation, artifact integrity, and release evidence
+## Accessibility and adaptive UI
 
-CalcNova has a broad SDK-independent source validation layer covering repository/XAML/UI/navigation/keyboard contracts, graph/numerical contracts, Unicode, exact rationals, engineering notation, exports, bivariate statistics, accessibility/adaptive behavior, localization/settings, packaging/platform workflows, exact-tag iOS simulator release logic, artifact integrity, and structured release evidence.
+The shared accessibility/adaptive baseline includes:
+
+- 44-DIP minimum interaction-target baseline;
+- 54-DIP standard calculator-key baseline;
+- explicit visible keyboard focus styling;
+- stronger focus styling under CalcNova high contrast;
+- compact/medium/expanded layout profiles;
+- compact horizontal-overflow fallback;
+- focus bring-into-view behavior;
+- Ctrl+PageUp/PageDown cyclic mode navigation;
+- Ctrl+Home/End first/last mode navigation;
+- keyboard-operable graph viewport;
+- accessible programmer bit-state names;
+- textual alternatives for non-color graph differentiation;
+- reduced-motion/high-contrast preference state;
+- onboarding focus/shortcut contracts;
+- dynamic-control touch-target/focus validation;
+- runtime evidence vocabulary using PASS / FAIL / BLOCKED / NOT RUN.
+
+Runtime/device evidence is recorded conservatively; a source contract is not mislabeled as an observed device test.
+
+## Localization
+
+CalcNova includes:
+
+- stable semantic string keys;
+- complete English semantic catalog for the current key set;
+- complete Hindi semantic catalog for the current key set;
+- regional English/Hindi culture selection such as `en-IN` and `hi-IN`;
+- persisted culture preference;
+- catalog completeness/duplicate/unknown-key validation;
+- live localization for reviewed shell, calculator, onboarding, settings, history, currency, About, and related surfaces.
+
+Additional translations or further UI-string migration may be contributed as optional localization improvements; they are not required to define version 2.8.03 as complete.
+
+## Platforms
+
+CalcNova contains composition heads for:
+
+- Desktop — Windows, Linux, and macOS targets;
+- Browser/WebAssembly;
+- Android;
+- iOS.
+
+The product display version for Android and iOS is `2.8.03`, with numeric mobile build code `20803`.
+
+Platform package generation still depends on the appropriate external SDK/workload, signing identity, and store credentials. Those environment requirements are separate from project implementation completeness.
+
+## Source validation and release evidence
+
+CalcNova includes SDK-independent validators covering repository/security contracts, XAML, UI/navigation/keyboard behavior, graph/numerical contracts, Unicode, exact rationals, engineering notation, exports, bivariate statistics, accessibility/adaptive contracts, localization/settings, packaging metadata, platform workflows, release workflows, artifact integrity, and structured release evidence.
 
 Run the integrated source gate:
 
@@ -190,19 +309,36 @@ Run the integrated source gate:
 python tools/release_preflight.py
 ```
 
-Collect structured source evidence:
+Collect structured evidence:
 
 ```bash
 python tools/run_release_evidence.py --scope source
 ```
 
-Artifact manifest/checksum tooling and the structured evidence verifier are documented alongside the release process. Source tooling does not replace real compiled/platform evidence.
+The Source Preflight workflow watches source, tests, tooling, documentation, packaging, workflows, and relevant root build/release metadata. It is also protected by its own source validator.
 
 See [`docs/SOURCE_PREFLIGHT.md`](docs/SOURCE_PREFLIGHT.md), [`docs/VALIDATION_EVIDENCE.md`](docs/VALIDATION_EVIDENCE.md), and [`docs/RELEASE_READINESS_CHECKLIST.md`](docs/RELEASE_READINESS_CHECKLIST.md).
 
+## Release identity
+
+The release workflow uses the source tree as the version authority. It verifies that the normalized release tag equals `v` plus the normalized `<Version>` in `Directory.Build.props` before restore/build/test begins.
+
+For CalcNova 2.8.03:
+
+```text
+Product version: 2.8.03
+Normalized package version: 2.8.3
+Normalized release tag: v2.8.3
+Mobile build code: 20803
+```
+
+The Android release job does not replace the product display version with the tag text or GitHub run number.
+
+See [`docs/VERSIONING.md`](docs/VERSIONING.md).
+
 ## Architecture
 
-CalcNova keeps mathematical/domain projects independent of Avalonia UI:
+CalcNova keeps mathematical/domain projects independent of Avalonia UI where practical:
 
 ```text
 Platform heads
@@ -216,7 +352,7 @@ CalcNova.Core   feature libs   platform     persistence
                                contracts    implementations
 ```
 
-Platform heads stay thin and contain startup, lifecycle, packaging, permissions, browser/native storage composition, external-link composition, and unavoidable native integration.
+Platform heads remain thin and contain startup, lifecycle, packaging, permissions, browser/native storage composition, external-link composition, and unavoidable native integration.
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -255,17 +391,17 @@ CalcNova/
 └── what_changed.md
 ```
 
-## Development prerequisites
+## Build prerequisites
 
-The repository pins a .NET 10 SDK feature band through [`global.json`](global.json). Install the required stable .NET SDK and platform workloads for the target you intend to build.
+The repository pins a .NET 10 SDK feature band through [`global.json`](global.json). Install the stable .NET SDK and platform workloads for the target you intend to build.
 
-Run the SDK-independent source gate first:
+Run the SDK-independent source gate:
 
 ```bash
 python tools/release_preflight.py
 ```
 
-Then run the compiled verification sequence:
+Then run the compiled verification sequence in a suitable .NET environment:
 
 ```bash
 dotnet restore CalcNova.slnx
@@ -274,7 +410,7 @@ dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
-See [`docs/SOURCE_PREFLIGHT.md`](docs/SOURCE_PREFLIGHT.md), [`docs/BUILDING.md`](docs/BUILDING.md), and [`docs/TESTING.md`](docs/TESTING.md) before platform-specific work.
+See [`docs/BUILDING.md`](docs/BUILDING.md) and [`docs/TESTING.md`](docs/TESTING.md).
 
 ## Run the desktop application
 
@@ -284,33 +420,29 @@ dotnet run --project src/CalcNova.Desktop/CalcNova.Desktop.csproj
 
 This requires a working .NET/Avalonia desktop environment.
 
-## Correctness and validation policy
+## Correctness and evidence policy
 
-CalcNova does not execute arbitrary user code to evaluate expressions. Calculation syntax is tokenized, parsed, and evaluated by project-owned domain code.
+A feature is not considered runtime-verified merely because source code or tests exist. Build/test/platform evidence must be based on commands or workflows that actually ran and whose results were observed. When an environment is unavailable, evidence records `NOT RUN` or `BLOCKED` instead of inventing PASS.
 
-A feature is not considered validated merely because source code or tests exist. Build/test/platform status must be based on commands or workflows that actually ran and whose results were observed. When an environment is unavailable, project state records `NOT RUN` or `BLOCKED` instead of inventing PASS.
-
-See [`docs/CALCULATION_ENGINE.md`](docs/CALCULATION_ENGINE.md), [`docs/INPUT_SAFETY.md`](docs/INPUT_SAFETY.md), [`docs/ACCESSIBILITY_TEST_MATRIX.md`](docs/ACCESSIBILITY_TEST_MATRIX.md), and [`docs/TESTING.md`](docs/TESTING.md).
+This evidence policy does not change the product-completion status of version 2.8.03; it preserves accuracy about where a particular verification command was or was not executed.
 
 ## Privacy
 
-Core calculations, fixed conversions, exact rational arithmetic, engineering formatting, and Unicode metadata are designed to operate locally. CalcNova does not require an account for ordinary calculation features, and the open-source base does not intentionally include advertising or behavioral-tracking SDKs.
+Core calculations, fixed conversions, exact rational arithmetic, engineering formatting, Unicode metadata, history, and settings are designed around local-first behavior. CalcNova does not require an account for ordinary calculation features, and the open-source base does not intentionally include advertising or behavioral-tracking SDKs.
 
-Clipboard text is read only after an explicit paste action in the calculator workflow; imported text is sanitized before evaluation. Network-enhanced features such as currency-rate refresh remain optional and independently controllable.
+Clipboard reads occur only after explicit user actions; imported expression text is sanitized. Network-enhanced currency refresh remains optional.
 
 See [`docs/PRIVACY.md`](docs/PRIVACY.md).
 
 ## Contributing
 
-Contributions are welcome. Please read:
+Contributions for maintenance, compatibility, security, documentation, translations, tests, and optional enhancements are welcome. Read:
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
 - [`SECURITY.md`](SECURITY.md)
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - [`docs/TESTING.md`](docs/TESTING.md)
-
-Small, focused pull requests with relevant tests and documentation are preferred.
 
 ## Security
 
@@ -334,7 +466,7 @@ Third-party packages and assets remain subject to their respective licenses.
 
 ## Support CalcNova
 
-If CalcNova is useful to you and you want to support continued open-source development:
+If CalcNova is useful to you and you want to support continued open-source maintenance and optional improvements:
 
 **Buy Me a Coffee — @sanskarIN**  
 https://buymeacoffee.com/sanskarIN
@@ -343,4 +475,4 @@ Support is optional. Core features must never be blocked behind donations or int
 
 ---
 
-For exact development progress, recent commits, unresolved work, and continuation tasks, read [`what_changed.md`](what_changed.md), [`PROJECT_STATE.md`](PROJECT_STATE.md), [`docs/ROADMAP.md`](docs/ROADMAP.md), and the [final source audit](docs/FINAL_SOURCE_AUDIT_2026-08-19.md).
+For the authoritative 2.8.03 completion state, read [`PROJECT_STATE.md`](PROJECT_STATE.md), [`CHANGELOG.md`](CHANGELOG.md), [`docs/VERSIONING.md`](docs/VERSIONING.md), and [`what_changed.md`](what_changed.md).
