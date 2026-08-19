@@ -51,7 +51,7 @@ public sealed class ProductSurfaceLocalizationHeadlessTests
     }
 
     [AvaloniaFact]
-    public async Task HindiCulture_LocalizesSettingsTextAndActions()
+    public async Task HindiCulture_LocalizesSettingsTextActionsAndAccessibilityPreferences()
     {
         var (window, view, viewModel) = await CreateHindiWindowAsync();
         try
@@ -64,6 +64,9 @@ public sealed class ProductSurfaceLocalizationHeadlessTests
             Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(), item => item.Text == "दशमलव परिशुद्धता (1–29)");
             Assert.Contains(view.GetVisualDescendants().OfType<Button>(), item => Equals(item.Content, "सहेजें"));
             Assert.Contains(view.GetVisualDescendants().OfType<Button>(), item => Equals(item.Content, "रीसेट करें"));
+            Assert.Contains(view.GetVisualDescendants().OfType<CheckBox>(), item => Equals(item.Content, "इतिहास सक्षम करें"));
+            Assert.Contains(view.GetVisualDescendants().OfType<CheckBox>(), item => Equals(item.Content, "कम गति प्रभाव"));
+            Assert.Contains(view.GetVisualDescendants().OfType<CheckBox>(), item => Equals(item.Content, "उच्च कंट्रास्ट प्राथमिकता"));
         }
         finally
         {
