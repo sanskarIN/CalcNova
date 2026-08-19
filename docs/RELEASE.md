@@ -4,13 +4,22 @@ CalcNova releases must reflect actual validated repository state. A version numb
 
 ## Versioning
 
-The project intends to use semantic versioning:
+CalcNova release tags use a `v`-prefixed Semantic Versioning form:
 
 ```text
-MAJOR.MINOR.PATCH
+vMAJOR.MINOR.PATCH
 ```
 
-Pre-release identifiers may be used for alpha/beta/release-candidate builds.
+Examples:
+
+```text
+v0.1.0
+v1.0.0
+v1.2.0-rc.1
+v1.2.0-rc.1+build.7
+```
+
+`tools/validate_release_tag.py` rejects malformed tags, missing `v` prefixes, incomplete versions, leading-zero numeric identifiers, and malformed prerelease/build identifiers. Its standard-library unit tests live in `tools/tests/test_validate_release_tag.py`.
 
 Suggested development milestones are guidance, not obligations. Version boundaries may move when implementation or validation reality changes.
 
@@ -19,6 +28,8 @@ Suggested development milestones are guidance, not obligations. Version boundari
 Before tagging a release, verify at minimum:
 
 ```bash
+python tools/tests/test_validate_release_tag.py
+python tools/validate_release_tag.py v0.1.0
 python tools/validate_packaging_metadata.py .
 dotnet restore CalcNova.slnx
 dotnet format CalcNova.slnx --verify-no-changes --no-restore
@@ -28,9 +39,30 @@ dotnet test CalcNova.slnx --configuration Release --no-build
 
 Then run the target-specific builds required for that release.
 
-The package-metadata validator is intentionally SDK-independent. It checks repository identity/version contracts and structured release metadata, but it does **not** prove that an Android, iOS, Windows, Linux, macOS, or Browser package can be built, signed, installed, or accepted by a store.
+The Python validators are intentionally SDK-independent. They check repository release contracts, but they do **not** prove that an Android, iOS, Windows, Linux, macOS, or Browser package can be built, signed, installed, or accepted by a store.
 
 A target that was not available must be listed as `NOT RUN`; it must not be presented as validated.
+
+## Automated release flow
+
+`.github/workflows/release.yml` supports both a pushed `v*` tag and manual `workflow_dispatch` with an existing tag name.
+
+The workflow now follows a tag-first safety contract:
+
+1. fetch complete tag history;
+2. validate the requested tag syntax;
+3. verify that the tag exists in Git;
+4. detach the validation job at that tag;
+5. validate package metadata from the tagged source;
+6. restore, format-check, build, and test the tagged source;
+7. make every Desktop, Browser, and Android publish job check out the same release tag;
+8. generate checksums for packaged artifacts;
+9. create a GitHub Release only when one does not already exist;
+10. on a rerun, preserve the existing release/notes and replace packaged assets with `--clobber` instead of deleting/recreating the release.
+
+This prevents a manual release from accidentally building the branch head while publishing an older/different tag.
+
+The release workflow does not create a missing tag automatically. Tag creation remains an explicit maintainer action after validation.
 
 ## Packaging metadata contract
 
@@ -43,7 +75,7 @@ The current release-layer metadata uses these source identities:
 - desktop assembly: `CalcNova.Desktop`;
 - browser assembly: `CalcNova.Browser`.
 
-`tools/validate_packaging_metadata.py` cross-checks Android/iOS project metadata, iOS launch metadata, the Linux desktop/AppStream files, the macOS plist template, and the Windows Appx/MSIX manifest template. The dedicated `Packaging Metadata Validate` workflow runs this preflight when relevant files change.
+`tools/validate_packaging_metadata.py` cross-checks Android/iOS project metadata, iOS launch metadata, the Linux desktop/AppStream files, the macOS plist template, and the Windows Appx/MSIX manifest template. The dedicated `Packaging Metadata Validate` and `Release Contract Validate` workflows run this preflight when relevant files change.
 
 Release-time values such as the macOS version/build placeholders and Windows publisher/MSIX version placeholders must be resolved by the release process. Do not commit a real signing identity, certificate password, keystore password, private key, provisioning profile, or other signing secret just to satisfy a package template.
 
@@ -103,9 +135,11 @@ Signing credentials must live outside Git.
 
 Use platform-appropriate secure local configuration or GitHub Actions secrets. Never print signing passwords or private-key content into build logs.
 
+The Android release workflow only produces a signed AAB when all required signing secrets are configured. The temporary keystore is created in runner temporary storage and removed in an `always()` cleanup step.
+
 ## Release artifacts
 
-Attach only artifacts built from the release commit/tag through a documented process.
+Attach only artifacts built from the release commit/tag through the documented release workflow or an equivalent recorded process.
 
 Potential artifacts include:
 
@@ -130,7 +164,7 @@ v0.2.0
 v1.0.0
 ```
 
-Tag only validated milestones.
+Tag only validated milestones. Manual release dispatch must reference an already-existing valid tag; it must not be used as an implicit tag-creation mechanism.
 
 ## Release notes
 
