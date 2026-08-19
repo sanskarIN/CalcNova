@@ -18,7 +18,10 @@ public sealed class MainViewModel : ViewModelBase
             recordCalculationAsync: (expression, result) => History.RecordAsync(expression, result),
             historyEnabledProvider: () => Settings.HistoryEnabled,
             clipboardService: dependencies.ClipboardService);
-        Converter = new ConverterViewModel();
+        Programmer = new ProgrammerViewModel(dependencies.ClipboardService);
+        CodePoint = new CodePointViewModel(dependencies.ClipboardService);
+        Converter = new ConverterViewModel(dependencies.ClipboardService);
+        Graphing = new GraphingViewModel(dependencies.ClipboardService);
         Currency = new CurrencyViewModel(dependencies.CurrencyRateCache, dependencies.CurrencyRateProvider);
         About = new AboutViewModel(dependencies.ExternalLinkService);
 
@@ -30,9 +33,9 @@ public sealed class MainViewModel : ViewModelBase
 
     public CalculatorViewModel Calculator { get; }
 
-    public ProgrammerViewModel Programmer { get; } = new();
+    public ProgrammerViewModel Programmer { get; }
 
-    public CodePointViewModel CodePoint { get; } = new();
+    public CodePointViewModel CodePoint { get; }
 
     public ConverterViewModel Converter { get; }
 
@@ -42,7 +45,7 @@ public sealed class MainViewModel : ViewModelBase
 
     public MatricesViewModel Matrices { get; } = new();
 
-    public GraphingViewModel Graphing { get; } = new();
+    public GraphingViewModel Graphing { get; }
 
     public DateTimeViewModel DateTime { get; } = new();
 
