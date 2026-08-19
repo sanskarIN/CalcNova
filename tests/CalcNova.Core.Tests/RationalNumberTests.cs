@@ -30,6 +30,20 @@ public sealed class RationalNumberTests
         Assert.Throws<DivideByZeroException>(() => new RationalNumber(1, 0));
     }
 
+    [Fact]
+    public void DefaultValue_IsCanonicalZero()
+    {
+        RationalNumber value = default;
+
+        Assert.Equal(RationalNumber.Zero, value);
+        Assert.Equal(BigInteger.Zero, value.Numerator);
+        Assert.Equal(BigInteger.One, value.Denominator);
+        Assert.True(value.IsInteger);
+        Assert.Equal("0", value.ToString());
+        Assert.Equal(RationalNumber.One, value + RationalNumber.One);
+        Assert.Equal(0, value.CompareTo(RationalNumber.Zero));
+    }
+
     [Theory]
     [InlineData("42", "42")]
     [InlineData("-7/21", "-1/3")]
