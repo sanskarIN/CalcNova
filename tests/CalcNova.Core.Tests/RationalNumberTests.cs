@@ -107,6 +107,15 @@ public sealed class RationalNumberTests
     }
 
     [Fact]
+    public void Parse_RejectsWhitespacePaddedInputAboveCharacterBudget()
+    {
+        var padding = new string(' ', RationalNumber.MaximumInputCharacters);
+        var text = $"{padding}1{padding}";
+
+        Assert.Throws<ArgumentException>(() => RationalNumber.Parse(text));
+    }
+
+    [Fact]
     public void Constructor_RejectsReducedValuesAboveBitBudget()
     {
         var tooLarge = BigInteger.One << RationalNumber.MaximumBitLength;
