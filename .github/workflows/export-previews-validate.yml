@@ -6,8 +6,10 @@ on:
     paths:
       - "src/CalcNova.App/Infrastructure/ExportPreviewFormatter.cs"
       - "src/CalcNova.App/ViewModels/HistoryViewModel.cs"
+      - "src/CalcNova.App/ViewModels/GraphingViewModel.cs"
       - "tests/CalcNova.App.Tests/ExportPreviewFormatterTests.cs"
       - "tests/CalcNova.App.Tests/HistoryExportPreviewViewModelTests.cs"
+      - "tests/CalcNova.App.Tests/GraphExportPreviewViewModelTests.cs"
       - "tools/validate_export_previews.py"
       - "tools/tests/test_validate_export_previews.py"
       - ".github/workflows/export-previews-validate.yml"
@@ -15,8 +17,10 @@ on:
     paths:
       - "src/CalcNova.App/Infrastructure/ExportPreviewFormatter.cs"
       - "src/CalcNova.App/ViewModels/HistoryViewModel.cs"
+      - "src/CalcNova.App/ViewModels/GraphingViewModel.cs"
       - "tests/CalcNova.App.Tests/ExportPreviewFormatterTests.cs"
       - "tests/CalcNova.App.Tests/HistoryExportPreviewViewModelTests.cs"
+      - "tests/CalcNova.App.Tests/GraphExportPreviewViewModelTests.cs"
       - "tools/validate_export_previews.py"
       - "tools/tests/test_validate_export_previews.py"
       - ".github/workflows/export-previews-validate.yml"
