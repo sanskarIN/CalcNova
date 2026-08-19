@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Validate release tag
+      - name: Validate requested release tag syntax
         run: python tools/validate_release_tag.py "$RELEASE_TAG"
 
       - name: Verify and checkout release tag
@@ -39,8 +39,8 @@ jobs:
           git rev-parse -q --verify "refs/tags/$RELEASE_TAG^{commit}" >/dev/null
           git checkout --detach "$RELEASE_TAG"
 
-      - name: Validate package metadata
-        run: python tools/validate_packaging_metadata.py .
+      - name: Run tagged source preflight
+        run: python tools/release_preflight.py --tag "$RELEASE_TAG"
 
       - uses: actions/setup-dotnet@v6
         with:
