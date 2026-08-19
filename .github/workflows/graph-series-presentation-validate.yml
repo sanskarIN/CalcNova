@@ -1,0 +1,59 @@
+name: Graph Series Presentation Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Graphing/GraphSeriesLinePattern.cs"
+      - "src/CalcNova.Graphing/GraphSeriesLinePatternCatalog.cs"
+      - "src/CalcNova.Graphing/GraphSeriesPresentation.cs"
+      - "src/CalcNova.App/Controls/GraphPlotControl.cs"
+      - "src/CalcNova.App/Controls/GraphSeriesPattern.cs"
+      - "src/CalcNova.App/Views/MainView.axaml.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphSeriesLinePatternCatalogTests.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphSeriesPresentationTests.cs"
+      - "tests/CalcNova.App.Tests/GraphSeriesPatternTests.cs"
+      - "tests/CalcNova.App.Tests/GraphMultiSeriesHeadlessTests.cs"
+      - "tools/validate_graph_series_presentation.py"
+      - "tools/tests/test_validate_graph_series_presentation.py"
+      - "docs/GRAPH_INTERACTION.md"
+      - ".github/workflows/graph-series-presentation-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.Graphing/GraphSeriesLinePattern.cs"
+      - "src/CalcNova.Graphing/GraphSeriesLinePatternCatalog.cs"
+      - "src/CalcNova.Graphing/GraphSeriesPresentation.cs"
+      - "src/CalcNova.App/Controls/GraphPlotControl.cs"
+      - "src/CalcNova.App/Controls/GraphSeriesPattern.cs"
+      - "src/CalcNova.App/Views/MainView.axaml.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphSeriesLinePatternCatalogTests.cs"
+      - "tests/CalcNova.Graphing.Tests/GraphSeriesPresentationTests.cs"
+      - "tests/CalcNova.App.Tests/GraphSeriesPatternTests.cs"
+      - "tests/CalcNova.App.Tests/GraphMultiSeriesHeadlessTests.cs"
+      - "tools/validate_graph_series_presentation.py"
+      - "tools/tests/test_validate_graph_series_presentation.py"
+      - "docs/GRAPH_INTERACTION.md"
+      - ".github/workflows/graph-series-presentation-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  graph-series-presentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate multi-series presentation contracts
+        run: python tools/validate_graph_series_presentation.py .
+
+      - name: Run graph-series presentation validator tests
+        run: python -m unittest tools.tests.test_validate_graph_series_presentation
