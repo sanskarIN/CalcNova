@@ -1,21 +1,27 @@
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
+using CalcNova.App.Services;
+using CalcNova.Platform.Clipboard;
 using CalcNova.Programmer;
 
 namespace CalcNova.App.ViewModels;
 
 public sealed class CodePointViewModel : ViewModelBase
 {
+    private readonly IClipboardService? _clipboardService;
     private string _codePointInput = "U+0041";
     private string _textInput = "A";
     private string _codePointResult = "U+0041 → A";
     private string _textResult = "U+0041";
     private string _errorMessage = string.Empty;
 
-    public CodePointViewModel()
+    public CodePointViewModel(IClipboardService? clipboardService = null)
     {
+        _clipboardService = clipboardService;
         DecodeCodePointCommand = new RelayCommand(_ => DecodeCodePoint());
         InspectTextCommand = new RelayCommand(_ => InspectText());
+        CopyCodePointResultCommand = new AsyncRelayCommand(_ => CopyCodePointResultAsync());
+        CopyTextResultCommand = new AsyncRelayCommand(_ => CopyTextResultAsync());
     }
 
     public string CodePointInput
@@ -52,6 +58,10 @@ public sealed class CodePointViewModel : ViewModelBase
 
     public ICommand InspectTextCommand { get; }
 
+    public ICommand CopyCodePointResultCommand { get; }
+
+    public ICommand CopyTextResultCommand { get; }
+
     private void DecodeCodePoint()
     {
         try
@@ -80,5 +90,15 @@ public sealed class CodePointViewModel : ViewModelBase
             TextResult = string.Empty;
             ErrorMessage = exception.Message;
         }
+    }
+
+    private async Task CopyCodePointResultAsync()
+    {
+        ErrorMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, CodePointResult, "code point result");
+    }
+
+    private async Task CopyTextResultAsync()
+    {
+        ErrorMessage = await ClipboardTextWriter.CopyAsync(_clipboardService, TextResult, "text inspection result");
     }
 }
