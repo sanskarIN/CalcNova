@@ -9,27 +9,53 @@ from pathlib import Path
 
 
 def validate(root: Path) -> list[str]:
+    editor_path = root / "src" / "CalcNova.App" / "Infrastructure" / "CalculatorSelectionEditor.cs"
     view_model_path = root / "src" / "CalcNova.App" / "ViewModels" / "CalculatorViewModel.cs"
     view_path = root / "src" / "CalcNova.App" / "Views" / "MainView.axaml.cs"
     tests_path = root / "tests" / "CalcNova.App.Tests" / "CalculatorSelectionEditingTests.cs"
+    editor_tests_path = root / "tests" / "CalcNova.App.Tests" / "CalculatorSelectionEditorTests.cs"
+    wrapping_tests_path = root / "tests" / "CalcNova.App.Tests" / "CalculatorFunctionSelectionViewModelTests.cs"
 
+    paths = (
+        editor_path,
+        view_model_path,
+        view_path,
+        tests_path,
+        editor_tests_path,
+        wrapping_tests_path,
+    )
     failures: list[str] = []
-    for path in (view_model_path, view_path, tests_path):
+    for path in paths:
         if not path.is_file():
             failures.append(f"Missing calculator selection-editing source: {path}")
 
     if failures:
         return failures
 
+    editor = editor_path.read_text(encoding="utf-8")
     view_model = view_model_path.read_text(encoding="utf-8")
     view = view_path.read_text(encoding="utf-8")
     tests = tests_path.read_text(encoding="utf-8")
+    editor_tests = editor_tests_path.read_text(encoding="utf-8")
+    wrapping_tests = wrapping_tests_path.read_text(encoding="utf-8")
+
+    for marker in (
+        "public sealed record CalculatorSelectionEdit",
+        "public static CalculatorSelectionEdit ApplyToken",
+        "if (hasSelection && IsWrapperToken(token))",
+        "var replacement = token + selected + \"\)\"".replace("\\)", ")"),
+        "EnsureWithinLimit",
+        "public static bool IsWrapperToken",
+    ):
+        if marker not in editor:
+            failures.append(f"CalculatorSelectionEditor is missing selection-editing marker: {marker}")
 
     for marker in (
         "public event Action<int, int>? SelectionRequested",
         "public void UpdateSelection(int selectionStart, int selectionEnd)",
         "var (start, end) = NormalizedSelection()",
-        "Expression = Expression[..start] + token + Expression[end..]",
+        "CalculatorSelectionEditor.ApplyToken(",
+        "RequestSelection(edit.CaretIndex)",
         "Expression = Expression.Remove(start, end - start)",
         "Expression = Expression.Remove(start - 1, 1)",
         "private void RequestSelection(int caretIndex)",
@@ -63,6 +89,26 @@ def validate(root: Path) -> list[str]:
         if marker not in tests:
             failures.append(f"Calculator selection-editing tests are missing scenario: {marker}")
 
+    for marker in (
+        "FunctionToken_WrapsForwardSelection",
+        "FunctionToken_WrapsReversedSelection",
+        "OpenParenthesis_WrapsSelectedExpression",
+        "FunctionToken_WithoutSelection_RemainsOpenForTyping",
+        "OrdinaryToken_ReplacesSelection",
+        "WrappedSelection_RespectsFinalExpressionLimit",
+    ):
+        if marker not in editor_tests:
+            failures.append(f"Calculator selection editor tests are missing scenario: {marker}")
+
+    for marker in (
+        "AppendFunction_WrapsSelectedTextAndRequestsCaretAfterClose",
+        "AppendParenthesis_WrapsSelectedSubexpression",
+        "AppendFunction_AtCaretKeepsFunctionOpenForFurtherTyping",
+        "AppendOrdinaryToken_StillReplacesSelectedText",
+    ):
+        if marker not in wrapping_tests:
+            failures.append(f"Calculator function-selection view-model tests are missing scenario: {marker}")
+
     return failures
 
 
@@ -78,7 +124,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated selection-aware calculator keypad editing and TextBox synchronization contracts.")
+    print("Validated selection-aware calculator editing, function wrapping, and TextBox synchronization contracts.")
     return 0
 
 
