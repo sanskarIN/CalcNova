@@ -63,8 +63,10 @@ def validate(root: Path) -> list[str]:
 
     expected_tests = (
         "SharedShell_LoadsEveryPrimaryMode",
-        "CalculatorEvaluateButton_ExecutesBoundCommand",
+        "CalculatorClearButton_ExecutesBoundCommand",
         "CompactWindow_AppliesCompactAdaptiveClass",
+        "CtrlPageDown_AdvancesSharedModeSelection",
+        "HighContrastPreference_AppliesShellClass",
         "NewUser_OnboardingOverlayIsVisibleAndSkipHidesIt",
     )
     for marker in expected_tests:
@@ -77,8 +79,10 @@ def validate(root: Path) -> list[str]:
     for marker in (
         "window.Show()",
         "GetVisualDescendants()",
-        "window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None)",
+        'button.Content?.ToString(), "AC"',
+        "window.KeyPressQwerty(PhysicalKey.PageDown, RawInputModifiers.Control)",
         'Assert.Contains("compact", view.Classes)',
+        'Assert.Contains("high-contrast", view.Classes)',
         "Assert.True(overlay.IsVisible)",
     ):
         if marker not in tests:
