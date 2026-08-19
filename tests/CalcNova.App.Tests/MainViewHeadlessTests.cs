@@ -59,6 +59,40 @@ public sealed class MainViewHeadlessTests
     }
 
     [AvaloniaFact]
+    public async Task CalculatorKeypad_ReplacesTrackedSelectionAndRestoresCaret()
+    {
+        var viewModel = await CreateReadyViewModelAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 980, Height = 780, Content = view };
+
+        window.Show();
+        try
+        {
+            viewModel.Calculator.Expression = "12345";
+            var expressionBox = view.GetVisualDescendants()
+                .OfType<TextBox>()
+                .First(textBox => ReferenceEquals(textBox.DataContext, viewModel.Calculator));
+            expressionBox.SelectionStart = 1;
+            expressionBox.SelectionEnd = 4;
+            viewModel.Calculator.UpdateSelection(expressionBox.SelectionStart, expressionBox.SelectionEnd);
+
+            var nineButton = view.GetVisualDescendants()
+                .OfType<Button>()
+                .First(button => string.Equals(button.Content?.ToString(), "9", StringComparison.Ordinal));
+            Assert.NotNull(nineButton.Command);
+            nineButton.Command.Execute(nineButton.CommandParameter);
+
+            Assert.Equal("195", viewModel.Calculator.Expression);
+            Assert.Equal(2, expressionBox.SelectionStart);
+            Assert.Equal(2, expressionBox.SelectionEnd);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public async Task CompactWindow_AppliesCompactAdaptiveClass()
     {
         var viewModel = await CreateReadyViewModelAsync();
