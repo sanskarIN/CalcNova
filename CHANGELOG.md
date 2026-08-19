@@ -28,6 +28,8 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Explicit history export preview and clipboard-copy workflow for the currently visible/search-matching history set.
 - Shared settings, external-link, clipboard, and platform composition abstractions.
 - Global minimum touch-target sizing and accessible programmer bit-state labels.
+- Keyboard-first shared-shell mode navigation with `Ctrl+PageUp`, `Ctrl+PageDown`, `Ctrl+Home`, and `Ctrl+End`.
+- Dedicated keyboard shortcut mapping tests, SDK-independent keyboard contract validation, and a keyboard validation workflow.
 - Shared-XAML command/property contract validation for Calculator, Programmer, Unicode, Converter, Statistics, Matrices, Graphing, and History.
 - Avalonia XAML XML well-formedness validation in the shared UI contract workflow.
 - GitHub Actions workflow foundations for build/test, formatting, docs, coverage, security, advanced utilities, platform builds, UI contracts, and release work.
@@ -41,6 +43,8 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Shared Graph UI now exposes trace, single-series CSV, multi-expression sampling/CSV, and accessible SVG generation/copy controls.
 - Shared Statistics and Matrix modes now expose copy actions for generated results.
 - Shared History mode now exposes TXT/CSV/JSON preview/copy controls rather than leaving the export engine hidden behind source APIs.
+- Shared mode selection now has explicit first/last/direct navigation APIs while cyclic next/previous behavior remains deterministic.
+- Shell navigation shortcuts require exactly the Control modifier and remain suppressed while onboarding is visible.
 - Programmer non-decimal output now consistently displays fixed-width masked values while decimal output follows signed/unsigned interpretation.
 - Converter recent-pair recording now tracks deliberate conversion/swap/restoration actions instead of noisy intermediate selector changes.
 - Converter significant-digit precision, recent pairs, and favorites now restore and autosave through shared settings.
@@ -62,6 +66,7 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 - Settings reset synchronizes converter state immediately rather than waiting for the next launch.
 - Expression sanitizer uses evaluator-configured maximum length and preserves the previous expression when imported text is rejected.
 - Shared clipboard composition now reaches every currently copy-enabled Calculator, Programmer, Unicode, Converter, Statistics, Matrix, Graphing, and History workflow.
+- Transient invalid two-way `TabControl` selection values no longer wrap to another CalcNova mode during initialization or rebinding.
 
 ### Security / Privacy
 
@@ -76,7 +81,7 @@ The format is inspired by Keep a Changelog, and the project intends to use seman
 
 ### Validation note
 
-The active continuation environment does not provide the required .NET SDK. Local restore, format, build, and test commands are therefore **NOT RUN** here. Platform packaging is also **NOT RUN** in this continuation. Source-level XAML/UI validators and workflow definitions are implemented, but their mere presence is not treated as a passing run. Source/test presence must not be interpreted as a validated release until actual CI/target-environment results are observed.
+The active continuation environment does not provide the required .NET SDK. Local restore, format, build, and test commands are therefore **NOT RUN** here. Platform packaging is also **NOT RUN** in this continuation. Source-level XAML/UI/keyboard validators and workflow definitions are implemented, but their mere presence is not treated as a passing run. Source/test presence must not be interpreted as a validated release until actual CI/target-environment results are observed.
 
 ## [0.1.0] - Planned
 
