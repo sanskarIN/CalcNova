@@ -1,0 +1,45 @@
+name: Calculator Text Symbols Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.App/Infrastructure/CalculatorTextSymbolInput.cs"
+      - "src/CalcNova.App/Views/MainView.CalculatorTextSymbols.cs"
+      - "tests/CalcNova.App.Tests/CalculatorTextSymbolInputTests.cs"
+      - "tools/validate_keyboard_contracts.py"
+      - "tools/tests/test_validate_keyboard_contracts.py"
+      - "docs/KEYBOARD_SHORTCUTS.md"
+      - ".github/workflows/calculator-text-symbols-validate.yml"
+  pull_request:
+    paths:
+      - "src/CalcNova.App/Infrastructure/CalculatorTextSymbolInput.cs"
+      - "src/CalcNova.App/Views/MainView.CalculatorTextSymbols.cs"
+      - "tests/CalcNova.App.Tests/CalculatorTextSymbolInputTests.cs"
+      - "tools/validate_keyboard_contracts.py"
+      - "tools/tests/test_validate_keyboard_contracts.py"
+      - "docs/KEYBOARD_SHORTCUTS.md"
+      - ".github/workflows/calculator-text-symbols-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  text-symbols:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate keyboard and glyph contracts
+        run: python tools/validate_keyboard_contracts.py .
+
+      - name: Run keyboard validator regression tests
+        run: python -m unittest tools.tests.test_validate_keyboard_contracts
