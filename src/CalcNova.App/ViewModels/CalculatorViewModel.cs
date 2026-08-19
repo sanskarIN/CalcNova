@@ -23,6 +23,8 @@ public sealed class CalculatorViewModel : ViewModelBase
     private string _result = "0";
     private string _statusMessage = string.Empty;
     private AngleUnit _angleUnit = AngleUnit.Degrees;
+    private int _selectionStart;
+    private int _selectionEnd;
 
     public CalculatorViewModel(
         ExpressionEvaluator? evaluator = null,
@@ -54,16 +56,23 @@ public sealed class CalculatorViewModel : ViewModelBase
         CopyResultCommand = new AsyncRelayCommand(_ => CopyResultAsync());
     }
 
+    public event Action<int, int>? SelectionRequested;
+
     public string Expression
     {
         get => _expression;
         set
         {
             var normalized = value ?? string.Empty;
-            if (SetField(ref _expression, normalized) &&
-                !string.Equals(_lastEvaluatedExpression, normalized, StringComparison.Ordinal))
+            if (SetField(ref _expression, normalized))
             {
-                ResetRepeatState();
+                _selectionStart = normalized.Length;
+                _selectionEnd = normalized.Length;
+
+                if (!string.Equals(_lastEvaluatedExpression, normalized, StringComparison.Ordinal))
+                {
+                    ResetRepeatState();
+                }
             }
         }
     }
@@ -175,12 +184,19 @@ public sealed class CalculatorViewModel : ViewModelBase
 
     public void ApplyAngleUnit(AngleUnit angleUnit) => AngleUnit = angleUnit;
 
+    public void UpdateSelection(int selectionStart, int selectionEnd)
+    {
+        _selectionStart = ClampSelectionIndex(selectionStart);
+        _selectionEnd = ClampSelectionIndex(selectionEnd);
+    }
+
     public void ImportExpression(string? text)
     {
         try
         {
             Expression = ExpressionTextSanitizer.Sanitize(text);
             StatusMessage = string.Empty;
+            RequestSelection(Expression.Length);
         }
         catch (ArgumentException exception)
         {
@@ -248,11 +264,11 @@ public sealed class CalculatorViewModel : ViewModelBase
 
     public void Clear()
     {
-        _expression = string.Empty;
-        OnPropertyChanged(nameof(Expression));
+        Expression = string.Empty;
         Result = "0";
         StatusMessage = string.Empty;
         ResetRepeatState();
+        RequestSelection(0);
     }
 
     public void Backspace()
@@ -262,8 +278,23 @@ public sealed class CalculatorViewModel : ViewModelBase
             return;
         }
 
-        Expression = Expression[..^1];
+        var (start, end) = NormalizedSelection();
+        if (start != end)
+        {
+            Expression = Expression.Remove(start, end - start);
+            StatusMessage = string.Empty;
+            RequestSelection(start);
+            return;
+        }
+
+        if (start == 0)
+        {
+            return;
+        }
+
+        Expression = Expression.Remove(start - 1, 1);
         StatusMessage = string.Empty;
+        RequestSelection(start - 1);
     }
 
     private void Append(object? parameter)
@@ -273,14 +304,18 @@ public sealed class CalculatorViewModel : ViewModelBase
             return;
         }
 
-        if (Expression.Length + token.Length > EvaluationOptions.Default.MaximumExpressionLength)
+        var (start, end) = NormalizedSelection();
+        var replacedLength = end - start;
+        var nextLength = Expression.Length - replacedLength + token.Length;
+        if (nextLength > EvaluationOptions.Default.MaximumExpressionLength)
         {
             StatusMessage = "Expression limit reached.";
             return;
         }
 
-        Expression += token;
+        Expression = string.Concat(Expression.AsSpan(0, start), token, Expression.AsSpan(end));
         StatusMessage = string.Empty;
+        RequestSelection(start + token.Length);
     }
 
     private void ImportExpression(object? parameter)
@@ -311,6 +346,7 @@ public sealed class CalculatorViewModel : ViewModelBase
 
         Expression = Result;
         StatusMessage = string.Empty;
+        RequestSelection(Expression.Length);
     }
 
     private void ApplyPercentage()
@@ -326,6 +362,7 @@ public sealed class CalculatorViewModel : ViewModelBase
             var transformation = _percentageTransformer.Transform(Expression, CreateOptions());
             Expression = transformation.TransformedExpression;
             StatusMessage = string.Empty;
+            RequestSelection(Expression.Length);
         }
         catch (Exception exception) when (exception is ArgumentException or InvalidOperationException or CalculationException)
         {
@@ -351,6 +388,7 @@ public sealed class CalculatorViewModel : ViewModelBase
         Expression = _memory.Recall().ToDisplayString();
         StatusMessage = string.Empty;
         OnPropertyChanged(nameof(MemoryIndicator));
+        RequestSelection(Expression.Length);
     }
 
     private void MemoryStore()
@@ -430,6 +468,23 @@ public sealed class CalculatorViewModel : ViewModelBase
 
         value = NumberValue.Zero;
         return false;
+    }
+
+    private (int Start, int End) NormalizedSelection()
+    {
+        var start = ClampSelectionIndex(_selectionStart);
+        var end = ClampSelectionIndex(_selectionEnd);
+        return start <= end ? (start, end) : (end, start);
+    }
+
+    private int ClampSelectionIndex(int index) => Math.Clamp(index, 0, Expression.Length);
+
+    private void RequestSelection(int caretIndex)
+    {
+        var clamped = ClampSelectionIndex(caretIndex);
+        _selectionStart = clamped;
+        _selectionEnd = clamped;
+        SelectionRequested?.Invoke(clamped, clamped);
     }
 
     private EvaluationOptions CreateOptions() => new() { AngleUnit = AngleUnit };
