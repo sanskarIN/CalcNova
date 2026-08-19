@@ -49,7 +49,7 @@ public sealed class HistoryExportViewModelTests
         await clipboard.WaitForWriteAsync();
 
         Assert.Equal(viewModel.ExportPreview, clipboard.WrittenText);
-        Assert.Contains("1 + 1 = 2", clipboard.WrittenText, StringComparison.Ordinal);
+        Assert.Contains("1 + 1 = 2", clipboard.WrittenText!, StringComparison.Ordinal);
     }
 
     private sealed class FakeHistoryRepository : ICalculationHistoryRepository
