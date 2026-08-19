@@ -1,0 +1,41 @@
+name: Graph Keyboard Validate
+
+on:
+  push:
+    paths:
+      - 'src/CalcNova.App/Infrastructure/GraphKeyboardInput.cs'
+      - 'src/CalcNova.App/Controls/GraphPlotControl.cs'
+      - 'tests/CalcNova.App.Tests/GraphKeyboardInputTests.cs'
+      - 'tools/validate_graph_keyboard.py'
+      - 'tools/tests/test_validate_graph_keyboard.py'
+      - '.github/workflows/graph-keyboard-validate.yml'
+  pull_request:
+    paths:
+      - 'src/CalcNova.App/Infrastructure/GraphKeyboardInput.cs'
+      - 'src/CalcNova.App/Controls/GraphPlotControl.cs'
+      - 'tests/CalcNova.App.Tests/GraphKeyboardInputTests.cs'
+      - 'tools/validate_graph_keyboard.py'
+      - 'tools/tests/test_validate_graph_keyboard.py'
+      - '.github/workflows/graph-keyboard-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  graph-keyboard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Validate graph keyboard contracts
+        run: python tools/validate_graph_keyboard.py
+
+      - name: Run graph keyboard validator tests
+        run: python -m unittest tools.tests.test_validate_graph_keyboard
