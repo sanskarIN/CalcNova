@@ -24,13 +24,23 @@ The integrated preflight currently executes:
 2. Avalonia XAML XML parsing;
 3. shared XAML/view-model UI contracts;
 4. mode-navigation contracts;
-5. calculator keyboard-input contracts;
+5. calculator and shared-shell keyboard-input contracts;
 6. source-level accessibility markup contracts;
-7. localization catalog and preference contracts;
-8. onboarding persistence/visual/focus contracts;
-9. cross-platform packaging metadata contracts;
-10. release-tag validator unit tests;
-11. optional validation of the requested release tag.
+7. shared and high-contrast focus-visibility contracts;
+8. compact/medium/expanded adaptive-layout contracts;
+9. shared touch-target contracts;
+10. English/Hindi localization catalog and preference contracts;
+11. onboarding persistence/visual/focus contracts;
+12. cross-platform packaging metadata contracts;
+13. release-documentation contracts;
+14. release-tag validator unit tests;
+15. focus-validator regression tests;
+16. keyboard-validator regression tests;
+17. localization-validator regression tests;
+18. adaptive-layout validator regression tests;
+19. touch-target validator regression tests;
+20. packaging-metadata validator regression tests;
+21. optional validation of the requested release tag.
 
 Each underlying validator remains independently runnable. The integrated command exists to catch interactions between contracts and give maintainers one reproducible preflight entry point.
 
@@ -52,7 +62,7 @@ A successful source preflight does **not** mean CalcNova compiled or ran success
 - signing/notarization tools;
 - screen readers or accessibility inspection tools.
 
-Full release evidence still requires the build/test/platform checks documented in [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), and [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md).
+Full release evidence still requires the build/test/platform checks documented in [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md), and [FOCUS_VISIBILITY.md](FOCUS_VISIBILITY.md).
 
 If an environment cannot run a required check, record it as `NOT RUN` instead of treating source presence as a pass.
 
