@@ -2,9 +2,9 @@
 
 **Fast. Precise. Private. Everywhere.**
 
-CalcNova is an open-source, privacy-first, cross-platform calculator built with C#, .NET, and Avalonia UI. The project is being developed as a serious long-term utility with a tested calculation engine, scientific and programmer tooling, offline unit conversion, local history, responsive UI, accessibility, keyboard support, and broad platform goals.
+CalcNova is an open-source, privacy-first, cross-platform calculator built with C#, .NET, and Avalonia UI. It combines a project-owned expression engine with scientific, programmer, conversion, graphing, statistics, equation, matrix, date/time, currency, history, and settings modules while keeping ordinary calculations local.
 
-> CalcNova is under active development. The repository does not claim that unvalidated builds or unfinished platform targets are production-ready. See [`PROJECT_STATE.md`](PROJECT_STATE.md) for exact status.
+> CalcNova is under active development. Source presence is not the same as validated release readiness. See [`PROJECT_STATE.md`](PROJECT_STATE.md) for exact implementation and validation status.
 
 ## Status
 
@@ -15,44 +15,42 @@ CalcNova is an open-source, privacy-first, cross-platform calculator built with 
 
 ## Current capabilities
 
-### Calculation engine
+### Standard and scientific calculator
 
-- Safe tokenizer and deterministic recursive-descent parser
-- Standard arithmetic with explicit operator precedence
-- Right-associative exponentiation
+- Safe tokenizer and recursive-descent parser owned by the project
+- Explicit operator precedence and right-associative exponentiation
 - Parentheses and unary plus/minus
-- Arbitrary-precision integers through `System.Numerics.BigInteger`
-- Decimal arithmetic where appropriate
-- Floating-point fallback for transcendental functions
+- Arbitrary-precision integers with `System.Numerics.BigInteger`
+- Decimal arithmetic where appropriate with bounded floating-point fallback
 - Typed calculation errors and workload limits
 - Scientific notation parsing
-
-### Scientific calculations
-
-- Square, cube, arbitrary power, square root, cube root, and nth root
-- Reciprocal and absolute value
-- Natural, base-10, base-2, and arbitrary-base logarithms
-- Exponential functions
-- Trigonometric and inverse trigonometric functions
-- Hyperbolic and inverse hyperbolic functions
+- Square/cube/power/root operations
+- Reciprocal, absolute value, logarithms, exponentials
+- Trigonometric, inverse-trigonometric, hyperbolic, and inverse-hyperbolic functions
 - Degrees, radians, and gradians
-- Floor, ceiling, truncation, rounding, sign, min, max
-- Factorial, GCD, LCM, combinations, permutations
+- Floor/ceiling/truncation/rounding/sign/min/max
+- Factorial, GCD, LCM, combinations, and permutations
 - Constants including π, e, and τ
+- Calculator-style percentage handling separate from expression modulo
+- Repeated-equals session behavior
+- MC, MR, MS, M+, and M- memory operations
+- Sanitized external expression import with common calculator-glyph normalization
 
 ### Programmer tools
 
 - Base 2 through base 36 parsing and formatting
-- Arbitrary-precision integer conversion
+- Binary/octal/decimal/hex representations
+- Configurable word size and signed/unsigned interpretation
 - AND, OR, XOR, NOT
 - Left shift, logical right shift, arithmetic right shift
-- Configurable word size
-- Signed/unsigned two's-complement interpretation
-- Fixed-width bit-string visualization
+- Fixed-width bit strings
+- Bounded bit inspection and toggling
+- Unicode scalar/code-point parsing and formatting helpers
+- Unicode scalar-to-text and bounded text-inspection utilities
 
-### Offline conversion
+### Offline unit conversion
 
-The current fixed-unit engine includes categories such as:
+Fixed conversion categories include:
 
 - length
 - area
@@ -69,31 +67,85 @@ The current fixed-unit engine includes categories such as:
 - force
 - angle
 
-### User interface
+The converter also has source support for swapping units, recent conversion pairs, favorite pairs, and selectable 1–17 significant-digit result precision.
 
-- Initial shared Avalonia application
-- Standard/scientific calculator workspace
-- Angle-mode controls
-- Touch/mouse calculator keypad
-- Expression entry and result reuse
-- Basic desktop keyboard actions
-- System-aware Fluent theme foundation
+### Currency and date/time utilities
 
-### Local persistence
+- Optional replaceable currency-rate provider architecture
+- Local currency-rate cache and offline fallback semantics
+- No embedded provider credentials
+- Date difference calculations
+- Calendar arithmetic
+- Business-day helpers
+- Fixed-duration conversion
 
-- SQLite-backed native calculation history implementation
-- Search, recent history, favorite state, delete, and clear operations
-- Persistence exposed behind an interface so other targets can use different storage backends
+### Graphing and numerical analysis
 
-## Planned modes and platform work
+- `y = f(x)` sampling through the shared expression engine
+- Workload-bounded sampling
+- Discontinuity segmentation
+- Explicit graph viewport model
+- Interactive Avalonia plot control
+- Deterministic SVG graph export
+- Bounded central-difference derivative approximation
+- Bracketed bisection root finding
+- Bounded Simpson numerical integration
 
-The master project target includes Standard, Scientific, Programmer, Converter, Graphing, Statistics, Equations, Matrices/Vectors, History, Settings, and supporting utilities. Platform goals include Windows, Linux, macOS, Android, iOS, and Browser/WebAssembly where supported by the selected stable .NET/Avalonia toolchain.
+Numerical analysis is approximate by design and must be presented as such in UI/documentation.
 
-Not every planned mode or platform head is complete yet. Exact implementation and validation status is tracked in [`PROJECT_STATE.md`](PROJECT_STATE.md) and [`docs/ROADMAP.md`](docs/ROADMAP.md).
+### Advanced mathematics
+
+- Statistics module and shared view model
+- Equation-solving module and shared view model
+- Matrix utilities and shared view model
+
+See the source modules and [`PROJECT_STATE.md`](PROJECT_STATE.md) for the exact implemented surface.
+
+### Local history and settings
+
+- Calculation-history abstraction
+- SQLite-backed native history
+- Browser-safe storage path
+- Search and recent-history workflows
+- Favorite history entries
+- Delete/clear operations
+- TXT/CSV/JSON history export
+- Settings/preferences abstraction and view model
+- About/support external-link abstraction
+
+## Shared application
+
+The shared Avalonia shell contains principal modes for:
+
+- Calculator
+- Programmer
+- Unit conversion
+- Statistics
+- Equations
+- Matrices
+- Graphing
+- Date/time
+- Currency
+- History
+- Settings
+- About/support
+
+Some newer domain/view-model capabilities still need dedicated visible controls in the shared XAML shell. Those tasks are tracked in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+## Platform source targets
+
+The repository contains platform heads/composition for:
+
+- Desktop
+- Browser/WebAssembly
+- Android
+- iOS
+
+Platform-specific source existing in the repository does **not** by itself mean a store/package build has been validated. Exact build/packaging status is recorded in [`PROJECT_STATE.md`](PROJECT_STATE.md).
 
 ## Architecture
 
-CalcNova uses modular dependency direction:
+CalcNova keeps mathematical/domain projects independent of Avalonia UI:
 
 ```text
 Platform heads
@@ -101,12 +153,13 @@ Platform heads
      ▼
 CalcNova.App
      │
-     ├─────────────┬─────────────┐
-     ▼             ▼             ▼
-CalcNova.Core   feature libs   persistence abstractions/implementations
+     ├─────────────┬─────────────┬─────────────┐
+     ▼             ▼             ▼             ▼
+CalcNova.Core   feature libs   platform     persistence
+                               contracts    implementations
 ```
 
-Mathematical/domain projects do not depend on Avalonia UI. Platform heads should stay thin and contain startup, packaging, lifecycle, permissions, and unavoidable native integration.
+Platform heads stay thin and contain startup, lifecycle, packaging, permissions, browser/native storage composition, external-link composition, and unavoidable native integration.
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -115,6 +168,7 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 ```text
 CalcNova/
 ├── .github/
+│   └── workflows/
 ├── docs/
 ├── src/
 │   ├── CalcNova.App/
@@ -122,8 +176,18 @@ CalcNova/
 │   ├── CalcNova.Scientific/
 │   ├── CalcNova.Programmer/
 │   ├── CalcNova.Converter/
+│   ├── CalcNova.Currency/
+│   ├── CalcNova.DateTime/
+│   ├── CalcNova.Graphing/
+│   ├── CalcNova.Statistics/
+│   ├── CalcNova.Equations/
+│   ├── CalcNova.Matrices/
+│   ├── CalcNova.Platform/
 │   ├── CalcNova.Persistence/
-│   └── CalcNova.Desktop/
+│   ├── CalcNova.Desktop/
+│   ├── CalcNova.Browser/
+│   ├── CalcNova.Android/
+│   └── CalcNova.iOS/
 ├── tests/
 ├── tools/
 ├── CalcNova.slnx
@@ -132,8 +196,6 @@ CalcNova/
 ├── PROJECT_STATE.md
 └── what_changed.md
 ```
-
-The structure will expand as additional stable modules and platform heads are implemented.
 
 ## Development prerequisites
 
@@ -156,21 +218,21 @@ See [`docs/BUILDING.md`](docs/BUILDING.md) and [`docs/TESTING.md`](docs/TESTING.
 dotnet run --project src/CalcNova.Desktop/CalcNova.Desktop.csproj
 ```
 
-This command requires a working .NET/Avalonia desktop environment.
+This requires a working .NET/Avalonia desktop environment.
 
 ## Correctness and validation policy
 
-CalcNova does not use arbitrary code execution to evaluate expressions. Calculation syntax is tokenized, parsed, and evaluated by project-owned domain code.
+CalcNova does not execute arbitrary user code to evaluate expressions. Calculation syntax is tokenized, parsed, and evaluated by project-owned domain code.
 
-A feature is not considered validated merely because source code exists. Build/test/platform status must be based on commands that actually ran. When an environment is unavailable, project state records `NOT RUN` instead of a fabricated PASS.
+A feature is not considered validated merely because source code or tests exist. Build/test/platform status must be based on commands or workflows that actually ran and whose results were observed. When an environment is unavailable, project state records `NOT RUN` instead of inventing PASS.
 
 See [`docs/CALCULATION_ENGINE.md`](docs/CALCULATION_ENGINE.md) and [`docs/TESTING.md`](docs/TESTING.md).
 
 ## Privacy
 
-Core calculations are designed to operate locally. The project does not require an account for ordinary calculation features, and the open-source base does not intentionally include advertising or behavioral-tracking SDKs.
+Core calculations and fixed conversions are designed to operate locally. CalcNova does not require an account for ordinary calculation features, and the open-source base does not intentionally include advertising or behavioral-tracking SDKs.
 
-Network-enhanced features such as future currency rates must remain optional and independently controllable.
+Network-enhanced features such as currency-rate refresh remain optional and independently controllable.
 
 See [`docs/PRIVACY.md`](docs/PRIVACY.md).
 
@@ -217,4 +279,4 @@ Support is optional. Core features must never be blocked behind donations or int
 
 ---
 
-For exact development progress, recent commits, unresolved issues, and the next continuation tasks, read [`what_changed.md`](what_changed.md) and [`PROJECT_STATE.md`](PROJECT_STATE.md).
+For exact development progress, recent commits, unresolved work, and continuation tasks, read [`what_changed.md`](what_changed.md), [`PROJECT_STATE.md`](PROJECT_STATE.md), and [`docs/ROADMAP.md`](docs/ROADMAP.md).
