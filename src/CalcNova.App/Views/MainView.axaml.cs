@@ -81,7 +81,27 @@ public partial class MainView : UserControl
 
     private async void OnKeyDown(object? sender, KeyEventArgs eventArgs)
     {
-        if (DataContext is not MainViewModel viewModel || viewModel.SelectedModeIndex != 0)
+        if (DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        if ((eventArgs.KeyModifiers & KeyModifiers.Control) != 0)
+        {
+            switch (eventArgs.Key)
+            {
+                case Key.PageDown:
+                    viewModel.SelectNextMode();
+                    eventArgs.Handled = true;
+                    return;
+                case Key.PageUp:
+                    viewModel.SelectPreviousMode();
+                    eventArgs.Handled = true;
+                    return;
+            }
+        }
+
+        if (viewModel.SelectedModeIndex != 0)
         {
             return;
         }
@@ -96,7 +116,7 @@ public partial class MainView : UserControl
                 viewModel.Calculator.Clear();
                 eventArgs.Handled = true;
                 break;
-            case Key.Back:
+            case Key.Back when eventArgs.Source is not TextBox:
                 viewModel.Calculator.Backspace();
                 eventArgs.Handled = true;
                 break;
