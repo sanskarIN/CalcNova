@@ -6,11 +6,14 @@ on:
     paths:
       - "src/CalcNova.App/App.axaml"
       - "src/CalcNova.App/Infrastructure/AdaptiveLayoutProfile.cs"
+      - "src/CalcNova.App/Infrastructure/CalculatorKeyboardInput.cs"
       - "src/CalcNova.App/Views/MainView.axaml"
       - "src/CalcNova.App/Views/MainView.axaml.cs"
       - "src/CalcNova.App/ViewModels/**"
       - "tests/CalcNova.App.Tests/AdaptiveLayoutProfileTests.cs"
+      - "tests/CalcNova.App.Tests/CalculatorKeyboardInputTests.cs"
       - "tests/CalcNova.App.Tests/MainViewModelNavigationTests.cs"
+      - "tools/validate_keyboard_contracts.py"
       - "tools/validate_navigation_contracts.py"
       - "tools/validate_ui_contracts.py"
       - "tools/validate_xaml.py"
@@ -19,11 +22,14 @@ on:
     paths:
       - "src/CalcNova.App/App.axaml"
       - "src/CalcNova.App/Infrastructure/AdaptiveLayoutProfile.cs"
+      - "src/CalcNova.App/Infrastructure/CalculatorKeyboardInput.cs"
       - "src/CalcNova.App/Views/MainView.axaml"
       - "src/CalcNova.App/Views/MainView.axaml.cs"
       - "src/CalcNova.App/ViewModels/**"
       - "tests/CalcNova.App.Tests/AdaptiveLayoutProfileTests.cs"
+      - "tests/CalcNova.App.Tests/CalculatorKeyboardInputTests.cs"
       - "tests/CalcNova.App.Tests/MainViewModelNavigationTests.cs"
+      - "tools/validate_keyboard_contracts.py"
       - "tools/validate_navigation_contracts.py"
       - "tools/validate_ui_contracts.py"
       - "tools/validate_xaml.py"
@@ -54,3 +60,6 @@ jobs:
 
       - name: Validate shared navigation contracts
         run: python tools/validate_navigation_contracts.py .
+
+      - name: Validate calculator keyboard contracts
+        run: python tools/validate_keyboard_contracts.py .
