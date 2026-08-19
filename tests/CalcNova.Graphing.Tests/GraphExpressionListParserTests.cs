@@ -30,7 +30,7 @@ public sealed class GraphExpressionListParserTests
     [Fact]
     public void Parse_RejectsMoreThanSupportedExpressionCount()
     {
-        var text = string.Join('\n', Enumerable.Range(1, MultiGraphSampler.MaximumExpressions + 1).Select(index => $"x + {index}"));
+        var text = string.Join("\n", Enumerable.Range(1, MultiGraphSampler.MaximumExpressions + 1).Select(index => $"x + {index}"));
 
         Assert.Throws<ArgumentOutOfRangeException>(() => GraphExpressionListParser.Parse(text));
     }
