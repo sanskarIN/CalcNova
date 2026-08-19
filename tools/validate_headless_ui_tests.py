@@ -15,10 +15,20 @@ def validate(root: Path) -> list[str]:
     package_path = root / "Directory.Packages.props"
     project_path = root / "tests" / "CalcNova.App.Tests" / "CalcNova.App.Tests.csproj"
     builder_path = root / "tests" / "CalcNova.App.Tests" / "TestAppBuilder.cs"
-    tests_path = root / "tests" / "CalcNova.App.Tests" / "MainViewHeadlessTests.cs"
+    shell_tests_path = root / "tests" / "CalcNova.App.Tests" / "MainViewHeadlessTests.cs"
+    graph_tests_path = root / "tests" / "CalcNova.App.Tests" / "GraphPlotControlHeadlessTests.cs"
+    graph_control_path = root / "src" / "CalcNova.App" / "Controls" / "GraphPlotControl.cs"
     solution_path = root / "CalcNova.slnx"
 
-    paths = (package_path, project_path, builder_path, tests_path, solution_path)
+    paths = (
+        package_path,
+        project_path,
+        builder_path,
+        shell_tests_path,
+        graph_tests_path,
+        graph_control_path,
+        solution_path,
+    )
     failures: list[str] = []
     for path in paths:
         if not path.is_file():
@@ -30,7 +40,9 @@ def validate(root: Path) -> list[str]:
     packages = package_path.read_text(encoding="utf-8")
     project = project_path.read_text(encoding="utf-8")
     builder = builder_path.read_text(encoding="utf-8")
-    tests = tests_path.read_text(encoding="utf-8")
+    shell_tests = shell_tests_path.read_text(encoding="utf-8")
+    graph_tests = graph_tests_path.read_text(encoding="utf-8")
+    graph_control = graph_control_path.read_text(encoding="utf-8")
     solution = solution_path.read_text(encoding="utf-8")
 
     avalonia_match = re.search(r'<PackageVersion Include="Avalonia" Version="([^"]+)"', packages)
@@ -61,7 +73,7 @@ def validate(root: Path) -> list[str]:
         if marker not in builder:
             failures.append(f"Headless test app builder is missing marker: {marker}")
 
-    expected_tests = (
+    expected_shell_tests = (
         "SharedShell_LoadsEveryPrimaryMode",
         "CalculatorClearButton_ExecutesBoundCommand",
         "CompactWindow_AppliesCompactAdaptiveClass",
@@ -69,12 +81,22 @@ def validate(root: Path) -> list[str]:
         "HighContrastPreference_AppliesShellClass",
         "NewUser_OnboardingOverlayIsVisibleAndSkipHidesIt",
     )
-    for marker in expected_tests:
-        if marker not in tests:
+    for marker in expected_shell_tests:
+        if marker not in shell_tests:
             failures.append(f"Headless shared-shell suite is missing test: {marker}")
 
-    if tests.count("[AvaloniaFact]") < len(expected_tests):
-        failures.append("Headless shared-shell scenarios must remain AvaloniaFact tests.")
+    expected_graph_tests = (
+        "KeyboardPanAndZoom_UpdateViewport",
+        "HomeKey_ResetsViewportAfterKeyboardNavigation",
+        "FitKey_FitsFiniteSampledData",
+    )
+    for marker in expected_graph_tests:
+        if marker not in graph_tests:
+            failures.append(f"Headless graph suite is missing test: {marker}")
+
+    expected_fact_count = len(expected_shell_tests) + len(expected_graph_tests)
+    if shell_tests.count("[AvaloniaFact]") + graph_tests.count("[AvaloniaFact]") < expected_fact_count:
+        failures.append("Headless UI scenarios must remain AvaloniaFact tests.")
 
     for marker in (
         "window.Show()",
@@ -85,8 +107,21 @@ def validate(root: Path) -> list[str]:
         'Assert.Contains("high-contrast", view.Classes)',
         "Assert.True(overlay.IsVisible)",
     ):
-        if marker not in tests:
+        if marker not in shell_tests:
             failures.append(f"Headless shared-shell suite is missing interaction marker: {marker}")
+
+    for marker in (
+        "window.KeyPressQwerty(PhysicalKey.ArrowRight, RawInputModifiers.None)",
+        "window.KeyPressQwerty(PhysicalKey.NumPadAdd, RawInputModifiers.None)",
+        "window.KeyPressQwerty(PhysicalKey.Home, RawInputModifiers.None)",
+        "window.KeyPressQwerty(PhysicalKey.F, RawInputModifiers.None)",
+        "plot.Viewport",
+    ):
+        if marker not in graph_tests:
+            failures.append(f"Headless graph suite is missing interaction marker: {marker}")
+
+    if "public GraphViewport Viewport" not in graph_control:
+        failures.append("GraphPlotControl must expose read-only viewport state for deterministic UI assertions.")
 
     if '<Project Path="tests/CalcNova.App.Tests/CalcNova.App.Tests.csproj" />' not in solution:
         failures.append("CalcNova.slnx must include the headless-enabled App test project.")
@@ -106,7 +141,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated Avalonia headless xUnit configuration and shared-shell UI scenarios.")
+    print("Validated Avalonia headless xUnit configuration plus shared-shell and graph UI scenarios.")
     return 0
 
 
