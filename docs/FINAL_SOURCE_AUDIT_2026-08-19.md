@@ -53,9 +53,7 @@ Regression coverage includes out-of-range non-zero and zero-mantissa forms so an
 
 ### Engineering non-zero underflow silently becoming zero
 
-A final numeric edge review found another real issue after the explicit exponent bounds were added.
-
-`1e-324` uses a syntactically valid engineering exponent, but the value is below the minimum positive subnormal `double`. Chunked power-of-ten scaling therefore produces floating-point `0`.
+A final numeric edge review found that `1e-324` uses a syntactically valid engineering exponent but lies below the minimum positive subnormal `double`. Bounded power-of-ten scaling therefore produces floating-point `0`.
 
 Returning `0` for a non-zero canonical engineering input would silently change its meaning.
 
@@ -64,9 +62,25 @@ The parser now rejects the case when:
 - the parsed mantissa is non-zero; and
 - bounded scaling produces `0`.
 
-It throws `OverflowException` with a below-supported-non-zero-range message. The regression suite includes `Parse_RejectsUnderflowingNonZeroEngineeringValue`, and the SDK-independent validator requires both the source guard and the regression scenario.
+It throws `OverflowException` instead of silently returning zero. The regression suite includes `Parse_RejectsUnderflowingNonZeroEngineeringValue`, and the SDK-independent validator requires both the source guard and regression scenario.
 
 Representable extreme forms such as the formatter output for `double.Epsilon` remain part of round-trip coverage.
+
+### Engineering input text had no explicit workload budget
+
+The core Engineering parser and the shared Calculator Format action previously accepted arbitrary-length input strings before numeric parsing. The UI TextBox also had no feature-specific maximum length.
+
+The engineering utility now has one shared workload contract:
+
+- `EngineeringNotationFormatter.MaximumInputCharacters = 4_096`;
+- core `Parse` checks raw `text.Length` before whitespace scanning, trimming, or `double.TryParse`;
+- oversized all-whitespace input is rejected before blank-input scanning;
+- the shared `EngineeringNotationViewModel.Format` action checks the same limit before `double.TryParse`;
+- `EngineeringNotationPanel` sets `TextBox.MaxLength` from the same core constant.
+
+Core, App, and Avalonia headless regression source covers these layers. `tools/validate_engineering_notation.py` now validates the formatter, view model, panel, and related regression scenarios rather than only the original core files.
+
+The focused engineering workflow also watches the App view model/panel/tests, closing a path-filter gap that could otherwise have allowed a protected UI contract to change without running that focused gate.
 
 ### Integrated release-preflight inventory gaps
 
@@ -79,9 +93,40 @@ The integrated inventory was expanded to include the current critical source con
 - artifact integrity infrastructure;
 - structured release-evidence infrastructure;
 - dynamic shared-control accessibility;
-- exact-tag unsigned iOS simulator release workflow.
+- exact-tag unsigned iOS simulator release workflow;
+- the Source Preflight workflow's own trigger/least-privilege/execution contract.
 
 The preflight inventory regression was expanded simultaneously so these validators cannot silently fall out of the integrated gate.
+
+### Master Source Preflight workflow could miss domain changes
+
+The integrated Python preflight validates contracts across many source libraries, tests, tools, documentation files, packaging files, and workflows. The earlier `.github/workflows/source-preflight.yml` path filter watched only a selected subset of App/platform/settings paths.
+
+That mismatch meant an ordinary domain-only change could avoid running the unified source gate even though the gate was capable of validating it.
+
+The workflow now watches broad repository surfaces on pushes to `main` and on pull requests:
+
+- `src/**`;
+- `tests/**`;
+- `tools/**`;
+- `docs/**`;
+- `packaging/**`;
+- `.github/workflows/**`;
+- solution, SDK, package/build properties, `.gitignore`, README, changelog, project-state, and continuation-checkpoint files.
+
+The workflow remains least-privilege with `contents: read` and still runs the integrated preflight on Ubuntu with Python 3.13.
+
+A new `tools/validate_source_preflight_workflow.py` source validator protects:
+
+- the broad trigger contract;
+- both push and pull-request coverage;
+- manual dispatch;
+- read-only contents permission;
+- the expected runner/toolchain;
+- the integrated preflight command;
+- rejection of `pull_request_target`, `contents: write`, and `actions: write` drift.
+
+Its regression suite is part of `tools/release_preflight.py`, making the master gate partially self-validating at source level.
 
 ### Documentation drift
 
@@ -98,9 +143,8 @@ The documentation set was synchronized so source state, roadmap, features, chang
 - repeated equals, percentage, and calculator memory workflows;
 - selection/caret-aware calculator editing and selection-preserving wrapping;
 - safe printable/shifted operator mappings outside active text-editing fields;
-- bounded exact rational arithmetic with shared Calculator utility UI;
-- bounded engineering-notation formatting/parsing with explicit finite exponent and non-zero-underflow protection;
-- focused tests/source validators/workflows for the recent numeric utilities.
+- bounded exact rational arithmetic with canonical default-value behavior and shared Calculator utility UI;
+- bounded engineering-notation formatting/parsing with shared Calculator UI, text/exponent budgets, and non-zero-underflow protection.
 
 ### Programmer and Unicode
 
@@ -164,13 +208,14 @@ The documentation set was synchronized so source state, roadmap, features, chang
 - repository/XAML/UI/navigation/keyboard/numerical/accessibility/localization/settings/platform/release source validators;
 - focused Python regression suites;
 - integrated `tools/release_preflight.py` source gate;
+- master Source Preflight workflow self-validation and broad path coverage;
 - artifact manifest generation/verification and SHA-256 integrity infrastructure;
 - machine-readable release-evidence schema/model/runner/verifier;
 - platform/release workflows including tag-first release logic and exact-tag unsigned iOS simulator validation.
 
 ## Documentation status
 
-The main documentation index now links the current major contracts, including:
+The main documentation index links the current major contracts, including:
 
 - `EXACT_RATIONALS.md`;
 - `ENGINEERING_NOTATION.md`;
@@ -182,11 +227,11 @@ The main documentation index now links the current major contracts, including:
 - `VALIDATION_EVIDENCE.md`;
 - this final source audit.
 
-`FEATURES.md` distinguishes completed source features from remaining runtime/product work.
+`FEATURES.md` distinguishes completed source features from remaining runtime/product work and now includes the engineering input/underflow contracts plus Source Preflight workflow self-validation.
 
 `ROADMAP.md` no longer lists exact rational arithmetic, engineering notation, covariance/correlation/regression, printable calculator operator mappings, deterministic multi-series differentiation, or already-added numerical edge hardening as future work.
 
-`README.md`, `CHANGELOG.md`, `PROJECT_STATE.md`, and `what_changed.md` have been synchronized with the same source/evidence boundary.
+`README.md`, `CHANGELOG.md`, `PROJECT_STATE.md`, and `what_changed.md` are maintained as public/state/continuation entry points.
 
 The previous active continuation was preserved verbatim at:
 
@@ -206,6 +251,13 @@ Optional tag syntax/source validation can be included with:
 python tools/release_preflight.py --tag v0.1.0
 ```
 
+The Source Preflight workflow contract can be inspected independently with:
+
+```bash
+python tools/validate_source_preflight_workflow.py .
+python -m unittest tools.tests.test_validate_source_preflight_workflow
+```
+
 Structured source evidence can be collected with:
 
 ```bash
@@ -214,15 +266,13 @@ python tools/run_release_evidence.py --scope source
 
 and evaluated through the repository evidence verifier according to `VALIDATION_EVIDENCE.md`.
 
-## Observed GitHub status at the final audit boundary
+## Observed GitHub status at the audit boundary
 
-The exact `main` commit was inspected through the GitHub connector during the final review.
+A combined-status lookup performed during the audit on the then-current `main` commit returned no status contexts. A separate connector lookup returned no pull-request-triggered workflow runs for that commit.
 
-A combined-status lookup returned no status contexts for the checked latest commit. A separate commit-workflow lookup available through the connector returned no pull-request-triggered workflow runs for that commit.
+Those empty results are **not** treated as CI success.
 
-These empty results are **not** treated as CI success.
-
-The connector available in this environment did not provide a general push-run listing for the branch through the allowed endpoint, so no unobserved push workflow is inferred either way.
+Because additional source-hardening commits were subsequently pushed, GitHub status must be checked again against the exact final `main` commit before any CI PASS claim is made.
 
 ## Runtime/release evidence still required
 
@@ -271,4 +321,4 @@ When a real compiler, test, platform, accessibility, packaging, artifact, or sig
 4. rerun the affected validation;
 5. update structured/manual evidence without converting unavailable checks into PASS.
 
-The source-level final audit is complete only in that limited sense: the known source/documentation inconsistencies and concrete numeric/release-gate defects found during this review were corrected, while runtime/platform release readiness remains evidence-dependent.
+The source-level final audit is complete only in that limited sense: known source/documentation inconsistencies, numeric workload/correctness defects, focused-workflow trigger gaps, and master Source Preflight trigger/inventory gaps found during this review were corrected, while runtime/platform release readiness remains evidence-dependent.
