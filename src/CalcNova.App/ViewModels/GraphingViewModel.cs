@@ -32,9 +32,12 @@ public sealed class GraphingViewModel : ViewModelBase
     private string _analysisResult = string.Empty;
     private string _traceResult = string.Empty;
     private string _tableCsv = string.Empty;
+    private string _tablePreview = string.Empty;
     private string _multiSummary = string.Empty;
     private string _multiTableCsv = string.Empty;
+    private string _multiTablePreview = string.Empty;
     private string _svgExport = string.Empty;
+    private string _svgPreview = string.Empty;
     private string _copyStatus = string.Empty;
     private string _errorMessage = string.Empty;
 
@@ -159,6 +162,12 @@ public sealed class GraphingViewModel : ViewModelBase
         private set => SetField(ref _tableCsv, value);
     }
 
+    public string TablePreview
+    {
+        get => _tablePreview;
+        private set => SetField(ref _tablePreview, value);
+    }
+
     public string MultiSummary
     {
         get => _multiSummary;
@@ -171,10 +180,22 @@ public sealed class GraphingViewModel : ViewModelBase
         private set => SetField(ref _multiTableCsv, value);
     }
 
+    public string MultiTablePreview
+    {
+        get => _multiTablePreview;
+        private set => SetField(ref _multiTablePreview, value);
+    }
+
     public string SvgExport
     {
         get => _svgExport;
         private set => SetField(ref _svgExport, value);
+    }
+
+    public string SvgPreview
+    {
+        get => _svgPreview;
+        private set => SetField(ref _svgPreview, value);
     }
 
     public string CopyStatus
@@ -224,6 +245,7 @@ public sealed class GraphingViewModel : ViewModelBase
 
             TraceResult = string.Empty;
             SvgExport = string.Empty;
+            SvgPreview = string.Empty;
             CopyStatus = string.Empty;
 
             if (!result.Success)
@@ -237,6 +259,7 @@ public sealed class GraphingViewModel : ViewModelBase
             Segments = result.Segments;
             TableRows = GraphTableExporter.CreateRows(result.Segments);
             TableCsv = GraphTableExporter.ToCsv(TableRows);
+            TablePreview = ExportPreviewFormatter.Create(TableCsv);
             var pointCount = result.Segments.Sum(segment => segment.Points.Count);
             Summary = $"{result.Segments.Count} segment(s) • {pointCount} valid point(s) • {result.InvalidSampleCount} invalid sample(s)";
             Preview = BuildPreview(result.Segments);
@@ -247,6 +270,7 @@ public sealed class GraphingViewModel : ViewModelBase
         {
             TraceResult = string.Empty;
             SvgExport = string.Empty;
+            SvgPreview = string.Empty;
             CopyStatus = string.Empty;
             ClearPlotOutputs();
             PlotMode = GraphPlotMode.Single;
@@ -272,6 +296,7 @@ public sealed class GraphingViewModel : ViewModelBase
             MultiSeries = result.Series;
             MultiTableRows = MultiGraphTableExporter.CreateRows(result.Series);
             MultiTableCsv = MultiGraphTableExporter.ToCsv(MultiTableRows);
+            MultiTablePreview = ExportPreviewFormatter.Create(MultiTableCsv);
             var pointCount = result.Series.Sum(series => series.ValidPointCount);
             var invalidCount = result.Series.Sum(series => series.InvalidSampleCount);
             MultiSummary = $"{result.Series.Count} expression(s) • {pointCount} valid point(s) • {invalidCount} invalid sample(s)";
@@ -343,12 +368,14 @@ public sealed class GraphingViewModel : ViewModelBase
             }
 
             SvgExport = _svgExporter.Export(Segments);
+            SvgPreview = ExportPreviewFormatter.Create(SvgExport);
             CopyStatus = string.Empty;
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
         {
             SvgExport = string.Empty;
+            SvgPreview = string.Empty;
             ErrorMessage = exception.Message;
         }
     }
@@ -416,9 +443,11 @@ public sealed class GraphingViewModel : ViewModelBase
         Segments = Array.Empty<GraphSegment>();
         TableRows = Array.Empty<GraphTableRow>();
         TableCsv = string.Empty;
+        TablePreview = string.Empty;
         Summary = string.Empty;
         Preview = string.Empty;
         SvgExport = string.Empty;
+        SvgPreview = string.Empty;
     }
 
     private void ClearMultiPlotOutputs()
@@ -426,6 +455,7 @@ public sealed class GraphingViewModel : ViewModelBase
         MultiSeries = Array.Empty<GraphExpressionSample>();
         MultiTableRows = Array.Empty<MultiGraphTableRow>();
         MultiTableCsv = string.Empty;
+        MultiTablePreview = string.Empty;
         MultiSummary = string.Empty;
     }
 
