@@ -10,6 +10,8 @@ on:
       - "src/CalcNova.App/Views/MainView.axaml.cs"
       - "src/CalcNova.App/ViewModels/**"
       - "tests/CalcNova.App.Tests/AdaptiveLayoutProfileTests.cs"
+      - "tests/CalcNova.App.Tests/MainViewModelNavigationTests.cs"
+      - "tools/validate_navigation_contracts.py"
       - "tools/validate_ui_contracts.py"
       - "tools/validate_xaml.py"
       - ".github/workflows/ui-contract-validate.yml"
@@ -21,6 +23,8 @@ on:
       - "src/CalcNova.App/Views/MainView.axaml.cs"
       - "src/CalcNova.App/ViewModels/**"
       - "tests/CalcNova.App.Tests/AdaptiveLayoutProfileTests.cs"
+      - "tests/CalcNova.App.Tests/MainViewModelNavigationTests.cs"
+      - "tools/validate_navigation_contracts.py"
       - "tools/validate_ui_contracts.py"
       - "tools/validate_xaml.py"
       - ".github/workflows/ui-contract-validate.yml"
@@ -47,3 +51,6 @@ jobs:
 
       - name: Validate shared UI contracts
         run: python tools/validate_ui_contracts.py .
+
+      - name: Validate shared navigation contracts
+        run: python tools/validate_navigation_contracts.py .
