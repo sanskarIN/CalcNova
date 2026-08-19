@@ -23,7 +23,8 @@ Current source/UI measures include:
 - textual graph sampling/analysis output in addition to graphical presentation;
 - a shared first-run surface with accessible Skip/Start actions;
 - onboarding focus queued to the visible action surface, with focus returned to the calculator input after dismissal;
-- reduced-motion and high-contrast preference fields in settings;
+- an active `high-contrast` shell class that strengthens borders on common interactive controls when the preference is enabled;
+- an active `reduced-motion` shell class that future motion styles/components can honor consistently;
 - scrollable shared-mode layouts rather than fixed-height content clipping;
 - source-level accessibility markup validation in the shared UI workflow.
 
@@ -47,9 +48,11 @@ This is an implementation baseline, not a claim that every mode is fully optimiz
 - common control styles retain the shared 44-pixel minimum-height baseline;
 - normal calculator keys retain the 54-pixel baseline;
 - compact calculator keys retain at least a 50-pixel minimum height;
-- CheckBox touch-target styling remains present.
+- CheckBox touch-target styling remains present;
+- high-contrast style selectors remain present for Button, TextBox, ComboBox, TabItem, and ListBoxItem;
+- the shared shell continues to apply both `high-contrast` and `reduced-motion` preference classes from settings.
 
-This gate catches accidental source regressions only. It cannot prove screen-reader wording, focus order, contrast, text scaling, or target-platform accessibility behavior.
+This gate catches accidental source regressions only. It cannot prove screen-reader wording, focus order, measured contrast ratios, text scaling, or target-platform accessibility behavior.
 
 ## Requirements
 
@@ -60,6 +63,8 @@ This gate catches accidental source regressions only. It cannot prove screen-rea
 - Results and important calculation errors should be announced in a useful, non-disruptive way where platform APIs allow it.
 - Mode, angle, signed/unsigned, word-size, and favorite state must be exposed semantically, not only visually.
 - Dynamic bit states must remain understandable after toggling.
+
+Dynamic live-region announcements should be added selectively. Making every result/status change a live announcement can become disruptive, so this needs targeted assistive-technology testing rather than a blanket source rule.
 
 ### Keyboard
 
@@ -90,11 +95,14 @@ Dense scientific/programmer layouts should adapt rather than shrinking important
 
 ### Contrast
 
-- Light, dark, and any future AMOLED/accent themes must retain readable contrast.
-- Focus states must remain visible in each theme.
-- Disabled state must remain distinguishable without becoming unreadable.
-- High-contrast preference behavior must be validated rather than inferred from a stored setting.
-- The current onboarding color treatment requires explicit target high-contrast testing before stable release.
+When the CalcNova high-contrast preference is enabled, the shared shell now applies a `high-contrast` class. Current styles strengthen borders on Button, TextBox, ComboBox, TabItem, and ListBoxItem controls, and TabItem text becomes semi-bold.
+
+This is an implemented visual preference, not proof of platform-level high-contrast conformance. Before stable release:
+
+- measure representative foreground/background and focus-state contrast in light/dark themes;
+- verify disabled/selected/error states remain distinguishable;
+- verify the preference composes correctly with system high-contrast modes where supported;
+- verify the fixed onboarding color treatment remains readable and does not fight system accessibility settings.
 
 ### Color
 
@@ -102,7 +110,9 @@ Information must not be conveyed by color alone. Graph functions, error states, 
 
 ### Motion
 
-Motion should be purposeful and brief. Future transitions/graph interactions should respect reduced-motion preferences where practical. No essential meaning should depend on animation.
+The reduced-motion setting now changes shared shell state by applying a `reduced-motion` class. The current shared UI does not contain decorative animation/transitions that require suppression, so there is no observable motion reduction to claim yet.
+
+Future animation/transition styles must either honor the `reduced-motion` class or document why a motion effect is essential. No essential meaning should depend on animation.
 
 ### Error messages
 
@@ -164,7 +174,7 @@ Before a stable release, test representative workflows with:
 - large text/text scaling;
 - light theme;
 - dark theme;
-- high-contrast settings where supported;
+- CalcNova high-contrast preference plus supported system high-contrast settings;
 - reduced-motion settings where supported;
 - narrow mobile layout;
 - landscape/tablet layout;
