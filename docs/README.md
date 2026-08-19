@@ -18,6 +18,7 @@ Use this index to find the authoritative guide for each area of the project.
 ## Calculation and feature contracts
 
 - [Calculation engine](CALCULATION_ENGINE.md)
+- [Calculator expression editing](CALCULATOR_EDITING.md)
 - [Input safety and expression import](INPUT_SAFETY.md)
 - [Programmer mode](PROGRAMMER_MODE.md)
 - [Unicode scalar metadata](UNICODE_METADATA.md)
