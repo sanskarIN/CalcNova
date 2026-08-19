@@ -4,9 +4,16 @@ CalcNova welcomes responsible reports that help keep users and contributors safe
 
 ## Supported versions
 
-CalcNova is currently in active pre-release development. Security fixes are applied to the actively maintained `main` branch and to supported release branches after stable releases exist.
+**CalcNova 2.8.03 is the current completed and supported product baseline.**
 
-When multiple stable versions are supported, this file will list exact version ranges.
+Security fixes are applied to the actively maintained `main` branch and, when needed, to supported release or maintenance branches/tags.
+
+| Version | Supported |
+| --- | --- |
+| `2.8.03` | Yes |
+| Earlier pre-2.8.03 snapshots | No stable-support guarantee |
+
+The normalized SemVer/package equivalent of 2.8.03 is `2.8.3`, and the normalized release tag is `v2.8.3`.
 
 ## Reporting a vulnerability
 
@@ -38,7 +45,7 @@ Response and remediation time varies with complexity, platform requirements, and
 
 Please allow maintainers a reasonable opportunity to investigate and prepare a fix before publishing exploit details for a confirmed vulnerability.
 
-After remediation is available, maintainers may publish an advisory, release note, or security changelog entry describing impact and affected versions without exposing unnecessary user data.
+After remediation is available, maintainers may publish an advisory, maintenance release note, or security changelog entry describing impact and affected versions without exposing unnecessary user data.
 
 ## Security design principles
 
@@ -53,7 +60,11 @@ CalcNova's baseline security requirements include:
 - sanitized imports;
 - safe external-link handling;
 - optional network features isolated behind interfaces;
-- TLS for any future network provider;
+- TLS for configured network providers;
 - no remote upload of calculation history by default.
 
 Implementation details are documented in `docs/SECURITY.md`.
+
+## Completion and security maintenance
+
+The completed status of CalcNova 2.8.03 does not end security maintenance. Confirmed vulnerabilities, compatibility problems, and dependency/security issues can be fixed through maintenance updates without reclassifying the 2.8.03 product baseline as unfinished.
