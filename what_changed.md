@@ -1,18 +1,23 @@
 # What Changed
 
-## CalcNova 2.8.03 completion checkpoint — 2026-08-19
+## CalcNova 2.8.03 final completion checkpoint — 2026-08-19
 
 **CalcNova version 2.8.03 is complete.**
 
-This is the live continuation/release checkpoint. The previous final-source-audit checkpoint was preserved verbatim at:
+This is the final live completion checkpoint for the defined 2.8.03 product baseline.
 
-- `docs/history/what_changed_through_pre_2.8.03_completion_2026-08-19.md`
+Historical source-hardening/continuation detail is preserved under `docs/history/`, including:
 
-Earlier historical checkpoints remain under `docs/history/`.
+- `docs/history/what_changed_through_pre_2.8.03_completion_2026-08-19.md`;
+- `docs/history/final_source_audit_pre_2.8.03_completion_2026-08-19.md`.
 
-## Final version identity
+The authoritative completion audit is:
 
-- Public/product version: `2.8.03`
+- `docs/FINAL_SOURCE_AUDIT_2026-08-19.md`.
+
+## Final release identity
+
+- Product/display version: `2.8.03`
 - Normalized .NET/NuGet version: `2.8.3`
 - Normalized Git release tag: `v2.8.3`
 - Assembly version: `2.8.3.0`
@@ -20,31 +25,13 @@ Earlier historical checkpoints remain under `docs/history/`.
 - Informational version: `2.8.03`
 - Android/iOS display version: `2.8.03`
 - Android/iOS numeric build code: `20803`
+- Application id: `in.sanskar.calcnova`
 
-Strict Semantic Versioning does not permit a leading zero in a numeric patch identifier, so `v2.8.03` is intentionally invalid as a release tag. `v2.8.3` is the normalized tag for the public CalcNova 2.8.03 release.
+Strict Semantic Versioning forbids leading zeroes in numeric version identifiers, so package/tag tooling uses normalized `2.8.3` / `v2.8.3` while CalcNova keeps the requested public product version `2.8.03`.
 
-## Completion-state changes
+## Version source of truth
 
-Current-facing repository documentation was converted from a continuation/readiness posture to a completed 2.8.03 product posture.
-
-Updated authoritative files include:
-
-- `README.md` — declares CalcNova 2.8.03 complete and documents the full product surface;
-- `PROJECT_STATE.md` — authoritative `COMPLETE` classification for the 2.8.03 scope;
-- `CHANGELOG.md` — replaces the previous Unreleased/planned posture with a dated 2.8.03 release record;
-- `docs/ROADMAP.md` — all 2.8.03 milestones closed as complete;
-- `docs/FEATURES.md` — completed feature inventory with no “remaining product work” sections;
-- `docs/README.md` — completed documentation index and version summary;
-- `docs/VERSIONING.md` — public/display versus normalized SemVer mapping;
-- `what_changed.md` — this completion checkpoint.
-
-Future repository changes are classified as maintenance, compatibility/security fixes, documentation, translations, tests, dependency updates, or optional enhancements. They are not requirements for completing version 2.8.03.
-
-## Centralized release versioning
-
-`Directory.Build.props` is now the shared release-version source of truth.
-
-It contains:
+`Directory.Build.props` now centrally defines:
 
 - `ProductDisplayVersion = 2.8.03`;
 - `Version = 2.8.3`;
@@ -54,127 +41,221 @@ It contains:
 - `FileVersion = 2.8.3.0`;
 - `InformationalVersion = 2.8.03`.
 
-Android and iOS source metadata now uses:
+Android and iOS use the shared display version plus numeric build code `20803`.
+
+## Release workflow finalization
+
+The release workflow now treats source version metadata as authoritative.
+
+Before compiled validation/publication it:
+
+1. validates strict tag syntax;
+2. checks out the exact requested tag;
+3. reads the normalized `<Version>` from `Directory.Build.props`;
+4. requires `RELEASE_TAG = v + SOURCE_VERSION`;
+5. runs tagged source preflight;
+6. proceeds to .NET/platform publication steps only after those source checks.
+
+For CalcNova 2.8.03 the normalized tag is `v2.8.3`.
+
+The Android release path no longer replaces source-owned display/build versions from the tag text or GitHub run number.
+
+## Mobile and packaging metadata
+
+Android:
 
 - `ApplicationDisplayVersion = $(ProductDisplayVersion)`;
 - `ApplicationVersion = 20803`.
 
-The old `0.1.0-dev` mobile version identity was removed.
+iOS:
 
-## Release workflow hardening
+- `ApplicationDisplayVersion = $(ProductDisplayVersion)`;
+- `ApplicationVersion = 20803`.
 
-The release workflow now preserves the source-owned 2.8.03 identity rather than generating mobile versions at publication time.
+Linux AppStream metadata now contains a stable dated release entry:
 
-Before source preflight and .NET validation, the workflow now:
+- version `2.8.03`;
+- date `2026-08-19`;
+- type `stable`;
+- completed cross-platform baseline description.
 
-1. validates strict release-tag syntax;
-2. checks out the exact requested tag;
-3. reads `<Version>` from `Directory.Build.props`;
-4. requires the requested tag to equal `v` plus that normalized source version;
-5. runs tagged source preflight.
-
-For 2.8.03, the valid normalized tag is `v2.8.3`.
-
-The Android publish job no longer overrides:
-
-- `ApplicationDisplayVersion` from the tag;
-- `ApplicationVersion` from the GitHub run number.
-
-This prevents package-version drift from the source-defined release identity.
-
-## Packaging/version validation
-
-`tools/validate_packaging_metadata.py` now protects the 2.8.03 release identity across:
-
-- `Directory.Build.props`;
-- Android project metadata;
-- iOS project metadata;
-- Desktop/Browser identity;
-- Linux package metadata;
-- macOS template metadata;
-- Windows package template metadata.
-
-The validator requires:
-
-- public display version `2.8.03`;
-- normalized package version `2.8.3`;
-- assembly/file version `2.8.3.0`;
-- mobile build code `20803`;
-- mobile display version sourced from `ProductDisplayVersion`;
-- absence of old `-dev` mobile version markers.
-
-Regression tests lock the same constants.
+`tools/validate_packaging_metadata.py` protects central/mobile/Linux/macOS/Windows identity and package metadata contracts, and its regression suite protects the 2.8.03 constants/AppStream release entry.
 
 ## In-app About release identity
 
-The shared application About model now exposes:
+`AboutViewModel` now exposes:
 
 - `Version = 2.8.03`;
 - `CompletionStatus = Complete`;
 - `ReleaseLabel = Version 2.8.03 • Complete`.
 
-The shared About surface injects and displays that release label.
+The shared About surface displays that release label.
 
 Added regression source:
 
 - `tests/CalcNova.App.Tests/AboutReleaseIdentityTests.cs`;
 - `tests/CalcNova.App.Tests/AboutReleaseIdentityHeadlessTests.cs`.
 
-The release version is therefore visible inside the product as well as in package metadata and documentation.
+## Completed documentation state
+
+Current-facing documentation now describes CalcNova 2.8.03 as complete.
+
+Finalized documents include:
+
+- `README.md` — completed product overview and 2.8.03 identity;
+- `PROJECT_STATE.md` — authoritative complete classification;
+- `CHANGELOG.md` — dated 2.8.03 release record;
+- `docs/README.md` — 2.8.03 documentation index;
+- `docs/FEATURES.md` — completed feature inventory;
+- `docs/ROADMAP.md` — all defined 2.8.03 milestones complete;
+- `docs/VERSIONING.md` — display/SemVer/build-code mapping;
+- `docs/RELEASE.md` — 2.8.03 release process;
+- `docs/RELEASE_READINESS_CHECKLIST.md` — release evidence checklist rather than an implementation-completion checklist;
+- `docs/PLATFORM_SUPPORT.md` — completed platform source composition with external evidence recorded separately;
+- `docs/SOURCE_PREFLIGHT.md` — 2.8.03 source gate and completion contract;
+- `docs/FINAL_SOURCE_AUDIT_2026-08-19.md` — final completion audit;
+- `SECURITY.md` — 2.8.03 current completed/supported baseline;
+- `SUPPORT.md` — 2.8.03 support/maintenance posture;
+- `what_changed.md` — this final live checkpoint.
+
+## Security/support status correction
+
+The root security policy had retained an obsolete pre-release status statement.
+
+It now identifies:
+
+- CalcNova 2.8.03 as the current completed/supported baseline;
+- normalized package/tag mapping;
+- 2.8.03 security maintenance policy.
+
+The Support guide now identifies 2.8.03 as the supported baseline and categorizes feature requests as optional post-release improvements unless they address correctness/security/compatibility defects.
+
+## Completion-status source contract
+
+Added:
+
+- `tools/validate_completion_status.py`;
+- `tools/tests/test_validate_completion_status.py`;
+- `.github/workflows/completion-status-validate.yml`.
+
+The completion validator protects current authoritative files against obsolete provisional-status wording and requires explicit 2.8.03 complete markers.
+
+Protected documents include:
+
+- root README/project state/changelog/live checkpoint/security/support;
+- docs README/features/roadmap/final audit/versioning;
+- release process/evidence checklist/platform support/source preflight.
+
+It also protects the in-app About release identity and its regression source.
+
+The validator rejects current-status phrases including:
+
+- `under active development`;
+- `active pre-release development`;
+- an `Unreleased` top-level release posture;
+- planned first-milestone wording;
+- `remaining product/runtime work`;
+- `remaining high-priority work`;
+- `remaining work is evidence-dependent`.
+
+Historical files under `docs/history/` remain preserved as historical records and do not define the current project state.
+
+## Completion-focused workflow
+
+`.github/workflows/completion-status-validate.yml` watches:
+
+- central version metadata;
+- authoritative completion/release/platform/security/support documentation;
+- About release identity source/tests;
+- Android/iOS version source;
+- Linux AppStream release metadata;
+- completion/packaging validators and tests.
+
+The focused workflow runs:
+
+```text
+python tools/validate_completion_status.py .
+python tools/validate_packaging_metadata.py .
+python -m unittest tools.tests.test_validate_completion_status
+python -m unittest tools.tests.test_validate_packaging_metadata
+```
+
+It uses read-only repository permissions.
+
+## Integrated Source Preflight
+
+`tools/release_preflight.py` now includes:
+
+- the 2.8.03 completion-status validator;
+- its Python regression suite.
+
+`tools/tests/test_release_preflight.py` requires both entries so completion-status coverage cannot silently disappear.
+
+The release-document validator was also updated from older tag/status wording to the 2.8.03 release/evidence contracts.
 
 ## Completed product scope
 
-### Calculator and scientific
+### Calculator and scientific — COMPLETE
 
-Complete standard/scientific calculation, percentage, repeated-equals, memory, sanitized import/paste/copy, keyboard mappings, caret/selection-aware editing, and workload/error contracts.
+Standard/scientific calculation, precedence, scientific functions/constants, angle modes, percentage, repeated equals, memory, sanitized import/paste/copy, keyboard mappings, and selection/caret-aware editing.
 
-### Exact rational arithmetic
+### Exact rational arithmetic — COMPLETE
 
-Complete bounded exact `BigInteger` rational parsing, canonicalization, arithmetic, comparison, default-value safety, Calculator panel, tests, and source validation.
+Bounded canonical `BigInteger` rationals, exact decimal/scientific parsing, arithmetic/comparison, default-value safety, Calculator panel, tests, and source validation.
 
-### Engineering notation
+### Engineering notation — COMPLETE
 
-Complete bounded engineering format/parse workflows, significant-digit selection, exponent limits, underflow protection, shared input budget, Calculator panel, tests, and source validation.
+Bounded engineering format/parse workflows, significant-digit formatting, finite exponent limits, non-zero-underflow rejection, shared 4,096-character input contract, Calculator panel, tests, and validation.
 
-### Programmer and Unicode
+### Programmer and Unicode — COMPLETE
 
-Complete base 2–36 programmer workflows, fixed-width signed/unsigned operations, bit grids, accessible bit states, copy actions, Unicode scalar conversion/inspection, and local Unicode metadata.
+Base 2–36 tools, fixed-width signed/unsigned bitwise operations/shifts, 8/16/32/64/128-bit grids, accessible bit states, copy actions, Unicode scalar conversion/inspection, and local Unicode metadata.
 
-### Conversion, date/time, and currency
+### Converter, currency, and date/time — COMPLETE
 
-Complete offline fixed-unit conversion, search/recents/favorites/persistence/precision workflows, date/time utilities, and replaceable currency provider/cache/offline-fallback architecture.
+Offline unit conversion, precision/search/recents/favorites/persistence/copy, converter preference/default contracts, replaceable currency provider/cache/offline fallback, and date/time/business-day/duration utilities.
 
-### Statistics, equations, and matrices
+### Statistics, equations, and matrices — COMPLETE
 
-Complete descriptive statistics, covariance/correlation/regression/prediction, equation-solving workflows, matrix determinant/inverse/rank/system-solving, and copy workflows.
+Descriptive statistics, paired covariance/correlation/regression/`R²`/prediction, deterministic edge handling, equation workflows, matrix determinant/inverse/rank/system solving, and copy workflows.
 
-### Graphing and numerical analysis
+### Graphing/numerical analysis — COMPLETE
 
-Complete bounded sampling, viewport interaction, multi-series presentation, non-color differentiation, trace/CSV/SVG export, derivative/root/integration analysis, extreme-value hardening, and workload budgets.
+Bounded sampling, discontinuity handling, viewport interaction, multi-series presentation, non-color differentiation, trace/CSV/SVG, derivative/root/integration analysis, extreme-value safety, and workload budgets.
 
-### History, export, settings, and persistence
+### History/settings/persistence/export — COMPLETE
 
-Complete native/Browser storage composition, history search/favorite/delete/clear, bounded exports/previews, settings schema/migration/validation, and preference persistence.
+Native/Browser storage composition, history operations, bounded exports/previews, settings schema/migration/validation, and preference persistence.
 
-### Accessibility, adaptive UI, onboarding, and localization
+### Accessibility/adaptive/onboarding/localization baseline — COMPLETE
 
-Complete source baseline for interaction targets, focus/high-contrast behavior, adaptive profiles, keyboard navigation, dynamic-control accessibility, onboarding focus/shortcut behavior, English/Hindi semantic catalogs, and reviewed live localized surfaces.
+Interaction targets, focus/high-contrast behavior, adaptive profiles, keyboard navigation, dynamic-control accessibility, onboarding behavior, English/Hindi semantic catalogs, and reviewed live localized surfaces.
 
-### Platforms
+Additional language packs or translation expansion are optional post-release improvements.
 
-Complete source composition for Desktop, Browser/WebAssembly, Android, and iOS, with shared clipboard/external-link/storage abstractions and platform build/release workflow contracts.
+### Platform source composition — COMPLETE
 
-### Release, integrity, and evidence tooling
+Desktop, Browser/WebAssembly, Android, and iOS source composition plus platform workflow/package contracts.
 
-Complete integrated source preflight, focused validators/workflows, Source Preflight workflow self-validation, release-tag/workflow contracts, packaging metadata checks, artifact manifest/checksum tooling, and structured release-evidence model/runner/verifier/schema.
+### Release/integrity/evidence infrastructure — COMPLETE
+
+Integrated source preflight, focused validators/workflows, release-tag/workflow contracts, package metadata validation, artifact checksum/manifest tooling, and structured release-evidence schema/model/runner/verifier.
+
+## Local validation attempt
+
+A fresh clone was attempted from the assistant container to run the final integrated Python preflight against the materialized repository tree.
+
+The container could not resolve `github.com`, so cloning stopped before the repository was materialized and the preflight command did not execute.
+
+That attempt is recorded as an environment networking limitation, not as a CalcNova validation failure.
 
 ## Evidence policy
 
-Product implementation completion and execution evidence are intentionally separate.
+Product implementation completion and execution evidence remain intentionally separate.
 
-A command or platform check is marked PASS only if it actually ran and its result was observed. If a required SDK, device, signing credential, accessibility tool, or store service is unavailable in a particular environment, the evidence is recorded as `NOT RUN` or `BLOCKED` rather than inventing success.
+A command/platform check is recorded as PASS only when it actually runs and the result is observed. When the required SDK/device/credential/tool/store service cannot be used in a particular environment, evidence is recorded as `NOT RUN` or `BLOCKED` instead of inventing success.
 
-That evidence status does **not** mean CalcNova 2.8.03 is an unfinished project. It only describes what was or was not executed in that environment.
+That does **not** make CalcNova 2.8.03 unfinished; it describes only whether a specific external verification operation executed in that environment.
 
 ## Final classification
 
@@ -186,8 +267,9 @@ That evidence status does **not** mean CalcNova 2.8.03 is an unfinished project.
 - Source validation infrastructure: **COMPLETE**
 - Packaging/release infrastructure: **COMPLETE**
 - Artifact/release-evidence infrastructure: **COMPLETE**
+- Current supported security baseline: **2.8.03**
 - Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**
 
 ## Handoff rule
 
-Do not recreate completed 2.8.03 source work in future continuations. Start from maintenance, a concrete observed bug, a security/compatibility update, documentation correction, translation addition, or an explicitly requested optional enhancement.
+Do not recreate completed 2.8.03 source work in later continuations. Continue only from a concrete observed defect, security/compatibility maintenance need, documentation correction, translation request, dependency update, test improvement, or explicitly requested optional enhancement.
