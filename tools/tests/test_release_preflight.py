@@ -44,6 +44,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools/validate_navigation_contracts.py",
             "tools/validate_keyboard_contracts.py",
             "tools/validate_graph_keyboard.py",
+            "tools/validate_headless_ui_tests.py",
             "tools/validate_accessibility_markup.py",
             "tools/validate_focus_visibility.py",
             "tools/validate_accessibility_evidence.py",
@@ -68,6 +69,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
         expected_modules = {
             "tools.tests.test_validate_release_workflow",
             "tools.tests.test_validate_release_docs",
+            "tools.tests.test_validate_headless_ui_tests",
             "tools.tests.test_validate_focus_visibility",
             "tools.tests.test_validate_accessibility_evidence",
             "tools.tests.test_validate_keyboard_contracts",
