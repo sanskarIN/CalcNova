@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using CalcNova.Platform.Settings;
 
@@ -65,6 +66,8 @@ public sealed class BrowserSettingsRepository : ISettingsRepository
             throw new InvalidDataException("The stored angle unit is invalid.");
         }
 
+        ValidateCultureName(settings.CultureName);
+
         if (settings.DecimalPrecision is < 1 or > 29)
         {
             throw new InvalidDataException("Decimal precision must be between 1 and 29.");
@@ -75,8 +78,30 @@ public sealed class BrowserSettingsRepository : ISettingsRepository
             throw new InvalidDataException("History limit must be between 1 and 5000.");
         }
 
+        if (settings.CompletedOnboardingVersion < 0)
+        {
+            throw new InvalidDataException("The stored onboarding version cannot be negative.");
+        }
+
         ValidateConverterState(settings);
         return settings;
+    }
+
+    private static void ValidateCultureName(string? cultureName)
+    {
+        if (string.IsNullOrWhiteSpace(cultureName) || cultureName.Length > 64)
+        {
+            throw new InvalidDataException("The stored application culture is invalid.");
+        }
+
+        try
+        {
+            _ = CultureInfo.GetCultureInfo(cultureName);
+        }
+        catch (CultureNotFoundException exception)
+        {
+            throw new InvalidDataException("The stored application culture is invalid.", exception);
+        }
     }
 
     private static void ValidateConverterState(AppSettings settings)
