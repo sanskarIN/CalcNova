@@ -6,6 +6,8 @@ public static class EngineeringNotationFormatter
 {
     public const int MinimumSignificantDigits = 1;
     public const int MaximumSignificantDigits = 15;
+    public const int MinimumEngineeringExponent = -324;
+    public const int MaximumEngineeringExponent = 306;
 
     public static string Format(double value, int significantDigits = 12)
     {
@@ -27,7 +29,7 @@ public static class EngineeringNotationFormatter
             NumberStyles.Float,
             CultureInfo.InvariantCulture);
 
-        if (Math.Abs(roundedMantissa) >= 1000d && exponent <= 303)
+        if (Math.Abs(roundedMantissa) >= 1000d && exponent <= MaximumEngineeringExponent - 3)
         {
             roundedMantissa /= 1000d;
             exponent += 3;
@@ -67,6 +69,12 @@ public static class EngineeringNotationFormatter
         if (exponent % 3 != 0)
         {
             throw new FormatException("Engineering exponent must be a multiple of 3.");
+        }
+
+        if (exponent is < MinimumEngineeringExponent or > MaximumEngineeringExponent)
+        {
+            throw new OverflowException(
+                $"Engineering exponent must be from {MinimumEngineeringExponent} through {MaximumEngineeringExponent}.");
         }
 
         if (mantissa != 0d && Math.Abs(mantissa) is < 1d or >= 1000d)
