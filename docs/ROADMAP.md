@@ -32,6 +32,8 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Accessible bit-cell names.
 - Unicode scalar/code-point helper backend and shared UI.
 - Shared Unicode decode/inspection result copy actions.
+- Local Unicode scalar metadata for general category, Unicode plane, UTF-8 byte width, and UTF-16 code-unit width.
+- Shared Unicode metadata presentation and copy controls without a network lookup.
 
 ### Conversion and utility modules
 
@@ -69,6 +71,10 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - Shared bounded single-expression table-of-values CSV export/copy.
 - Shared bounded multi-expression sampling and identified CSV export/copy.
 - Newline-separated multi-expression parsing with stable generated series identities.
+- Deterministic multi-series line-pattern differentiation that does not rely on color alone.
+- Shared multi-series text legend synchronized with the active graph presentation.
+- Extreme-bound numerical-analysis hardening plus dedicated edge-case and workload-budget regressions.
+- Explicit graph sampling, root-iteration, and Simpson-integration workload-budget coverage.
 
 ### Persistence and platform architecture
 
@@ -108,15 +114,18 @@ This roadmap tracks planned work without promising fixed release dates. Implemen
 - English/Hindi regional culture selection such as `en-IN` and `hi-IN`.
 - Persisted culture preference.
 - Multi-catalog completeness/duplicate validation.
+- Runtime localization of shared shell headers, calculator prompts, and onboarding copy.
+- Expanded semantic keys for settings, history, currency, About, and other product surfaces.
 
-The shared XAML is still predominantly hard-coded English; semantic catalog support is therefore a foundation, not a claim of fully localized UI.
+The shared XAML still contains hard-coded English outside migrated surfaces; semantic catalog support is therefore a foundation, not a claim of fully localized UI.
 
 ### Validation and release infrastructure
 
 - Repository validation, formatting, build/test, coverage, security, advanced-utility, release, UI-contract, and platform workflow foundations.
 - Source-level shared-XAML command/property contract validation.
 - Source-level Avalonia XML well-formedness validation.
-- Dedicated adaptive-layout, touch-target, keyboard, graph-keyboard, focus-visibility, accessibility-evidence, localization, settings-schema, onboarding, and packaging-metadata source validators/workflows.
+- Dedicated adaptive-layout, touch-target, keyboard, graph-keyboard, graph-surface, graph-series-presentation, numerical-analysis, Unicode-metadata, focus-visibility, accessibility-evidence, localization, settings-schema, onboarding, and packaging-metadata source validators/workflows.
+- Dedicated graph workload-budget validation covering sample caps, root iteration limits, and integration limits.
 - Python regression tests for the source validators added during hardening.
 - Unified SDK-independent release preflight covering the current source-contract inventory.
 - Versioned release/package identity metadata for supported heads/templates.
@@ -155,8 +164,8 @@ The shared XAML is still predominantly hard-coded English; semantic catalog supp
 
 ### Localization UI migration
 
-- Migrate visible shared XAML strings to the semantic localization layer in compile-verified increments.
-- Localize accessibility names, onboarding, settings, units/categories, date/time labels, empty states, and About/Support text.
+- Continue migrating remaining visible shared XAML strings to the semantic localization layer in compile-verified increments.
+- Localize remaining accessibility names, settings, units/categories, date/time labels, empty states, and About/Support text.
 - Validate Hindi long-string/Devanagari layout at compact widths and large text sizes.
 - Add further reviewed language packs only when translation quality and layout can be validated.
 
@@ -173,13 +182,12 @@ The shared XAML is still predominantly hard-coded English; semantic catalog supp
 - Evaluate optional per-category converter default pairs after settings migration behavior is validated in real storage environments.
 - Add visible persistence/privacy explanation for saved converter preferences.
 - Evaluate custom programmer word sizes only if interaction and workload semantics remain clear.
-- Add additional Unicode metadata only from stable local data sources.
+- Evaluate richer Unicode names/properties only if a stable local data source can be versioned and validated without weakening the local-first contract.
 
 ### Graph presentation
 
-- Add deterministic multi-series visual differentiation that never relies on color alone.
 - Improve axis/grid labels and optional explicit viewport controls after runtime graph interaction is validated.
-- Continue numerical-analysis edge-case coverage and workload-budget testing.
+- Extend numerical-analysis regression coverage when new real-world edge cases are observed.
 
 ## Later
 
