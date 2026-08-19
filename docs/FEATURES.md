@@ -18,12 +18,13 @@ This document distinguishes implemented source/shared-app integration from remai
 - MC, MR, MS, M+, M- memory behavior;
 - sanitized imported expression text with common calculator-glyph normalization;
 - user-triggered sanitized clipboard paste;
-- valid-result clipboard copy through a platform abstraction.
+- valid-result clipboard copy through a platform abstraction;
+- top-row/numpad digit and numpad arithmetic mappings outside active text fields.
 
 ### Remaining product work
 
 - cursor/selection-aware calculator editing;
-- broader physical keyboard/numpad shortcuts;
+- locale-aware printable operator shortcuts without breaking text editing/browser conventions;
 - configurable result-presentation modes beyond current feature-specific formatting;
 - target-platform clipboard validation.
 
@@ -49,7 +50,7 @@ This document distinguishes implemented source/shared-app integration from remai
 
 ### Remaining product work
 
-- more compact/adaptive function grouping;
+- more compact/adaptive function grouping if target-device evidence shows current horizontal fallback is insufficient;
 - function discovery/search;
 - optional engineering/fraction presentation after numeric-design review.
 
@@ -76,8 +77,8 @@ This document distinguishes implemented source/shared-app integration from remai
 
 ### Remaining product work
 
-- compact-layout/virtualization polish for 64/128-bit grids;
-- screen-reader and keyboard validation on supported platforms.
+- compact-layout/virtualization changes only if real narrow-device testing demonstrates a usability problem;
+- screen-reader and keyboard traversal validation on supported platforms.
 
 ## Unit converter
 
@@ -104,8 +105,8 @@ Additional implemented source/app behavior:
 
 ### Remaining product work
 
-- optional per-category default pairs;
-- compact responsive layout refinement;
+- optional per-category default pairs after real settings-migration/storage validation;
+- compact responsive layout refinement based on target-device evidence;
 - target-platform clipboard/accessibility validation.
 
 ## Currency converter
@@ -157,7 +158,7 @@ Additional implemented source/app behavior:
 
 - richer grouped/multi-select management where it improves usability;
 - platform-specific file-save/share polish;
-- additional UI/integration automation.
+- real shared-shell UI/integration automation.
 
 ## Graphing
 
@@ -167,7 +168,14 @@ Additional implemented source/app behavior:
 - configurable bounded X range/sample count;
 - invalid-sample/discontinuity segmentation;
 - graph viewport model;
-- interactive Avalonia plot control;
+- focusable interactive Avalonia plot control;
+- pointer drag panning;
+- pointer-wheel zoom around the pointer;
+- double-tap/double-click fit-to-data;
+- keyboard arrow-key panning;
+- keyboard numpad Add/Subtract zoom;
+- keyboard Home viewport reset;
+- keyboard `F` fit-to-data;
 - deterministic accessible SVG export;
 - explicit SVG generation/copy workflow;
 - central-difference derivative approximation;
@@ -183,10 +191,10 @@ Additional implemented source/app behavior:
 
 ### Remaining product work
 
-- deterministic multi-series color assignment by theme;
-- final pan/zoom/reset controls and labels;
-- compact/mobile graph-control refinement;
-- expanded numerical edge-case coverage.
+- deterministic multi-series visual differentiation that never depends on color alone;
+- compact/mobile graph-control refinement after target validation;
+- expanded numerical edge-case coverage;
+- runtime keyboard/focus/screen-reader validation.
 
 ## Statistics
 
@@ -238,18 +246,40 @@ Equation-solving module and shared view model are present, including quadratic w
 
 - settings repository abstraction;
 - shared settings view model;
-- theme/angle/history settings integration;
+- theme/angle/history/accessibility settings integration;
 - converter preference persistence;
-- bounded native JSON and browser settings validation;
+- persisted culture preference;
+- explicit settings schema version;
+- legacy schema-v0 normalization to the current schema;
+- fail-closed rejection of corrupt negative and unsupported future schemas;
+- shared schema normalization on native JSON and Browser storage paths;
+- bounded native JSON and Browser settings validation;
 - About/support view model;
 - external-link abstraction.
 
 ### Remaining product work
 
-- final settings information architecture;
-- onboarding/feature discovery;
-- localization expansion;
-- complete accessibility validation.
+- final settings information architecture after runtime testing;
+- full visible-XAML localization migration;
+- complete accessibility and platform persistence validation.
+
+## Localization
+
+### Implemented source foundation
+
+- stable semantic localization keys;
+- complete English catalog;
+- complete Hindi catalog for the current semantic key set;
+- regional English/Hindi culture selection;
+- persisted culture preference;
+- multi-catalog completeness, unknown-key, and duplicate-key validation.
+
+### Remaining product work
+
+- migrate the predominantly English shared XAML to localized bindings in compile-verified increments;
+- localize accessibility names/onboarding/unit display/date labels/About text;
+- validate Hindi long-string and large-text layouts on target sizes;
+- add additional reviewed languages only after translation and layout review.
 
 ## Accessibility baseline
 
@@ -257,23 +287,57 @@ Equation-solving module and shared view model are present, including quadratic w
 
 - global minimum 44-pixel heights for common interactive controls;
 - 54-pixel standard calculator keys;
+- explicit focused-state border emphasis for buttons, text boxes, combo boxes, check boxes, tabs, and list items;
+- stronger focused-state emphasis under CalcNova high contrast;
 - keyboard Enter/Escape/Backspace handling for the primary calculator workflow;
+- Ctrl+PageUp/PageDown/Home/End shared mode navigation;
+- focus bring-into-view on shared mode scroll containers;
 - accessible names for programmer bit cells;
 - byte-grouped programmer presentation;
 - textual alternatives for bit patterns and graph-analysis results;
+- keyboard-operable graph viewport;
 - graph CSV output and accessible SVG export paths;
 - reduced-motion/high-contrast preference fields in settings;
-- source-level shared XAML command/property contract validation;
-- source-level Avalonia XML well-formedness validation.
+- onboarding focus/shortcut source contracts;
+- runtime accessibility evidence matrix using PASS/FAIL/BLOCKED/NOT RUN states;
+- source-level XAML, touch-target, focus, keyboard, graph-keyboard, adaptive-layout, and evidence validation.
 
 ### Remaining validation/polish
 
-- complete keyboard traversal audit;
+- actual Tab/Shift+Tab traversal audit;
 - screen-reader testing on target platforms;
-- high-contrast/theme verification;
-- large-text/narrow-window validation;
-- compact mobile layout pass;
+- measured high-contrast/theme verification;
+- large-text/narrow-window target validation;
+- mobile portrait/landscape validation;
 - real Avalonia UI automation and target accessibility validation.
+
+## Release/source validation
+
+### Implemented
+
+- repository/security source checks;
+- XAML XML and shared-binding contracts;
+- keyboard/navigation contracts;
+- graph keyboard contracts;
+- focus visibility and touch-target contracts;
+- adaptive-layout contracts;
+- accessibility evidence discipline;
+- English/Hindi catalog validation;
+- settings-schema migration contracts;
+- onboarding contracts;
+- cross-platform package metadata contracts;
+- release documentation/tag validators;
+- regression tests for the SDK-independent validators;
+- unified SDK-independent release preflight.
+
+### Still requires execution evidence
+
+- .NET restore/build/format/test;
+- Avalonia compiled-XAML/UI automation;
+- Android/iOS workload builds and signed packages;
+- Browser publish output;
+- Windows/Linux/macOS packaging;
+- target-device accessibility, clipboard, storage, and adaptive-layout behavior.
 
 ## Privacy baseline
 
@@ -290,4 +354,4 @@ Equation-solving module and shared view model are present, including quadratic w
 
 ## Platforms
 
-Desktop, Browser/WebAssembly, Android, and iOS source heads/composition exist. Platform source presence does not automatically imply a validated package/store build. See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md) and [`PROJECT_STATE.md`](../PROJECT_STATE.md) for validation status.
+Desktop, Browser/WebAssembly, Android, and iOS source heads/composition exist. Platform source presence does not automatically imply a validated package/store build. See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md), [`ACCESSIBILITY_TEST_MATRIX.md`](ACCESSIBILITY_TEST_MATRIX.md), and [`PROJECT_STATE.md`](../PROJECT_STATE.md) for validation status.
