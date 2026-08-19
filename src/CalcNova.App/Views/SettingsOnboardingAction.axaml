@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalcNova.App.Views.SettingsOnboardingAction">
+  <StackPanel Spacing="6">
+    <TextBlock Text="Introduction"
+               FontWeight="SemiBold" />
+    <TextBlock Text="Show the short CalcNova introduction again without resetting your other settings."
+               Opacity="0.62"
+               TextWrapping="Wrap" />
+    <Button Content="Show introduction again"
+            Command="{Binding RestartOnboardingCommand}"
+            AutomationProperties.Name="Show CalcNova introduction again"
+            HorizontalAlignment="Left" />
+  </StackPanel>
+</UserControl>
