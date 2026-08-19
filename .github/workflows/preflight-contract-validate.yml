@@ -1,0 +1,54 @@
+name: Preflight Contract Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/release_preflight.py"
+      - "tools/tests/test_release_preflight.py"
+      - "tools/scripts/validate_repository.py"
+      - "tools/validate_xaml.py"
+      - "tools/validate_ui_contracts.py"
+      - "tools/validate_navigation_contracts.py"
+      - "tools/validate_keyboard_contracts.py"
+      - "tools/validate_accessibility_markup.py"
+      - "tools/validate_localization_catalog.py"
+      - "tools/validate_onboarding_contracts.py"
+      - "tools/validate_packaging_metadata.py"
+      - "tools/tests/test_validate_release_tag.py"
+      - ".github/workflows/preflight-contract-validate.yml"
+  pull_request:
+    paths:
+      - "tools/release_preflight.py"
+      - "tools/tests/test_release_preflight.py"
+      - "tools/scripts/validate_repository.py"
+      - "tools/validate_xaml.py"
+      - "tools/validate_ui_contracts.py"
+      - "tools/validate_navigation_contracts.py"
+      - "tools/validate_keyboard_contracts.py"
+      - "tools/validate_accessibility_markup.py"
+      - "tools/validate_localization_catalog.py"
+      - "tools/validate_onboarding_contracts.py"
+      - "tools/validate_packaging_metadata.py"
+      - "tools/tests/test_validate_release_tag.py"
+      - ".github/workflows/preflight-contract-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-preflight-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Test integrated preflight inventory
+        run: python tools/tests/test_release_preflight.py
