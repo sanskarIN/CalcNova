@@ -27,6 +27,10 @@
             <Border Padding="12" CornerRadius="14">
               <StackPanel Spacing="6">
                 <TextBox Text="{Binding Expression, Mode=TwoWay}" Watermark="Enter an expression" FontSize="19" HorizontalContentAlignment="Right" />
+                <WrapPanel HorizontalAlignment="Right">
+                  <Button Content="Paste expression" Command="{Binding PasteCommand}" Margin="0,0,6,6" />
+                  <Button Content="Copy result" Command="{Binding CopyResultCommand}" Margin="0,0,0,6" />
+                </WrapPanel>
                 <Button Command="{Binding UseResultCommand}" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Right">
                   <TextBlock Text="{Binding Result}" FontSize="32" FontWeight="SemiBold" TextWrapping="Wrap" />
                 </Button>
@@ -91,13 +95,31 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
           <StackPanel DataContext="{Binding Programmer}" Margin="8" Spacing="10">
             <TextBlock Text="Programmer Calculator" FontSize="21" FontWeight="SemiBold" />
-            <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Value" />
-            <TextBlock Text="Input radix" Opacity="0.62" />
-            <ComboBox ItemsSource="{Binding CommonBases}" SelectedItem="{Binding InputBase, Mode=TwoWay}" />
+            <TextBox Text="{Binding Input, Mode=TwoWay}" Watermark="Primary value" />
+            <TextBlock Text="Input radix (2–36)" Opacity="0.62" />
+            <ComboBox ItemsSource="{Binding SupportedBases}" SelectedItem="{Binding InputBase, Mode=TwoWay}" />
             <TextBlock Text="Word size" Opacity="0.62" />
             <ComboBox ItemsSource="{Binding WordSizes}" SelectedItem="{Binding WordSize, Mode=TwoWay}" />
             <CheckBox Content="Signed two's-complement interpretation" IsChecked="{Binding Signed, Mode=TwoWay}" />
-            <Button Content="Convert" Command="{Binding ConvertCommand}" HorizontalAlignment="Left" />
+            <WrapPanel>
+              <Button Content="Convert" Command="{Binding ConvertCommand}" Margin="0,0,6,6" />
+              <Button Content="NOT" Command="{Binding NotCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
+            <TextBlock Text="Second operand (same radix)" Opacity="0.62" />
+            <TextBox Text="{Binding Operand, Mode=TwoWay}" Watermark="Second operand" />
+            <WrapPanel>
+              <Button Content="AND" Command="{Binding AndCommand}" Margin="0,0,6,6" />
+              <Button Content="OR" Command="{Binding OrCommand}" Margin="0,0,6,6" />
+              <Button Content="XOR" Command="{Binding XorCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
+            <TextBlock Text="Shift count" Opacity="0.62" />
+            <TextBox Text="{Binding ShiftCount, Mode=TwoWay}" Watermark="Shift count" />
+            <WrapPanel>
+              <Button Content="Shift left" Command="{Binding ShiftLeftCommand}" Margin="0,0,6,6" />
+              <Button Content="Logical right" Command="{Binding LogicalShiftRightCommand}" Margin="0,0,6,6" />
+              <Button Content="Arithmetic right" Command="{Binding ArithmeticShiftRightCommand}" Margin="0,0,6,6" />
+            </WrapPanel>
+            <TextBlock Text="{Binding LastOperation}" Opacity="0.62" />
             <Grid ColumnDefinitions="Auto,*">
               <TextBlock Text="BIN" FontWeight="SemiBold" Margin="0,0,10,0" />
               <TextBlock Grid.Column="1" Text="{Binding Binary}" TextWrapping="Wrap" />
@@ -125,7 +147,11 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Button Content="{Binding Label}" Command="{Binding ToggleCommand}" Margin="0,0,6,6" MinWidth="58" />
+                  <Button Content="{Binding Label}"
+                          Command="{Binding ToggleCommand}"
+                          AutomationProperties.Name="{Binding AccessibleLabel}"
+                          Margin="0,0,6,6"
+                          MinWidth="58" />
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
