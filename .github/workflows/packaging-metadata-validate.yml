@@ -11,6 +11,7 @@ on:
       - "src/CalcNova.Browser/CalcNova.Browser.csproj"
       - "packaging/**"
       - "tools/validate_packaging_metadata.py"
+      - "tools/tests/test_validate_packaging_metadata.py"
       - "docs/RELEASE.md"
       - ".github/workflows/packaging-metadata-validate.yml"
   pull_request:
@@ -22,6 +23,7 @@ on:
       - "src/CalcNova.Browser/CalcNova.Browser.csproj"
       - "packaging/**"
       - "tools/validate_packaging_metadata.py"
+      - "tools/tests/test_validate_packaging_metadata.py"
       - "docs/RELEASE.md"
       - ".github/workflows/packaging-metadata-validate.yml"
   workflow_dispatch:
@@ -44,3 +46,6 @@ jobs:
 
       - name: Validate package metadata
         run: python tools/validate_packaging_metadata.py .
+
+      - name: Run packaging validator regression tests
+        run: python -m unittest tools.tests.test_validate_packaging_metadata
