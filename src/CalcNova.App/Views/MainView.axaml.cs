@@ -223,17 +223,20 @@ public partial class MainView : UserControl
         _localizedWatermarks.Clear();
     }
 
-    private void HandleCultureChanged(CultureInfo culture)
+    private void HandleCultureChanged(CultureInfo culture) => RefreshLocalizationTargets();
+
+    private void HandleLocalizationSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs) =>
+        RefreshLocalizationTargets();
+
+    private void RefreshLocalizationTargets()
     {
-        Dispatcher.UIThread.Post(() =>
+        if (Dispatcher.UIThread.CheckAccess())
         {
             CaptureLocalizedControls();
             ApplyLocalization();
-        });
-    }
+            return;
+        }
 
-    private void HandleLocalizationSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
-    {
         Dispatcher.UIThread.Post(() =>
         {
             CaptureLocalizedControls();
