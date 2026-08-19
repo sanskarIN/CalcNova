@@ -1,4 +1,5 @@
 using CalcNova.App.ViewModels;
+using CalcNova.Graphing;
 using CalcNova.Platform.Clipboard;
 using Xunit;
 
@@ -19,16 +20,18 @@ public sealed class GraphExportPreviewViewModelTests
         };
 
         viewModel.PlotCommand.Execute(null);
+        var expectedFullExport = GraphTableExporter.ToCsv(viewModel.TableRows);
 
-        Assert.True(viewModel.TableCsv.Length > viewModel.TablePreview.Length);
-        Assert.True(viewModel.TablePreview.Length <= 4_096);
-        Assert.Contains("preview truncated", viewModel.TablePreview, StringComparison.Ordinal);
+        Assert.True(expectedFullExport.Length > viewModel.TableCsv.Length);
+        Assert.Equal(viewModel.TablePreview, viewModel.TableCsv);
+        Assert.True(viewModel.TableCsv.Length <= 4_096);
+        Assert.Contains("preview truncated", viewModel.TableCsv, StringComparison.Ordinal);
 
         viewModel.CopyTableCommand.Execute(null);
         await clipboard.WaitForWriteAsync();
 
-        Assert.Equal(viewModel.TableCsv, clipboard.WrittenText);
-        Assert.NotEqual(viewModel.TablePreview, clipboard.WrittenText);
+        Assert.Equal(expectedFullExport, clipboard.WrittenText);
+        Assert.NotEqual(viewModel.TableCsv, clipboard.WrittenText);
     }
 
     [Fact]
@@ -44,16 +47,18 @@ public sealed class GraphExportPreviewViewModelTests
         };
 
         viewModel.PlotMultipleCommand.Execute(null);
+        var expectedFullExport = MultiGraphTableExporter.ToCsv(viewModel.MultiTableRows);
 
-        Assert.True(viewModel.MultiTableCsv.Length > viewModel.MultiTablePreview.Length);
-        Assert.True(viewModel.MultiTablePreview.Length <= 4_096);
-        Assert.Contains("preview truncated", viewModel.MultiTablePreview, StringComparison.Ordinal);
+        Assert.True(expectedFullExport.Length > viewModel.MultiTableCsv.Length);
+        Assert.Equal(viewModel.MultiTablePreview, viewModel.MultiTableCsv);
+        Assert.True(viewModel.MultiTableCsv.Length <= 4_096);
+        Assert.Contains("preview truncated", viewModel.MultiTableCsv, StringComparison.Ordinal);
 
         viewModel.CopyMultiTableCommand.Execute(null);
         await clipboard.WaitForWriteAsync();
 
-        Assert.Equal(viewModel.MultiTableCsv, clipboard.WrittenText);
-        Assert.NotEqual(viewModel.MultiTablePreview, clipboard.WrittenText);
+        Assert.Equal(expectedFullExport, clipboard.WrittenText);
+        Assert.NotEqual(viewModel.MultiTableCsv, clipboard.WrittenText);
     }
 
     [Fact]
@@ -65,21 +70,23 @@ public sealed class GraphExportPreviewViewModelTests
             Expression = "sin(x)",
             MinimumX = "-20",
             MaximumX = "20",
-            SampleCount = 600
+            SampleCount = 2_000
         };
         viewModel.PlotCommand.Execute(null);
 
         viewModel.GenerateSvgCommand.Execute(null);
+        var expectedFullExport = new SvgGraphExporter().Export(viewModel.Segments);
 
-        Assert.True(viewModel.SvgExport.Length > viewModel.SvgPreview.Length);
-        Assert.True(viewModel.SvgPreview.Length <= 4_096);
-        Assert.Contains("preview truncated", viewModel.SvgPreview, StringComparison.Ordinal);
+        Assert.True(expectedFullExport.Length > viewModel.SvgExport.Length);
+        Assert.Equal(viewModel.SvgPreview, viewModel.SvgExport);
+        Assert.True(viewModel.SvgExport.Length <= 4_096);
+        Assert.Contains("preview truncated", viewModel.SvgExport, StringComparison.Ordinal);
 
         viewModel.CopySvgCommand.Execute(null);
         await clipboard.WaitForWriteAsync();
 
-        Assert.Equal(viewModel.SvgExport, clipboard.WrittenText);
-        Assert.NotEqual(viewModel.SvgPreview, clipboard.WrittenText);
+        Assert.Equal(expectedFullExport, clipboard.WrittenText);
+        Assert.NotEqual(viewModel.SvgExport, clipboard.WrittenText);
     }
 
     private sealed class FakeClipboardService : IClipboardService
