@@ -1,148 +1,155 @@
 # Changelog
 
-All notable user-visible changes to CalcNova are documented here.
+All notable CalcNova changes are recorded here.
 
-The format is inspired by Keep a Changelog, and the project intends to use semantic versioning for validated releases.
+## [2.8.03] - 2026-08-19
 
-## [Unreleased]
+**Status: Complete**
 
-### Added
+Public/product version: `2.8.03`  
+Normalized package version: `2.8.3`  
+Normalized release tag: `v2.8.3`  
+Mobile build code: `20803`
 
-- Modular C#/.NET/Avalonia architecture with Desktop, Browser/WebAssembly, Android, and iOS heads.
-- Project-owned tokenizer, parser, evaluator, typed calculation errors, and workload limits.
-- Arbitrary-precision integer support, decimal-first arithmetic, and bounded floating-point fallbacks.
-- Standard/scientific calculation with angle modes, percentage behavior, repeated equals, and classic calculator memory.
-- Sanitized imported-expression pipeline with normalization for common calculator glyphs.
-- Platform-safe clipboard abstraction with explicit paste and copy-result workflows.
-- Selection-aware calculator keypad editing that inserts at the tracked caret, replaces selections, performs caret-aware Backspace, restores the requested TextBox caret, and supports selection-preserving function/parenthesis wrapping.
-- Safe top-row/numpad and printable/shifted calculator operator mappings outside active text-editing fields.
-- Bounded exact `BigInteger` rational arithmetic with canonical normalization, exact decimal/scientific parsing, arithmetic/comparison, workload limits, Calculator utility UI, tests, focused source validation, and release-preflight integration.
-- Bounded engineering-notation formatter/parser with 1–15 significant digits, explicit -324..306 engineering exponent limits, a 4,096-character input budget, non-zero-underflow rejection, extreme-finite-value scaling, Calculator utility UI, tests, focused source validation, and release-preflight integration.
-- Programmer mode with full base 2–36 selection, signed/unsigned fixed-width interpretation, bitwise operations, shifts, and 8/16/32/64/128-bit interactive grids.
-- Programmer byte-group presentation plus explicit binary/octal/decimal/hex/fixed-width bit copy actions.
-- Unicode scalar/code-point conversion, bounded text inspection, local general-category/plane/UTF-8/UTF-16 metadata, and explicit result/metadata copy workflows.
-- Offline fixed-unit converter with recent pairs, favorites, selectable precision, persisted converter preferences, category-scoped unit search, clear-recents, search-result assignment, and result copy.
-- Optional currency provider/cache architecture with offline fallback semantics.
-- Date difference, calendar arithmetic, business-day, and duration utilities.
-- Descriptive statistics plus bounded paired X/Y analysis for population/sample covariance, Pearson correlation, ordinary least-squares regression, `R²`, and regression prediction.
-- Shared bivariate-statistics panel with copy/prediction workflows, tests, focused validator/workflow, and integrated release-preflight coverage.
-- Equation and matrix modules with shared view models; statistics summary and matrix-result clipboard copy workflows.
-- Graph sampling, discontinuity segmentation, viewport/plot support, derivative approximation, bracketed root finding, and Simpson integration.
-- Graph nearest-sample trace, bounded table-of-values CSV, bounded multi-expression sampling/identified CSV, and accessible SVG generation/copy workflows.
-- Deterministic multi-series graph line patterns and synchronized text legend so series identification does not depend on color alone.
-- Graph keyboard viewport interaction: arrow-key pan, numpad Add/Subtract zoom, Home reset, and `F` fit-to-data.
-- Extreme-finite-value graph numerical-analysis hardening plus explicit sampling/root/integration workload-budget regressions.
-- Read-only graph viewport state for deterministic UI integration assertions.
-- Reusable bounded export-preview formatter with line/character limits, newline normalization, UTF-16 boundary safety, and complete private copy payloads.
-- SQLite native history, browser-safe history/storage, history search/favorites/delete/clear, and TXT/CSV/JSON export engine.
-- Explicit history export preview and clipboard-copy workflow for the currently visible/search-matching history set.
-- Shared settings, external-link, clipboard, and platform composition abstractions.
-- Versioned settings schema with legacy migration and fail-closed future-schema rejection.
-- Detection/migration of historical settings JSON that contains no `schemaVersion` property.
-- Shared schema-aware settings JSON decoder and validator used by native and Browser storage.
-- English and Hindi semantic localization catalogs for the current `AppStringKey` set, including regional English/Hindi culture selection and reviewed live product-surface mappings.
-- Global minimum touch-target sizing, accessible programmer bit-state labels, and dynamic graph-control accessibility contracts.
-- Explicit visible focus styling for common keyboard controls, with stronger focus emphasis under CalcNova high contrast.
-- Keyboard-first shared-shell mode navigation with `Ctrl+PageUp`, `Ctrl+PageDown`, `Ctrl+Home`, and `Ctrl+End`.
-- Runtime accessibility evidence matrix using PASS / FAIL / BLOCKED / NOT RUN status discipline.
-- Avalonia headless xUnit v3 test foundation using the repository-matched `Avalonia.Headless.XUnit` package.
-- Headless shared-shell tests for mode inventory, calculator command binding, selection-aware keypad editing, compact layout class, keyboard mode navigation, high-contrast state, onboarding, graph interaction, supplemental Calculator utilities, paired statistics, and dynamic controls.
-- SDK-independent source validators for repository/XAML/UI/navigation/keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bounded exports, bivariate statistics, headless UI, accessibility/focus/dynamic controls/adaptive layout/touch targets, localization, converter preferences, settings schema, onboarding, packaging/platform workflows, the Source Preflight workflow itself, iOS release validation, release workflow/documentation, artifact integrity, and structured release evidence.
-- Python regression tests for release-critical source validators and release tooling.
-- Integrated SDK-independent release/source preflight covering the current critical validation inventory.
-- Cross-platform validation workflows for Desktop, Browser, Android, and iOS source heads.
-- Cross-platform workflow source-contract validation protecting runner/workload/build configuration and keeping signing secrets out of normal validation builds.
-- Source Preflight workflow self-validation protecting broad trigger coverage, least-privilege permissions, runner/toolchain setup, and the integrated command.
-- Tag-first release workflow validation that detaches at the requested release tag before source preflight and `.NET` validation.
-- Exact-release-tag iOS simulator validation workflow that intentionally remains unsigned and does not claim device/App Store readiness.
-- Artifact manifest generation/verification and SHA-256 integrity infrastructure.
-- Machine-readable release-evidence schema/model/runner/verifier with explicit PASS/FAIL/BLOCKED/NOT RUN semantics.
-- Detailed calculator-editing, exact-rational, engineering-notation, bivariate-statistics, Unicode-metadata, graph-interaction/numerical-safety, export-preview, UI-automation, focus/accessibility, settings-migration/storage, platform, source-preflight, validation-evidence, testing, privacy, release, and final-source-audit documentation.
+### Calculator
 
-### Changed
+- Added the project-owned tokenizer, parser, evaluator, typed calculation errors, and workload limits.
+- Added standard arithmetic, explicit precedence, right-associative exponentiation, parentheses, unary operators, decimal/scientific input, and result reuse.
+- Added scientific functions, constants, degrees/radians/gradians, factorial, GCD/LCM, combinations/permutations, logarithmic/exponential functions, and trigonometric/hyperbolic functions.
+- Added calculator percentage semantics, repeated-equals behavior, and MC/MR/MS/M+/M- memory operations.
+- Added sanitized expression import, user-triggered paste, explicit copy result, top-row/numpad handling, and safe printable/shifted operator mappings.
+- Added selection-aware editing, caret restoration, forward/reversed selection replacement, Backspace semantics, and selection-preserving function/parenthesis wrapping.
 
-- Shared Avalonia shell expanded from the original calculator workspace to Calculator, Programmer, Code Points, Converter, Statistics, Equations, Matrices, Graph, Date/Time, Currency, History, Settings, and About modes, with supplemental exact-rational/engineering and paired-statistics panels integrated into their relevant modes.
-- Shared Programmer UI exposes byte-grouped bits and radix/fixed-width copy actions plus local Unicode metadata presentation/copy controls.
-- Shared Converter UI exposes unit search, search-result From/To assignment, result copy, clear-recents actions, and persisted recents/favorites/precision.
-- Shared Graph UI exposes trace, single-series CSV, multi-expression sampling/CSV, deterministic multi-series presentation, accessible SVG generation/copy controls, numerical analysis, and keyboard viewport interaction.
-- Shared Statistics mode exposes descriptive and paired-data covariance/correlation/regression workflows.
-- Shared History mode exposes bounded TXT/CSV/JSON previews while preserving complete private copy payloads.
-- Shared mode selection has explicit first/last/direct navigation APIs while cyclic next/previous behavior remains deterministic.
-- Shell navigation shortcuts require exactly the Control modifier and remain suppressed while onboarding is visible.
-- Calculator keypad edits honor the current expression caret/selection instead of always appending at the end.
-- Calculator TextBox keyboard/pointer selection state is synchronized with the selection-aware keypad editor.
-- Programmer non-decimal output consistently displays fixed-width masked values while decimal output follows signed/unsigned interpretation.
-- Converter recent-pair recording tracks deliberate conversion/swap/restoration actions instead of noisy intermediate selector changes.
-- Converter significant-digit precision, recent pairs, and favorites restore and autosave through shared settings.
-- Native and Browser settings storage share one JSON legacy-detection contract and one preference validator rather than duplicated validation logic.
-- Settings validation bounds converter precision and persisted pair-token counts/lengths through the shared Platform validator.
-- The localization layer supports English and Hindi semantic catalogs with reviewed live mappings; visible shared XAML still contains unmigrated English and is not presented as fully localized.
-- Accessibility documentation distinguishes source implementation from runtime/device evidence using an explicit test matrix.
-- Platform support documentation reflects the implemented Browser, Android, and iOS heads/workflows instead of describing them as absent.
-- Release documentation treats integrated source preflight as the authoritative first source gate and documents machine-readable validation evidence separately from runtime/manual proof.
-- Release workflow validates tagged source before restore/format/build/test and preserves existing GitHub Release notes/history on reruns.
-- Source-preflight inventory includes rational, engineering, statistics, dynamic-control, iOS-release, artifact-integrity, structured-evidence, and Source Preflight workflow self-validation contracts instead of relying on focused workflows alone.
-- `.github/workflows/source-preflight.yml` now watches the broad source/test/tool/docs/packaging/workflow surfaces that the integrated gate actually validates rather than a narrow selected-file subset.
-- `.github/workflows/engineering-notation-validate.yml` watches the shared engineering view model, panel, and App/headless tests in addition to core formatter/test/validator paths.
-- Feature, roadmap, README, preflight, exact-rational, engineering-notation, changelog, project-state, checkpoint, and final-audit documentation are synchronized with the current source scope.
-- Package management remains centralized through `Directory.Packages.props`.
-- Nullable reference types, analyzers, warnings-as-errors, and deterministic build settings remain enabled centrally.
+### Exact rational arithmetic
 
-### Fixed
+- Added canonical bounded `BigInteger` rational representation.
+- Added exact parsing for integers, fractions, finite decimals, and decimal scientific notation.
+- Added exact arithmetic, negation, reciprocal, comparison, equality, and hashing.
+- Added multiplication cross-cancellation and denominator reduction.
+- Added safe canonical behavior for `default(RationalNumber)`.
+- Added a 4,096-character raw input bound enforced before trimming.
+- Added 10,000 decimal scale/exponent and 65,536-bit reduced-value workload bounds.
+- Added Calculator panel workflows, regression source, focused validation, and integrated preflight coverage.
 
-- Scientific-notation marker detection in numeric parsing uses valid APIs.
-- Programmer radix parsing safely rejects separator-only and sign-only input.
-- Numeric equality and hash-code behavior share a compatible cross-kind representation.
-- Programmer arithmetic-right-shift and signed fixed-width result presentation preserve correct two's-complement bit patterns.
-- Stale programmer integration expectations match signed two's-complement decimal presentation.
-- Converter saved-pair selection can be reselected after application.
-- Converter persistence restore preserves recency ordering, deduplicates entries, and respects capacity.
-- Converter recent clearing reports whether persistent state actually changed.
-- Settings reset synchronizes converter state immediately rather than waiting for the next launch.
-- Expression sanitizer uses evaluator-configured maximum length and preserves the previous expression when imported text is rejected.
-- Shared clipboard composition reaches every currently copy-enabled Calculator, Programmer, Unicode, Converter, Statistics, Matrix, Graphing, and History workflow.
-- Transient invalid two-way `TabControl` selection values no longer wrap to another CalcNova mode during initialization or rebinding.
-- Release-documentation validation uses the current four-state evidence vocabulary rather than stale exact wording.
-- Historical pre-schema settings files that omit `schemaVersion` are explicitly recognized as legacy schema zero instead of accidentally inheriting the current C# default.
-- Native and Browser settings validation drift risk is reduced by centralizing the shared validation implementation.
-- Calculator keypad insertion/backspace correctly handles forward selections, reversed selections, middle-caret edits, and clamped invalid selection indexes.
-- A potentially ambiguous span/string expression replacement implementation was replaced with compiler-safe string slicing.
-- Exact-rational source validation no longer looks for a stale/nonexistent magnitude-check marker.
-- `default(RationalNumber)` is treated as canonical zero instead of exposing an invalid zero denominator.
-- Exact-rational raw input workload limits are enforced before trimming, closing an oversized whitespace-padding bypass.
-- Engineering-notation source/tests enforce the documented finite engineering exponent range, including zero-mantissa inputs.
-- Non-zero engineering inputs that underflow to floating-point zero, such as `1e-324`, are rejected instead of silently becoming `0`.
-- Engineering Parse/Format input text is bounded to 4,096 characters before whitespace/numeric parsing, and the shared TextBox applies the same limit.
-- Integrated release preflight no longer omits recent exact-rational, engineering-notation, artifact-integrity, structured-evidence, dynamic-control-accessibility, exact-tag iOS workflow, or Source Preflight workflow-contract validators.
-- The focused engineering workflow no longer misses App view-model/panel/test changes protected by the engineering validator.
-- The master Source Preflight workflow no longer misses ordinary domain-library/test/docs/workflow changes because of a narrow path filter.
-- Documentation no longer lists already-implemented exact rationals, engineering notation, covariance/correlation/regression, printable calculator operators, deterministic graph series differentiation, or numerical edge hardening as future features.
+### Engineering notation
 
-### Security / Privacy
+- Added finite engineering-notation format/parse workflows with exponents divisible by three.
+- Added 1–15 significant-digit formatting.
+- Added canonical invariant-culture parsing.
+- Added explicit `-324..306` engineering exponent bounds.
+- Added rejection of non-zero inputs that would underflow to floating-point zero.
+- Added extreme finite-value scaling safeguards.
+- Added one 4,096-character input contract across core parser, Format action, and shared TextBox.
+- Added Calculator panel, core/App/headless regression source, focused validation, and integrated preflight coverage.
 
-- Expression evaluation uses project-owned parsing/evaluation rather than arbitrary code execution.
-- Input and expensive integer/numerical operations include bounded workload controls.
-- Exact-rational raw input, decimal exponent/scale, and reduced magnitude are bounded.
-- Engineering-notation input text and exponent scaling are explicitly bounded, and non-zero floating-point underflow is rejected.
-- Clipboard reads are explicit user actions; pasted text is sanitized and is not automatically evaluated.
-- Clipboard writes occur only after explicit copy actions.
-- History/graph exports are generated locally and copied only after explicit user action.
-- Unicode metadata is derived locally without a network lookup.
-- Fixed-unit conversion remains offline.
-- Currency networking is optional and contains no embedded provider credential.
-- Repository ignore rules exclude common signing credentials and local secret files.
-- Ordinary Android/iOS validation workflows intentionally keep signing secrets out of source.
-- Source Preflight uses read-only repository contents permission and rejects `pull_request_target`/write-permission drift through source validation.
-- Android release signing is conditional on external secrets and uses temporary signing material that is removed afterward.
-- iOS release-tag validation is simulator-only unless a future externally secured signing/archive path is added.
-- Unsupported future settings schemas fail closed instead of being silently overwritten by an older build.
+### Programmer and Unicode
 
-### Validation note
+- Added base 2–36 parsing/formatting.
+- Added binary/octal/decimal/hex synchronized representations.
+- Added 8/16/32/64/128-bit signed/unsigned two's-complement workflows.
+- Added AND/OR/XOR/NOT plus left/logical-right/arithmetic-right shifts.
+- Added full interactive bit grids, byte grouping, accessible bit names, and representation copy actions.
+- Added Unicode scalar/code-point conversion and bounded text inspection.
+- Added local Unicode plane/general-category/UTF-8/UTF-16 metadata and metadata copy workflows without a network lookup.
 
-The active assistant execution environment used for the final source review does not provide the required .NET 10 SDK. Local restore, format, compiled build, compiled tests, and Avalonia headless tests are therefore **NOT RUN** here. Platform runtime/package/signing/accessibility validation is also **NOT RUN** unless separately observed on the actual target environment.
+### Conversion, date/time, and currency
 
-The final current `main` tree was audited through GitHub source/commit inspection and its source contracts were hardened, but the complete integrated preflight was not re-executed locally against a materialized final repository tree in this environment. Source/test/workflow presence must not be interpreted as release PASS evidence. The authoritative next step is observed CI or local .NET/platform execution with structured/manual evidence recorded from the exact release-candidate commit.
+- Added offline fixed-unit conversion across major physical/data categories.
+- Added validated pairs, swapping, search, recent pairs, favorites, restoration, clear-recents, copy, and persisted converter preferences.
+- Added selectable 1–17 significant-digit conversion precision.
+- Added source contracts for converter defaults and persisted-preference/privacy behavior.
+- Added replaceable currency provider/cache architecture with offline fallback and no embedded provider credentials.
+- Added date-difference, calendar arithmetic, business-day, and fixed-duration utilities.
 
-## [0.1.0] - Planned
+### Statistics, equations, and matrices
 
-The first validated milestone will be created only after the required source, build, analyzer, formatter, test, accessibility, and supported-platform release gates pass in suitable environments. It has not been released yet.
+- Added descriptive statistics and summary copy.
+- Added bounded paired X/Y parsing.
+- Added population/sample covariance, Pearson correlation, ordinary least-squares regression, `R²`, and regression prediction when mathematically defined.
+- Added deterministic handling of mismatched, non-finite, oversized, constant-X, constant-Y, and single-pair datasets.
+- Added stale regression-state clearing after failed analysis.
+- Added shared paired-statistics panel and source validation.
+- Added equation-solving workflows.
+- Added matrix determinant, inverse, rank, linear-system solving, and result copy.
+
+### Graphing and numerical analysis
+
+- Added workload-bounded graph sampling and discontinuity segmentation.
+- Added explicit viewport model and focusable interactive Avalonia plot control.
+- Added pointer pan/wheel zoom/double-click fit and keyboard pan/zoom/reset/fit controls.
+- Added nearest sampled-point tracing.
+- Added bounded single- and multi-expression CSV output.
+- Added stable multi-series identities, deterministic non-color-only line patterns, and synchronized text legend.
+- Added accessible SVG generation/copy.
+- Added bounded derivative approximation, bisection root finding, and Simpson integration.
+- Added extreme-finite-value safety and explicit sampling/root/integration workload budgets.
+
+### History, export, settings, and persistence
+
+- Added native SQLite history behind an abstraction and Browser-safe storage.
+- Added recent/search/favorite/delete/clear history workflows.
+- Added bounded TXT/CSV/JSON export with bounded display previews and complete private copy payloads.
+- Added UTF-16-safe preview boundaries and newline normalization.
+- Added shared settings abstraction/view model.
+- Added persisted converter/culture preferences.
+- Added explicit settings schema version, legacy/unversioned migration, and fail-closed future-schema handling.
+- Added shared native/Browser settings JSON decoding and validation.
+
+### Accessibility, adaptive UI, onboarding, and localization
+
+- Added 44-DIP minimum interaction-target and 54-DIP calculator-key baselines.
+- Added visible focus styling and stronger CalcNova high-contrast focus styling.
+- Added compact/medium/expanded layout profiles and compact overflow fallback.
+- Added focus bring-into-view and Ctrl+PageUp/PageDown/Home/End mode navigation.
+- Added accessible programmer bit-state naming and non-color graph differentiation.
+- Added dynamic-control focus/touch-target contracts.
+- Added high-contrast and reduced-motion preference state.
+- Added onboarding focus/shortcut behavior.
+- Added English and Hindi semantic catalogs for the current key set, regional culture selection, persisted preference, catalog validation, and live localization of reviewed surfaces.
+
+### Platforms
+
+- Added Desktop composition for Windows/Linux/macOS targets.
+- Added Browser/WebAssembly composition.
+- Added Android composition.
+- Added iOS composition.
+- Added shared clipboard/external-link abstractions and appropriate native/Browser storage composition.
+
+### Version 2.8.03 release identity
+
+- Centralized product/display version `2.8.03` in `Directory.Build.props`.
+- Set normalized .NET/NuGet version `2.8.3`.
+- Set assembly/file version `2.8.3.0` and informational version `2.8.03`.
+- Set Android/iOS display version from `ProductDisplayVersion`.
+- Set Android/iOS numeric build code to `20803`.
+- Updated package metadata validation to reject old development-version markers.
+- Documented that strict SemVer uses normalized tag `v2.8.3`; `v2.8.03` is intentionally invalid under SemVer numeric rules.
+
+### Validation and release infrastructure
+
+- Added repository/security, XAML, UI, navigation, keyboard, calculator-editing, graph, Unicode, exact-rational, engineering, export, statistics, accessibility, localization, settings, onboarding, packaging, platform-workflow, release-workflow, artifact-integrity, and structured-evidence validators.
+- Added Python regression tests for SDK-independent source validators/tooling.
+- Added unified source preflight.
+- Added Source Preflight workflow self-validation and broad path coverage.
+- Added focused platform and feature validation workflows.
+- Added tag-first release validation.
+- Added exact-tag unsigned iOS simulator validation contract.
+- Added release artifact checksum/manifest integrity infrastructure.
+- Added structured PASS / FAIL / BLOCKED / NOT RUN evidence model, runner, verifier, and schema.
+- Added release source-version consistency check so a release tag must equal `v` plus the normalized source `<Version>`.
+- Removed Android release-time display/build version overrides so publication cannot drift from the source-owned 2.8.03 identity.
+
+### Documentation
+
+- Completed architecture, build, testing, UI automation, troubleshooting, security, privacy, accessibility, adaptive layout, localization, platform, feature, numerical, converter, persistence, release, source-preflight, release-evidence, versioning, and audit documentation.
+- Added the authoritative 2.8.03 completion state in `PROJECT_STATE.md`.
+- Added `docs/VERSIONING.md` for public/display versus normalized SemVer mapping.
+- Updated the root README to identify CalcNova 2.8.03 as complete.
+
+### Evidence policy
+
+CalcNova records an execution result as PASS only when the command or platform check actually ran and was observed. `NOT RUN`/`BLOCKED` records describe execution evidence in a particular environment; they do not change the completed implementation status of version 2.8.03.
+
+## Maintenance policy
+
+Version 2.8.03 is the completed product baseline. Later repository changes may contain security fixes, compatibility maintenance, documentation corrections, translations, test improvements, dependency updates, or optional features.
