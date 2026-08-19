@@ -34,6 +34,19 @@ public static class BitwiseCalculator
         return ToSigned(value, wordSize) >> shift;
     }
 
+    public static bool IsBitSet(BigInteger value, int bitIndex, int wordSize)
+    {
+        ValidateBitIndex(bitIndex, wordSize);
+        var unsigned = ToUnsigned(value, wordSize);
+        return ((unsigned >> bitIndex) & BigInteger.One) == BigInteger.One;
+    }
+
+    public static BigInteger ToggleBit(BigInteger value, int bitIndex, int wordSize)
+    {
+        ValidateBitIndex(bitIndex, wordSize);
+        return ToUnsigned(value ^ (BigInteger.One << bitIndex), wordSize);
+    }
+
     public static BigInteger ToUnsigned(BigInteger value, int wordSize)
     {
         var mask = CreateMask(wordSize);
@@ -71,6 +84,15 @@ public static class BitwiseCalculator
     {
         ValidateWordSize(wordSize);
         return (BigInteger.One << wordSize) - BigInteger.One;
+    }
+
+    private static void ValidateBitIndex(int bitIndex, int wordSize)
+    {
+        ValidateWordSize(wordSize);
+        if (bitIndex < 0 || bitIndex >= wordSize)
+        {
+            throw new ArgumentOutOfRangeException(nameof(bitIndex), bitIndex, $"Bit index must be between 0 and {wordSize - 1}.");
+        }
     }
 
     private static void ValidateWordSize(int wordSize)
