@@ -57,6 +57,13 @@ public sealed class EngineeringNotationViewModel : ViewModelBase
     {
         try
         {
+            if (InputText.Length > EngineeringNotationFormatter.MaximumInputCharacters)
+            {
+                throw new ArgumentException(
+                    $"Engineering notation input may contain at most {EngineeringNotationFormatter.MaximumInputCharacters} characters.",
+                    nameof(InputText));
+            }
+
             if (!double.TryParse(InputText, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) || !double.IsFinite(value))
             {
                 throw new FormatException("Enter a finite invariant-culture number to format.");
