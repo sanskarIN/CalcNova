@@ -33,12 +33,7 @@ def parse_xml(path: Path, failures: list[str]) -> None:
         failures.append(f"Invalid XML in {path}: {exception}")
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate CalcNova package metadata consistency.")
-    parser.add_argument("root", nargs="?", default=".", help="Repository root")
-    args = parser.parse_args()
-
-    root = Path(args.root).resolve()
+def validate(root: Path) -> list[str]:
     failures: list[str] = []
 
     android_path = root / "src" / "CalcNova.Android" / "CalcNova.Android.csproj"
@@ -109,6 +104,15 @@ def main() -> int:
         if re.search(pattern, combined):
             failures.append(f"Packaging metadata appears to contain an inline signing secret matching: {pattern}")
 
+    return failures
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Validate CalcNova package metadata consistency.")
+    parser.add_argument("root", nargs="?", default=".", help="Repository root")
+    args = parser.parse_args()
+
+    failures = validate(Path(args.root).resolve())
     if failures:
         print("Packaging metadata validation failed:", file=sys.stderr)
         for failure in failures:
