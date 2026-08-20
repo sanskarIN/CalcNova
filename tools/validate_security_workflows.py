@@ -10,6 +10,7 @@ from pathlib import Path
 
 CODEQL_WORKFLOW = ".github/workflows/codeql.yml"
 DEPENDENCY_REVIEW_WORKFLOW = ".github/workflows/dependency-review.yml"
+SECURITY_VALIDATE_WORKFLOW = ".github/workflows/security-automation-validate.yml"
 
 
 def _require_markers(source: str, path: str, markers: tuple[str, ...], failures: list[str]) -> None:
@@ -85,6 +86,50 @@ def validate(root: Path) -> list[str]:
                     f"{DEPENDENCY_REVIEW_WORKFLOW} contains forbidden privilege/trigger marker: {forbidden}"
                 )
 
+    focused_path = root / SECURITY_VALIDATE_WORKFLOW
+    if not focused_path.is_file():
+        failures.append(f"Missing focused security validation workflow: {SECURITY_VALIDATE_WORKFLOW}")
+    else:
+        source = focused_path.read_text(encoding="utf-8")
+        _require_markers(
+            source,
+            SECURITY_VALIDATE_WORKFLOW,
+            (
+                "push:\n    branches: [main]",
+                "pull_request:\n    branches: [main]",
+                "workflow_dispatch:",
+                '      - "Directory.Build.props"',
+                '      - "tools/validate_security_workflows.py"',
+                '      - "tools/validate_dependency_security.py"',
+                '      - "tools/tests/test_validate_security_workflows.py"',
+                '      - "tools/tests/test_validate_dependency_security.py"',
+                "permissions:\n  contents: read",
+                "actions/checkout@v6",
+                "actions/setup-python@v6",
+                "python tools/validate_security_workflows.py .",
+                "python tools/validate_dependency_security.py .",
+                "python -m unittest tools.tests.test_validate_security_workflows",
+                "python -m unittest tools.tests.test_validate_dependency_security",
+            ),
+            failures,
+        )
+        if source.count('      - "Directory.Build.props"') < 2:
+            failures.append(
+                f"{SECURITY_VALIDATE_WORKFLOW} must watch Directory.Build.props for both push and pull_request."
+            )
+        for forbidden in (
+            "pull_request_target:",
+            "contents: write",
+            "security-events: write",
+            "id-token: write",
+            "actions: write",
+            "packages: write",
+        ):
+            if forbidden in source:
+                failures.append(
+                    f"{SECURITY_VALIDATE_WORKFLOW} contains forbidden privilege/trigger marker: {forbidden}"
+                )
+
     return failures
 
 
@@ -100,7 +145,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated CodeQL and dependency-review workflow security contracts.")
+    print("Validated CodeQL, dependency-review, and focused security-validation workflow contracts.")
     return 0
 
 
