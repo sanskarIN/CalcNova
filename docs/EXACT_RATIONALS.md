@@ -153,4 +153,12 @@ Focused workflow:
 
 ## Evidence policy
 
-Implementation, test source, source validation, focused workflow, panel, and shared-shell integration are present. Compiled `.NET`/Avalonia tests remain **NOT RUN** until execution is observed in a suitable .NET 10 environment.
+Implementation, test source, source validation, focused workflow, panel, and shared-shell integration are present.
+
+Compiled `.NET`/Avalonia execution is separate observed evidence. Record each actual run as:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+Source presence does not prove a compiled PASS, and one environment's unavailable SDK does not make `NOT RUN` the permanent status of the completed exact-rational feature.
