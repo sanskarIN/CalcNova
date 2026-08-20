@@ -1,5 +1,116 @@
 # What Changed
 
+## NuGet audit and attestation compatibility follow-up — 2026-08-20
+
+This follow-up supersedes the security/provenance implementation details in the earlier 2026-08-20 checkpoint below while preserving that checkpoint as historical context.
+
+### NuGet vulnerability auditing is now explicit and enforced
+
+`Directory.Build.props` now defines:
+
+```xml
+<NuGetAudit>true</NuGetAudit>
+<NuGetAuditMode>all</NuGetAuditMode>
+<NuGetAuditLevel>moderate</NuGetAuditLevel>
+<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+```
+
+This makes CalcNova's .NET 10 restore path explicitly audit direct and transitive NuGet dependencies and keeps the enforced threshold aligned with the Dependency Review gate. When configured audit sources actually report a moderate, high, or critical advisory, the corresponding audit warning is expected to fail restore because warnings are treated as errors.
+
+Added:
+
+- `tools/validate_dependency_security.py`;
+- `tools/tests/test_validate_dependency_security.py`.
+
+The validator protects the audit-enabled state, transitive `all` mode, `moderate` threshold, warnings-as-errors enforcement, duplicate-policy drift, and `NU1901`–`NU1904` suppression through `NoWarn` / `WarningsNotAsErrors`, including composite warning lists.
+
+Unrelated warning configuration remains allowed.
+
+### Focused security validation strengthened
+
+`.github/workflows/security-automation-validate.yml` now watches `Directory.Build.props` for both pushes and pull requests and runs:
+
+```text
+python tools/validate_security_workflows.py .
+python tools/validate_dependency_security.py .
+python -m unittest tools.tests.test_validate_security_workflows
+python -m unittest tools.tests.test_validate_dependency_security
+```
+
+`tools/validate_security_workflows.py` now also validates that focused workflow itself, including read-only permissions, path coverage, commands, and rejection of `pull_request_target`/unnecessary write permissions.
+
+Both security validators and both regression suites are integrated into `tools/release_preflight.py`, and the preflight inventory tests require them.
+
+### Final release-attestation contract corrected
+
+The stable release workflow's current publication permissions are:
+
+```yaml
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+```
+
+Only `publish-release` receives those permissions. The workflow-level default remains:
+
+```yaml
+permissions:
+  contents: read
+```
+
+The current `actions/attest@v4` step uses one inclusive subject:
+
+```text
+release-assets/**/*
+```
+
+This covers every prepared release asset, including desktop/Browser ZIP archives, `SHA256SUMS.txt`, and the Android AAB when signing secrets produce it, without requiring a separate potentially absent Android path.
+
+`tools/validate_release_workflow.py` and `tools/tests/test_validate_release_workflow.py` now lock the four-permission publication contract, inclusive subject glob, ordering, and single-job privilege grants.
+
+### Documentation synchronized
+
+Updated current-facing documentation includes:
+
+- `PROJECT_STATE.md`;
+- `CHANGELOG.md`;
+- root `SECURITY.md`;
+- `docs/SECURITY.md`;
+- `docs/SECURITY_AUTOMATION.md`;
+- `docs/SOURCE_PREFLIGHT.md`;
+- `docs/BUILDING.md`;
+- `docs/RELEASE.md`;
+- `docs/ARTIFACT_PROVENANCE.md`;
+- this live `what_changed.md` record.
+
+`PROJECT_STATE.md` now records the four attestation permissions and inclusive release-tree subject rather than the earlier three-permission snapshot.
+
+### Evidence status
+
+No execution result was fabricated. The available commit-status surface returned no legacy status records for the checked maintenance commits, which is not interpreted as either CI success or CI failure.
+
+The assistant environment still did not provide a materialized .NET 10 repository execution path for the full restore/build/test suite. Therefore:
+
+- security policy/source contracts are present on `main`;
+- GitHub-hosted CodeQL/Dependency Review execution remains separately observable service evidence;
+- online NuGet advisory-query success remains separate restore evidence;
+- artifact-attestation execution remains separate release-service evidence;
+- compiled/runtime/signing/store evidence remains environment dependent.
+
+Use `PASS / FAIL / BLOCKED / NOT RUN` only from actual observed execution.
+
+### Version/status unchanged
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Mobile build code: `20803`
+- Application id: `in.sanskar.calcnova`
+- Product scope: **COMPLETE**
+- This follow-up: **POST-COMPLETION SECURITY / DEPENDENCY / RELEASE-PROVENANCE MAINTENANCE**
+
 ## Security automation and release provenance maintenance — 2026-08-20
 
 CalcNova 2.8.03 remains the completed product baseline. This continuation strengthened automated security review, release least privilege, and supply-chain provenance without changing the public version, normalized package version, release-tag mapping, application id, or mobile build code.
