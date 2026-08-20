@@ -38,6 +38,17 @@ All notable CalcNova changes are recorded here.
 - Added `docs/ARTIFACT_PROVENANCE.md` with online/offline verification guidance and evidence semantics, then synchronized it with the current `actions/attest@v4` metadata-permission requirements.
 - Updated the release/security/documentation index and made the security/provenance guides required repository documentation.
 
+### Release checksum usability and collision safety
+
+- Fixed `SHA256SUMS.txt` so entries use the flat basenames users actually download from a GitHub Release instead of GitHub Actions runner-local `release-assets/<artifact>/...` paths.
+- Added a pre-publication duplicate-basename guard so two nested workflow artifacts cannot collapse to the same GitHub Release filename.
+- Reserved `SHA256SUMS.txt` so a build artifact cannot collide with the generated checksum manifest.
+- Required at least one prepared release asset before checksum generation.
+- Kept the checksum manifest outside its own hash set, then copied it into `release-assets/` so the manifest itself is covered by provenance attestation.
+- Hardened `tools/validate_release_workflow.py` and its regression tests to require flat basename checksum entries, filename validation ordering, and rejection of the old nested-path `xargs -0 sha256sum` implementation.
+- Expanded release-document validation to protect the artifact-provenance and security-automation guides as current release contracts.
+- Documented direct verification with `sha256sum -c SHA256SUMS.txt` after downloading release assets into one directory.
+
 The product/display version remains `2.8.03`; these are repository maintenance/security/release-quality enhancements, not a new product-version declaration.
 
 ## [2.8.03] - 2026-08-19
@@ -120,7 +131,7 @@ Mobile build code: `20803`
 - Added stable multi-series identities, deterministic non-color-only line patterns, and synchronized text legend.
 - Added accessible SVG generation/copy.
 - Added bounded derivative approximation, bisection root finding, and Simpson integration.
-- Added extreme-finite-value safety and explicit sampling/root/integration workload budgets.
+- Added extreme finite-value safety and explicit sampling/root/integration workload budgets.
 
 ### History, export, settings, and persistence
 
