@@ -1,5 +1,80 @@
 # What Changed
 
+## Documentation consistency pass — 2026-08-20
+
+The maintained CalcNova documentation was audited against the completed 2.8.03 source tree. The product/version classification is unchanged: **CalcNova 2.8.03 remains COMPLETE**.
+
+The authoritative record for this documentation pass is:
+
+- `docs/DOCUMENTATION_AUDIT_2026-08-20.md`.
+
+The documentation index now links that audit and provides a comprehensive current-guide map with explicit source-of-truth rules.
+
+### Current-facing documentation corrected
+
+This pass corrected stale development-era or environment-specific wording across:
+
+- `docs/BUILDING.md`;
+- `docs/README.md`;
+- `docs/TROUBLESHOOTING.md`;
+- `docs/ARCHITECTURE.md`;
+- `docs/RUNTIME_VALIDATION_RUNBOOK.md`;
+- `docs/PRIVACY.md`;
+- `docs/SECURITY.md`;
+- `docs/CALCULATION_ENGINE.md`;
+- `docs/CALCULATOR_EDITING.md`;
+- `docs/INPUT_SAFETY.md`;
+- `docs/KEYBOARD_SHORTCUTS.md`;
+- `docs/NUMERICAL_ANALYSIS.md`;
+- `docs/BIVARIATE_STATISTICS.md`;
+- `docs/EXACT_RATIONALS.md`;
+- `docs/ENGINEERING_NOTATION.md`;
+- `docs/CONVERTER_MODE.md`;
+- `docs/PROGRAMMER_MODE.md`;
+- `docs/ACCESSIBILITY.md`;
+- `docs/DESIGN_SYSTEM.md`;
+- `docs/LOCALIZATION.md`;
+- `docs/LIVE_LOCALIZATION.md`;
+- `docs/ONBOARDING.md`;
+- `docs/UI_AUTOMATION.md`.
+
+### Major reconciliations
+
+- Desktop, Browser/WebAssembly, Android, and iOS are documented as present maintained source heads rather than future work.
+- `BUILDING.md` now reflects the actual platform workflows, including Browser `wasm-tools`, Android workload + JDK 17, iOS workload/simulator RIDs, Android API 23, iOS 15.0, and current Desktop release RIDs.
+- Android signed-AAB publication is documented with the current external CI secret contract without embedding credentials.
+- Native SQLite history and Browser-safe settings/history composition are documented as current implementation.
+- Optional network-enhanced currency provider/cache/offline behavior is documented consistently in architecture, privacy, and security guidance.
+- Exact rational arithmetic, engineering notation, graph trace/multi-series/export, converter search/recents/favorites/copy, and programmer large-word grouping/copy are documented as completed 2.8.03 features rather than remaining work.
+- English/Hindi semantic localization and reviewed live-localized onboarding/shared surfaces are documented as the completed 2.8.03 baseline; additional languages/detail migration remain optional enhancements.
+- Shift-only top-row Calculator mappings for `+`, `*`, `(`, `)`, `^`, and `%` are documented as implemented rather than planned.
+- Permanent feature documentation no longer freezes one assistant/environment's unavailable SDK state as a global `NOT RUN` status; execution evidence remains per-run and conservative.
+
+### Evidence policy preserved
+
+The documentation pass does **not** manufacture runtime results. Runtime/device/signing/store checks continue to use:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+Source completeness does not imply a runtime PASS, and an unexecuted runtime check does not redefine a completed source feature as unfinished.
+
+### Historical records preserved
+
+Dated 2026-08-19 continuation/source-audit records and `docs/history/` remain intact as historical evidence. Current authoritative documentation wins when a historical checkpoint describes an earlier implementation state.
+
+### Product scope unchanged
+
+No product-code behavior or release version was changed by this documentation pass.
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Mobile build code: `20803`
+- Application id: `in.sanskar.calcnova`
+- Product/source scope: **COMPLETE**
+
 ## CalcNova 2.8.03 final completion checkpoint — 2026-08-19
 
 **CalcNova version 2.8.03 is complete.**
