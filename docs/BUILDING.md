@@ -111,11 +111,16 @@ dotnet build src/CalcNova.Desktop/CalcNova.Desktop.csproj --configuration Releas
 
 ### Release publish targets
 
-The current release workflow produces self-contained desktop publish output for:
+The current release workflow produces self-contained desktop publish output for both x64 and ARM64 on each maintained desktop operating system:
 
 - `win-x64`;
+- `win-arm64`;
 - `linux-x64`;
-- `osx-x64`.
+- `linux-arm64`;
+- `osx-x64`;
+- `osx-arm64`.
+
+These are portable .NET runtime identifiers. The release matrix packages each RID independently so users do not have to rely on CPU-architecture emulation when a native x64 or ARM64 build is available.
 
 Equivalent commands are:
 
@@ -129,6 +134,16 @@ dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj `
   --output publish/win-x64
 ```
 
+#### Windows ARM64
+
+```powershell
+dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj `
+  --configuration Release `
+  --runtime win-arm64 `
+  --self-contained true `
+  --output publish/win-arm64
+```
+
 #### Linux x64
 
 ```bash
@@ -137,6 +152,16 @@ dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj \
   --runtime linux-x64 \
   --self-contained true \
   --output publish/linux-x64
+```
+
+#### Linux ARM64
+
+```bash
+dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj \
+  --configuration Release \
+  --runtime linux-arm64 \
+  --self-contained true \
+  --output publish/linux-arm64
 ```
 
 #### macOS x64
@@ -149,7 +174,17 @@ dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj \
   --output publish/osx-x64
 ```
 
-The shared Avalonia desktop source is not limited to those release RIDs, but additional release architectures should only be advertised after their publish/runtime evidence is recorded.
+#### macOS ARM64 / Apple Silicon
+
+```bash
+dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj \
+  --configuration Release \
+  --runtime osx-arm64 \
+  --self-contained true \
+  --output publish/osx-arm64
+```
+
+The shared Avalonia desktop source is not limited to those release RIDs. Additional architectures should only be advertised after their publish/runtime evidence is recorded and their release contract is explicitly added to source validation.
 
 ### Desktop packaging metadata
 
