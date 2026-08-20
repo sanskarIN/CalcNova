@@ -18,13 +18,15 @@ See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
 **COMPLETE — CalcNova version 2.8.03**
 
-The defined 2.8.03 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization infrastructure and reviewed localized surfaces, accessibility/adaptive contracts, Desktop/Browser/Android/iOS composition, source validation, artifact integrity, structured release evidence, packaging metadata, and release workflows are present as completed source capabilities.
+The defined 2.8.03 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization infrastructure and reviewed localized surfaces, accessibility/adaptive contracts, Desktop/Browser/Android/iOS composition, source validation, artifact integrity, structured release evidence, packaging metadata, release workflows, security automation, and release provenance controls are present as completed source capabilities.
 
 Future repository changes are classified as maintenance, compatibility updates, security fixes, documentation changes, translation additions, or optional enhancements. They are not required to define the 2.8.03 project as complete.
 
 ## Current Maintenance Enhancements — 2026-08-20
 
-The completed 2.8.03 baseline now includes a stronger desktop release publication contract:
+The completed 2.8.03 baseline now includes stronger cross-platform release and supply-chain controls.
+
+### Native desktop release coverage
 
 - Windows self-contained archives for `win-x64` and `win-arm64`;
 - Linux self-contained archives for `linux-x64` and `linux-arm64`;
@@ -34,7 +36,27 @@ The completed 2.8.03 baseline now includes a stronger desktop release publicatio
 - regression tests that lock x64 + ARM64 coverage for every desktop operating system;
 - build/platform/release documentation synchronized with the six-target release matrix.
 
-This is a post-completion maintenance improvement. It does not change the public product version, normalized package version, release tag mapping, or mobile build code.
+### Automated security maintenance
+
+- C# CodeQL scanning on pushes and pull requests to `main`, weekly schedule, and manual dispatch;
+- pull-request dependency review with `moderate` vulnerability severity enforcement;
+- existing Dependabot coverage for NuGet and GitHub Actions retained;
+- `tools/validate_security_workflows.py` protects action majors, triggers, language/build mode, severity threshold, permissions, and unsafe-trigger drift;
+- regression tests protect the security-workflow validator;
+- focused `Security Automation Validate` workflow added with read-only repository permission;
+- security workflow validation and regression tests integrated into the SDK-independent release preflight.
+
+### Release provenance and least privilege
+
+- release workflow defaults to `contents: read`;
+- only the publication job receives `contents: write`, `id-token: write`, and `attestations: write`;
+- `actions/attest@v4` generates provenance attestations for release ZIP archives, Android AAB when present, and `SHA256SUMS.txt`;
+- provenance generation occurs after checksum creation and before GitHub Release asset upload;
+- release workflow validator requires the permission/attestation/order contract and rejects deprecated provenance wrapper actions;
+- release-workflow regression tests lock the provenance action, subject set, and permission counts;
+- `docs/SECURITY_AUTOMATION.md` and `docs/ARTIFACT_PROVENANCE.md` document operation, evidence semantics, and verification guidance.
+
+These are post-completion maintenance improvements. They do not change the public product version, normalized package version, release tag mapping, or mobile build code.
 
 ## Product Identity
 
@@ -68,6 +90,8 @@ The public `2.8.03` format is intentionally preserved. Strict SemVer tooling use
 - Local-first ordinary calculation and metadata behavior
 - Centralized package management
 - Nullable reference types, analyzers, warnings-as-errors, and deterministic build settings
+- Automated dependency review and CodeQL source scanning
+- Provenance-attested stable release artifact publication
 
 ## Completed Calculator Capabilities
 
@@ -260,9 +284,9 @@ Additional language packs or further localization expansion are optional post-re
 
 Android and iOS source metadata uses display version `2.8.03` and numeric build code `20803`.
 
-Desktop release source now packages `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, and `osx-arm64`. Runtime/package evidence for those architecture artifacts remains separately recorded.
+Desktop release source packages `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, and `osx-arm64`. Runtime/package evidence for those architecture artifacts remains separately recorded.
 
-## Completed Validation and Release Infrastructure
+## Completed Validation, Security, and Release Infrastructure
 
 SDK-independent source contracts cover:
 
@@ -284,15 +308,30 @@ SDK-independent source contracts cover:
 - onboarding;
 - packaging metadata;
 - Desktop/Browser/Android/iOS workflow contracts;
+- security automation workflow contracts;
 - Source Preflight workflow self-validation;
 - exact-tag iOS simulator workflow;
 - release workflow and documentation contracts;
 - six-target x64/ARM64 desktop release matrix validation;
+- release least-privilege/provenance attestation validation;
 - release-tag syntax;
 - artifact manifest/checksum integrity;
 - structured release-evidence model/runner/verifier;
 - Python regression suites for source validators;
 - integrated SDK-independent source preflight.
+
+Maintained GitHub security automation includes:
+
+- CodeQL Action v4 C# source scanning;
+- Dependency Review Action v5 with moderate-or-higher enforcement;
+- Dependabot NuGet/GitHub Actions updates;
+- focused security automation source validation.
+
+Stable release publication includes:
+
+- SHA-256 checksum generation;
+- provenance attestations using `actions/attest@v4` for ZIP/AAB/checksum release material;
+- job-scoped release write/OIDC/attestation permissions.
 
 ## Release-Version Safety
 
@@ -305,7 +344,8 @@ The release workflow:
 3. reads the normalized `<Version>` from `Directory.Build.props`;
 4. verifies the tag equals `v` plus that normalized source version;
 5. runs tagged source preflight;
-6. proceeds to .NET validation and platform publication only after those checks.
+6. proceeds to .NET validation and platform publication only after those checks;
+7. generates checksums and artifact provenance before publishing stable release assets.
 
 The Android publication job does not replace source-owned display/build versions with the tag text or GitHub run number.
 
@@ -331,23 +371,27 @@ Focused Avalonia headless test source covers the shared shell and key product sc
 
 Product implementation completeness and environment execution evidence are separate concepts.
 
-The repository records a check as PASS only when it actually executes and its result is observed. In the assistant environment used for the final source pass, the required .NET 10/platform toolchains were not available for direct execution, so local compiled/platform evidence remains recorded conservatively as `NOT RUN` rather than being invented.
+The repository records a check as PASS only when it actually executes and its result is observed. In the assistant environment used for the source pass, the required .NET 10/platform toolchains were not available for direct execution, so local compiled/platform evidence remains recorded conservatively as `NOT RUN` rather than being invented.
 
-A fresh-clone attempt on 2026-08-20 also could not resolve `github.com`, so the updated repository could not be materialized in that container for a local full-tree preflight. The release-workflow maintenance was therefore validated through repository source contracts and regression-source updates, while compiled/runtime evidence remains environment-dependent.
+A fresh-clone attempt on 2026-08-20 also could not resolve `github.com`, so the updated repository could not be materialized in that container for a local full-tree preflight. The current maintenance work was therefore validated through repository source contracts, regression-source updates, GitHub repository reads/writes, and documentation consistency checks, while compiled/runtime/GitHub-hosted security-service evidence remains environment/service dependent.
 
-This evidence notation does **not** mean CalcNova 2.8.03 is incomplete. It means a particular command was not executed in that particular environment.
+The commit-status endpoint exposed no legacy commit statuses for the checked maintenance commit. That is not treated as proof that GitHub Actions checks passed or failed; no Actions service PASS was inferred from it.
+
+This evidence notation does **not** mean CalcNova 2.8.03 is incomplete. It means a particular command or service check was not observed in that environment/tool surface.
 
 Typical environment-specific verification commands include:
 
 ```bash
 python tools/release_preflight.py
+python tools/validate_security_workflows.py .
+python tools/validate_release_workflow.py .
 dotnet restore CalcNova.slnx
 dotnet format CalcNova.slnx --verify-no-changes --no-restore
 dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
-Platform signing, notarization, provisioning, and store processing additionally require external platform credentials/services.
+Platform signing, notarization, provisioning, GitHub-hosted security scanning, artifact attestation execution, and store processing additionally require their respective external environments/services/credentials.
 
 ## Final Classification
 
@@ -356,6 +400,8 @@ Platform signing, notarization, provisioning, and store processing additionally 
 - Shared application features: **COMPLETE**
 - Platform source composition: **COMPLETE**
 - x64/ARM64 desktop release source contract: **COMPLETE**
+- Security automation source contract: **COMPLETE**
+- Release provenance/least-privilege source contract: **COMPLETE**
 - Documentation baseline: **COMPLETE**
 - Source validation infrastructure: **COMPLETE**
 - Packaging/release workflow infrastructure: **COMPLETE**
@@ -369,5 +415,7 @@ For details, see:
 - [`docs/VERSIONING.md`](docs/VERSIONING.md)
 - [`docs/FEATURES.md`](docs/FEATURES.md)
 - [`docs/ROADMAP.md`](docs/ROADMAP.md)
+- [`docs/SECURITY_AUTOMATION.md`](docs/SECURITY_AUTOMATION.md)
+- [`docs/ARTIFACT_PROVENANCE.md`](docs/ARTIFACT_PROVENANCE.md)
 - [`docs/FINAL_SOURCE_AUDIT_2026-08-19.md`](docs/FINAL_SOURCE_AUDIT_2026-08-19.md)
 - [`what_changed.md`](what_changed.md)
