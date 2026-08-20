@@ -1,81 +1,202 @@
-# CalcNova Keyboard Shortcuts
+# CalcNova 2.8.03 Keyboard Shortcuts
 
-CalcNova is intended to support efficient keyboard-first use on desktop and browser targets. This file distinguishes currently implemented shortcuts from planned mappings.
+CalcNova supports keyboard-first workflows on keyboard-capable targets while deliberately avoiding broad shortcut interception that would conflict with text editing, browsers, operating systems, or assistive technology.
 
-## Current shared key handling
+This document lists implemented shared mappings and separates optional future shortcut ideas from the completed 2.8.03 baseline.
 
-| Key | Current action |
+## Shared shell navigation
+
+When onboarding is not visible and the shortcut carries exactly the Control modifier:
+
+| Key | Action |
 |---|---|
-| Enter / Return | Evaluate current expression while Calculator mode is active |
-| Escape | Clear expression/result state while Calculator mode is active |
-| Backspace | Remove the final expression character when Calculator mode is active and focus is not inside a text box |
-| Ctrl+PageDown | Select the next CalcNova mode, wrapping from About to Calc |
-| Ctrl+PageUp | Select the previous CalcNova mode, wrapping from Calc to About |
-| Ctrl+Home | Select the first CalcNova mode |
-| Ctrl+End | Select the final CalcNova mode |
+| `Ctrl+PageDown` | Select next CalcNova mode, wrapping from last to first |
+| `Ctrl+PageUp` | Select previous CalcNova mode, wrapping from first to last |
+| `Ctrl+Home` | Select first CalcNova mode |
+| `Ctrl+End` | Select final CalcNova mode |
 
-The expression text box also receives ordinary text entry according to Avalonia/platform text-input behavior. Backspace is deliberately left to an active text box instead of being intercepted by the shell so normal caret/selection editing can occur.
+Mode navigation is implemented through `MainViewModel` selection behavior rather than direct hard-coded tab mutation.
 
-Mode navigation is implemented through `MainViewModel` rather than hard-coded tab mutations in the view. Shared selection now normalizes out-of-range indexes, supports explicit first/last navigation, and preserves wraparound semantics. The shell shortcut policy requires exactly the Control modifier so accidental Control+Shift combinations do not activate background navigation.
+Out-of-range selection is normalized and previous/next navigation preserves wraparound semantics.
 
-## Current calculator hardware mappings
+Using exactly Control prevents unrelated Control+Shift/Alt chords from being captured accidentally.
 
-When Calculator mode is active, focus is outside a text box, and no modifier is held, the shared shell maps these keys directly to canonical parser tokens:
+## Calculator action keys
 
-| Key | Action/token |
+When Calculator mode is active and focus is not inside an ordinary text editor, shared key handling includes:
+
+| Key | Action |
 |---|---|
-| Top-row `0`–`9` | Insert matching digit |
-| Numpad `0`–`9` | Insert matching digit |
+| Enter / Return | Evaluate current expression |
+| Escape | Clear calculator expression/result state |
+| Backspace | Apply calculator selection/caret-aware Backspace behavior |
+
+Inside an active `TextBox`, ordinary Avalonia/platform text editing remains authoritative so selection, caret, IME, and native editing behavior are not overridden by shell token injection.
+
+## Unmodified calculator hardware mappings
+
+Outside an active `TextBox`, Calculator mode recognizes supported unmodified keys including:
+
+| Key | Token/action |
+|---|---|
+| Top-row `0`–`9` | matching digit |
+| Numpad `0`–`9` | matching digit |
 | Numpad `+` | `+` |
 | Numpad `-` | `-` |
 | Numpad `*` | `*` |
 | Numpad `/` | `/` |
-| Numpad decimal | `.` canonical decimal token |
+| Numpad decimal | canonical decimal token |
+| Keyboard `-` | `-` where Avalonia reports the supported key |
+| Keyboard `/` | `/` where Avalonia reports the supported key |
+| Keyboard `.` | decimal punctuation/token path where supported |
+| Keyboard `,` | comma token for function argument separation where supported |
 
-The mapping intentionally does not interpret shifted OEM punctuation keys yet. Those keys vary by keyboard layout and locale, so they should be handled only after locale/input-boundary behavior is defined and tested. The mapping is unit-tested and protected by source-level validation.
+These mappings use canonical parser tokens rather than localized display symbols.
 
-## Planned calculator mappings
+## Shift-only top-row operator mappings
 
-The following mappings are intended but must be tested before being marked implemented:
+When the event carries exactly the Shift modifier, the implemented Calculator mapping recognizes the common top-row operator positions:
 
-| Key | Intended action |
+| Key | Token |
 |---|---|
-| Locale-aware decimal punctuation outside the numpad | Insert decimal separator safely |
-| Top-row `+`, `-`, `*`, `/` punctuation variants | Arithmetic operators with keyboard-layout awareness |
-| `%` | Percentage/modulo according to active context |
-| `^` | Power |
-| `(` / `)` | Parentheses |
-| Delete | Clear selected/input content where appropriate |
-| Ctrl/Cmd+C | Copy selected/result content |
-| Ctrl/Cmd+V | Paste sanitized expression text |
-| Ctrl/Cmd+K | Command palette if implemented |
-| Ctrl/Cmd+L | Focus expression input if adopted without platform conflict |
+| Shift+`=` | `+` |
+| Shift+`8` | `*` |
+| Shift+`9` | `(` |
+| Shift+`0` | `)` |
+| Shift+`6` | `^` |
+| Shift+`5` | `%` |
 
-## Mode shortcuts
+Control, Alt, and combined modifier chords are deliberately excluded from this mapping.
 
-`Ctrl+PageUp` and `Ctrl+PageDown` provide cyclic navigation. `Ctrl+Home` and `Ctrl+End` provide deterministic boundary navigation without requiring repeated tab traversal. Additional direct mode shortcuts are not finalized. Any future mappings should avoid conflicts with OS/browser conventions and remain discoverable in an in-app shortcut reference.
+Keyboard-layout differences still require runtime verification, especially in Browser and non-US layouts. The source mapping being implemented does not mean every physical layout produces identical key codes.
 
-## Onboarding safety
+## Calculator glyph normalization
 
-Shared mode and calculator shortcuts remain suppressed while the first-run onboarding overlay is visible. This prevents a keyboard command from activating content behind the onboarding surface.
+For non-editor text-input paths, CalcNova also normalizes supported calculator-style Unicode glyphs that are not reliably represented by physical key enums:
+
+- multiplication glyphs such as `×` / supported middle-dot form -> `*`;
+- `÷` -> `/`;
+- Unicode minus/dash forms -> `-`.
+
+The text-symbol path intentionally avoids duplicating ordinary ASCII digit/operator insertion already handled through key events.
+
+See [CALCULATOR_KEYBOARD_INPUT.md](CALCULATOR_KEYBOARD_INPUT.md).
+
+## Selection/caret behavior
+
+Hardware/keypad editing shares Calculator selection semantics rather than assuming all edits occur at the end of the string.
+
+Supported behavior includes:
+
+- replacement of selected text;
+- insertion at caret when there is no selection;
+- Backspace deleting selection or the character before the caret;
+- clamped/reversed selection handling;
+- selection-preserving function/parenthesis wrapping from keypad controls;
+- predictable caret restoration after programmatic edits.
+
+See [CALCULATOR_EDITING.md](CALCULATOR_EDITING.md).
+
+## Graph keyboard controls
+
+When the graph control has focus and no conflicting modifier is held:
+
+| Key | Action |
+|---|---|
+| Left/Right Arrow | Pan horizontally |
+| Up/Down Arrow | Pan vertically |
+| Numpad `+` | Zoom in |
+| Numpad `-` | Zoom out |
+| Home | Reset default viewport |
+| `F` | Fit viewport to finite sampled data |
+
+Graph key handling deliberately avoids modified variants so browser/OS/application/accessibility shortcuts retain priority.
+
+See [GRAPH_INTERACTION.md](GRAPH_INTERACTION.md).
+
+## Onboarding containment
+
+While first-run onboarding is visible, shared Calculator/mode keyboard shortcuts are suppressed so a command cannot activate hidden background content.
+
+After onboarding dismissal, focus is restored through the shared focus-handoff behavior.
+
+See [ONBOARDING.md](ONBOARDING.md).
+
+## Clipboard shortcuts versus clipboard actions
+
+CalcNova has explicit user-triggered paste/copy commands and buttons through its shared clipboard abstraction.
+
+Ordinary platform `Ctrl/Cmd+C` and `Ctrl/Cmd+V` behavior inside editable controls remains subject to native/Avalonia text editing. CalcNova should not globally intercept platform copy/paste chords unless a future mapping is carefully scoped and tested for browser/OS/accessibility conflicts.
+
+Explicit calculator paste still sanitizes imported expression text and does not auto-evaluate it.
+
+See [INPUT_SAFETY.md](INPUT_SAFETY.md).
 
 ## Focus and accessibility requirements
 
-Keyboard support is not complete merely because key events exist. Each interactive control must also support:
+Keyboard support is more than key-event mapping.
 
-- logical Tab/Shift+Tab order;
+The shared design contract also requires:
+
+- logical Tab/Shift+Tab traversal;
 - visible focus indication;
-- activation using expected platform keys;
-- no keyboard trap;
-- dialogs that return focus predictably;
-- screen-reader labels that describe function, not only visual glyphs.
+- expected control activation behavior;
+- no keyboard traps;
+- overlay/dialog focus containment/restoration;
+- semantic accessible names for symbol-heavy controls;
+- focus bring-into-view under scroll/adaptive layouts.
 
-The navigation policy and `MainViewModel` selection semantics now have dedicated unit coverage, but actual focus traversal and assistive-technology behavior still require runtime validation.
+Source/headless contracts cover representative behavior, while actual keyboard layout, browser conflicts, focus rendering, and assistive-technology behavior remain target-runtime evidence.
 
 ## Browser considerations
 
-Browser builds must avoid hijacking important browser/system shortcuts. Any shortcut that conflicts with navigation, developer tools, tabs, or accessibility software should be changed or made configurable after target-browser validation.
+Browser builds must not unnecessarily hijack important browser/system shortcuts.
 
-## Custom shortcuts
+CalcNova's modifier policies intentionally limit interception. Any future shortcut that conflicts with browser navigation, tabs, developer tools, accessibility software, or OS conventions should be redesigned or made appropriately configurable rather than captured globally.
 
-Configurable shortcuts are a later power-user feature. If implemented, the settings UI must detect duplicates/conflicts and provide a reset-to-default option.
+## Optional post-2.8.03 shortcut ideas
+
+Possible future power-user additions include:
+
+- direct mode-selection shortcuts;
+- a command palette;
+- explicit focus-expression shortcut;
+- configurable user shortcuts with conflict detection;
+- additional locale-aware physical-key mappings after target validation.
+
+These are optional enhancements, not missing 2.8.03 requirements.
+
+## Validation
+
+Relevant source validators/regressions cover:
+
+- shell navigation policies;
+- calculator physical/shift-only mappings;
+- glyph normalization;
+- calculator selection editing;
+- graph keyboard behavior;
+- onboarding shortcut suppression.
+
+The integrated source gate is:
+
+```bash
+python tools/release_preflight.py
+```
+
+Target keyboard/layout/browser behavior is recorded independently using:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+## 2.8.03 classification
+
+- Calculator Enter/Escape/Backspace: **COMPLETE**;
+- top-row/numpad digit input: **COMPLETE**;
+- numpad arithmetic input: **COMPLETE**;
+- supported unmodified punctuation input: **COMPLETE**;
+- Shift-only `+ * ( ) ^ %` mapping: **COMPLETE**;
+- shared mode navigation: **COMPLETE**;
+- graph keyboard pan/zoom/reset/fit: **COMPLETE**;
+- onboarding shortcut suppression: **COMPLETE**;
+- configurable/direct-mode extra shortcuts: **OPTIONAL POST-2.8.03**.
