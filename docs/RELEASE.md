@@ -101,16 +101,17 @@ permissions:
   contents: read
 ```
 
-Only `publish-release` receives the privileges needed to create/update the GitHub Release and generate provenance attestations:
+Only `publish-release` receives the privileges needed to create/update the GitHub Release and generate current `actions/attest@v4` provenance metadata/attestations:
 
 ```yaml
 permissions:
   contents: write
   id-token: write
   attestations: write
+  artifact-metadata: write
 ```
 
-This keeps release-write and OIDC privileges away from validation/build jobs.
+This keeps release-write, OIDC, attestation, and artifact-metadata write privileges away from validation/build jobs.
 
 `tools/validate_release_workflow.py` requires this least-privilege structure and rejects permission drift that would grant those write permissions more broadly.
 
@@ -306,13 +307,17 @@ Do not publish debug builds as stable release artifacts.
 
 Release publication generates SHA-256 checksum material and then creates GitHub artifact provenance attestations before publishing the GitHub Release assets.
 
-The attested subject set includes:
+The workflow passes the inclusive subject glob:
 
-- all release ZIP archives;
-- the Android AAB when present;
-- `SHA256SUMS.txt`.
+```text
+release-assets/**/*
+```
 
-The workflow uses `actions/attest@v4`, not the older wrapper actions. Provenance attestation binds artifacts to GitHub workflow/repository/commit identity; it does not claim that the artifact is vulnerability-free.
+to `actions/attest@v4`, so every file in the prepared release-asset tree is covered. For the current topology this includes all desktop/Browser ZIP archives, the Android AAB when present, and `SHA256SUMS.txt`.
+
+The inclusive release-tree glob also keeps optional Android output conditional without requiring a separate potentially absent AAB path.
+
+Provenance attestation binds artifacts to GitHub workflow/repository/commit identity; it does not claim that the artifact is vulnerability-free.
 
 See [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md) for verification guidance.
 
@@ -333,7 +338,7 @@ The workflow:
 - creates a GitHub Release only if one does not already exist;
 - preserves existing release notes/history on rerun;
 - generates checksums before provenance attestations;
-- attests intended ZIP/AAB/checksum release files before upload;
+- attests the prepared `release-assets/` tree before upload;
 - uploads intended packaged artifacts with `--clobber`;
 - does not delete/recreate the release as a normal rerun strategy.
 
