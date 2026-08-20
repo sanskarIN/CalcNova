@@ -19,7 +19,7 @@ Strict Semantic Versioning does not allow leading zeroes in numeric identifiers,
 
 CalcNova 2.8.03 is the completed product baseline. Release execution evidence is recorded independently.
 
-A command, build, test, device check, signing operation, accessibility audit, or store validation is marked PASS only after it actually executes and the result is observed. `NOT RUN` and `BLOCKED` are evidence states for unavailable environments/tools/credentials; they do not describe the product as unfinished.
+A command, build, test, device check, signing operation, accessibility audit, security-service run, attestation, or store validation is marked PASS only after it actually executes and the result is observed. `NOT RUN` and `BLOCKED` are evidence states for unavailable environments/tools/credentials/services; they do not describe the product as unfinished.
 
 ## Source release gate
 
@@ -29,7 +29,7 @@ From the exact 2.8.03 release-tag checkout, run:
 python tools/release_preflight.py --tag v2.8.3
 ```
 
-The preflight validates repository/security structure, XAML/UI/navigation/keyboard contracts, calculator editing, graph/numerical contracts, Unicode metadata, exact rationals, engineering notation, bounded exports, bivariate statistics, accessibility/adaptive/localization contracts, settings/onboarding, package metadata, the 2.8.03 completion status, platform workflows, release workflows, artifact integrity, structured release evidence, and regression suites for the SDK-independent validators/tooling.
+The preflight validates repository/security structure, XAML/UI/navigation/keyboard contracts, calculator editing, graph/numerical contracts, Unicode metadata, exact rationals, engineering notation, bounded exports, bivariate statistics, accessibility/adaptive/localization contracts, settings/onboarding, package metadata, the 2.8.03 completion status, platform workflows, security-automation workflows, release workflows, artifact integrity, structured release evidence, and regression suites for the SDK-independent validators/tooling.
 
 The preflight also rejects obsolete current-status wording in authoritative completion documents.
 
@@ -47,6 +47,19 @@ dotnet test CalcNova.slnx --configuration Release --no-build
 Target-specific builds then run for the platform artifacts included in the release.
 
 The SDK-independent preflight and compiled quality gate are separate evidence layers.
+
+## Automated security gates
+
+The maintained branch also contains:
+
+- `.github/workflows/codeql.yml` — C# CodeQL scanning;
+- `.github/workflows/dependency-review.yml` — PR dependency vulnerability review at moderate severity or higher;
+- `.github/dependabot.yml` — NuGet and GitHub Actions update proposals;
+- `.github/workflows/security-automation-validate.yml` — focused security-workflow source validation.
+
+See [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md).
+
+A release maintainer should review relevant CodeQL, dependency-review, Dependabot, and repository security alerts before publication. The presence of workflow source is not equivalent to a successful service run.
 
 ## Automated release flow
 
@@ -78,6 +91,28 @@ The Desktop job publishes six self-contained architecture-specific archives:
 - macOS: `osx-x64`, `osx-arm64`.
 
 The release workflow validator requires all six target/runner pairs, the RID-specific archive naming contract, and the RID-specific artifact naming contract. This prevents a maintenance edit from silently dropping native ARM64 or x64 desktop publication.
+
+## Release workflow permissions
+
+The release workflow defaults to read-only repository contents permission:
+
+```yaml
+permissions:
+  contents: read
+```
+
+Only `publish-release` receives the privileges needed to create/update the GitHub Release and generate provenance attestations:
+
+```yaml
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+```
+
+This keeps release-write and OIDC privileges away from validation/build jobs.
+
+`tools/validate_release_workflow.py` requires this least-privilege structure and rejects permission drift that would grant those write permissions more broadly.
 
 ## Source-owned version identity
 
@@ -176,16 +211,18 @@ For the release commit/tag, confirm:
 - `PROJECT_STATE.md` identifies version 2.8.03 as complete;
 - `CHANGELOG.md` contains the dated 2.8.03 release entry;
 - `docs/VERSIONING.md` maps 2.8.03 to normalized 2.8.3 / `v2.8.3`;
-- `what_changed.md` contains the final completion checkpoint;
+- `what_changed.md` contains the current maintenance checkpoint;
 - package/version identifiers are consistent;
 - source preflight is run or its evidence state is recorded;
 - no release-critical placeholder implementation exists;
 - generated packaging placeholders are resolved by the appropriate packaging step;
 - no private signing material is tracked;
 - dependency/security alerts are reviewed;
+- CodeQL/dependency-review status is reviewed where applicable;
 - privacy/security documentation matches dependencies/network behavior;
 - contact/support links are correct;
-- license/third-party notices are complete.
+- license/third-party notices are complete;
+- release provenance/checksum behavior still satisfies the release workflow validator.
 
 ## Mathematical verification
 
@@ -265,11 +302,29 @@ An iOS archive remains credential/provisioning dependent and is not represented 
 
 Do not publish debug builds as stable release artifacts.
 
-## Artifact integrity
+## Checksums and provenance attestations
 
-Release publication generates SHA-256 checksum material. CalcNova also includes manifest generation/verification tooling that binds artifact evidence to repository/commit identity.
+Release publication generates SHA-256 checksum material and then creates GitHub artifact provenance attestations before publishing the GitHub Release assets.
 
-Use the artifact-integrity and structured-evidence tooling where release provenance needs to be recorded or independently checked.
+The attested subject set includes:
+
+- all release ZIP archives;
+- the Android AAB when present;
+- `SHA256SUMS.txt`.
+
+The workflow uses `actions/attest@v4`, not the older wrapper actions. Provenance attestation binds artifacts to GitHub workflow/repository/commit identity; it does not claim that the artifact is vulnerability-free.
+
+See [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md) for verification guidance.
+
+A downloaded artifact can be checked with a current GitHub CLI installation using:
+
+```bash
+gh attestation verify PATH_TO_ARTIFACT -R sanskarIN/CalcNova
+```
+
+Checksum verification remains useful as a separate integrity check. Verify both the provenance of the release material and the expected checksum when high-assurance distribution verification is required.
+
+CalcNova also includes manifest generation/verification tooling that binds structured artifact evidence to repository/commit identity.
 
 ## GitHub Release behavior
 
@@ -277,6 +332,8 @@ The workflow:
 
 - creates a GitHub Release only if one does not already exist;
 - preserves existing release notes/history on rerun;
+- generates checksums before provenance attestations;
+- attests intended ZIP/AAB/checksum release files before upload;
 - uploads intended packaged artifacts with `--clobber`;
 - does not delete/recreate the release as a normal rerun strategy.
 
@@ -292,9 +349,9 @@ Release notes should identify:
 - security changes where relevant;
 - migration notes where relevant;
 - documentation links;
-- known runtime evidence limitations, if any.
+- known runtime/security-service evidence limitations, if any.
 
-Do not claim universal compatibility or zero defects without evidence.
+Do not claim universal compatibility, zero defects, or successful provenance generation without observed evidence.
 
 ## Maintenance / hotfix process
 
@@ -303,8 +360,8 @@ For a post-2.8.03 defect:
 1. reproduce and scope impact;
 2. add regression coverage where practical;
 3. fix the issue;
-4. run applicable source/compiled/platform checks;
+4. run applicable source/compiled/platform/security checks;
 5. update changelog/release notes;
-6. issue the appropriate normalized SemVer maintenance tag/version.
+6. issue the appropriate normalized SemVer maintenance tag/version when publication is required.
 
 Avoid destructive repository history rewrites for ordinary release corrections.
