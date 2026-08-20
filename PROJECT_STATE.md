@@ -22,6 +22,20 @@ The defined 2.8.03 product scope is implemented in the repository. Core calculat
 
 Future repository changes are classified as maintenance, compatibility updates, security fixes, documentation changes, translation additions, or optional enhancements. They are not required to define the 2.8.03 project as complete.
 
+## Current Maintenance Enhancements — 2026-08-20
+
+The completed 2.8.03 baseline now includes a stronger desktop release publication contract:
+
+- Windows self-contained archives for `win-x64` and `win-arm64`;
+- Linux self-contained archives for `linux-x64` and `linux-arm64`;
+- macOS self-contained archives for `osx-x64` and `osx-arm64`;
+- RID-specific archive and artifact names;
+- release-workflow source validation requiring all six target/runner pairs;
+- regression tests that lock x64 + ARM64 coverage for every desktop operating system;
+- build/platform/release documentation synchronized with the six-target release matrix.
+
+This is a post-completion maintenance improvement. It does not change the public product version, normalized package version, release tag mapping, or mobile build code.
+
 ## Product Identity
 
 - Product name: CalcNova
@@ -242,8 +256,11 @@ Additional language packs or further localization expansion are optional post-re
 - Shared clipboard abstraction and Avalonia adapter
 - External-link abstraction
 - Settings/history composition appropriate to native and Browser environments
+- x64 + ARM64 self-contained desktop release matrix for Windows, Linux, and macOS
 
 Android and iOS source metadata uses display version `2.8.03` and numeric build code `20803`.
+
+Desktop release source now packages `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, and `osx-arm64`. Runtime/package evidence for those architecture artifacts remains separately recorded.
 
 ## Completed Validation and Release Infrastructure
 
@@ -270,6 +287,7 @@ SDK-independent source contracts cover:
 - Source Preflight workflow self-validation;
 - exact-tag iOS simulator workflow;
 - release workflow and documentation contracts;
+- six-target x64/ARM64 desktop release matrix validation;
 - release-tag syntax;
 - artifact manifest/checksum integrity;
 - structured release-evidence model/runner/verifier;
@@ -315,6 +333,8 @@ Product implementation completeness and environment execution evidence are separ
 
 The repository records a check as PASS only when it actually executes and its result is observed. In the assistant environment used for the final source pass, the required .NET 10/platform toolchains were not available for direct execution, so local compiled/platform evidence remains recorded conservatively as `NOT RUN` rather than being invented.
 
+A fresh-clone attempt on 2026-08-20 also could not resolve `github.com`, so the updated repository could not be materialized in that container for a local full-tree preflight. The release-workflow maintenance was therefore validated through repository source contracts and regression-source updates, while compiled/runtime evidence remains environment-dependent.
+
 This evidence notation does **not** mean CalcNova 2.8.03 is incomplete. It means a particular command was not executed in that particular environment.
 
 Typical environment-specific verification commands include:
@@ -335,6 +355,7 @@ Platform signing, notarization, provisioning, and store processing additionally 
 - Core features: **COMPLETE**
 - Shared application features: **COMPLETE**
 - Platform source composition: **COMPLETE**
+- x64/ARM64 desktop release source contract: **COMPLETE**
 - Documentation baseline: **COMPLETE**
 - Source validation infrastructure: **COMPLETE**
 - Packaging/release workflow infrastructure: **COMPLETE**
