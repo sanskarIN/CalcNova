@@ -8,6 +8,16 @@ import sys
 from pathlib import Path
 
 
+DESKTOP_RELEASE_TARGETS: tuple[tuple[str, str], ...] = (
+    ("windows-latest", "win-x64"),
+    ("windows-latest", "win-arm64"),
+    ("ubuntu-latest", "linux-x64"),
+    ("ubuntu-latest", "linux-arm64"),
+    ("macos-latest", "osx-x64"),
+    ("macos-latest", "osx-arm64"),
+)
+
+
 def validate(root: Path) -> list[str]:
     workflow_path = root / ".github" / "workflows" / "release.yml"
     if not workflow_path.is_file():
@@ -31,10 +41,18 @@ def validate(root: Path) -> list[str]:
         "--verify-tag --generate-notes",
         "--clobber",
         'rm -f "$RUNNER_TEMP/calcnova-release.keystore"',
+        'dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true --output publish/${{ matrix.rid }}',
+        'name: desktop-${{ matrix.rid }}',
+        'path: CalcNova-${{ matrix.rid }}.zip',
     )
     for marker in required_markers:
         if marker not in source:
             failures.append(f"Release workflow is missing required marker: {marker}")
+
+    for runner, rid in DESKTOP_RELEASE_TARGETS:
+        target_marker = f"- os: {runner}\n            rid: {rid}"
+        if target_marker not in source:
+            failures.append(f"Release workflow is missing desktop release target: {runner} / {rid}")
 
     ref_marker = "ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}"
     if source.count(ref_marker) < 4:
@@ -81,7 +99,9 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated tag/source version alignment, tagged preflight, build, signing, and publication workflow contracts.")
+    print(
+        "Validated tag/source version alignment, tagged preflight, x64/ARM64 desktop publication, build, signing, and publication workflow contracts."
+    )
     return 0
 
 
