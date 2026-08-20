@@ -148,4 +148,12 @@ The focused workflow is `.github/workflows/bivariate-statistics-validate.yml`. T
 
 ## Evidence policy
 
-The implementation, regression source, workflow, and source-contract validation are present. Compiled .NET/Avalonia tests and real target-platform interaction remain **NOT RUN** until their execution is observed in a suitable environment.
+The implementation, regression source, workflow, and source-contract validation are present.
+
+Compiled .NET/Avalonia execution and target-platform interaction are recorded separately per observed run using:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+Do not infer a compiled/runtime PASS from source presence, and do not hard-code one environment's `NOT RUN` state as the permanent status of this completed feature.
