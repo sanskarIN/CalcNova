@@ -71,6 +71,14 @@ The validation job follows this order:
 
 Desktop, Browser, Android, and release-publication jobs all check out the release ref rather than branch head.
 
+The Desktop job publishes six self-contained architecture-specific archives:
+
+- Windows: `win-x64`, `win-arm64`;
+- Linux: `linux-x64`, `linux-arm64`;
+- macOS: `osx-x64`, `osx-arm64`.
+
+The release workflow validator requires all six target/runner pairs, the RID-specific archive naming contract, and the RID-specific artifact naming contract. This prevents a maintenance edit from silently dropping native ARM64 or x64 desktop publication.
+
 ## Source-owned version identity
 
 `Directory.Build.props` is the release-version source of truth.
@@ -223,6 +231,8 @@ iOS: PASS / FAIL / BLOCKED / NOT RUN
 Browser: PASS / FAIL / BLOCKED / NOT RUN
 ```
 
+For desktop release evidence, record x64 and ARM64 separately when both architecture artifacts are evaluated.
+
 Package metadata correctness and actual package execution are separate evidence layers.
 
 ## Signing
@@ -239,15 +249,19 @@ The iOS exact-tag simulator validation path is intentionally unsigned and does n
 
 Publish only artifacts built from the release tag through the documented workflow or an equivalent recorded process.
 
-Potential artifact families:
+Current automated artifact families include:
 
-- Windows publish/package;
-- Linux publish/package;
-- macOS app/package;
-- Android AAB;
-- iOS archive where distribution rules/credentials permit;
+- Windows x64 self-contained desktop archive;
+- Windows ARM64 self-contained desktop archive;
+- Linux x64 self-contained desktop archive;
+- Linux ARM64 self-contained desktop archive;
+- macOS Intel x64 self-contained desktop archive;
+- macOS Apple Silicon ARM64 self-contained desktop archive;
 - Browser bundle;
-- checksum/manifest files.
+- Android AAB when signing secrets are configured;
+- checksum material.
+
+An iOS archive remains credential/provisioning dependent and is not represented by the unsigned simulator-validation workflow.
 
 Do not publish debug builds as stable release artifacts.
 
