@@ -27,6 +27,7 @@ Security goals include:
 - minimizing permissions and platform attack surface;
 - separating source completeness from signing/store credentials;
 - failing safely on malformed/unsupported persisted state;
+- auditing direct and transitive NuGet dependencies for moderate-or-higher known vulnerabilities during restore;
 - detecting vulnerable dependency additions before merge where GitHub dependency data is available;
 - scanning maintained C# source for CodeQL-detectable security issues;
 - preserving verifiable provenance for stable release artifacts.
@@ -211,10 +212,14 @@ If a real credential is accidentally committed, removing the file from the lates
 
 CalcNova uses multiple complementary maintenance controls:
 
+- repository-level NuGet Audit explicitly enables direct and transitive package auditing with `NuGetAuditMode=all` and a `moderate` minimum severity threshold;
+- `TreatWarningsAsErrors=true` makes reported moderate/high/critical NuGet audit warnings fail restore/build gates rather than remaining informational warnings;
 - Dependabot proposes scheduled NuGet dependency updates;
 - Dependabot proposes scheduled GitHub Actions updates;
 - Dependency Review inspects dependency changes in pull requests and is configured to fail when a newly introduced known vulnerability is moderate severity or higher;
 - CodeQL scans maintained C# source on pushes and pull requests to `main`, on a weekly schedule, and on manual runs.
+
+The restore-level NuGet audit is important even when Dependency Review exists: a vulnerability can be disclosed after a dependency was already merged. A later restore can then report that newly known advisory without requiring a dependency-file change.
 
 New or upgraded dependencies should still be reviewed for:
 
@@ -230,14 +235,18 @@ New or upgraded dependencies should still be reviewed for:
 
 Do not blindly auto-merge major dependency updates without appropriate build/test/platform evidence.
 
-The repository-owned workflow contract is protected by:
+The repository-owned security contracts are protected by:
 
 ```bash
 python tools/validate_security_workflows.py .
+python tools/validate_dependency_security.py .
 python -m unittest tools.tests.test_validate_security_workflows
+python -m unittest tools.tests.test_validate_dependency_security
 ```
 
 Those checks are also part of `python tools/release_preflight.py`.
+
+The focused security workflow watches `Directory.Build.props`, so weakening the repository-level NuGet audit policy is included in its path-filtered validation surface.
 
 See [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md).
 
@@ -255,13 +264,13 @@ Requirements include:
 - keep security workflow behavior protected by source validators/regression tests;
 - treat GitHub-hosted service results as execution evidence, not as implied success from YAML presence.
 
-The stable release workflow keeps repository contents read-only by default and grants `contents: write`, `id-token: write`, and `attestations: write` only to the release-publication job.
+The stable release workflow keeps repository contents read-only by default and grants `contents: write`, `id-token: write`, `attestations: write`, and `artifact-metadata: write` only to the release-publication job.
 
 ## Release artifact provenance
 
-Stable release publication generates SHA-256 checksum material and GitHub artifact provenance attestations for intended release ZIP/AAB/checksum files.
+Stable release publication generates SHA-256 checksum material and GitHub artifact provenance attestations for the prepared `release-assets/**/*` tree.
 
-The release workflow uses `actions/attest@v4` after checksum generation and before GitHub Release asset upload.
+The release workflow uses `actions/attest@v4` after checksum generation and before GitHub Release asset upload. The inclusive release-tree subject covers desktop/Browser ZIP files, the signed Android AAB when present, and `SHA256SUMS.txt` without requiring a separate path for optional Android output.
 
 Artifact attestations help consumers verify where/how an artifact was built and bind it to workflow/repository/commit identity. They do not prove that an artifact is free from vulnerabilities or defects.
 
@@ -306,20 +315,21 @@ Any change to networking, telemetry, permissions, storage, account/authenticatio
 For a stable release or maintenance update:
 
 1. run `python tools/release_preflight.py` from the intended source checkout;
-2. run the applicable .NET restore/format/build/test gate;
-3. run target-specific build workflows/commands for claimed platforms;
-4. review CodeQL, dependency-review, Dependabot, and repository security alerts as applicable;
-5. inspect tracked changes for likely secrets/signing files;
-6. verify Android/iOS signing credentials remain external;
-7. review package/application identifiers and generated permission/entitlement metadata;
-8. review external-link destinations;
-9. test malformed/imported expression handling;
-10. test relevant workload/input boundaries;
-11. review currency provider response/error behavior if networking changed;
-12. review privacy documentation against actual release dependencies/configuration;
-13. verify release artifacts originate from the expected tag/commit and checksum process;
-14. verify provenance attestation generation when GitHub release publication runs;
-15. document unresolved security/service/runtime limitations accurately.
+2. run `dotnet restore CalcNova.slnx` and review/resolve any NuGet audit failure rather than suppressing it broadly;
+3. run the applicable .NET format/build/test gate;
+4. run target-specific build workflows/commands for claimed platforms;
+5. review CodeQL, dependency-review, Dependabot, and repository security alerts as applicable;
+6. inspect tracked changes for likely secrets/signing files;
+7. verify Android/iOS signing credentials remain external;
+8. review package/application identifiers and generated permission/entitlement metadata;
+9. review external-link destinations;
+10. test malformed/imported expression handling;
+11. test relevant workload/input boundaries;
+12. review currency provider response/error behavior if networking changed;
+13. review privacy documentation against actual release dependencies/configuration;
+14. verify release artifacts originate from the expected tag/commit and checksum process;
+15. verify provenance attestation generation when GitHub release publication runs;
+16. document unresolved security/service/runtime limitations accurately.
 
 See [RELEASE_READINESS_CHECKLIST.md](RELEASE_READINESS_CHECKLIST.md), [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md), [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md), and [RUNTIME_VALIDATION_RUNBOOK.md](RUNTIME_VALIDATION_RUNBOOK.md).
 
