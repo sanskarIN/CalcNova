@@ -24,6 +24,27 @@ class ReleaseWorkflowValidatorTests(unittest.TestCase):
         validator = load_validator()
         self.assertEqual([], validator.validate(ROOT))
 
+    def test_desktop_release_target_inventory_is_stable(self) -> None:
+        validator = load_validator()
+        self.assertEqual(
+            (
+                ("windows-latest", "win-x64"),
+                ("windows-latest", "win-arm64"),
+                ("ubuntu-latest", "linux-x64"),
+                ("ubuntu-latest", "linux-arm64"),
+                ("macos-latest", "osx-x64"),
+                ("macos-latest", "osx-arm64"),
+            ),
+            validator.DESKTOP_RELEASE_TARGETS,
+        )
+
+    def test_each_desktop_os_has_x64_and_arm64_release_targets(self) -> None:
+        validator = load_validator()
+        targets = set(validator.DESKTOP_RELEASE_TARGETS)
+        self.assertTrue({("windows-latest", "win-x64"), ("windows-latest", "win-arm64")} <= targets)
+        self.assertTrue({("ubuntu-latest", "linux-x64"), ("ubuntu-latest", "linux-arm64")} <= targets)
+        self.assertTrue({("macos-latest", "osx-x64"), ("macos-latest", "osx-arm64")} <= targets)
+
 
 if __name__ == "__main__":
     unittest.main()
