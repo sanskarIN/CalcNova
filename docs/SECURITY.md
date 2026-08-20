@@ -13,7 +13,9 @@ CalcNova is primarily a local calculator, but it processes data from multiple tr
 - optional currency-rate network responses;
 - external links;
 - generated/exported data;
-- platform/runtime metadata.
+- platform/runtime metadata;
+- dependency/package updates;
+- CI/release workflow inputs and artifacts.
 
 Security goals include:
 
@@ -24,7 +26,10 @@ Security goals include:
 - keeping calculation history local by default;
 - minimizing permissions and platform attack surface;
 - separating source completeness from signing/store credentials;
-- failing safely on malformed/unsupported persisted state.
+- failing safely on malformed/unsupported persisted state;
+- detecting vulnerable dependency additions before merge where GitHub dependency data is available;
+- scanning maintained C# source for CodeQL-detectable security issues;
+- preserving verifiable provenance for stable release artifacts.
 
 ## Expression evaluation
 
@@ -202,11 +207,16 @@ Repository ignore rules and source validators help reduce risk, but they are not
 
 If a real credential is accidentally committed, removing the file from the latest commit is not sufficient: revoke/rotate the credential and follow the relevant incident-response/history-cleanup process.
 
-## Dependencies
+## Dependencies and code scanning
 
-Dependencies are monitored through repository automation such as Dependabot.
+CalcNova uses multiple complementary maintenance controls:
 
-New or upgraded dependencies should be reviewed for:
+- Dependabot proposes scheduled NuGet dependency updates;
+- Dependabot proposes scheduled GitHub Actions updates;
+- Dependency Review inspects dependency changes in pull requests and is configured to fail when a newly introduced known vulnerability is moderate severity or higher;
+- CodeQL scans maintained C# source on pushes and pull requests to `main`, on a weekly schedule, and on manual runs.
+
+New or upgraded dependencies should still be reviewed for:
 
 - active maintenance;
 - license compatibility;
@@ -219,6 +229,49 @@ New or upgraded dependencies should be reviewed for:
 - transitive dependencies.
 
 Do not blindly auto-merge major dependency updates without appropriate build/test/platform evidence.
+
+The repository-owned workflow contract is protected by:
+
+```bash
+python tools/validate_security_workflows.py .
+python -m unittest tools.tests.test_validate_security_workflows
+```
+
+Those checks are also part of `python tools/release_preflight.py`.
+
+See [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md).
+
+## CI workflow security
+
+Security-sensitive workflow design should preserve least privilege.
+
+Requirements include:
+
+- default to `contents: read` where a job only needs source access;
+- grant write permissions only to the job that actually requires them;
+- avoid `pull_request_target` for workflows that inspect untrusted pull-request changes unless a separately reviewed design genuinely requires it;
+- do not expose repository, signing, or provider secrets to untrusted pull-request code;
+- use maintained action major versions and keep them covered by dependency monitoring;
+- keep security workflow behavior protected by source validators/regression tests;
+- treat GitHub-hosted service results as execution evidence, not as implied success from YAML presence.
+
+The stable release workflow keeps repository contents read-only by default and grants `contents: write`, `id-token: write`, and `attestations: write` only to the release-publication job.
+
+## Release artifact provenance
+
+Stable release publication generates SHA-256 checksum material and GitHub artifact provenance attestations for intended release ZIP/AAB/checksum files.
+
+The release workflow uses `actions/attest@v4` after checksum generation and before GitHub Release asset upload.
+
+Artifact attestations help consumers verify where/how an artifact was built and bind it to workflow/repository/commit identity. They do not prove that an artifact is free from vulnerabilities or defects.
+
+Consumers can verify an attested downloaded artifact with a current GitHub CLI installation:
+
+```bash
+gh attestation verify PATH_TO_ARTIFACT -R sanskarIN/CalcNova
+```
+
+See [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md) for the full provenance/verification contract.
 
 ## Logging and diagnostics
 
@@ -255,7 +308,7 @@ For a stable release or maintenance update:
 1. run `python tools/release_preflight.py` from the intended source checkout;
 2. run the applicable .NET restore/format/build/test gate;
 3. run target-specific build workflows/commands for claimed platforms;
-4. review dependency/security alerts;
+4. review CodeQL, dependency-review, Dependabot, and repository security alerts as applicable;
 5. inspect tracked changes for likely secrets/signing files;
 6. verify Android/iOS signing credentials remain external;
 7. review package/application identifiers and generated permission/entitlement metadata;
@@ -265,9 +318,10 @@ For a stable release or maintenance update:
 11. review currency provider response/error behavior if networking changed;
 12. review privacy documentation against actual release dependencies/configuration;
 13. verify release artifacts originate from the expected tag/commit and checksum process;
-14. document unresolved security limitations accurately.
+14. verify provenance attestation generation when GitHub release publication runs;
+15. document unresolved security/service/runtime limitations accurately.
 
-See [RELEASE_READINESS_CHECKLIST.md](RELEASE_READINESS_CHECKLIST.md) and [RUNTIME_VALIDATION_RUNBOOK.md](RUNTIME_VALIDATION_RUNBOOK.md).
+See [RELEASE_READINESS_CHECKLIST.md](RELEASE_READINESS_CHECKLIST.md), [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md), [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md), and [RUNTIME_VALIDATION_RUNBOOK.md](RUNTIME_VALIDATION_RUNBOOK.md).
 
 ## Security change rule
 
