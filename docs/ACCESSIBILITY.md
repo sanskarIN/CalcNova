@@ -1,191 +1,291 @@
-# CalcNova Accessibility
+# CalcNova 2.8.03 Accessibility
 
-Accessibility is a release requirement, not a post-release decoration.
+Accessibility is part of the completed CalcNova 2.8.03 source baseline, not a post-release decoration.
 
-## Current state
+Source implementation completeness and target-platform accessibility evidence are intentionally separate. CalcNova includes shared accessibility contracts and automated source/headless coverage, while screen-reader, text-scaling, contrast, touch, and device behavior must still be recorded as `PASS / FAIL / BLOCKED / NOT RUN` only after the relevant runtime check is actually performed.
 
-CalcNova now includes several accessibility-oriented implementation measures, but a full platform accessibility audit has **not** yet been completed. Do not describe the pre-release UI as fully accessible until the checks below have been exercised on supported platforms.
+## Completed shared baseline
 
-Current source/UI measures include:
+The 2.8.03 shared source includes:
 
-- global minimum 44-pixel heights for Button, TextBox, ComboBox, CheckBox, TabItem, and ListBoxItem controls;
-- 54-pixel minimum height for standard calculator keys, with compact-layout keys remaining at least 50 pixels tall;
-- width-driven `compact`, `medium`, and `expanded` shared-shell profiles;
-- compact-width horizontal scroll fallback for mode content that still contains wide fixed-column control groups;
-- focus-change bring-into-view behavior on shared mode scroll containers;
-- keyboard Enter/Escape/Backspace support in the primary calculator mode;
-- `Ctrl+PageUp` / `Ctrl+PageDown` shared mode cycling;
-- deterministic top-row/numpad digit and numpad arithmetic-key handling outside text fields;
-- explicit automation names for symbol-heavy calculator controls including memory, angle, scientific, operator, digit, decimal, and evaluation keys;
-- explicit automation names for programmer bitwise AND/OR/XOR/NOT controls;
-- accessible state names for programmer bit cells such as `Bit 7, set`;
-- textual programmer bit patterns in addition to the interactive bit grid;
-- textual graph sampling/analysis output in addition to graphical presentation;
-- a shared first-run surface with accessible Skip/Start actions;
-- onboarding focus queued to the visible action surface, with focus returned to the calculator input after dismissal;
-- an active `high-contrast` shell class that strengthens borders on common interactive controls when the preference is enabled;
-- an active `reduced-motion` shell class that future motion styles/components can honor consistently;
-- scrollable shared-mode layouts rather than fixed-height content clipping;
-- source-level accessibility markup validation in the shared UI workflow.
+- a 44-DIP minimum interaction-target baseline for common controls;
+- a 54-DIP standard calculator-key baseline;
+- compact calculator keys that remain at least 50 DIPs tall;
+- width-driven compact, medium, and expanded shell profiles;
+- compact horizontal-overflow fallback for wide mode content;
+- focus bring-into-view behavior;
+- explicit visible keyboard focus styling;
+- stronger focus/border styling under CalcNova high contrast;
+- reduced-motion shell preference state;
+- keyboard Enter/Escape/Backspace calculator behavior;
+- deterministic top-row/numpad input mappings outside active text editing;
+- `Ctrl+PageUp` / `Ctrl+PageDown` cyclic mode navigation;
+- `Ctrl+Home` / `Ctrl+End` first/last mode navigation;
+- automation names for symbol-heavy calculator/programmer controls;
+- accessible programmer bit-state names;
+- structural grouping and textual alternatives for large programmer bit representations;
+- explicit programmer copy actions;
+- keyboard-operable graph viewport controls;
+- non-color-only graph series patterns plus text legend;
+- textual graph sample/analysis/trace alternatives;
+- accessible SVG export;
+- onboarding shortcut suppression and focus restoration;
+- scrollable mode surfaces;
+- localization-aware reviewed shared surfaces;
+- SDK-independent accessibility source validators;
+- focused Avalonia headless regression coverage.
+
+## Evidence boundary
+
+A source contract proves that required markup/state/logic exists. It does not prove how every operating system, browser, screen reader, display scale, or input device presents that behavior.
+
+Use the runtime evidence vocabulary:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+Do not mark TalkBack, VoiceOver, Narrator, browser accessibility, measured contrast, large text, or touch behavior PASS merely because source validators exist.
+
+See [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md) and [RUNTIME_VALIDATION_RUNBOOK.md](RUNTIME_VALIDATION_RUNBOOK.md).
 
 ## Adaptive layout baseline
 
-The shared shell now selects an available-width profile instead of relying on device names:
+The shared shell selects an available-width profile rather than relying on device names:
 
-- **Compact:** up to 599 logical pixels;
-- **Medium:** 600–979 logical pixels;
-- **Expanded:** 980 logical pixels and above.
+- **Compact:** up to 599 DIPs;
+- **Medium:** 600–979 DIPs;
+- **Expanded:** 980 DIPs and above.
 
-Compact mode reduces non-essential padding while preserving minimum interactive target heights. It also enables horizontal scrolling inside shared mode scroll containers as a safe fallback for wide calculator/function/date grids that have not yet received a deeper structural reflow. Focus changes are configured to bring the focused control into view where the Avalonia scroll container supports that behavior.
+Compact mode reduces non-essential spacing while preserving interaction-target baselines. Horizontal mode scrolling is available as a fallback for wide content. Focused controls request bring-into-view behavior where supported by the Avalonia container.
 
-This is an implementation baseline, not a claim that every mode is fully optimized for phones. The final mobile pass must still verify actual portrait/landscape behavior, text scaling, tab-header navigation, screen-reader order, and 64/128-bit programmer interaction on target devices.
+Long values, programmer grids, history/export content, localized labels, and graph controls must remain reachable through wrapping, scrolling, or adaptive structure rather than being silently clipped.
 
-## Source-level accessibility gate
+See [ADAPTIVE_LAYOUT.md](ADAPTIVE_LAYOUT.md).
 
-`tools/validate_accessibility_markup.py` is wired into `UI Contract Validate` and currently checks deterministic source rules that do not require an accessibility runtime:
+## Source-level accessibility gates
 
-- symbol-heavy calculator/programmer buttons covered by the contract have an explicit `AutomationProperties.Name`;
-- common control styles retain the shared 44-pixel minimum-height baseline;
-- normal calculator keys retain the 54-pixel baseline;
-- compact calculator keys retain at least a 50-pixel minimum height;
-- CheckBox touch-target styling remains present;
-- high-contrast style selectors remain present for Button, TextBox, ComboBox, TabItem, and ListBoxItem;
-- the shared shell continues to apply both `high-contrast` and `reduced-motion` preference classes from settings.
+`tools/validate_accessibility_markup.py` and related validators protect deterministic source requirements such as:
 
-This gate catches accidental source regressions only. It cannot prove screen-reader wording, focus order, measured contrast ratios, text scaling, or target-platform accessibility behavior.
+- automation names for symbol-heavy controls covered by the contract;
+- common 44-DIP interaction-target styling;
+- calculator-key sizing;
+- CheckBox target styling;
+- visible focus/high-contrast selectors;
+- shared `high-contrast` and `reduced-motion` state classes.
 
-## Requirements
+Additional source contracts cover:
 
-### Screen readers and semantics
+- focus visibility;
+- adaptive layout;
+- touch targets;
+- dynamically inserted control accessibility;
+- onboarding focus behavior;
+- graph keyboard/surface behavior;
+- programmer bit accessibility;
+- localization/catalog integrity;
+- accessibility evidence discipline.
 
-- Every control must have an understandable accessible name.
-- Glyph-only buttons such as backspace, square root, or operators need semantic labels where the visual symbol is insufficient.
-- Results and important calculation errors should be announced in a useful, non-disruptive way where platform APIs allow it.
-- Mode, angle, signed/unsigned, word-size, and favorite state must be exposed semantically, not only visually.
-- Dynamic bit states must remain understandable after toggling.
+These checks run through focused workflows and the integrated source preflight:
 
-Dynamic live-region announcements should be added selectively. Making every result/status change a live announcement can become disruptive, so this needs targeted assistive-technology testing rather than a blanket source rule.
+```bash
+python tools/release_preflight.py
+```
 
-### Keyboard
+## Screen readers and semantics
 
-- All essential desktop/browser functions must be reachable without a mouse.
-- Tab order must follow the visual/logical workflow.
-- Focus must always be visible.
-- Dialogs/overlays must contain navigation appropriately while open and restore focus when closed.
-- No calculator interaction may create an unrecoverable keyboard trap.
-- Large programmer bit grids must preserve predictable focus order.
-- Background calculator/mode shortcuts must not activate through the onboarding overlay.
+Shared design requirements are:
 
-The current onboarding implementation queues focus to its first visible action and returns focus to the calculator input after dismissal. This behavior still requires runtime verification on each supported keyboard target.
+- every essential control has an understandable accessible name or platform-derived label;
+- symbol-only controls expose semantic names where the glyph alone is insufficient;
+- important state such as mode, angle unit, signed/unsigned interpretation, word size, favorite state, and programmer bit state is available semantically rather than only visually;
+- graph series have textual/non-color identifiers;
+- dynamic controls remain understandable after state changes;
+- overlays/onboarding do not leave focus behind hidden content.
 
-### Touch targets
+Live announcements should be used selectively. Automatically announcing every result/status mutation can become disruptive, so live-region behavior requires platform assistive-technology validation rather than blanket implementation.
 
-Common shared controls now use a minimum 44-pixel height, while calculator keys use 54 pixels in normal layouts and at least 50 pixels in compact mode. This is a source-level baseline, not a substitute for device testing.
+## Keyboard accessibility
 
-Dense scientific/programmer layouts should adapt rather than shrinking important targets below usable sizes. The 64/128-bit grid requires special compact-layout review on phones.
+On keyboard-capable targets, essential workflows should remain operable without a mouse.
 
-### Text scaling
+The implemented shared baseline includes:
 
-- Text must remain readable with platform text scaling/large-text settings.
-- Results may wrap or adapt rather than being clipped silently.
-- Layouts should not depend on one fixed font size.
-- Important labels must not disappear solely because text is enlarged.
-- Tab/navigation presentation must remain usable when labels scale.
-- Onboarding content must remain scrollable and keep Skip/Start reachable when text grows.
+- visible keyboard focus;
+- calculator key mappings;
+- selection/caret-aware editing;
+- mode navigation shortcuts;
+- onboarding background-shortcut suppression;
+- focus restoration after onboarding;
+- keyboard-operable graph panning/zoom/reset/fit;
+- focusable programmer bit controls.
 
-### Contrast
+Graph keyboard controls include:
 
-When the CalcNova high-contrast preference is enabled, the shared shell now applies a `high-contrast` class. Current styles strengthen borders on Button, TextBox, ComboBox, TabItem, and ListBoxItem controls, and TabItem text becomes semi-bold.
+- arrow-key panning;
+- numpad Add/Subtract zoom;
+- Home reset;
+- `F` fit-to-data.
 
-This is an implemented visual preference, not proof of platform-level high-contrast conformance. Before stable release:
+Target browsers/desktop environments must still be checked for shortcut conflicts and actual focus order.
 
-- measure representative foreground/background and focus-state contrast in light/dark themes;
-- verify disabled/selected/error states remain distinguishable;
-- verify the preference composes correctly with system high-contrast modes where supported;
-- verify the fixed onboarding color treatment remains readable and does not fight system accessibility settings.
+## Touch targets
 
-### Color
+Common shared controls use a minimum 44-DIP height baseline. Standard calculator keys use 54 DIPs; compact calculator keys remain at least 50 DIPs tall.
 
-Information must not be conveyed by color alone. Graph functions, error states, base indicators, bit states, favorites, and selected modes need labels, patterns, markers, or other redundant cues where appropriate.
+Touch-target source contracts also cover dynamically inserted shared controls where applicable.
 
-### Motion
+Real Android/iOS/touchscreen evidence should verify reachability, spacing, orientation behavior, and accidental-activation risk on representative devices.
 
-The reduced-motion setting now changes shared shell state by applying a `reduced-motion` class. The current shared UI does not contain decorative animation/transitions that require suppression, so there is no observable motion reduction to claim yet.
+## Text scaling and localization
 
-Future animation/transition styles must either honor the `reduced-motion` class or document why a motion effect is essential. No essential meaning should depend on animation.
+Layouts should tolerate:
 
-### Error messages
+- platform text scaling;
+- large text/Dynamic Type where supported;
+- Hindi/English reviewed localized strings;
+- long results and expressions;
+- narrow portrait/landscape surfaces.
 
-Errors should be concise and understandable. Avoid raw stack traces in normal UI. Preserve user input when practical so errors can be corrected. Clipboard rejection, numerical-analysis failure, and converter/programmer validation errors must remain readable without relying on color alone.
+Important labels/actions must not disappear solely because text grows.
+
+Onboarding remains scrollable so Skip/Start actions can stay reachable under larger text.
+
+Runtime large-text evidence remains target-specific.
+
+## Contrast and high contrast
+
+CalcNova includes an application high-contrast preference that applies stronger focus/border styling across common interactive controls.
+
+This implemented state is not the same as measured contrast evidence for every platform/theme/state.
+
+Runtime review should measure or otherwise verify, as appropriate:
+
+- representative foreground/background combinations;
+- focus indicators;
+- disabled/selected/error states;
+- light/dark themes;
+- interaction with supported system high-contrast modes;
+- onboarding and graph presentation.
+
+Visual inspection alone should not be recorded as a measured-contrast PASS when a measurement is required.
+
+## Color independence
+
+Essential information must not depend on color alone.
+
+The completed source baseline provides examples such as:
+
+- programmer textual bit representations and state labels;
+- graph deterministic line patterns;
+- graph text legend;
+- textual graph sample/analysis output;
+- explicit selected/state text where appropriate.
+
+Future UI changes must preserve equivalent redundant cues.
+
+## Reduced motion
+
+The shared shell exposes a `reduced-motion` state class derived from preference state.
+
+Current 2.8.03 shared UI does not require decorative animation to communicate essential meaning. Future transitions/animations must respect reduced-motion behavior where appropriate and must not make calculation workflows slower or inaccessible.
 
 ## Programmer accessibility
 
-The current bit grid is most-significant-bit first, keyboard-focusable through ordinary buttons, and exposes readable bit-state names. A fixed-width text pattern is also shown.
+The current programmer surface includes:
 
-Before stable release:
+- keyboard-focusable bit buttons;
+- state-aware accessible bit labels;
+- 8/16/32/64/128-bit presets;
+- byte-grouped presentation for large word sizes;
+- fixed-width textual representation;
+- radix/fixed-width copy actions;
+- signed/unsigned interpretation state.
 
-- verify actual screen-reader announcements after toggles;
-- verify focus order for 8/16/32/64/128-bit modes;
-- add byte/nibble grouping without color-only semantics;
-- evaluate grouping/virtualization for large grids on narrow screens;
-- verify signed/unsigned state is announced clearly.
+Runtime evidence should verify actual screen-reader announcements, focus order, large-text behavior, narrow layouts, and high-contrast behavior on each claimed target.
+
+See [PROGRAMMER_MODE.md](PROGRAMMER_MODE.md).
 
 ## Graph accessibility
 
-Graphing requires:
+The completed graph accessibility baseline includes:
 
-- expression labels independent of line color;
-- textual coordinate/value views;
-- keyboard pan/zoom alternatives where practical;
-- table-of-values support;
-- clear focus for graph controls;
-- explicit approximate labeling for numerical analysis;
-- no rapid flashing or unnecessary animated effects.
+- expression/series identities independent of color;
+- deterministic non-color-only line patterns;
+- synchronized text legend;
+- textual sample/analysis/trace information;
+- bounded CSV output;
+- accessible SVG export;
+- focusable graph control;
+- pointer interaction;
+- keyboard pan/zoom/reset/fit;
+- explicit approximate numerical-analysis semantics.
 
-The shared UI now provides textual sample/analysis output, nearest-point trace output, bounded table-of-values CSV, multi-expression CSV, and accessible SVG generation/copy. Full graph keyboard pan/zoom interaction and target-platform screen-reader validation remain future work.
+Platform screen-reader/navigation behavior still requires runtime evidence.
+
+See [GRAPH_INTERACTION.md](GRAPH_INTERACTION.md), [GRAPH_SERIES_PRESENTATION.md](GRAPH_SERIES_PRESENTATION.md), and [GRAPH_VIEWPORT_CONTROLS.md](GRAPH_VIEWPORT_CONTROLS.md).
 
 ## Onboarding accessibility
 
-The shared onboarding overlay is implemented as a short, scrollable surface rather than a multi-page forced tour. Both dismissal actions are text buttons with explicit automation names. The shell suppresses its global calculator/mode shortcuts while onboarding is visible, then queues focus back to the Calculator input after dismissal.
+The shared onboarding surface is short, scrollable, and dismissible through explicit text actions.
 
-Still validate:
+Implemented behavior includes:
 
-- actual initial focus on Desktop and Browser keyboard targets;
-- Android/iOS screen-reader traversal;
-- focus restoration timing after the overlay collapses;
-- compact landscape/portrait behavior;
-- large text and display scaling;
-- high-contrast behavior;
-- whether assistive technology announces enough page context when the overlay appears.
+- accessible Skip/Start actions;
+- global calculator/mode shortcut suppression while onboarding is visible;
+- queued focus into the onboarding action surface;
+- focus restoration to calculator input after dismissal;
+- persisted dismissal/completion state;
+- ability to show the introduction again through settings.
+
+Runtime validation should cover initial focus, assistive-technology traversal/context, large text, portrait/landscape, and focus restoration timing.
+
+See [ONBOARDING.md](ONBOARDING.md).
 
 ## Clipboard accessibility and privacy
 
-Clipboard operations are explicit buttons. Paste reads clipboard text only after user action, sanitizes it, and reports errors through calculator status text. Copy reports successful result copying through status text.
+Clipboard workflows are explicit user actions.
 
-Target-platform testing must verify these status messages are discoverable to assistive technologies and that clipboard permission/browser prompts do not create keyboard traps.
+Paste sanitizes imported expression text before evaluation. Copy actions report status through shared application state where implemented.
 
-## Testing checklist
+Target testing should verify that permission prompts/failures remain usable with keyboard and assistive technology and do not create traps.
 
-Before a stable release, test representative workflows with:
+See [PRIVACY.md](PRIVACY.md) and [INPUT_SAFETY.md](INPUT_SAFETY.md).
 
-- keyboard only;
-- screen reader on available supported platforms;
-- onboarding first run, Skip, Complete, and focus restoration;
+## Runtime validation matrix
+
+Representative runtime checks include:
+
+- keyboard-only workflows on keyboard targets;
+- available screen readers;
+- onboarding first launch/Skip/Start/reopen/focus restoration;
 - large text/text scaling;
-- light theme;
-- dark theme;
-- CalcNova high-contrast preference plus supported system high-contrast settings;
-- reduced-motion settings where supported;
-- narrow mobile layout;
-- landscape/tablet layout;
-- desktop window resizing;
+- light/dark/high-contrast states;
+- reduced-motion preference;
+- compact/medium/expanded widths;
+- mobile portrait/landscape;
 - 64/128-bit programmer grids;
-- clipboard paste/copy;
-- graph numerical-analysis controls;
-- converter saved-pair controls.
+- calculator selection editing;
+- clipboard paste/copy and permission failure;
+- graph pointer/keyboard workflows;
+- converter saved/search controls;
+- history/export preview.
 
-Record platform-specific limitations here rather than hiding them.
+Record results in [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md), not as unqualified prose claims in this document.
 
 ## Contribution requirement
 
-UI pull requests should state how accessibility was considered and add/update automated accessibility checks when the project tooling supports them.
+UI changes must preserve the shared accessibility/adaptive contracts. Pull requests should state relevant accessibility considerations and add/update deterministic automated coverage where practical.
+
+A new UI capability that cannot be operated or understood through the project's supported input/accessibility patterns requires explicit design review before inclusion.
+
+## 2.8.03 classification
+
+- shared accessibility source baseline: **COMPLETE**;
+- adaptive/touch/focus contracts: **COMPLETE**;
+- programmer accessibility source behavior: **COMPLETE**;
+- graph keyboard/non-color/text-alternative source behavior: **COMPLETE**;
+- onboarding accessibility source behavior: **COMPLETE**;
+- platform-specific runtime evidence: recorded independently as **PASS / FAIL / BLOCKED / NOT RUN**.
+
+Runtime evidence gaps do not redefine the completed 2.8.03 source scope, and source completeness does not justify inventing runtime PASS results.
