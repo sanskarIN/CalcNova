@@ -4,21 +4,27 @@ on:
   push:
     branches: [main]
     paths:
+      - "Directory.Build.props"
       - ".github/workflows/codeql.yml"
       - ".github/workflows/dependency-review.yml"
       - ".github/workflows/security-automation-validate.yml"
       - "tools/validate_security_workflows.py"
+      - "tools/validate_dependency_security.py"
       - "tools/tests/test_validate_security_workflows.py"
+      - "tools/tests/test_validate_dependency_security.py"
       - "tools/release_preflight.py"
       - "tools/tests/test_release_preflight.py"
   pull_request:
     branches: [main]
     paths:
+      - "Directory.Build.props"
       - ".github/workflows/codeql.yml"
       - ".github/workflows/dependency-review.yml"
       - ".github/workflows/security-automation-validate.yml"
       - "tools/validate_security_workflows.py"
+      - "tools/validate_dependency_security.py"
       - "tools/tests/test_validate_security_workflows.py"
+      - "tools/tests/test_validate_dependency_security.py"
       - "tools/release_preflight.py"
       - "tools/tests/test_release_preflight.py"
   workflow_dispatch:
@@ -43,5 +49,11 @@ jobs:
       - name: Validate security workflows
         run: python tools/validate_security_workflows.py .
 
+      - name: Validate NuGet dependency security policy
+        run: python tools/validate_dependency_security.py .
+
       - name: Run security workflow validator tests
         run: python -m unittest tools.tests.test_validate_security_workflows
+
+      - name: Run dependency security validator tests
+        run: python -m unittest tools.tests.test_validate_dependency_security
