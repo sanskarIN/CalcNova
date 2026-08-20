@@ -27,7 +27,7 @@ REQUIRED_MARKERS: dict[str, tuple[str, ...]] = {
         "actions/attest@v4",
         "artifact-metadata: write",
         "release-assets/**/*",
-        "Duplicate release asset filenames",
+        "duplicate-basename guard",
         "published asset **basenames**",
         "sha256sum -c SHA256SUMS.txt",
         "gh attestation verify PATH_TO_ARTIFACT -R sanskarIN/CalcNova",
