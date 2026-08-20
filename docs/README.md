@@ -29,6 +29,7 @@ Use this page as the documentation map. Current guides are grouped by responsibi
 - [Privacy](PRIVACY.md)
 - [Security engineering](SECURITY.md)
 - [Security automation](SECURITY_AUTOMATION.md)
+- [Artifact provenance](ARTIFACT_PROVENANCE.md)
 
 ## Calculator and mathematical features
 
@@ -91,19 +92,23 @@ Release publication is defined by `.github/workflows/release.yml`.
 - [Public security policy](../SECURITY.md)
 - [Secure engineering](SECURITY.md)
 - [Security automation](SECURITY_AUTOMATION.md)
+- [Release artifact provenance](ARTIFACT_PROVENANCE.md)
 
 Maintained security automation includes:
 
 - `.github/workflows/codeql.yml` — C# code scanning;
 - `.github/workflows/dependency-review.yml` — pull-request dependency vulnerability review;
 - `.github/dependabot.yml` — scheduled dependency update proposals;
-- `.github/workflows/security-automation-validate.yml` — focused workflow-contract validation.
+- `.github/workflows/security-automation-validate.yml` — focused workflow-contract validation;
+- `.github/workflows/release.yml` — least-privilege release publication with artifact provenance attestations.
 
 Repository-owned source validation is provided by:
 
 ```bash
 python tools/validate_security_workflows.py .
 python -m unittest tools.tests.test_validate_security_workflows
+python tools/validate_release_workflow.py .
+python -m unittest tools.tests.test_validate_release_workflow
 ```
 
 These checks are also integrated into the main source preflight.
@@ -130,6 +135,7 @@ The compiled .NET gate is documented in [BUILDING.md](BUILDING.md) and [TESTING.
 ## Release and packaging
 
 - [Release process](RELEASE.md)
+- [Release artifact provenance](ARTIFACT_PROVENANCE.md)
 - [Release readiness checklist](RELEASE_READINESS_CHECKLIST.md)
 - [Versioning](VERSIONING.md)
 - [Platform support](PLATFORM_SUPPORT.md)
@@ -138,6 +144,8 @@ The compiled .NET gate is documented in [BUILDING.md](BUILDING.md) and [TESTING.
 - [Changelog](../CHANGELOG.md)
 
 Current automated release artifact families include Desktop (`win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, `osx-arm64`), Browser/WebAssembly, and a signed Android AAB when signing secrets are configured. iOS simulator validation is maintained separately from signed App Store distribution.
+
+The publication job generates SHA-256 checksum material and provenance attestations for ZIP/AAB/checksum release files before uploading the intended GitHub Release assets.
 
 ## Completion and audit records
 
@@ -180,7 +188,7 @@ Use these files when resolving conflicting wording:
 2. `Directory.Build.props` and [VERSIONING.md](VERSIONING.md) for release version identity;
 3. actual `src/CalcNova.*` project files for target frameworks/platform metadata;
 4. `.github/workflows/build-*.yml` and `.github/workflows/release.yml` for automated build/release commands;
-5. `.github/workflows/codeql.yml`, `.github/workflows/dependency-review.yml`, and [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md) for automated security-maintenance behavior;
+5. `.github/workflows/codeql.yml`, `.github/workflows/dependency-review.yml`, [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md), and [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md) for automated security/supply-chain behavior;
 6. [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for platform source status;
 7. [BUILDING.md](BUILDING.md) for developer build instructions;
 8. [RELEASE.md](RELEASE.md) for release publication behavior;
