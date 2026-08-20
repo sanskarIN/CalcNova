@@ -8,6 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 VALIDATOR = ROOT / "tools" / "validate_release_workflow.py"
+RELEASE_WORKFLOW = ROOT / ".github" / "workflows" / "release.yml"
 
 
 def load_validator():
@@ -44,6 +45,17 @@ class ReleaseWorkflowValidatorTests(unittest.TestCase):
         self.assertTrue({("windows-latest", "win-x64"), ("windows-latest", "win-arm64")} <= targets)
         self.assertTrue({("ubuntu-latest", "linux-x64"), ("ubuntu-latest", "linux-arm64")} <= targets)
         self.assertTrue({("macos-latest", "osx-x64"), ("macos-latest", "osx-arm64")} <= targets)
+
+    def test_release_provenance_uses_current_attest_action_and_scoped_permissions(self) -> None:
+        source = RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("permissions:\n  contents: read", source)
+        self.assertIn("actions/attest@v4", source)
+        self.assertEqual(1, source.count("contents: write"))
+        self.assertEqual(1, source.count("id-token: write"))
+        self.assertEqual(1, source.count("attestations: write"))
+        self.assertIn("release-assets/**/*.zip", source)
+        self.assertIn("release-assets/**/*.aab", source)
+        self.assertIn("release-assets/SHA256SUMS.txt", source)
 
 
 if __name__ == "__main__":
