@@ -120,6 +120,7 @@ Current release artifact families include Desktop (`win-x64`, `linux-x64`, `osx-
 
 These records describe completed source passes/checkpoints and should not override newer authoritative files such as `PROJECT_STATE.md`:
 
+- [Documentation consistency audit — 2026-08-20](DOCUMENTATION_AUDIT_2026-08-20.md)
 - [Final source audit — 2026-08-19](FINAL_SOURCE_AUDIT_2026-08-19.md)
 - [Release source checkpoint — 2026-08-19](RELEASE_SOURCE_CHECKPOINT_2026-08-19.md)
 - [Continuation checkpoint — 2026-08-19](CONTINUATION_CHECKPOINT_2026-08-19.md)
