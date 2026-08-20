@@ -2,7 +2,7 @@
 
 **Project status: Complete for version 2.8.03.**
 
-This directory contains the authoritative product, engineering, quality, platform, packaging, validation, and release documentation for the completed CalcNova 2.8.03 baseline.
+This directory contains the authoritative product, engineering, quality, platform, packaging, validation, security-maintenance, and release documentation for the completed CalcNova 2.8.03 baseline.
 
 Use this page as the documentation map. Current guides are grouped by responsibility; dated continuation/audit records are grouped separately so historical checkpoints are not confused with current product status.
 
@@ -28,6 +28,7 @@ Use this page as the documentation map. Current guides are grouped by responsibi
 - [Settings migration](SETTINGS_MIGRATION.md)
 - [Privacy](PRIVACY.md)
 - [Security engineering](SECURITY.md)
+- [Security automation](SECURITY_AUTOMATION.md)
 
 ## Calculator and mathematical features
 
@@ -85,6 +86,28 @@ Platform build workflow source contracts live in:
 
 Release publication is defined by `.github/workflows/release.yml`.
 
+## Security maintenance and supply-chain checks
+
+- [Public security policy](../SECURITY.md)
+- [Secure engineering](SECURITY.md)
+- [Security automation](SECURITY_AUTOMATION.md)
+
+Maintained security automation includes:
+
+- `.github/workflows/codeql.yml` — C# code scanning;
+- `.github/workflows/dependency-review.yml` — pull-request dependency vulnerability review;
+- `.github/dependabot.yml` — scheduled dependency update proposals;
+- `.github/workflows/security-automation-validate.yml` — focused workflow-contract validation.
+
+Repository-owned source validation is provided by:
+
+```bash
+python tools/validate_security_workflows.py .
+python -m unittest tools.tests.test_validate_security_workflows
+```
+
+These checks are also integrated into the main source preflight.
+
 ## Testing and source validation
 
 - [Testing](TESTING.md)
@@ -114,7 +137,7 @@ The compiled .NET gate is documented in [BUILDING.md](BUILDING.md) and [TESTING.
 - [Packaging overview](../packaging/README.md)
 - [Changelog](../CHANGELOG.md)
 
-Current release artifact families include Desktop (`win-x64`, `linux-x64`, `osx-x64`), Browser/WebAssembly, and a signed Android AAB when signing secrets are configured. iOS simulator validation is maintained separately from signed App Store distribution.
+Current automated release artifact families include Desktop (`win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, `osx-arm64`), Browser/WebAssembly, and a signed Android AAB when signing secrets are configured. iOS simulator validation is maintained separately from signed App Store distribution.
 
 ## Completion and audit records
 
@@ -157,16 +180,17 @@ Use these files when resolving conflicting wording:
 2. `Directory.Build.props` and [VERSIONING.md](VERSIONING.md) for release version identity;
 3. actual `src/CalcNova.*` project files for target frameworks/platform metadata;
 4. `.github/workflows/build-*.yml` and `.github/workflows/release.yml` for automated build/release commands;
-5. [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for platform source status;
-6. [BUILDING.md](BUILDING.md) for developer build instructions;
-7. [RELEASE.md](RELEASE.md) for release publication behavior;
-8. [VALIDATION_EVIDENCE.md](VALIDATION_EVIDENCE.md) for evidence-state semantics.
+5. `.github/workflows/codeql.yml`, `.github/workflows/dependency-review.yml`, and [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md) for automated security-maintenance behavior;
+6. [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for platform source status;
+7. [BUILDING.md](BUILDING.md) for developer build instructions;
+8. [RELEASE.md](RELEASE.md) for release publication behavior;
+9. [VALIDATION_EVIDENCE.md](VALIDATION_EVIDENCE.md) for evidence-state semantics.
 
 When code or a workflow changes, update the corresponding documentation in the same maintenance change.
 
 ## Evidence note
 
-A runtime/platform check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 2.8.03 implementation is an unfinished project.
+A runtime/platform/service check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 2.8.03 implementation is an unfinished project.
 
 Use the vocabulary:
 
