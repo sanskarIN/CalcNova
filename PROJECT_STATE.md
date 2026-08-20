@@ -18,7 +18,7 @@ See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
 **COMPLETE — CalcNova version 2.8.03**
 
-The defined 2.8.03 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization infrastructure and reviewed localized surfaces, accessibility/adaptive contracts, Desktop/Browser/Android/iOS composition, source validation, artifact integrity, structured release evidence, packaging metadata, release workflows, security automation, and release provenance controls are present as completed source capabilities.
+The defined 2.8.03 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization infrastructure and reviewed localized surfaces, accessibility/adaptive contracts, Desktop/Browser/Android/iOS composition, source validation, dependency vulnerability policy, artifact integrity, structured release evidence, packaging metadata, release workflows, security automation, and release provenance controls are present as completed source capabilities.
 
 Future repository changes are classified as maintenance, compatibility updates, security fixes, documentation changes, translation additions, or optional enhancements. They are not required to define the 2.8.03 project as complete.
 
@@ -38,22 +38,26 @@ The completed 2.8.03 baseline now includes stronger cross-platform release and s
 
 ### Automated security maintenance
 
+- repository-level NuGet Audit explicitly enabled for direct and transitive packages with `NuGetAudit=true`, `NuGetAuditMode=all`, and `NuGetAuditLevel=moderate`;
+- warnings-as-errors retained so moderate-or-higher NuGet audit warnings fail restore/build gates when observed;
+- `tools/validate_dependency_security.py` protects the NuGet audit policy against disablement, direct-only drift, threshold weakening, duplicate definitions, and protected NU190x suppression markers;
+- regression tests protect the dependency-security validator;
 - C# CodeQL scanning on pushes and pull requests to `main`, weekly schedule, and manual dispatch;
 - pull-request dependency review with `moderate` vulnerability severity enforcement;
 - existing Dependabot coverage for NuGet and GitHub Actions retained;
-- `tools/validate_security_workflows.py` protects action majors, triggers, language/build mode, severity threshold, permissions, and unsafe-trigger drift;
-- regression tests protect the security-workflow validator;
-- focused `Security Automation Validate` workflow added with read-only repository permission;
-- security workflow validation and regression tests integrated into the SDK-independent release preflight.
+- `tools/validate_security_workflows.py` protects action majors, triggers, language/build mode, severity threshold, permissions, unsafe-trigger drift, and the focused security workflow itself;
+- focused `Security Automation Validate` workflow watches `Directory.Build.props` and runs both security validators plus their regression suites with read-only repository permission;
+- security workflow and dependency-policy validation are integrated into the SDK-independent release preflight.
 
 ### Release provenance and least privilege
 
 - release workflow defaults to `contents: read`;
-- only the publication job receives `contents: write`, `id-token: write`, and `attestations: write`;
-- `actions/attest@v4` generates provenance attestations for release ZIP archives, Android AAB when present, and `SHA256SUMS.txt`;
+- only the publication job receives `contents: write`, `id-token: write`, `attestations: write`, and `artifact-metadata: write`;
+- `actions/attest@v4` generates provenance attestations for the prepared `release-assets/**/*` tree, covering desktop/Browser ZIP archives, the Android AAB when present, and `SHA256SUMS.txt`;
+- the inclusive release-tree subject keeps optional Android output conditional without requiring a separate potentially absent AAB path;
 - provenance generation occurs after checksum creation and before GitHub Release asset upload;
-- release workflow validator requires the permission/attestation/order contract and rejects deprecated provenance wrapper actions;
-- release-workflow regression tests lock the provenance action, subject set, and permission counts;
+- release workflow validator requires the permission/attestation/order/subject contract and rejects deprecated provenance wrapper actions;
+- release-workflow regression tests lock the provenance action, inclusive subject set, and permission counts;
 - `docs/SECURITY_AUTOMATION.md` and `docs/ARTIFACT_PROVENANCE.md` document operation, evidence semantics, and verification guidance.
 
 These are post-completion maintenance improvements. They do not change the public product version, normalized package version, release tag mapping, or mobile build code.
@@ -89,7 +93,7 @@ The public `2.8.03` format is intentionally preserved. Strict SemVer tooling use
 - Optional network-enhanced currency conversion with no embedded provider credentials
 - Local-first ordinary calculation and metadata behavior
 - Centralized package management
-- Nullable reference types, analyzers, warnings-as-errors, and deterministic build settings
+- Nullable reference types, analyzers, warnings-as-errors, deterministic build settings, and explicit moderate-or-higher direct/transitive NuGet vulnerability auditing
 - Automated dependency review and CodeQL source scanning
 - Provenance-attested stable release artifact publication
 
@@ -308,7 +312,8 @@ SDK-independent source contracts cover:
 - onboarding;
 - packaging metadata;
 - Desktop/Browser/Android/iOS workflow contracts;
-- security automation workflow contracts;
+- security automation workflow contracts and focused-workflow self-validation;
+- NuGet dependency-security policy contracts;
 - Source Preflight workflow self-validation;
 - exact-tag iOS simulator workflow;
 - release workflow and documentation contracts;
@@ -320,22 +325,23 @@ SDK-independent source contracts cover:
 - Python regression suites for source validators;
 - integrated SDK-independent source preflight.
 
-Maintained GitHub security automation includes:
+Maintained security controls include:
 
+- explicit direct/transitive NuGet Audit with moderate-or-higher enforcement through warnings-as-errors;
 - CodeQL Action v4 C# source scanning;
 - Dependency Review Action v5 with moderate-or-higher enforcement;
 - Dependabot NuGet/GitHub Actions updates;
-- focused security automation source validation.
+- focused security automation and dependency-policy source validation.
 
 Stable release publication includes:
 
 - SHA-256 checksum generation;
-- provenance attestations using `actions/attest@v4` for ZIP/AAB/checksum release material;
-- job-scoped release write/OIDC/attestation permissions.
+- provenance attestations using `actions/attest@v4` for the prepared release-assets tree;
+- job-scoped release `contents: write`, OIDC, attestation, and artifact-metadata permissions.
 
 ## Release-Version Safety
 
-`Directory.Build.props` is the release-version source of truth.
+`Directory.Build.props` is the release-version and dependency-audit policy source of truth.
 
 The release workflow:
 
@@ -343,9 +349,10 @@ The release workflow:
 2. checks out the exact requested tag;
 3. reads the normalized `<Version>` from `Directory.Build.props`;
 4. verifies the tag equals `v` plus that normalized source version;
-5. runs tagged source preflight;
-6. proceeds to .NET validation and platform publication only after those checks;
-7. generates checksums and artifact provenance before publishing stable release assets.
+5. runs tagged source preflight, including dependency-security policy validation;
+6. restores the .NET solution, which executes the configured NuGet direct/transitive vulnerability audit when advisory sources are available;
+7. proceeds to .NET validation and platform publication only after those checks;
+8. generates checksums and artifact provenance before publishing stable release assets.
 
 The Android publication job does not replace source-owned display/build versions with the tag text or GitHub run number.
 
@@ -371,11 +378,11 @@ Focused Avalonia headless test source covers the shared shell and key product sc
 
 Product implementation completeness and environment execution evidence are separate concepts.
 
-The repository records a check as PASS only when it actually executes and its result is observed. In the assistant environment used for the source pass, the required .NET 10/platform toolchains were not available for direct execution, so local compiled/platform evidence remains recorded conservatively as `NOT RUN` rather than being invented.
+The repository records a check as PASS only when it actually executes and its result is observed. In the assistant environment used for the source pass, the required .NET 10/platform toolchains were not available for direct execution, so local compiled/platform/NuGet-audit execution evidence remains recorded conservatively as `NOT RUN` rather than being invented.
 
-A fresh-clone attempt on 2026-08-20 also could not resolve `github.com`, so the updated repository could not be materialized in that container for a local full-tree preflight. The current maintenance work was therefore validated through repository source contracts, regression-source updates, GitHub repository reads/writes, and documentation consistency checks, while compiled/runtime/GitHub-hosted security-service evidence remains environment/service dependent.
+A fresh-clone attempt on 2026-08-20 also could not resolve `github.com`, so the updated repository could not be materialized in that container for a local full-tree preflight. The current maintenance work was therefore validated through repository source contracts, regression-source updates, GitHub repository reads/writes, and documentation consistency checks, while compiled/runtime/GitHub-hosted security-service/NuGet advisory-query evidence remains environment/service dependent.
 
-The commit-status endpoint exposed no legacy commit statuses for the checked maintenance commit. That is not treated as proof that GitHub Actions checks passed or failed; no Actions service PASS was inferred from it.
+The commit-status endpoint exposed no legacy commit statuses for the checked maintenance commits. That is not treated as proof that GitHub Actions checks passed or failed; no Actions service PASS was inferred from it.
 
 This evidence notation does **not** mean CalcNova 2.8.03 is incomplete. It means a particular command or service check was not observed in that environment/tool surface.
 
@@ -384,6 +391,7 @@ Typical environment-specific verification commands include:
 ```bash
 python tools/release_preflight.py
 python tools/validate_security_workflows.py .
+python tools/validate_dependency_security.py .
 python tools/validate_release_workflow.py .
 dotnet restore CalcNova.slnx
 dotnet format CalcNova.slnx --verify-no-changes --no-restore
@@ -391,7 +399,7 @@ dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
-Platform signing, notarization, provisioning, GitHub-hosted security scanning, artifact attestation execution, and store processing additionally require their respective external environments/services/credentials.
+Platform signing, notarization, provisioning, GitHub-hosted security scanning, online NuGet advisory lookup, artifact attestation execution, and store processing additionally require their respective external environments/services/credentials.
 
 ## Final Classification
 
@@ -401,6 +409,7 @@ Platform signing, notarization, provisioning, GitHub-hosted security scanning, a
 - Platform source composition: **COMPLETE**
 - x64/ARM64 desktop release source contract: **COMPLETE**
 - Security automation source contract: **COMPLETE**
+- NuGet dependency-security policy source contract: **COMPLETE**
 - Release provenance/least-privilege source contract: **COMPLETE**
 - Documentation baseline: **COMPLETE**
 - Source validation infrastructure: **COMPLETE**
