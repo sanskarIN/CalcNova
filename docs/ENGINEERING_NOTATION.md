@@ -156,4 +156,12 @@ The focused workflow watches the core implementation/tests, shared view model/pa
 
 ## Evidence policy
 
-The implementation, test source, source validator, focused workflow, shared UI guards, and integrated preflight wiring are present. Compiled `.NET`/Avalonia tests remain **NOT RUN** until their execution is observed in a suitable .NET 10 environment.
+The implementation, test source, source validator, focused workflow, shared UI guards, and integrated preflight wiring are present.
+
+Compiled `.NET`/Avalonia execution is recorded separately from source-contract presence. Each observed run should use:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+Do not infer a compiled PASS from source presence, and do not make one environment's missing SDK the permanent global status of the completed engineering-notation feature.
