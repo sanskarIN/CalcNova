@@ -1,5 +1,116 @@
 # What Changed
 
+## Security automation and release provenance maintenance — 2026-08-20
+
+CalcNova 2.8.03 remains the completed product baseline. This continuation strengthened automated security review, release least privilege, and supply-chain provenance without changing the public version, normalized package version, release-tag mapping, application id, or mobile build code.
+
+### Automated security gates added
+
+The maintained `main` branch now contains:
+
+- `.github/workflows/codeql.yml` — C# CodeQL analysis on pushes and pull requests to `main`, a weekly schedule, and manual dispatch;
+- `.github/workflows/dependency-review.yml` — pull-request dependency review using `actions/dependency-review-action@v5` with `fail-on-severity: moderate`;
+- `.github/workflows/security-automation-validate.yml` — focused read-only validation for the security workflow contracts;
+- the existing `.github/dependabot.yml` — weekly NuGet and GitHub Actions update proposals.
+
+CodeQL uses `github/codeql-action/init@v4` and `github/codeql-action/analyze@v4` for `csharp` with `build-mode: none`.
+
+### Security workflow source contract added
+
+Added:
+
+- `tools/validate_security_workflows.py`;
+- `tools/tests/test_validate_security_workflows.py`.
+
+The validator protects:
+
+- CodeQL push/PR/schedule/manual triggers;
+- CodeQL Action major v4;
+- C# language selection and source-analysis build mode;
+- CodeQL result-publication permission without unnecessary repository/OIDC write privileges;
+- Dependency Review Action major v5;
+- moderate-or-higher vulnerability enforcement;
+- read-only dependency-review permissions;
+- rejection of `pull_request_target` for these workflows;
+- rejection of unnecessary write/OIDC/package permissions.
+
+The security validator and regression suite are integrated into `tools/release_preflight.py`, and the preflight inventory tests require that integration.
+
+### Release least privilege hardened
+
+`.github/workflows/release.yml` now defaults to:
+
+```yaml
+permissions:
+  contents: read
+```
+
+Only `publish-release` receives:
+
+```yaml
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+```
+
+Validation and build jobs therefore do not inherit release-write or OIDC privileges.
+
+### Release provenance added
+
+The release publication job now uses `actions/attest@v4` after checksum generation and before GitHub Release asset upload.
+
+The attested release subject set includes:
+
+- all packaged release ZIP files;
+- the Android AAB when signing secrets produce one;
+- `SHA256SUMS.txt`.
+
+`tools/validate_release_workflow.py` now requires the provenance action, subject paths, ordering, global read-only permission, job-scoped publication permissions, and exactly one grant of each publication write/OIDC/attestation permission. It also rejects deprecated provenance-wrapper action references in the release workflow.
+
+`tools/tests/test_validate_release_workflow.py` locks the same provenance and permission contract.
+
+### Documentation synchronized
+
+Added:
+
+- `docs/SECURITY_AUTOMATION.md`;
+- `docs/ARTIFACT_PROVENANCE.md`.
+
+Updated:
+
+- root `SECURITY.md`;
+- `docs/SECURITY.md`;
+- `docs/RELEASE.md`;
+- `docs/SOURCE_PREFLIGHT.md`;
+- `docs/README.md`;
+- `CHANGELOG.md`;
+- `PROJECT_STATE.md`;
+- repository required-document validation;
+- this live `what_changed.md` checkpoint.
+
+The provenance guide documents `gh attestation verify PATH_TO_ARTIFACT -R sanskarIN/CalcNova`, checksum/provenance separation, least-privilege permissions, and offline-verification considerations.
+
+### Evidence status
+
+The assistant container still could not resolve `github.com` during the fresh-clone attempt, so a materialized local full-tree preflight and .NET build/test run were not executed there.
+
+A checked maintenance commit exposed no legacy combined commit statuses through the available connector surface. That is not treated as proof that GitHub Actions passed or failed.
+
+No CodeQL, Dependency Review, provenance-attestation, compiled, runtime, signing, or store-service PASS was invented. Their execution evidence remains `NOT RUN`/unobserved from this tool surface unless an actual service result is later retrieved.
+
+The repository source contracts, workflow files, validator source, regression source, and documentation changes are present on `main`.
+
+### Version/status unchanged
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Mobile build code: `20803`
+- Application id: `in.sanskar.calcnova`
+- Product scope: **COMPLETE**
+- This continuation: **POST-COMPLETION SECURITY / RELEASE-QUALITY MAINTENANCE**
+
 ## Native x64 + ARM64 desktop release maintenance — 2026-08-20
 
 CalcNova 2.8.03 remains the completed product baseline. This continuation improved the release/distribution layer without changing the public version, normalized package version, release-tag mapping, application id, or mobile build code.
