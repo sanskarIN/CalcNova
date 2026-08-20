@@ -56,6 +56,7 @@ CalcNova's baseline security requirements include:
 - no signing credentials in Git;
 - bounded input/workload handling;
 - safe local persistence;
+- direct and transitive NuGet vulnerability auditing at a moderate-or-higher enforcement threshold;
 - dependency monitoring;
 - automated C# code scanning;
 - pull-request dependency vulnerability review;
@@ -69,26 +70,31 @@ Implementation details are documented in `docs/SECURITY.md`.
 
 ## Automated security maintenance
 
-The maintained `main` branch contains repository-owned security automation:
+The maintained `main` branch contains repository-owned security controls:
 
+- `Directory.Build.props` — explicit `NuGetAudit=true`, `NuGetAuditMode=all`, and `NuGetAuditLevel=moderate`; warnings-as-errors causes reported moderate/high/critical audit warnings to fail restore/build gates;
 - `.github/workflows/codeql.yml` — CodeQL C# scanning on pushes and pull requests to `main`, weekly scheduled analysis, and manual runs;
 - `.github/workflows/dependency-review.yml` — pull-request dependency review that fails for newly introduced known vulnerabilities at moderate severity or higher;
 - `.github/dependabot.yml` — scheduled NuGet and GitHub Actions dependency update proposals;
-- `.github/workflows/security-automation-validate.yml` — focused source-contract validation for the security workflows.
+- `.github/workflows/security-automation-validate.yml` — focused read-only source-contract validation for the security workflows and NuGet audit policy.
 
-The workflow contracts are protected by:
+The source contracts are protected by:
 
 ```bash
 python tools/validate_security_workflows.py .
+python tools/validate_dependency_security.py .
 python -m unittest tools.tests.test_validate_security_workflows
+python -m unittest tools.tests.test_validate_dependency_security
 ```
 
 Those checks are also integrated into `python tools/release_preflight.py`.
 
-The existence of a workflow is source evidence only. CodeQL/dependency-review results are recorded as PASS only after the corresponding GitHub Actions run actually executes successfully.
+The focused security workflow watches `Directory.Build.props`, so a change that disables transitive audit, weakens the severity threshold, suppresses protected NU190x warnings through the guarded properties, or removes warnings-as-errors becomes a source-contract failure.
 
-See `docs/SECURITY_AUTOMATION.md` for triggers, permissions, action versions, enforcement thresholds, and maintenance rules.
+The existence of workflow/MSBuild policy source is not execution evidence. CodeQL/dependency-review results and online NuGet audit results are recorded as PASS only after the corresponding operation actually executes successfully.
+
+See `docs/SECURITY_AUTOMATION.md` for triggers, permissions, action versions, NuGet audit enforcement, and maintenance rules. See `docs/ARTIFACT_PROVENANCE.md` for the stable release provenance contract.
 
 ## Completion and security maintenance
 
-The completed status of CalcNova 2.8.03 does not end security maintenance. Confirmed vulnerabilities, compatibility problems, and dependency/security issues can be fixed through maintenance updates without reclassifying the 2.8.03 product baseline as unfinished.
+The completed status of CalcNova 2.8.03 does not end security maintenance. Confirmed vulnerabilities, compatibility problems, dependency advisories, and security-tooling changes can be fixed through maintenance updates without reclassifying the 2.8.03 product baseline as unfinished.
