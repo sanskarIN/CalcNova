@@ -2,6 +2,18 @@
 
 All notable CalcNova changes are recorded here.
 
+## Post-2.8.03 maintenance - 2026-08-20
+
+### Cross-platform release architecture
+
+- Expanded the stable desktop release matrix from x64-only artifacts to native x64 and ARM64 self-contained archives for Windows, Linux, and macOS.
+- Added `win-arm64`, `linux-arm64`, and `osx-arm64` alongside the existing `win-x64`, `linux-x64`, and `osx-x64` release targets.
+- Kept every desktop architecture as an independent RID-specific archive/artifact so native packages remain unambiguous.
+- Hardened `tools/validate_release_workflow.py` so all six desktop target/runner pairs and RID-specific archive/artifact contracts are required by source validation.
+- Expanded release-workflow regression tests to lock the six-target inventory and require both x64 and ARM64 for each desktop operating system.
+- Updated build, platform-support, and release documentation to distinguish source publication support from separately observed runtime/package evidence.
+- The product/display version remains `2.8.03`; this is a repository maintenance enhancement, not a new product-version declaration.
+
 ## [2.8.03] - 2026-08-19
 
 **Status: Complete**
