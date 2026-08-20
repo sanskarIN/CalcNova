@@ -21,7 +21,7 @@ After a keypad edit, the view model requests the new caret position. The shared 
 
 ## Function-key wrapping
 
-Function buttons no longer discard a selected subexpression. The selection-aware token editor wraps the existing text and adds the matching closing parenthesis.
+Function buttons do not discard a selected subexpression. The selection-aware token editor wraps the existing text and adds the matching closing parenthesis.
 
 Examples:
 
@@ -102,10 +102,20 @@ This keeps function wrapping, replacement, reversed-selection handling, clamping
 
 The Avalonia headless shared-shell suite additionally exercises keypad replacement and verifies that the resulting caret is restored on the real calculator TextBox.
 
-`tools/validate_calculator_selection_editing.py` and its Python regression test protect the source wiring without requiring the .NET SDK. `.github/workflows/calculator-selection-validate.yml` watches the helper, view model, view synchronization, and all focused selection-editing tests. The same validator/test pair remains part of the integrated release-source preflight.
+`tools/validate_calculator_selection_editing.py` and its Python regression test protect the source wiring without requiring the .NET SDK. `.github/workflows/calculator-selection-validate.yml` watches the helper, view model, view synchronization, and focused selection-editing tests. The same validator/test pair remains part of the integrated release-source preflight.
 
 ## Validation boundary
 
-Source contracts and test source are implemented. The active continuation environment still does not provide the required .NET SDK, so compiled/headless selection-editing tests remain `NOT RUN` locally here until a real CI or suitable local execution result is observed.
+Source contracts and regression/headless test source are implemented.
 
-Target-specific IME, virtual-keyboard, accessibility, and unusual keyboard-layout behavior still require runtime checks on the supported platform rather than being inferred from source presence.
+The SDK-independent source validator does not prove compiled Avalonia execution. Compiled/headless results should be recorded only after the corresponding .NET/CI run is actually observed.
+
+Target-specific IME, virtual-keyboard, accessibility, and unusual keyboard-layout behavior likewise requires runtime testing on the relevant platform rather than being inferred from source presence.
+
+Use the shared evidence vocabulary:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+An environment-specific `NOT RUN` belongs in a validation record, not as a permanent global status for this completed feature.
