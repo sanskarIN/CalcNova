@@ -61,16 +61,49 @@ Build/validation jobs therefore do not inherit release-write, OIDC, attestation,
 
 `id-token: write` allows GitHub's attestation flow to establish workflow identity. `attestations: write` allows the attestation to be persisted. `artifact-metadata: write` allows the current attestation action to create the artifact storage metadata record. `contents: write` is required by the publication job to create/update GitHub Release assets.
 
+## Release asset filename contract
+
+GitHub Release assets are presented to users as flat filenames even though `actions/download-artifact` materializes prerequisite workflow artifacts under per-artifact subdirectories.
+
+Before generating checksums, CalcNova validates that:
+
+- at least one release asset exists;
+- no two prepared files have the same basename;
+- no build artifact is already named `SHA256SUMS.txt` because that name is reserved for the generated checksum manifest.
+
+The duplicate-basename guard prevents two nested workflow artifacts from later collapsing to the same GitHub Release filename.
+
+## Download-friendly checksum manifest
+
+`SHA256SUMS.txt` contains the published asset **basenames**, not runner-local paths such as `release-assets/desktop-win-x64/...`.
+
+A manifest entry therefore has the form:
+
+```text
+<sha256>  CalcNova-win-x64.zip
+```
+
+rather than a GitHub Actions workspace path.
+
+After downloading `SHA256SUMS.txt` and the release files into the same directory on a system with GNU/coreutils-compatible `sha256sum`, users can run:
+
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+The manifest deliberately excludes itself from checksum generation; it is then copied into the release-asset tree and covered by the provenance-attestation step.
+
 ## Release ordering
 
 The publication flow intentionally follows this order:
 
 1. download build artifacts from the prerequisite jobs;
-2. generate SHA-256 checksum material;
-3. copy `SHA256SUMS.txt` into the release-asset tree;
-4. generate provenance attestations for the prepared release-asset tree;
-5. create the GitHub Release if it does not already exist;
-6. upload/replace the intended release assets.
+2. reject duplicate/reserved release filenames and require at least one asset;
+3. generate a flat, download-friendly SHA-256 manifest using published basenames;
+4. copy `SHA256SUMS.txt` into the release-asset tree;
+5. generate provenance attestations for the prepared release-asset tree;
+6. create the GitHub Release if it does not already exist;
+7. upload/replace the intended release assets.
 
 This means the checksum manifest itself is included in the attested subject set.
 
@@ -100,7 +133,13 @@ First verify the provenance of `SHA256SUMS.txt` if it is available as a release 
 gh attestation verify SHA256SUMS.txt -R sanskarIN/CalcNova
 ```
 
-Then verify the downloaded artifact's SHA-256 value using the platform-appropriate checksum utility and compare it with the manifest entry.
+Then, after downloading the release assets into the same directory, verify their SHA-256 values:
+
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+On platforms without `sha256sum`, use the platform's SHA-256 tool and compare against the basename entry in `SHA256SUMS.txt`.
 
 Do not treat a matching checksum from an untrusted source as equivalent to provenance verification; an attacker who can replace both an artifact and an unauthenticated checksum file could make both agree.
 
@@ -117,7 +156,7 @@ Follow current GitHub documentation for the exact offline-verification command f
 
 ## Source contract validation
 
-`tools/validate_release_workflow.py` protects the provenance contract by requiring:
+`tools/validate_release_workflow.py` protects the release integrity/provenance contract by requiring:
 
 - global read-only contents permission;
 - exactly one `contents: write` grant;
@@ -126,10 +165,14 @@ Follow current GitHub documentation for the exact offline-verification command f
 - exactly one `artifact-metadata: write` grant;
 - `actions/attest@v4`;
 - the inclusive `release-assets/**/*` subject glob;
+- a duplicate/reserved release-filename validation step;
+- checksum entries written with `basename "$file"` rather than runner-local paths;
+- checksum generation after filename validation;
 - attestation after checksum generation and before release publication;
+- rejection of the old nested-path `xargs -0 sha256sum > SHA256SUMS.txt` implementation;
 - rejection of deprecated wrapper action references in the release workflow.
 
-Regression source in `tools/tests/test_validate_release_workflow.py` locks the same permission/action/subject contract.
+Regression source in `tools/tests/test_validate_release_workflow.py` locks the same permission/action/checksum/subject contract.
 
 Both are part of the integrated source preflight:
 
@@ -149,10 +192,11 @@ Examples:
 
 - release workflow source satisfies its validator after execution: source-contract `PASS`;
 - `actions/attest` run succeeds and produces an attestation for a release ZIP: attestation service evidence `PASS`;
+- `sha256sum -c SHA256SUMS.txt` succeeds against downloaded release assets: downloaded-checksum evidence `PASS`;
 - GitHub Actions/OIDC is unavailable in a local environment: `NOT RUN` or `BLOCKED`, depending on context;
 - `gh attestation verify` rejects a downloaded artifact: verification `FAIL` until the mismatch is understood.
 
-Never claim an attestation was generated merely because the YAML step exists.
+Never claim an attestation or checksum verification succeeded merely because the workflow source exists.
 
 ## Related documentation
 
