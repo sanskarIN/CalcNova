@@ -18,6 +18,27 @@ REQUIRED_MARKERS: dict[str, tuple[str, ...]] = {
         "validate_completion_status.py",
         "ACCESSIBILITY_TEST_MATRIX.md",
         "SETTINGS_MIGRATION.md",
+        "artifact-metadata: write",
+        "release-assets/**/*",
+        "ARTIFACT_PROVENANCE.md",
+    ),
+    "docs/ARTIFACT_PROVENANCE.md": (
+        "# CalcNova Release Artifact Provenance",
+        "actions/attest@v4",
+        "artifact-metadata: write",
+        "release-assets/**/*",
+        "Duplicate release asset filenames",
+        "published asset **basenames**",
+        "sha256sum -c SHA256SUMS.txt",
+        "gh attestation verify PATH_TO_ARTIFACT -R sanskarIN/CalcNova",
+    ),
+    "docs/SECURITY_AUTOMATION.md": (
+        "# CalcNova Security Automation",
+        "<NuGetAudit>true</NuGetAudit>",
+        "<NuGetAuditMode>all</NuGetAuditMode>",
+        "<NuGetAuditLevel>moderate</NuGetAuditLevel>",
+        "python tools/validate_dependency_security.py .",
+        "python tools/validate_security_workflows.py .",
     ),
     "docs/RELEASE_READINESS_CHECKLIST.md": (
         "# CalcNova 2.8.03 Release Evidence Checklist",
@@ -38,6 +59,9 @@ REQUIRED_MARKERS: dict[str, tuple[str, ...]] = {
     ),
     "PROJECT_STATE.md": (
         "**COMPLETE — CalcNova version 2.8.03**",
+        "NuGetAuditMode=all",
+        "artifact-metadata: write",
+        "release-assets/**/*",
         "## Environment Verification Record",
         "`NOT RUN`",
         "Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**",
@@ -45,6 +69,9 @@ REQUIRED_MARKERS: dict[str, tuple[str, ...]] = {
     "what_changed.md": (
         "# What Changed",
         "**CalcNova version 2.8.03 is complete.**",
+        "<NuGetAuditMode>all</NuGetAuditMode>",
+        "artifact-metadata: write",
+        "release-assets/**/*",
         "## Evidence policy",
         "`NOT RUN` or `BLOCKED`",
         "Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**",
@@ -89,7 +116,7 @@ def main() -> int:
 
     checked_markers = sum(len(markers) for markers in REQUIRED_MARKERS.values())
     print(
-        f"Validated {checked_markers} CalcNova 2.8.03 release/evidence markers across "
+        f"Validated {checked_markers} CalcNova 2.8.03 release/evidence/security markers across "
         f"{len(REQUIRED_MARKERS)} documentation/state files."
     )
     return 0
