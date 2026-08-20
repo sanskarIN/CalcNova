@@ -29,12 +29,16 @@ class SecurityWorkflowValidatorTests(unittest.TestCase):
         validator = load_validator()
         self.assertEqual(".github/workflows/codeql.yml", validator.CODEQL_WORKFLOW)
         self.assertEqual(".github/workflows/dependency-review.yml", validator.DEPENDENCY_REVIEW_WORKFLOW)
+        self.assertEqual(
+            ".github/workflows/security-automation-validate.yml",
+            validator.SECURITY_VALIDATE_WORKFLOW,
+        )
 
-    def test_missing_repository_reports_both_workflows(self) -> None:
+    def test_missing_repository_reports_all_security_workflows(self) -> None:
         validator = load_validator()
         with tempfile.TemporaryDirectory() as directory:
             failures = validator.validate(Path(directory))
-        self.assertEqual(2, len(failures))
+        self.assertEqual(3, len(failures))
 
     def test_pull_request_target_is_rejected(self) -> None:
         validator = load_validator()
@@ -42,6 +46,7 @@ class SecurityWorkflowValidatorTests(unittest.TestCase):
             root = Path(directory)
             codeql = root / validator.CODEQL_WORKFLOW
             dependency = root / validator.DEPENDENCY_REVIEW_WORKFLOW
+            focused = root / validator.SECURITY_VALIDATE_WORKFLOW
             codeql.parent.mkdir(parents=True)
             codeql.write_text(
                 "pull_request_target:\ncontents: read\nsecurity-events: write\nactions/checkout@v6\n"
@@ -54,8 +59,23 @@ class SecurityWorkflowValidatorTests(unittest.TestCase):
                 "actions/dependency-review-action@v5\nfail-on-severity: moderate\n",
                 encoding="utf-8",
             )
+            focused.write_text(
+                "pull_request_target:\ncontents: read\nactions/checkout@v6\nactions/setup-python@v6\n"
+                "python tools/validate_security_workflows.py .\n"
+                "python tools/validate_dependency_security.py .\n"
+                "python -m unittest tools.tests.test_validate_security_workflows\n"
+                "python -m unittest tools.tests.test_validate_dependency_security\n",
+                encoding="utf-8",
+            )
             failures = validator.validate(root)
         self.assertTrue(any("pull_request_target:" in failure for failure in failures))
+
+    def test_focused_workflow_watches_dependency_policy_on_push_and_pr(self) -> None:
+        validator = load_validator()
+        source = (ROOT / validator.SECURITY_VALIDATE_WORKFLOW).read_text(encoding="utf-8")
+        self.assertGreaterEqual(source.count('      - "Directory.Build.props"'), 2)
+        self.assertIn("python tools/validate_dependency_security.py .", source)
+        self.assertIn("python -m unittest tools.tests.test_validate_dependency_security", source)
 
 
 if __name__ == "__main__":
