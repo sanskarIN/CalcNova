@@ -65,7 +65,8 @@ The integrated preflight is intentionally broader than any one focused workflow.
 - onboarding persistence/visual/focus behavior;
 - cross-platform packaging metadata;
 - Desktop/Browser/Android/iOS build-workflow contracts;
-- CodeQL/dependency-review security workflow contracts;
+- CodeQL/dependency-review/focused-security workflow contracts;
+- repository-level NuGet dependency-security policy contracts;
 - the Source Preflight workflow's own trigger/least-privilege/execution contract;
 - exact-tag unsigned iOS simulator release-workflow contracts;
 - tag-first release workflow contracts;
@@ -82,6 +83,7 @@ The preflight also runs the Python regression suites for the focused validators 
 - release workflow/documentation/iOS workflow validators;
 - Source Preflight workflow validation;
 - security workflow validation;
+- NuGet dependency-security policy validation;
 - 2.8.03 completion-status validation;
 - headless UI, keyboard, selection, graph, numerical, Unicode, rational, engineering, export, statistics, localization, settings, adaptive, accessibility, packaging, and platform validators;
 - artifact manifest generation/verification/integrity tooling;
@@ -123,7 +125,7 @@ python tools/validate_security_workflows.py .
 python -m unittest tools.tests.test_validate_security_workflows
 ```
 
-The source validator requires the intended CodeQL and Dependency Review contracts, including:
+The source validator requires the intended CodeQL, Dependency Review, and focused security-validation contracts, including:
 
 - CodeQL Action v4;
 - C# analysis with source-analysis build mode;
@@ -132,11 +134,36 @@ The source validator requires the intended CodeQL and Dependency Review contract
 - Dependency Review Action v5;
 - `moderate` vulnerability severity enforcement;
 - read-only dependency-review permission;
+- focused workflow read-only permission;
+- `Directory.Build.props` watch coverage on push and pull request;
+- execution of both security validators and both regression suites;
 - rejection of `pull_request_target` for these workflows.
 
-`.github/workflows/security-automation-validate.yml` runs the validator and its tests as a focused read-only workflow when the relevant security/preflight files change.
+`.github/workflows/security-automation-validate.yml` runs the security and dependency-policy validators/tests as a focused read-only workflow when the relevant security/preflight files change.
 
 See [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md).
+
+## NuGet dependency-security source contract
+
+Repository-level NuGet vulnerability policy is protected independently by:
+
+```bash
+python tools/validate_dependency_security.py .
+python -m unittest tools.tests.test_validate_dependency_security
+```
+
+The validator requires `Directory.Build.props` to keep:
+
+```xml
+<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+<NuGetAudit>true</NuGetAudit>
+<NuGetAuditMode>all</NuGetAuditMode>
+<NuGetAuditLevel>moderate</NuGetAuditLevel>
+```
+
+This source contract ensures CalcNova explicitly audits direct and transitive packages and keeps the moderate-or-higher threshold aligned with the dependency-review gate.
+
+The SDK-independent validator only verifies policy source. The actual online vulnerability lookup occurs when a .NET restore executes with available audit sources. Because warnings-as-errors is enabled, reported moderate/high/critical audit warnings are expected to fail restore rather than being silently ignored.
 
 ## Source Preflight workflow trigger contract
 
@@ -165,7 +192,7 @@ Those checks are also part of `tools/release_preflight.py`, so narrowing the mas
 
 ## Focused CI workflows
 
-Specialized workflows remain in place because they provide narrower failure signals and path filtering. Focused gates cover keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bivariate statistics, bounded exports, headless UI setup/execution, focus/accessibility/adaptive/touch contracts, localization, settings/converter preferences, packaging/platform workflows, dynamic controls accessibility, security automation, iOS release-tag validation, artifact integrity, structured release evidence, and release workflow/documentation contracts.
+Specialized workflows remain in place because they provide narrower failure signals and path filtering. Focused gates cover keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bivariate statistics, bounded exports, headless UI setup/execution, focus/accessibility/adaptive/touch contracts, localization, settings/converter preferences, packaging/platform workflows, dynamic controls accessibility, security automation/dependency policy, iOS release-tag validation, artifact integrity, structured release evidence, and release workflow/documentation contracts.
 
 The engineering focused gate watches its core formatter/tests, App view model/panel/tests, validator, and validator tests so its input-budget contract cannot be changed through an unwatched App path.
 
@@ -182,8 +209,8 @@ It does **not** execute `Avalonia.Headless.XUnit` tests because that requires th
 Artifact integrity, release provenance, and release evidence are separate but complementary contracts:
 
 - artifact tooling generates/verifies manifests with SHA-256 checks and repository/commit identity safeguards;
-- the stable release workflow generates GitHub provenance attestations for intended ZIP/AAB/checksum release files;
-- `tools/validate_release_workflow.py` verifies the least-privilege permission and attestation source contract;
+- the stable release workflow generates GitHub provenance attestations for the prepared `release-assets/**/*` tree;
+- `tools/validate_release_workflow.py` verifies the global read-only default, job-scoped `contents: write` / `id-token: write` / `attestations: write` / `artifact-metadata: write` permissions, attestation action, inclusive subject glob, and publication ordering;
 - structured release evidence records whether commands actually passed, failed, were blocked, or were not run;
 - source validation verifies that those toolchains and their tests remain present and wired correctly.
 
@@ -194,6 +221,7 @@ See [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md) and [VALIDATION_EVIDENCE.md
 A successful source preflight validates deterministic repository contracts. It does not itself execute or replace:
 
 - the .NET SDK build/test layer;
+- the online NuGet advisory query performed by restore;
 - Avalonia compiled XAML/headless execution;
 - Android/iOS workloads;
 - WebAssembly tooling;
@@ -214,8 +242,8 @@ See [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PL
 
 The preflight runs every configured source check so one invocation can surface multiple independent problems. It exits non-zero if any check fails.
 
-Fix concrete failures and rerun the command. Source-level success is one evidence layer; external compiled/platform/security-service evidence remains independently recorded.
+Fix concrete failures and rerun the command. Source-level success is one evidence layer; external compiled/platform/security-service/NuGet-audit evidence remains independently recorded.
 
 ## Current completion note
 
-CalcNova 2.8.03 is the completed product baseline. The source preflight protects its source, documentation, security automation, release identity/provenance, and completion-status contracts against regression.
+CalcNova 2.8.03 is the completed product baseline. The source preflight protects its source, documentation, dependency-security policy, security automation, release identity/provenance, and completion-status contracts against regression.
