@@ -1,81 +1,165 @@
-# CalcNova UI Automation
+# CalcNova 2.8.03 UI Automation
 
-CalcNova now includes a focused Avalonia headless integration-test foundation for shared-shell behavior that is difficult to validate with pure view-model tests alone.
+CalcNova includes focused Avalonia headless integration coverage for shared-application behavior that is difficult to validate with pure domain/view-model tests alone.
+
+Headless automation is one test layer. It does not replace real Desktop, Browser, Android, or iOS runtime/accessibility/packaging evidence.
 
 ## Test stack
 
-The App test project uses the repository-matched `Avalonia.Headless.XUnit` package and xUnit v3. The central package version is kept equal to the repository Avalonia version so the headless platform and application controls use the same Avalonia release family.
+`tests/CalcNova.App.Tests` uses repository-matched `Avalonia.Headless.XUnit` with xUnit v3.
 
-`tests/CalcNova.App.Tests/TestAppBuilder.cs` configures the CalcNova `App` through Avalonia's headless platform and registers it as the test application.
+The central headless package version is kept aligned with the repository Avalonia version so the headless platform and application controls use the same release family.
 
-## Current headless scenarios
+`TestAppBuilder.cs` configures the CalcNova application through Avalonia's headless platform for tests that exercise real shared controls/views.
 
-`MainViewHeadlessTests` currently covers:
+## Covered shared-shell scenarios
 
-1. the shared shell loads the expected number of primary mode tabs;
-2. the Calculator `AC` control exposes and executes its real bound command;
-3. a compact-width window applies the shared `compact` adaptive class;
-4. `Ctrl+PageDown` advances shared mode selection through the real shell keyboard route;
-5. enabling CalcNova high contrast applies the shared `high-contrast` shell class;
-6. first-run onboarding is visible for a new/default settings state and becomes hidden after Skip.
+The current headless/source inventory protects shared-shell scenarios including:
 
-`GraphPlotControlHeadlessTests` currently covers:
+- expected primary mode inventory;
+- real Calculator command binding;
+- Calculator selection-aware editing/function wrapping integration;
+- compact adaptive-class application;
+- keyboard mode navigation;
+- high-contrast shell state;
+- first-run onboarding visibility/dismissal;
+- onboarding shortcut/focus-related contracts;
+- reviewed live localization across protected shell surfaces;
+- release/About identity presentation.
 
-1. arrow-key panning changes the exposed graph viewport deterministically;
-2. numpad Add/Subtract keyboard zoom changes viewport span;
-3. Home resets the viewport to the documented default;
-4. `F` fits the viewport around finite sampled data.
+## Graph headless coverage
 
-`GraphPlotControl.Viewport` is exposed as a read-only snapshot specifically so interaction behavior can be asserted without reading private rendering state.
+Graph control/application scenarios include:
 
-These tests supplement existing view-model/domain tests. They intentionally do not attempt to emulate screen readers, real touch input, platform clipboard permission prompts, GPU rendering, mobile layout engines, or native package lifecycles.
+- arrow-key panning;
+- keyboard zoom through numpad Add/Subtract;
+- Home viewport reset;
+- `F` fit-to-data;
+- exposed read-only viewport assertions;
+- multi-series presentation/legend integration;
+- dynamic graph-control focus/touch-target contracts.
+
+Headless graph coverage complements domain numerical/sampling tests; it does not attempt to prove GPU rendering quality or target screen-reader behavior.
+
+## Supplemental feature-panel coverage
+
+Focused headless tests also protect integration/presentation for implemented supplemental shared panels such as:
+
+- Unicode metadata;
+- exact-rational utility;
+- engineering-notation utility and UI input bounds;
+- paired/bivariate statistics.
+
+These tests verify that feature panels remain attached to the intended shared mode and expose expected application bindings/interactions without requiring a full native platform host.
+
+## Other application regression coverage
+
+`CalcNova.App.Tests` also contains non-headless view-model/application tests for areas including:
+
+- calculator session/clipboard/editing workflows;
+- converter search/defaults/persistence/productivity behavior;
+- programmer/Unicode workflows;
+- statistics/equation/matrix/graph/date/currency behavior;
+- history/export preview behavior;
+- settings/schema/preferences;
+- onboarding;
+- localization;
+- accessibility/adaptive behavior;
+- release identity.
+
+The exact file/test inventory remains the source of truth as maintenance evolves.
 
 ## CI
 
-`.github/workflows/headless-ui-validate.yml` provides a dedicated signal:
+`.github/workflows/headless-ui-validate.yml` provides a dedicated headless signal that:
 
-- runs the SDK-independent headless-test source validator;
-- runs the Python validator regression tests;
+- runs SDK-independent headless source-contract validation;
+- runs validator regression tests;
 - installs .NET 10;
 - restores `CalcNova.App.Tests`;
-- runs the App test project in Release configuration, including the Avalonia headless scenarios.
+- executes the App test project in Release configuration.
 
-The source validator also protects these workflow commands so the real `.NET` execution path cannot be removed silently.
+The normal solution-level test path also includes `CalcNova.App.Tests` through the maintained solution composition.
 
-The normal solution-level build/test and release gates include `CalcNova.App.Tests`, so validated solution test runs are expected to execute the same headless scenarios as part of the App test project.
+## Source-contract validation
 
-## Source contract validation
+`tools/validate_headless_ui_tests.py` protects deterministic infrastructure requirements such as:
 
-`tools/validate_headless_ui_tests.py` protects:
+- Avalonia/headless package alignment;
+- App test project references/bootstrap;
+- expected representative headless scenarios;
+- correct headless test attributes;
+- real-control/keyboard interaction markers;
+- graph viewport assertions;
+- solution inclusion;
+- the dedicated .NET workflow execution path.
 
-- Avalonia/headless package-version alignment;
-- required App test project references;
-- headless application bootstrap markers;
-- presence of the current shared-shell and graph scenarios;
-- use of `AvaloniaFact` for headless tests;
-- representative real-control and keyboard interaction markers;
-- graph read-only viewport assertions;
-- inclusion of `CalcNova.App.Tests` in `CalcNova.slnx`;
-- the dedicated .NET 10 restore/test workflow path.
+The validator has Python regression coverage and is included in:
 
-`tools/tests/test_validate_headless_ui_tests.py` regression-tests this validator. The SDK-independent release preflight includes both checks, but it does **not** execute the .NET headless tests itself.
+```bash
+python tools/release_preflight.py
+```
 
-## Validation boundary
+The SDK-independent preflight validates the headless-test source/configuration contract; it does not itself execute the compiled Avalonia headless suite.
 
-The headless source/tests are implemented, but this continuation environment does not provide the .NET SDK. Therefore the new headless suite is **NOT RUN locally** here and must not be described as passing until a real CI or suitable local execution result is observed.
+## Evidence boundary
 
-Headless UI tests also do not replace the runtime evidence in [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md). Desktop, Browser, Android, and iOS focus, screen-reader, clipboard, text-scaling, adaptive-layout, and packaging behavior still require their actual target environments.
+A headless test file existing in the repository is not an observed PASS.
 
-## Expansion priorities
+Likewise, an SDK-independent validator PASS proves source-contract structure, not compiled headless execution.
 
-After the initial suite is observed passing, expand it in small stable increments around:
+Record a compiled test result only after the corresponding `dotnet test`/CI run is observed:
 
-- Ctrl+PageUp/Home/End navigation in addition to the current PageDown scenario;
-- focus restoration after onboarding dismissal;
-- reduced-motion style-class application;
-- converter search/favorite/clear-recents workflows;
-- programmer representative bit-cell interaction;
-- history search/export preview behavior;
-- localized-string binding refresh once visible XAML localization migration begins.
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
 
-Keep high-cost or platform-dependent behavior in target-specific tests rather than forcing it into a synthetic headless environment.
+This evidence state is environment/run specific. Permanent feature documentation should not hard-code one assistant/local environment as the global status.
+
+## What headless UI does not prove
+
+Headless tests intentionally do not emulate or replace:
+
+- Narrator/NVDA/VoiceOver/TalkBack/browser screen readers;
+- real touch input and gesture timing;
+- platform clipboard permission prompts;
+- GPU/graphics-driver rendering;
+- system font/text scaling behavior;
+- native application lifecycle;
+- Android/iOS package signing/provisioning;
+- Windows/macOS/Linux installer/package behavior;
+- App Store/Play Store processing;
+- browser hosting/CSP/service-worker behavior.
+
+Those belong in target-platform/runtime validation.
+
+## Maintenance expansion rule
+
+Future headless tests should be added in small deterministic increments when they provide stable value for shared-control behavior.
+
+Good candidates are interactions that:
+
+- use shared Avalonia controls;
+- have deterministic state transitions;
+- do not require unavailable native services;
+- protect a previous bug or important binding/focus/navigation contract.
+
+High-cost or target-specific behavior should remain in platform runtime/manual/target automation instead of being forced into a synthetic headless environment.
+
+## Related documentation
+
+- [Testing](TESTING.md)
+- [Accessibility](ACCESSIBILITY.md)
+- [Adaptive layout](ADAPTIVE_LAYOUT.md)
+- [Runtime validation runbook](RUNTIME_VALIDATION_RUNBOOK.md)
+- [Validation evidence](VALIDATION_EVIDENCE.md)
+- [Source preflight](SOURCE_PREFLIGHT.md)
+
+## 2.8.03 classification
+
+- Avalonia headless test infrastructure: **COMPLETE**;
+- shared-shell representative scenarios: **COMPLETE**;
+- graph keyboard/viewport scenarios: **COMPLETE**;
+- supplemental feature-panel scenarios: **COMPLETE**;
+- CI execution path/source contract: **COMPLETE**;
+- target-platform runtime/accessibility evidence: **SEPARATE OBSERVED EVIDENCE**.
