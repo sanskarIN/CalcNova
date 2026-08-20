@@ -1,6 +1,15 @@
 # Building CalcNova
 
-This guide describes the repository's current build commands and the intended target-specific release paths. A command is only considered validated when it has actually run successfully in the relevant environment.
+This guide documents the current CalcNova 2.8.03 build, run, publish, and platform-workload paths.
+
+CalcNova contains maintained composition heads for:
+
+- Desktop (`src/CalcNova.Desktop`) for Windows, Linux, and macOS;
+- Browser/WebAssembly (`src/CalcNova.Browser`);
+- Android (`src/CalcNova.Android`);
+- iOS (`src/CalcNova.iOS`).
+
+A source project or CI workflow proves that a supported build path exists; it does not by itself prove that a particular machine, device, signing identity, store submission, or runtime scenario has passed. Record actual execution results using the evidence rules in [VALIDATION_EVIDENCE.md](VALIDATION_EVIDENCE.md) and [RUNTIME_VALIDATION_RUNBOOK.md](RUNTIME_VALIDATION_RUNBOOK.md).
 
 ## Toolchain
 
@@ -12,30 +21,62 @@ CalcNova uses:
 - MSBuild / `dotnet` CLI;
 - NuGet central package management.
 
-The SDK feature band is selected by the repository `global.json`.
+The repository SDK feature band is selected by `global.json`.
 
-Check your environment:
+Check the local environment with:
 
 ```bash
 dotnet --info
 dotnet --list-sdks
+dotnet workload list
 ```
 
-## Restore
+## Platform prerequisites
+
+| Target | Required build environment |
+|---|---|
+| Shared/core solution | .NET 10 SDK |
+| Windows desktop | .NET 10 SDK on Windows, Linux, or macOS for normal compilation; Windows is required for Windows-specific runtime/package verification |
+| Linux desktop | .NET 10 SDK; representative Linux runtime verification is recommended |
+| macOS desktop | .NET 10 SDK; macOS is required for macOS runtime, signing, and notarization verification |
+| Browser/WebAssembly | .NET 10 SDK + `wasm-tools` workload |
+| Android | .NET 10 SDK + Android workload + JDK 17 + Android SDK/toolchain |
+| iOS | supported macOS/Xcode environment + .NET 10 SDK + iOS workload |
+
+The current project metadata sets:
+
+- Android target framework: `net10.0-android`;
+- Android minimum platform/API: 23;
+- iOS target framework: `net10.0-ios`;
+- iOS minimum platform version: 15.0;
+- Browser target framework: `net10.0-browser`.
+
+## Source preflight
+
+The SDK-independent repository gate can be run first:
+
+```bash
+python tools/release_preflight.py
+```
+
+For a tagged 2.8.03 release checkout:
+
+```bash
+python tools/release_preflight.py --tag v2.8.3
+```
+
+## Restore, format, build, and test the core solution
 
 From the repository root:
 
 ```bash
 dotnet restore CalcNova.slnx
-```
-
-## Formatting
-
-```bash
 dotnet format CalcNova.slnx --verify-no-changes --no-restore
+dotnet build CalcNova.slnx --configuration Release --no-restore
+dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
-To apply formatter changes locally:
+To apply formatter changes locally rather than verify them:
 
 ```bash
 dotnet format CalcNova.slnx --no-restore
@@ -43,152 +84,285 @@ dotnet format CalcNova.slnx --no-restore
 
 Review formatter changes before committing them.
 
-## Build
+See [TESTING.md](TESTING.md) for test responsibilities and [SOURCE_PREFLIGHT.md](SOURCE_PREFLIGHT.md) for SDK-independent validation.
 
-Debug:
+## Desktop — Windows, Linux, macOS
 
-```bash
-dotnet build CalcNova.slnx --configuration Debug --no-restore
+The shared desktop entry point is:
+
+```text
+src/CalcNova.Desktop/CalcNova.Desktop.csproj
 ```
 
-Release:
-
-```bash
-dotnet build CalcNova.slnx --configuration Release --no-restore
-```
-
-## Tests
-
-```bash
-dotnet test CalcNova.slnx --configuration Release --no-build
-```
-
-See `docs/TESTING.md` for test responsibilities.
-
-## Run the current desktop application
+### Run the desktop application
 
 ```bash
 dotnet run --project src/CalcNova.Desktop/CalcNova.Desktop.csproj
 ```
 
-The current source tree contains the shared Avalonia app and desktop host. Other platform heads are added only when their source and packaging configuration are ready to be maintained.
+### CI-equivalent desktop build
 
-## Publish desktop output
+The `build-desktop.yml` workflow restores and builds the desktop project in Release configuration on Ubuntu, Windows, and macOS runners:
 
-### Windows
+```bash
+dotnet restore src/CalcNova.Desktop/CalcNova.Desktop.csproj
+dotnet build src/CalcNova.Desktop/CalcNova.Desktop.csproj --configuration Release --no-restore
+```
 
-When the Windows release target has passed CI and packaging review, a framework-dependent publish can be produced with a Windows RID such as:
+### Release publish targets
+
+The current release workflow produces self-contained desktop publish output for:
+
+- `win-x64`;
+- `linux-x64`;
+- `osx-x64`.
+
+Equivalent commands are:
+
+#### Windows x64
 
 ```powershell
 dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj `
   --configuration Release `
   --runtime win-x64 `
-  --self-contained false
+  --self-contained true `
+  --output publish/win-x64
 ```
 
-A self-contained package can be evaluated later after size and update tradeoffs are documented.
-
-MSIX packaging is a planned packaging option rather than a currently validated artifact.
-
-### Linux
-
-Example framework-dependent publish:
+#### Linux x64
 
 ```bash
 dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj \
   --configuration Release \
   --runtime linux-x64 \
-  --self-contained false
+  --self-contained true \
+  --output publish/linux-x64
 ```
 
-Linux distribution packages may require system libraries used by Avalonia and the selected graphics backend. Packaging formats such as Flatpak/AppImage should only be added when the project can maintain and test them.
-
-### macOS
-
-Example framework-dependent publish on a macOS build environment:
+#### macOS x64
 
 ```bash
 dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj \
   --configuration Release \
-  --runtime osx-arm64 \
-  --self-contained false
+  --runtime osx-x64 \
+  --self-contained true \
+  --output publish/osx-x64
 ```
 
-macOS signing/notarization requires Apple credentials and a macOS environment. Signing secrets must never be stored in this repository.
+The shared Avalonia desktop source is not limited to those release RIDs, but additional release architectures should only be advertised after their publish/runtime evidence is recorded.
 
-## Android
+### Desktop packaging metadata
 
-The master project requires Android APK and AAB support, but the Android platform head is not yet present in the current project state.
+Repository-owned release metadata is under `packaging/`:
 
-Once `src/CalcNova.Android` is implemented and validated, this section will contain exact project-specific commands for:
+- `packaging/windows/` — Windows Appx/MSIX manifest template;
+- `packaging/linux/` — freedesktop desktop entry and AppStream metadata;
+- `packaging/macos/` — macOS application-bundle metadata template.
 
-- debug APK;
-- release APK;
-- AAB;
-- package ID;
-- Android SDK/API requirements;
-- Java/JDK requirements;
-- signing through local/CI secret configuration;
-- adaptive icons and splash assets.
+These files are packaging-layer metadata. A normal development build does not require a native installer/package.
 
-Until then, do not treat generic Android commands as proof that CalcNova Android builds succeed.
-
-## iOS
-
-The iOS platform head is not yet present in the current project state.
-
-iOS device/archive validation requires a supported macOS/Xcode environment and appropriate Apple signing configuration. Real certificates, provisioning profiles, and passwords must remain outside Git.
-
-When the head exists, this guide will include exact simulator/device/archive commands tied to the actual project file.
+Windows package signing and macOS signing/notarization require external credentials and target-specific tooling.
 
 ## Browser / WebAssembly
 
-The Browser/WebAssembly platform head is not yet present in the current project state.
+The Browser head is:
 
-The intended browser target must:
+```text
+src/CalcNova.Browser/CalcNova.Browser.csproj
+```
 
-- reuse the shared Avalonia app;
-- avoid native SQLite dependencies;
-- use browser-compatible local persistence;
-- work without a server for ordinary calculations;
-- include PWA/offline-shell configuration where supported.
+Install the WebAssembly workload:
 
-Exact `dotnet run/publish` commands will be added with the real project.
+```bash
+dotnet workload install wasm-tools
+```
 
-## PWA deployment
+Restore and publish using the same contract as `build-browser.yml`:
 
-PWA deployment is planned with the Browser target. The final deployment guide must describe base-path handling, caching/update behavior, manifest/icons, and hosting requirements based on the implemented output rather than a generic template.
+```bash
+dotnet restore src/CalcNova.Browser/CalcNova.Browser.csproj
+dotnet publish src/CalcNova.Browser/CalcNova.Browser.csproj \
+  --configuration Release \
+  --no-restore \
+  --output artifacts/browser
+```
+
+The release workflow publishes the Browser head to its own release bundle.
+
+Browser composition uses Browser-safe history/settings storage rather than native SQLite composition. Ordinary calculation remains local-first.
+
+After publishing, browser runtime evidence should cover at least:
+
+- application load/initialization;
+- local storage persistence;
+- keyboard behavior where applicable;
+- clipboard permission/failure behavior;
+- graph interaction;
+- accessibility behavior;
+- optional network-enhanced currency behavior.
+
+Do not describe a publish-only result as proof that all browser/runtime scenarios passed.
+
+## Android
+
+The Android head is:
+
+```text
+src/CalcNova.Android/CalcNova.Android.csproj
+```
+
+Current identity and platform metadata:
+
+- application id: `in.sanskar.calcnova`;
+- application title: `CalcNova`;
+- display version: `2.8.03`;
+- numeric build code: `20803`;
+- minimum Android API: 23;
+- JDK used by CI: Temurin 17.
+
+Install the workload:
+
+```bash
+dotnet workload install android
+```
+
+CI-equivalent restore/build:
+
+```bash
+dotnet restore src/CalcNova.Android/CalcNova.Android.csproj
+dotnet build src/CalcNova.Android/CalcNova.Android.csproj \
+  --configuration Release \
+  --no-restore
+```
+
+A normal build can be used for compilation validation without production signing.
+
+### Signed Android App Bundle
+
+The release workflow publishes an AAB only when the required signing secrets are configured. Its publish contract is equivalent to:
+
+```bash
+dotnet publish src/CalcNova.Android/CalcNova.Android.csproj \
+  --configuration Release \
+  -p:AndroidPackageFormats=aab \
+  -p:AndroidKeyStore=true \
+  -p:AndroidSigningKeyStore="<secure-keystore-path>" \
+  -p:AndroidSigningKeyAlias="<alias>" \
+  -p:AndroidSigningKeyPass="<key-password>" \
+  -p:AndroidSigningStorePass="<store-password>"
+```
+
+Never put real signing values in shell history, committed scripts, documentation examples, or repository files. Prefer secure local secret storage or CI secrets.
+
+The GitHub release workflow uses these secret names:
+
+- `CALCNOVA_ANDROID_KEYSTORE_BASE64`;
+- `CALCNOVA_ANDROID_KEY_ALIAS`;
+- `CALCNOVA_ANDROID_KEY_PASSWORD`;
+- `CALCNOVA_ANDROID_STORE_PASSWORD`.
+
+The workflow decodes a temporary keystore, publishes the AAB, uploads the artifact, and removes the temporary keystore.
+
+Android runtime evidence should distinguish compilation from emulator/device launch, orientation behavior, persistence, clipboard, TalkBack/large-text checks, signed package generation, and Play Store processing.
+
+## iOS
+
+The iOS head is:
+
+```text
+src/CalcNova.iOS/CalcNova.iOS.csproj
+```
+
+Current identity and platform metadata:
+
+- application id: `in.sanskar.calcnova`;
+- application title: `CalcNova`;
+- display version: `2.8.03`;
+- numeric build code: `20803`;
+- minimum iOS platform version: 15.0.
+
+The iOS toolchain requires a supported macOS/Xcode environment.
+
+Install the workload:
+
+```bash
+dotnet workload install ios
+```
+
+### Simulator build
+
+The CI workflow chooses a simulator RID from the runner architecture:
+
+- Apple Silicon: `iossimulator-arm64`;
+- Intel: `iossimulator-x64`.
+
+Example Apple Silicon simulator commands:
+
+```bash
+dotnet restore src/CalcNova.iOS/CalcNova.iOS.csproj \
+  -p:RuntimeIdentifier=iossimulator-arm64
+
+dotnet build src/CalcNova.iOS/CalcNova.iOS.csproj \
+  --configuration Release \
+  --no-restore \
+  -p:RuntimeIdentifier=iossimulator-arm64
+```
+
+For an Intel simulator environment, replace the RID with `iossimulator-x64`.
+
+Real-device/archive/App Store distribution requires appropriate Apple signing, provisioning, entitlements, Xcode configuration, and credentials outside Git.
+
+The repository's unsigned simulator validation must not be described as a signed App Store artifact. See [IOS_RELEASE_VALIDATION.md](IOS_RELEASE_VALIDATION.md).
+
+## Platform workflow source of truth
+
+Current platform workflows are:
+
+- `.github/workflows/build-desktop.yml`;
+- `.github/workflows/build-browser.yml`;
+- `.github/workflows/build-android.yml`;
+- `.github/workflows/build-ios.yml`;
+- `.github/workflows/release.yml`.
+
+If a future maintenance change modifies a target project or workflow, update this build guide in the same change.
 
 ## Signing and secrets
 
 Never commit:
 
-- keystores;
+- Android keystores;
 - signing passwords;
-- Apple certificates/provisioning profiles;
+- Apple certificates or provisioning profiles;
 - private keys;
+- notarization credentials;
 - store credentials;
 - API tokens;
 - service-account secrets.
 
-Use local secure storage or CI secret stores and provide placeholder/example configuration only.
+Use secure local storage or CI secret stores. Documentation and example configuration must use placeholders only.
 
-## Cleaning local build output
+## Cleaning generated output
 
-Safe project-output cleanup:
+Safe solution cleanup:
 
 ```bash
 dotnet clean CalcNova.slnx
 ```
 
-If a stale build requires removal of `bin`/`obj`, confirm that only generated project output is being removed. Do not provide scripts that delete unrelated user files.
+Target-specific cleanup can use the corresponding project path. If manually removing `bin` or `obj`, confirm that only generated project output is being removed.
 
-## CI
+## Validation status vocabulary
 
-Current baseline workflows live under `.github/workflows/` and include formatting, build/test, and documentation checks.
+Use:
 
-CI is the source of truth for checks it actually executes. A missing, cancelled, or unavailable target must not be described as PASS.
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+A platform source head may be complete while a device/signing/store check remains `NOT RUN` or `BLOCKED` in a particular environment. Never convert an unexecuted operation into PASS.
 
 ## Common failures
 
-See `docs/TROUBLESHOOTING.md` for SDK, workload, JDK, Xcode, Linux dependency, cache, and package-resolution troubleshooting.
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for SDK, workload, JDK, Android SDK, Xcode, Linux dependency, cache, and package-resolution troubleshooting.
+
+See [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for the authoritative platform-composition status and [RELEASE.md](RELEASE.md) for release publication behavior.
