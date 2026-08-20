@@ -57,6 +57,8 @@ CalcNova's baseline security requirements include:
 - bounded input/workload handling;
 - safe local persistence;
 - dependency monitoring;
+- automated C# code scanning;
+- pull-request dependency vulnerability review;
 - sanitized imports;
 - safe external-link handling;
 - optional network features isolated behind interfaces;
@@ -64,6 +66,28 @@ CalcNova's baseline security requirements include:
 - no remote upload of calculation history by default.
 
 Implementation details are documented in `docs/SECURITY.md`.
+
+## Automated security maintenance
+
+The maintained `main` branch contains repository-owned security automation:
+
+- `.github/workflows/codeql.yml` — CodeQL C# scanning on pushes and pull requests to `main`, weekly scheduled analysis, and manual runs;
+- `.github/workflows/dependency-review.yml` — pull-request dependency review that fails for newly introduced known vulnerabilities at moderate severity or higher;
+- `.github/dependabot.yml` — scheduled NuGet and GitHub Actions dependency update proposals;
+- `.github/workflows/security-automation-validate.yml` — focused source-contract validation for the security workflows.
+
+The workflow contracts are protected by:
+
+```bash
+python tools/validate_security_workflows.py .
+python -m unittest tools.tests.test_validate_security_workflows
+```
+
+Those checks are also integrated into `python tools/release_preflight.py`.
+
+The existence of a workflow is source evidence only. CodeQL/dependency-review results are recorded as PASS only after the corresponding GitHub Actions run actually executes successfully.
+
+See `docs/SECURITY_AUTOMATION.md` for triggers, permissions, action versions, enforcement thresholds, and maintenance rules.
 
 ## Completion and security maintenance
 
