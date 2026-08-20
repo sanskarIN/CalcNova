@@ -1,70 +1,143 @@
-# CalcNova Live Localization
+# CalcNova 2.8.03 Live Localization
 
-CalcNova now has a semantic localization catalog plus a progressively migrated live Avalonia UI path. Catalog support alone is not treated as proof that every visible string is localized.
+CalcNova has a semantic localization catalog and a live Avalonia refresh path for the reviewed English/Hindi 2.8.03 surfaces.
+
+The completed baseline does not mean every technical token, user value, formula, unit ID, ISO code, URL, or remaining incidental detail string should be translated. It means the current reviewed semantic key set and protected major surfaces are implemented and validated as the 2.8.03 localization scope.
 
 ## Reviewed languages
 
-Current reviewed catalogs:
+Current reviewed semantic catalogs:
 
-- English (`en`, including regional fallback such as `en-IN`);
-- Hindi (`hi`, including regional fallback such as `hi-IN`).
+- English (`en`, including supported regional forms such as `en-IN`);
+- Hindi (`hi`, including supported regional forms such as `hi-IN`).
 
-The language preference is persisted through shared settings. Unsupported culture selections are rejected/fallback safely through `AppLocalizer` and settings validation.
+The culture preference is persisted through shared settings. Malformed/unsupported selections are rejected or safely normalized according to the localization/settings contracts.
 
 ## Live-localized surfaces
 
-The current shared shell updates immediately when culture changes for reviewed semantic strings including:
+The current shared shell refreshes reviewed semantic strings for major surfaces including:
 
 - app name/tagline/local-first header;
 - all primary mode tab headers;
-- Calculator title/subtitle/expression watermark and selected common actions;
+- Calculator title/subtitle/expression prompt and reviewed common actions;
 - primary headings for Programmer, Unicode, Converter, Statistics, Equations, Matrices, Graphing, and Date/Duration;
-- onboarding welcome, feature/privacy explanations, Skip, and Start calculating;
+- onboarding welcome, capability/privacy explanations, Skip, and Start calculating;
 - Currency heading/privacy text, amount/ISO prompts, and Refresh rates;
-- History heading, search, management actions, and export explanation/actions;
-- Settings language/precision/history labels, Save/Reset, and accessibility preference checkboxes;
-- About/support headings/actions and persistent local-first footer;
-- Converter local preference/privacy notice;
+- History heading, search, management actions, export explanation/actions;
+- Settings language/precision/history labels, Save/Reset, and accessibility preference controls;
+- About/support headings/actions and local-first footer;
+- Converter local preference/privacy notice and reviewed controls;
 - visible Graph viewport Pan/Zoom/Fit/Reset controls.
 
-Dynamic user data, formula text, numeric results, unit IDs, ISO currency codes, URLs, email addresses, and technical identifiers are not translated as prose.
+Dynamic user data, expressions, formulas, numeric results, stable unit IDs, ISO currency codes, URLs, email addresses, and technical identifiers remain invariant or follow specialist formatting rather than being translated as prose.
 
 ## Architecture
 
-`AppStringKey` defines stable semantic identities. English and Hindi catalogs must each contain every key exactly once.
+`AppStringKey` defines stable semantic identities.
 
-`ShellLocalization` maps reviewed legacy English XAML literals to semantic keys while the large shared XAML surface is migrated incrementally. `MainView` caches applicable visible controls and refreshes them on culture changes and tab realization.
+English and Hindi catalogs must each contain every required current semantic key exactly once.
 
-CheckBox content uses the same semantic keys through an isolated `MainView` partial lifecycle, allowing Settings accessibility preferences to localize without duplicating a second catalog.
+`ShellLocalization` maps reviewed shared UI literals/surfaces into semantic localization behavior while CalcNova preserves canonical mathematical and persisted identifiers.
 
-New dynamically inserted product surfaces such as the converter preference notice and Graph viewport toolbar read directly from the same `IAppLocalizer`.
+`MainView` refreshes applicable visible/realized shared controls when culture changes.
 
-## Why migration is incremental
+Settings accessibility preference controls and dynamically inserted reviewed product surfaces use the same localization state rather than maintaining unrelated per-feature translation stores.
 
-CalcNova keeps parser syntax, persisted mathematical tokens, unit IDs, and other machine-facing contracts culture-independent. Visible UI migration is therefore done in compile/testable increments rather than mass-replacing strings in mathematical/domain code.
+## Why localization remains semantic
 
-A catalog entry is not sufficient to advertise a language as fully supported. Compact-width layout, large text, screen-reader output, and terminology quality must still be reviewed on real targets.
+CalcNova intentionally does not mass-translate all strings mechanically.
+
+The following must remain semantically stable:
+
+- parser syntax;
+- persisted mathematical tokens;
+- stable conversion unit IDs;
+- ISO currency codes;
+- technical release/version identifiers;
+- user-entered data.
+
+Visible labels can be localized while the underlying identifiers remain invariant.
+
+This avoids a language change altering calculation meaning or corrupting persisted state.
+
+## Culture switching
+
+Supported culture changes update reviewed shared surfaces during the running application.
+
+The same localizer state is shared with settings so selected culture and displayed reviewed strings remain synchronized.
+
+A culture change must not:
+
+- reinterpret a stored mathematical expression;
+- rewrite stable unit IDs;
+- rewrite ISO codes;
+- change release identifiers;
+- translate user-entered data as though it were UI text.
 
 ## Validation
 
-Run:
+Focused catalog/source validation includes:
 
 ```bash
 python tools/validate_localization_catalog.py .
 python -m unittest tools.tests.test_validate_localization_catalog
 ```
 
-Avalonia headless tests additionally verify Hindi shell headers, Calculator prompts, onboarding, Currency, History, Settings, About/footer, converter privacy notice, mode headings, and Graph viewport controls.
+Avalonia application/headless coverage protects reviewed Hindi/English shared surfaces, including shell headers, Calculator prompts, onboarding, Currency, History, Settings, About/footer, converter privacy notice, protected mode headings, and Graph viewport controls.
 
-## Remaining localization work
+The integrated source gate is:
 
-Continue migrating remaining hard-coded shared XAML strings in focused groups, especially:
+```bash
+python tools/release_preflight.py
+```
 
-- detailed Programmer operation labels;
-- deeper Converter search/recents/favorites labels;
-- Statistics/Equations/Matrices field descriptions;
-- Graph analysis/export labels and technical help text;
-- Date/Duration field descriptions;
-- dynamic status/error messages that are currently generated in view models.
+Compiled headless execution remains separate observed evidence from SDK-independent source validation.
 
-Do not localize persisted mathematical syntax in a way that changes calculation semantics.
+## Runtime evidence
+
+Real target validation should still check:
+
+- English/Hindi layout at compact/medium/expanded widths;
+- large text;
+- Devanagari font/glyph rendering;
+- screen-reader pronunciation/context;
+- live culture refresh on supported targets;
+- persistence across restart;
+- no mathematical/persisted-identifier corruption after culture changes.
+
+Use:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+for observed runtime evidence.
+
+## Optional post-2.8.03 localization improvements
+
+Further localization work can still be valuable, for example:
+
+- migrating additional technical/detail labels to semantic keys;
+- adding more reviewed languages;
+- extending localized status/error coverage;
+- richer locale-aware numeric input where parser ambiguity can be handled safely;
+- RTL language support after dedicated design/testing.
+
+These are optional extensions. They should not be represented as unresolved requirements for the completed 2.8.03 English/Hindi localization baseline.
+
+## Related documentation
+
+- [Localization architecture](LOCALIZATION.md)
+- [Accessibility](ACCESSIBILITY.md)
+- [Adaptive layout](ADAPTIVE_LAYOUT.md)
+- [Settings storage contract](SETTINGS_STORAGE_CONTRACT.md)
+- [UI automation](UI_AUTOMATION.md)
+
+## 2.8.03 classification
+
+- reviewed English catalog: **COMPLETE**;
+- reviewed Hindi catalog: **COMPLETE**;
+- culture preference persistence: **COMPLETE**;
+- reviewed live shared-surface refresh: **COMPLETE**;
+- source/catalog/headless contract coverage: **COMPLETE**;
+- additional languages/detail migration: **OPTIONAL POST-2.8.03**.
