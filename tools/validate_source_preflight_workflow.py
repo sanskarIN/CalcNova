@@ -12,16 +12,13 @@ WORKFLOW_PATH = Path(".github/workflows/source-preflight.yml")
 
 REQUIRED_MARKERS = (
     "name: Source Preflight",
-    "branches: [main]",
-    '      - "src/**"',
-    '      - "tests/**"',
-    '      - "tools/**"',
-    '      - "packaging/**"',
-    '      - "docs/**"',
-    '      - ".github/workflows/**"',
+    "push:\n    branches: [main]",
+    "pull_request:\n    branches: [main]",
     "workflow_dispatch:",
     "permissions:",
     "contents: read",
+    "concurrency:",
+    "cancel-in-progress: true",
     "runs-on: ubuntu-latest",
     "timeout-minutes: 8",
     "uses: actions/checkout@v6",
@@ -34,6 +31,8 @@ FORBIDDEN_MARKERS = (
     "pull_request_target:",
     "contents: write",
     "actions: write",
+    "    paths:",
+    "    paths-ignore:",
 )
 
 
@@ -53,16 +52,8 @@ def validate(root: Path) -> list[str]:
         if marker in text:
             failures.append(f"Source preflight workflow contains forbidden marker: {marker}")
 
-    if text.count('      - "src/**"') < 2:
-        failures.append("Source preflight must watch src/** on both push and pull_request.")
-    if text.count('      - "tests/**"') < 2:
-        failures.append("Source preflight must watch tests/** on both push and pull_request.")
-    if text.count('      - "tools/**"') < 2:
-        failures.append("Source preflight must watch tools/** on both push and pull_request.")
-    if text.count('      - "docs/**"') < 2:
-        failures.append("Source preflight must watch docs/** on both push and pull_request.")
-    if text.count('      - ".github/workflows/**"') < 2:
-        failures.append("Source preflight must watch workflow changes on both push and pull_request.")
+    if text.count("branches: [main]") < 2:
+        failures.append("Source preflight must target main for both push and pull_request.")
 
     return failures
 
@@ -79,7 +70,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated Source Preflight triggers, least-privilege permissions, runner/toolchain, and integrated command.")
+    print("Validated always-run Source Preflight PR/push triggers, least privilege, concurrency, runner/toolchain, and integrated command.")
     return 0
 
 
