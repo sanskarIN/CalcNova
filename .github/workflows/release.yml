@@ -210,10 +210,30 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release-assets
+      - name: Validate release asset filenames
+        shell: bash
+        run: |
+          mapfile -t duplicate_names < <(find release-assets -type f -printf '%f\n' | sort | uniq -d)
+          if ((${#duplicate_names[@]} > 0)); then
+            echo "Duplicate release asset filenames are not allowed:" >&2
+            printf '%s\n' "${duplicate_names[@]}" >&2
+            exit 1
+          fi
+
+          if find release-assets -type f -name 'SHA256SUMS.txt' -print -quit | grep -q .; then
+            echo "SHA256SUMS.txt is a reserved release asset filename." >&2
+            exit 1
+          fi
+
+          test -n "$(find release-assets -type f -print -quit)"
       - name: Generate checksums
         shell: bash
         run: |
-          find release-assets -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
+          : > SHA256SUMS.txt
+          while IFS= read -r -d '' file; do
+            digest="$(sha256sum "$file" | cut -d ' ' -f 1)"
+            printf '%s  %s\n' "$digest" "$(basename "$file")" >> SHA256SUMS.txt
+          done < <(find release-assets -type f -print0 | sort -z)
           cp SHA256SUMS.txt release-assets/SHA256SUMS.txt
       - name: Attest release artifacts
         uses: actions/attest@v4
