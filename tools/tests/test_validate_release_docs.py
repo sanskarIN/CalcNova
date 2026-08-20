@@ -41,6 +41,26 @@ class ReleaseDocumentationValidatorTests(unittest.TestCase):
         validator = load_validator()
         self.assertIn("docs/VERSIONING.md", validator.REQUIRED_MARKERS)
 
+    def test_release_contract_protects_security_and_provenance_guides(self) -> None:
+        validator = load_validator()
+        self.assertIn("docs/ARTIFACT_PROVENANCE.md", validator.REQUIRED_MARKERS)
+        self.assertIn("docs/SECURITY_AUTOMATION.md", validator.REQUIRED_MARKERS)
+        provenance = validator.REQUIRED_MARKERS["docs/ARTIFACT_PROVENANCE.md"]
+        security = validator.REQUIRED_MARKERS["docs/SECURITY_AUTOMATION.md"]
+        self.assertIn("sha256sum -c SHA256SUMS.txt", provenance)
+        self.assertIn("artifact-metadata: write", provenance)
+        self.assertIn("<NuGetAuditMode>all</NuGetAuditMode>", security)
+        self.assertIn("python tools/validate_dependency_security.py .", security)
+
+    def test_current_state_and_handoff_track_security_release_contracts(self) -> None:
+        validator = load_validator()
+        project_state = validator.REQUIRED_MARKERS["PROJECT_STATE.md"]
+        what_changed = validator.REQUIRED_MARKERS["what_changed.md"]
+        self.assertIn("artifact-metadata: write", project_state)
+        self.assertIn("release-assets/**/*", project_state)
+        self.assertIn("<NuGetAuditMode>all</NuGetAuditMode>", what_changed)
+        self.assertIn("artifact-metadata: write", what_changed)
+
     def test_missing_release_documents_are_reported(self) -> None:
         validator = load_validator()
         with tempfile.TemporaryDirectory() as directory:
