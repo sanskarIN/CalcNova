@@ -56,6 +56,14 @@ class ReleaseWorkflowValidatorTests(unittest.TestCase):
         self.assertEqual(1, source.count("artifact-metadata: write"))
         self.assertIn("subject-path: release-assets/**/*", source)
 
+    def test_release_checksums_use_published_flat_filenames(self) -> None:
+        source = RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("- name: Validate release asset filenames", source)
+        self.assertIn("Duplicate release asset filenames are not allowed:", source)
+        self.assertIn("SHA256SUMS.txt is a reserved release asset filename.", source)
+        self.assertIn('printf \'%s  %s\\n\' "$digest" "$(basename "$file")" >> SHA256SUMS.txt', source)
+        self.assertNotIn("xargs -0 sha256sum > SHA256SUMS.txt", source)
+
 
 if __name__ == "__main__":
     unittest.main()
