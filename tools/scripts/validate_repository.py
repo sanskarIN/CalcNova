@@ -29,6 +29,7 @@ REQUIRED_FILES = [
     "docs/ACCESSIBILITY.md",
     "docs/PRIVACY.md",
     "docs/SECURITY.md",
+    "docs/SECURITY_AUTOMATION.md",
     "docs/TESTING.md",
     "docs/RELEASE.md",
     "docs/PLATFORM_SUPPORT.md",
