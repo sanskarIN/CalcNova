@@ -10,6 +10,11 @@
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <DebugType>embedded</DebugType>
 
+    <!-- Audit direct and transitive NuGet dependencies on every restore. With warnings-as-errors, moderate+ advisories fail the gate. -->
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>moderate</NuGetAuditLevel>
+
     <!-- Public/product release identity. 2.8.03 is the user-facing version requested for CalcNova. -->
     <ProductDisplayVersion>2.8.03</ProductDisplayVersion>
     <!-- NuGet/MSBuild package versions follow SemVer 2.0, where leading zero patch values are invalid. -->
