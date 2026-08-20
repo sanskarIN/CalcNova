@@ -94,24 +94,27 @@ Release publication is defined by `.github/workflows/release.yml`.
 - [Security automation](SECURITY_AUTOMATION.md)
 - [Release artifact provenance](ARTIFACT_PROVENANCE.md)
 
-Maintained security automation includes:
+Maintained security controls include:
 
+- `Directory.Build.props` — direct/transitive NuGet Audit with `NuGetAuditMode=all`, `NuGetAuditLevel=moderate`, and warnings-as-errors enforcement;
 - `.github/workflows/codeql.yml` — C# code scanning;
 - `.github/workflows/dependency-review.yml` — pull-request dependency vulnerability review;
 - `.github/dependabot.yml` — scheduled dependency update proposals;
-- `.github/workflows/security-automation-validate.yml` — focused workflow-contract validation;
-- `.github/workflows/release.yml` — least-privilege release publication with artifact provenance attestations.
+- `.github/workflows/security-automation-validate.yml` — focused read-only workflow/policy contract validation;
+- `.github/workflows/release.yml` — least-privilege release publication with flat checksums and artifact provenance attestations.
 
 Repository-owned source validation is provided by:
 
 ```bash
 python tools/validate_security_workflows.py .
+python tools/validate_dependency_security.py .
 python -m unittest tools.tests.test_validate_security_workflows
+python -m unittest tools.tests.test_validate_dependency_security
 python tools/validate_release_workflow.py .
 python -m unittest tools.tests.test_validate_release_workflow
 ```
 
-These checks are also integrated into the main source preflight.
+These checks are also integrated into the main source preflight. The online NuGet advisory query is performed by `dotnet restore`; source validation only protects the audit policy itself.
 
 ## Testing and source validation
 
@@ -145,7 +148,15 @@ The compiled .NET gate is documented in [BUILDING.md](BUILDING.md) and [TESTING.
 
 Current automated release artifact families include Desktop (`win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, `osx-arm64`), Browser/WebAssembly, and a signed Android AAB when signing secrets are configured. iOS simulator validation is maintained separately from signed App Store distribution.
 
-The publication job generates SHA-256 checksum material and provenance attestations for ZIP/AAB/checksum release files before uploading the intended GitHub Release assets.
+The publication job validates unique/reserved release filenames, generates `SHA256SUMS.txt` with the flat basenames users actually download, then creates provenance attestations for the prepared `release-assets/**/*` tree before uploading the intended GitHub Release assets.
+
+After downloading all release assets into one directory, GNU/coreutils-compatible systems can verify the checksum manifest with:
+
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+See [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md) for checksum and attestation verification details.
 
 ## Completion and audit records
 
@@ -185,12 +196,12 @@ Strict SemVer tooling uses `2.8.3` because leading zeroes are not allowed in num
 Use these files when resolving conflicting wording:
 
 1. `PROJECT_STATE.md` for completion status;
-2. `Directory.Build.props` and [VERSIONING.md](VERSIONING.md) for release version identity;
+2. `Directory.Build.props` and [VERSIONING.md](VERSIONING.md) for release version identity and repository-level NuGet audit policy;
 3. actual `src/CalcNova.*` project files for target frameworks/platform metadata;
 4. `.github/workflows/build-*.yml` and `.github/workflows/release.yml` for automated build/release commands;
 5. `.github/workflows/codeql.yml`, `.github/workflows/dependency-review.yml`, [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md), and [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md) for automated security/supply-chain behavior;
 6. [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for platform source status;
-7. [BUILDING.md](BUILDING.md) for developer build instructions;
+7. [BUILDING.md](BUILDING.md) for developer build instructions and restore-level dependency auditing;
 8. [RELEASE.md](RELEASE.md) for release publication behavior;
 9. [VALIDATION_EVIDENCE.md](VALIDATION_EVIDENCE.md) for evidence-state semantics.
 
@@ -198,7 +209,9 @@ When code or a workflow changes, update the corresponding documentation in the s
 
 ## Evidence note
 
-A runtime/platform/service check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 2.8.03 implementation is an unfinished project.
+A runtime/platform/network/service check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 2.8.03 implementation is an unfinished project.
+
+That distinction applies to CodeQL, Dependency Review, the online NuGet vulnerability query performed by restore, provenance generation, signing, packaging, and runtime checks.
 
 Use the vocabulary:
 
