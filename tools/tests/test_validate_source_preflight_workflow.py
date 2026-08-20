@@ -33,7 +33,7 @@ class SourcePreflightWorkflowValidatorTests(unittest.TestCase):
         self.assertEqual(1, len(failures))
         self.assertIn("Missing source preflight workflow", failures[0])
 
-    def test_narrow_or_privileged_workflow_fails(self) -> None:
+    def test_path_filtered_or_privileged_workflow_fails(self) -> None:
         validator = load_validator()
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -64,9 +64,18 @@ class SourcePreflightWorkflowValidatorTests(unittest.TestCase):
 
             failures = validator.validate(root)
 
-        self.assertTrue(any("src/**" in failure for failure in failures))
+        self.assertTrue(any("paths:" in failure for failure in failures))
         self.assertTrue(any("pull_request_target" in failure for failure in failures))
         self.assertTrue(any("contents: write" in failure for failure in failures))
+        self.assertTrue(any("pull_request" in failure for failure in failures))
+
+    def test_repository_gate_has_no_path_filters(self) -> None:
+        validator = load_validator()
+        source = (ROOT / validator.WORKFLOW_PATH).read_text(encoding="utf-8")
+        self.assertNotIn("    paths:", source)
+        self.assertNotIn("    paths-ignore:", source)
+        self.assertIn("pull_request:\n    branches: [main]", source)
+        self.assertIn("cancel-in-progress: true", source)
 
 
 if __name__ == "__main__":
