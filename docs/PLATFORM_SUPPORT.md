@@ -50,18 +50,26 @@ Completed source behavior includes:
 - settings/onboarding/About surfaces;
 - 2.8.03 release identity inherited from central build properties.
 
+The stable release workflow now publishes self-contained desktop archives for both x64 and ARM64 on all three maintained desktop operating systems:
+
+- Windows: `win-x64`, `win-arm64`;
+- Linux: `linux-x64`, `linux-arm64`;
+- macOS: `osx-x64`, `osx-arm64`.
+
+Each architecture is packaged independently and protected by the release-workflow source validator. Runtime/package execution evidence for each architecture remains separate from source completeness.
+
 ### Windows
 
 Completed source/release infrastructure:
 
 - Desktop host;
 - Windows runner validation workflow;
-- Windows release publish path;
+- Windows x64 and ARM64 self-contained release publish paths;
 - Appx/MSIX manifest template;
 - package identity validation;
 - release artifact path.
 
-External evidence may record Windows build/launch, DPI/text scaling, clipboard/persistence, accessibility/high-contrast behavior, and the selected installer/package path.
+External evidence may record Windows build/launch, DPI/text scaling, clipboard/persistence, accessibility/high-contrast behavior, native x64/ARM64 execution, and the selected installer/package path.
 
 ### Linux
 
@@ -69,12 +77,12 @@ Completed source/release infrastructure:
 
 - Desktop host;
 - Linux runner validation workflow;
-- Linux x64 release publish path;
+- Linux x64 and ARM64 self-contained release publish paths;
 - `.desktop` metadata;
 - AppStream metadata;
 - package identity validation.
 
-External evidence may record representative distribution launch behavior, clipboard/persistence, desktop integration, accessibility behavior, and the chosen packaging format.
+External evidence may record representative distribution launch behavior, clipboard/persistence, desktop integration, accessibility behavior, native x64/ARM64 execution, and the chosen packaging format.
 
 ### macOS
 
@@ -82,11 +90,11 @@ Completed source/release infrastructure:
 
 - Desktop host;
 - macOS runner validation workflow;
-- macOS release publish path;
+- macOS Intel x64 and Apple Silicon ARM64 self-contained release publish paths;
 - plist template;
 - package identity validation.
 
-External evidence may record macOS launch behavior, clipboard/persistence, VoiceOver/keyboard/scaling behavior, bundle generation, signing, and notarization where a distribution path requires them.
+External evidence may record macOS launch behavior, clipboard/persistence, VoiceOver/keyboard/scaling behavior, native Intel/Apple Silicon execution, bundle generation, signing, and notarization where a distribution path requires them.
 
 Signing/notarization credentials remain external to source control.
 
@@ -159,9 +167,12 @@ Platform and package contracts are protected by:
 ```bash
 python tools/validate_packaging_metadata.py .
 python tools/validate_platform_workflows.py .
+python tools/validate_release_workflow.py .
 python tools/validate_completion_status.py .
 python tools/release_preflight.py
 ```
+
+The release-workflow validator protects the six x64/ARM64 desktop release targets in addition to release-tag/version/publication safety contracts.
 
 The Source Preflight workflow watches `src/**`, `tests/**`, `tools/**`, `docs/**`, packaging, workflows, and release/build root metadata.
 
@@ -181,6 +192,7 @@ Do not convert an unexecuted target operation into PASS because source or a work
 - Browser/WebAssembly source composition: **COMPLETE**
 - Android source composition: **COMPLETE**
 - iOS source composition: **COMPLETE**
+- x64/ARM64 desktop release matrix: **COMPLETE SOURCE CONTRACT**
 - Platform workflow source contracts: **COMPLETE**
 - Packaging metadata contracts: **COMPLETE**
 - 2.8.03 platform version identity: **COMPLETE**
