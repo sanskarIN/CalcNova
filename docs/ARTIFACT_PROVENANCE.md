@@ -1,0 +1,155 @@
+# CalcNova Release Artifact Provenance
+
+CalcNova's stable release workflow generates cryptographic provenance attestations for packaged release artifacts in addition to SHA-256 checksum material.
+
+This is a post-2.8.03 supply-chain hardening control. It does not change the CalcNova product version and it does not claim that an artifact is vulnerability-free.
+
+## What is attested
+
+The release publication job attests the files that users actually download from the GitHub Release:
+
+- Windows x64 desktop ZIP;
+- Windows ARM64 desktop ZIP;
+- Linux x64 desktop ZIP;
+- Linux ARM64 desktop ZIP;
+- macOS Intel x64 desktop ZIP;
+- macOS Apple Silicon ARM64 desktop ZIP;
+- Browser/WebAssembly ZIP;
+- Android AAB when signing secrets are configured;
+- `SHA256SUMS.txt`.
+
+The workflow uses:
+
+```text
+actions/attest@v4
+```
+
+with release file globs under `release-assets/`.
+
+## Why provenance matters
+
+An artifact attestation allows a consumer to verify that the artifact is associated with GitHub build provenance for the CalcNova repository and release workflow. The provenance includes build identity such as repository/workflow context, commit identity, and triggering event.
+
+An attestation does **not** prove that the artifact contains no defects or vulnerabilities. It proves provenance/integrity facts that can be checked independently.
+
+## Least-privilege publication permissions
+
+The release workflow's default token permission is:
+
+```yaml
+permissions:
+  contents: read
+```
+
+Only the `publish-release` job receives the additional permissions needed to publish the GitHub Release and produce attestations:
+
+```yaml
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+```
+
+Build/validation jobs therefore do not inherit release-write or OIDC privileges.
+
+`id-token: write` is used by GitHub's attestation flow to establish the workflow identity. `attestations: write` allows the resulting attestation to be stored. `contents: write` is required by the publication job to create/update release assets.
+
+## Release ordering
+
+The publication flow intentionally follows this order:
+
+1. download build artifacts from the prerequisite jobs;
+2. generate SHA-256 checksum material;
+3. copy `SHA256SUMS.txt` into the release-asset set;
+4. generate provenance attestations for ZIP/AAB/checksum release files;
+5. create the GitHub Release if it does not already exist;
+6. upload/replace the intended release assets.
+
+This means the checksum manifest itself is included in the attested subject set.
+
+## Verify a downloaded artifact
+
+With a current GitHub CLI installation, verify a downloaded CalcNova release artifact using:
+
+```bash
+gh attestation verify PATH_TO_ARTIFACT -R sanskarIN/CalcNova
+```
+
+Example:
+
+```bash
+gh attestation verify CalcNova-win-x64.zip -R sanskarIN/CalcNova
+```
+
+For stronger policy binding, GitHub CLI also supports constraining verification to an expected signer workflow. Review the current GitHub CLI attestation options before introducing organization-level enforcement.
+
+## Verify checksum content
+
+Artifact provenance and checksums serve different purposes.
+
+First verify the provenance of `SHA256SUMS.txt` if it is available as a release asset:
+
+```bash
+gh attestation verify SHA256SUMS.txt -R sanskarIN/CalcNova
+```
+
+Then verify the downloaded artifact's SHA-256 value using the platform-appropriate checksum utility and compare it with the manifest entry.
+
+Do not treat a matching checksum from an untrusted source as equivalent to provenance verification; an attacker who can replace both an artifact and an unauthenticated checksum file could make both agree.
+
+## Offline attestation verification
+
+GitHub supports downloading attestation bundles and trusted-root material for later offline verification. The high-level flow is:
+
+1. from an online system, download the attestation bundle for the artifact;
+2. export current trusted-root material;
+3. transfer the artifact, bundle, trusted-root file, and GitHub CLI to the offline environment;
+4. run `gh attestation verify` with the downloaded bundle and trusted root.
+
+Follow current GitHub documentation for the exact offline-verification command flags because CLI behavior can evolve over time.
+
+## Source contract validation
+
+`tools/validate_release_workflow.py` protects the provenance contract by requiring:
+
+- global read-only contents permission;
+- exactly one `contents: write` grant;
+- exactly one `id-token: write` grant;
+- exactly one `attestations: write` grant;
+- `actions/attest@v4`;
+- ZIP, AAB, and checksum subject paths;
+- attestation after checksum generation and before release publication;
+- rejection of deprecated wrapper action references in the release workflow.
+
+Regression source in `tools/tests/test_validate_release_workflow.py` locks the same permission/action/subject contract.
+
+Both are part of the integrated source preflight:
+
+```bash
+python tools/release_preflight.py
+```
+
+## Evidence semantics
+
+Use:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+Examples:
+
+- release workflow source satisfies its validator after execution: source-contract `PASS`;
+- `actions/attest` run succeeds and produces an attestation for a release ZIP: attestation service evidence `PASS`;
+- GitHub Actions/OIDC is unavailable in a local environment: `NOT RUN` or `BLOCKED`, depending on context;
+- `gh attestation verify` rejects a downloaded artifact: verification `FAIL` until the mismatch is understood.
+
+Never claim an attestation was generated merely because the YAML step exists.
+
+## Related documentation
+
+- [Release process](RELEASE.md)
+- [Security automation](SECURITY_AUTOMATION.md)
+- [Security engineering](SECURITY.md)
+- [Artifact/release evidence](VALIDATION_EVIDENCE.md)
+- [Release readiness checklist](RELEASE_READINESS_CHECKLIST.md)
