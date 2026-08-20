@@ -13,25 +13,30 @@ All notable CalcNova changes are recorded here.
 - Expanded release-workflow regression tests to lock the six-target inventory and require both x64 and ARM64 for each desktop operating system.
 - Updated build, platform-support, and release documentation to distinguish source publication support from separately observed runtime/package evidence.
 
-### Security automation
+### Security automation and dependency auditing
 
 - Added `.github/workflows/codeql.yml` for C# CodeQL scanning on pushes and pull requests to `main`, weekly scheduled scans, and manual runs.
 - Added `.github/workflows/dependency-review.yml` to reject pull-request dependency changes that introduce known vulnerabilities at moderate severity or higher.
 - Added `.github/workflows/security-automation-validate.yml` as a focused read-only contract-validation workflow.
-- Added `tools/validate_security_workflows.py` and regression tests to protect CodeQL/Dependency Review action majors, triggers, language/build mode, vulnerability threshold, least-privilege permissions, and rejection of `pull_request_target` drift.
-- Integrated security-workflow source validation and its regression suite into `tools/release_preflight.py`.
-- Added `docs/SECURITY_AUTOMATION.md` and synchronized the public/engineering security documentation.
+- Added `tools/validate_security_workflows.py` and regression tests to protect CodeQL/Dependency Review action majors, triggers, language/build mode, vulnerability threshold, least-privilege permissions, rejection of `pull_request_target` drift, and the focused security workflow itself.
+- Added explicit repository-level NuGet vulnerability auditing in `Directory.Build.props`: `NuGetAudit=true`, `NuGetAuditMode=all`, and `NuGetAuditLevel=moderate`.
+- Kept `TreatWarningsAsErrors=true` so moderate-or-higher NuGet audit warnings fail restore/build gates when actually reported by the configured audit sources.
+- Added `tools/validate_dependency_security.py` and regression tests to protect direct/transitive audit coverage, severity threshold, warnings-as-errors enforcement, duplicate-policy drift, and protected NU190x suppression markers.
+- Updated the focused security workflow to watch `Directory.Build.props` and run both security validators plus both regression suites.
+- Integrated security-workflow and dependency-security source validation into `tools/release_preflight.py` and its inventory tests.
+- Added/updated `docs/SECURITY_AUTOMATION.md` and synchronized the security/preflight documentation.
 
 ### Release provenance and least privilege
 
 - Changed the release workflow default permission from `contents: write` to `contents: read`.
-- Scoped `contents: write`, `id-token: write`, and `attestations: write` only to the `publish-release` job.
-- Added `actions/attest@v4` provenance generation for release ZIP files, Android AAB when present, and `SHA256SUMS.txt`.
+- Scoped `contents: write`, `id-token: write`, `attestations: write`, and `artifact-metadata: write` only to the `publish-release` job.
+- Added `actions/attest@v4` provenance generation for the prepared `release-assets/**/*` tree, covering desktop/Browser ZIP files, the Android AAB when present, and `SHA256SUMS.txt`.
+- Used one inclusive release-tree subject so optional Android output remains conditional without requiring a separate potentially absent AAB path.
 - Ordered provenance generation after checksum creation and before GitHub Release publication.
-- Hardened `tools/validate_release_workflow.py` to enforce attestation action/subjects/order and single-job write/OIDC/attestation permission grants.
-- Expanded release-workflow regression tests to lock the provenance and permission contract.
-- Added `docs/ARTIFACT_PROVENANCE.md` with online/offline verification guidance and evidence semantics.
-- Updated the release/security/documentation index and made the new security/provenance guides required repository documentation.
+- Hardened `tools/validate_release_workflow.py` to enforce attestation action/subject/order plus single-job contents/OIDC/attestation/artifact-metadata permission grants.
+- Expanded release-workflow regression tests to lock the current provenance and permission contract.
+- Added `docs/ARTIFACT_PROVENANCE.md` with online/offline verification guidance and evidence semantics, then synchronized it with the current `actions/attest@v4` metadata-permission requirements.
+- Updated the release/security/documentation index and made the security/provenance guides required repository documentation.
 
 The product/display version remains `2.8.03`; these are repository maintenance/security/release-quality enhancements, not a new product-version declaration.
 
