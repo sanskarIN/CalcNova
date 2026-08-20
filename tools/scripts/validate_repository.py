@@ -30,6 +30,7 @@ REQUIRED_FILES = [
     "docs/PRIVACY.md",
     "docs/SECURITY.md",
     "docs/SECURITY_AUTOMATION.md",
+    "docs/ARTIFACT_PROVENANCE.md",
     "docs/TESTING.md",
     "docs/RELEASE.md",
     "docs/PLATFORM_SUPPORT.md",
