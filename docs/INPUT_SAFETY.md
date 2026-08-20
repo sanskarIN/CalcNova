@@ -1,4 +1,4 @@
-# Input Safety and Expression Import
+# CalcNova Input Safety and Expression Import
 
 CalcNova evaluates calculator expressions with project-owned tokenizer/parser/evaluator code. It does not pass calculator input to a shell, scripting engine, reflection-based evaluator, dynamic compiler, or general-purpose code execution path.
 
@@ -36,19 +36,37 @@ Sanitization is not a replacement for parsing. Sanitized text is still parsed an
 
 Clipboard access is isolated behind `CalcNova.Platform.Clipboard.IClipboardService`. The shared app provides `AvaloniaClipboardService`, which is attached to the active Avalonia top-level clipboard while `MainView` is attached to the visual tree and detached when the view leaves it.
 
-Current Desktop, Browser/WebAssembly, Android, and iOS compositions inject this shared adapter.
+Desktop, Browser/WebAssembly, Android, and iOS composition use the shared platform clipboard abstraction/adapter path.
 
 Privacy and safety requirements are enforced by design:
 
 1. ordinary calculator use does not require clipboard access;
 2. clipboard text is read only after the user invokes paste;
 3. clipboard content is not evaluated automatically;
-4. imported text always uses `CalculatorViewModel.ImportExpression`;
+4. imported text always uses the sanitized expression-import path;
 5. clipboard content is not intentionally logged or sent to telemetry;
 6. evaluator expression-length limits still apply;
-7. unavailable/cancelled/rejected clipboard operations produce user-facing status messages.
+7. unavailable/cancelled/rejected clipboard operations produce controlled user-facing status behavior.
 
-## Testing expectations
+## Security boundary
+
+Sanitized imported input remains untrusted data. It is never promoted to executable source code.
+
+A future import/share integration must preserve the same boundary:
+
+```text
+external text -> sanitize/normalize -> normal expression parser -> bounded evaluator
+```
+
+It must not introduce shell/process/script execution or bypass the normal expression limits.
+
+## Privacy boundary
+
+Clipboard access is explicit and user-triggered. CalcNova should not continuously poll the clipboard or upload clipboard content as ordinary telemetry.
+
+See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
+
+## Regression coverage
 
 Regression coverage includes:
 
@@ -63,6 +81,18 @@ Regression coverage includes:
 - valid result copy;
 - unavailable clipboard reporting.
 
-## Validation rule
+SDK-independent source contracts are also included in the integrated release preflight.
 
-Source and regression tests exist, but target-specific clipboard behavior must still be compiled and exercised on each supported platform before release readiness is marked PASS. In the current continuation environment, local .NET restore/build/test execution is **NOT RUN** because the required SDK is unavailable.
+## Validation boundary
+
+Source and regression-test coverage establish the implementation contract but do not prove real target clipboard/runtime behavior.
+
+Target-specific clipboard behavior should be compiled/exercised on each relevant platform and recorded only from observed results, including permission-denied/unavailable paths where applicable.
+
+Use:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+An environment-specific missing SDK or unexecuted test should be represented in an evidence record as `NOT RUN`; it should not be embedded in permanent feature documentation as the global state of the completed input-safety implementation.
