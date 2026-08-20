@@ -6,7 +6,7 @@ This is a post-2.8.03 supply-chain hardening control. It does not change the Cal
 
 ## What is attested
 
-The release publication job attests the files that users actually download from the GitHub Release:
+The release publication job attests every file in the prepared `release-assets/` tree after checksum generation. For the current release topology, that includes:
 
 - Windows x64 desktop ZIP;
 - Windows ARM64 desktop ZIP;
@@ -24,7 +24,13 @@ The workflow uses:
 actions/attest@v4
 ```
 
-with release file globs under `release-assets/`.
+with one inclusive subject glob:
+
+```text
+release-assets/**/*
+```
+
+Using one inclusive release-tree subject keeps optional artifacts such as the signed Android AAB conditional without requiring a separate path that may not exist in an unsigned release run.
 
 ## Why provenance matters
 
@@ -41,18 +47,19 @@ permissions:
   contents: read
 ```
 
-Only the `publish-release` job receives the additional permissions needed to publish the GitHub Release and produce attestations:
+Only the `publish-release` job receives the additional permissions needed to publish the GitHub Release and produce current `actions/attest@v4` artifact metadata/attestations:
 
 ```yaml
 permissions:
   contents: write
   id-token: write
   attestations: write
+  artifact-metadata: write
 ```
 
-Build/validation jobs therefore do not inherit release-write or OIDC privileges.
+Build/validation jobs therefore do not inherit release-write, OIDC, attestation, or artifact-metadata write privileges.
 
-`id-token: write` is used by GitHub's attestation flow to establish the workflow identity. `attestations: write` allows the resulting attestation to be stored. `contents: write` is required by the publication job to create/update release assets.
+`id-token: write` allows GitHub's attestation flow to establish workflow identity. `attestations: write` allows the attestation to be persisted. `artifact-metadata: write` allows the current attestation action to create the artifact storage metadata record. `contents: write` is required by the publication job to create/update GitHub Release assets.
 
 ## Release ordering
 
@@ -60,8 +67,8 @@ The publication flow intentionally follows this order:
 
 1. download build artifacts from the prerequisite jobs;
 2. generate SHA-256 checksum material;
-3. copy `SHA256SUMS.txt` into the release-asset set;
-4. generate provenance attestations for ZIP/AAB/checksum release files;
+3. copy `SHA256SUMS.txt` into the release-asset tree;
+4. generate provenance attestations for the prepared release-asset tree;
 5. create the GitHub Release if it does not already exist;
 6. upload/replace the intended release assets.
 
@@ -116,8 +123,9 @@ Follow current GitHub documentation for the exact offline-verification command f
 - exactly one `contents: write` grant;
 - exactly one `id-token: write` grant;
 - exactly one `attestations: write` grant;
+- exactly one `artifact-metadata: write` grant;
 - `actions/attest@v4`;
-- ZIP, AAB, and checksum subject paths;
+- the inclusive `release-assets/**/*` subject glob;
 - attestation after checksum generation and before release publication;
 - rejection of deprecated wrapper action references in the release workflow.
 
