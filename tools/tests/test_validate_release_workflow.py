@@ -53,9 +53,8 @@ class ReleaseWorkflowValidatorTests(unittest.TestCase):
         self.assertEqual(1, source.count("contents: write"))
         self.assertEqual(1, source.count("id-token: write"))
         self.assertEqual(1, source.count("attestations: write"))
-        self.assertIn("release-assets/**/*.zip", source)
-        self.assertIn("release-assets/**/*.aab", source)
-        self.assertIn("release-assets/SHA256SUMS.txt", source)
+        self.assertEqual(1, source.count("artifact-metadata: write"))
+        self.assertIn("subject-path: release-assets/**/*", source)
 
 
 if __name__ == "__main__":
