@@ -47,6 +47,10 @@ def validate(root: Path) -> list[str]:
         "permissions:\n  contents: read",
         "actions/attest@v4",
         "subject-path: release-assets/**/*",
+        "- name: Validate release asset filenames",
+        "Duplicate release asset filenames are not allowed:",
+        "SHA256SUMS.txt is a reserved release asset filename.",
+        'printf \'%s  %s\\n\' "$digest" "$(basename "$file")" >> SHA256SUMS.txt',
     )
     for marker in required_markers:
         if marker not in source:
@@ -84,18 +88,22 @@ def validate(root: Path) -> list[str]:
         "      artifact-metadata: write"
     )
     permission_position = source.find(publication_permissions, publish_position)
+    download_position = source.find("      - name: Download packaged artifacts", publish_position)
+    filename_position = source.find("      - name: Validate release asset filenames", publish_position)
     checksum_position = source.find("      - name: Generate checksums", publish_position)
     attestation_position = source.find("      - name: Attest release artifacts", publish_position)
     release_position = source.find("      - name: Create or reuse GitHub Release", publish_position)
     if not (
         publish_position >= 0
         and permission_position > publish_position
-        and checksum_position > permission_position
+        and download_position > permission_position
+        and filename_position > download_position
+        and checksum_position > filename_position
         and attestation_position > checksum_position
         and release_position > attestation_position
     ):
         failures.append(
-            "Release publication must use job-scoped contents/OIDC/attestation/artifact-metadata permissions and attest packaged artifacts after checksums but before GitHub Release upload."
+            "Release publication must validate flat asset filenames, generate download-friendly checksums, attest artifacts, and only then publish the GitHub Release."
         )
 
     if source.count("contents: write") != 1:
@@ -116,10 +124,11 @@ def validate(root: Path) -> list[str]:
         '-p:ApplicationVersion="${{ github.run_number }}"',
         "actions/attest-build-provenance@",
         "actions/attest-sbom@",
+        "xargs -0 sha256sum > SHA256SUMS.txt",
     )
     for marker in forbidden_markers:
         if marker in source:
-            failures.append(f"Release workflow contains forbidden destructive/insecure/version-drift/deprecated marker: {marker}")
+            failures.append(f"Release workflow contains forbidden destructive/insecure/version-drift/deprecated/checksum marker: {marker}")
 
     return failures
 
@@ -137,7 +146,7 @@ def main() -> int:
         return 1
 
     print(
-        "Validated tag/source version alignment, tagged preflight, x64/ARM64 desktop publication, least-privilege provenance attestation, signing, and publication workflow contracts."
+        "Validated tag/source version alignment, x64/ARM64 publication, flat checksum manifests, least-privilege provenance attestation, signing, and release publication contracts."
     )
     return 0
 
