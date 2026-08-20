@@ -1,5 +1,85 @@
 # What Changed
 
+## Release checksum manifest hardening — 2026-08-20
+
+The stable release workflow received one additional integrity/usability fix after the NuGet-audit and attestation follow-up below.
+
+### Downloaded checksum verification now matches GitHub Release filenames
+
+Previously, checksum generation hashed files directly from the nested GitHub Actions download tree. That produced manifest entries containing runner-local paths such as:
+
+```text
+release-assets/desktop-win-x64/CalcNova-win-x64.zip
+```
+
+GitHub Release downloads are presented by flat filenames, so a user downloading the release assets into one directory could not reliably use a normal:
+
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+The release workflow now writes checksum entries using each published asset basename, for example:
+
+```text
+<sha256>  CalcNova-win-x64.zip
+```
+
+### Release filename collision guard added
+
+Before checksum generation, `publish-release` now:
+
+- requires at least one prepared release file;
+- rejects duplicate basenames across nested downloaded workflow artifacts;
+- reserves `SHA256SUMS.txt` so no build artifact can collide with the generated manifest.
+
+This matters because separate GitHub Actions artifacts can live in different subdirectories while GitHub Release assets ultimately share one flat filename namespace.
+
+### Checksum/provenance ordering
+
+The publication order is now:
+
+1. download packaged workflow artifacts;
+2. validate unique/reserved release filenames;
+3. generate `SHA256SUMS.txt` using published basenames;
+4. copy the checksum manifest into `release-assets/`;
+5. attest the full `release-assets/**/*` tree with `actions/attest@v4`;
+6. create/reuse the GitHub Release;
+7. upload the prepared assets.
+
+The checksum manifest is not included in its own checksum set, but it **is** covered by artifact provenance after being copied into the attested release tree.
+
+### Regression and documentation protection
+
+Updated:
+
+- `.github/workflows/release.yml`;
+- `tools/validate_release_workflow.py`;
+- `tools/tests/test_validate_release_workflow.py`;
+- `tools/validate_release_docs.py`;
+- `tools/tests/test_validate_release_docs.py`;
+- `docs/ARTIFACT_PROVENANCE.md`;
+- `docs/README.md`;
+- `CHANGELOG.md`;
+- this live handoff record.
+
+The release workflow validator now requires the filename-validation step, flat basename checksum generation, correct ordering, and rejects the previous nested-path `xargs -0 sha256sum > SHA256SUMS.txt` implementation.
+
+The release-document validator now also protects the current security-automation and artifact-provenance guides, including the NuGet transitive-audit and release-attestation contracts.
+
+### Evidence status
+
+No release execution PASS is inferred from these source changes. Actual checksum validation, provenance generation, GitHub Release publication, .NET restore/build/test, CodeQL, Dependency Review, signing, and runtime results remain evidence only after those operations actually execute and are observed.
+
+### Version/status unchanged
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Mobile build code: `20803`
+- Application id: `in.sanskar.calcnova`
+- Product scope: **COMPLETE**
+- This change: **POST-COMPLETION RELEASE-INTEGRITY MAINTENANCE**
+
 ## NuGet audit and attestation compatibility follow-up — 2026-08-20
 
 This follow-up supersedes the security/provenance implementation details in the earlier 2026-08-20 checkpoint below while preserving that checkpoint as historical context.
