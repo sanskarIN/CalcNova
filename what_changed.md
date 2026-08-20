@@ -1,5 +1,78 @@
 # What Changed
 
+## Native x64 + ARM64 desktop release maintenance — 2026-08-20
+
+CalcNova 2.8.03 remains the completed product baseline. This continuation improved the release/distribution layer without changing the public version, normalized package version, release-tag mapping, application id, or mobile build code.
+
+### Desktop release matrix expanded
+
+`.github/workflows/release.yml` now publishes six self-contained desktop archives:
+
+- Windows x64: `win-x64`;
+- Windows ARM64: `win-arm64`;
+- Linux x64: `linux-x64`;
+- Linux ARM64: `linux-arm64`;
+- macOS Intel: `osx-x64`;
+- macOS Apple Silicon: `osx-arm64`.
+
+Each RID keeps an independent `CalcNova-<rid>.zip` archive and `desktop-<rid>` workflow artifact. This improves first-class native release coverage for current ARM64 desktop systems instead of requiring architecture emulation where a native package can be produced.
+
+### Release source contract hardened
+
+`tools/validate_release_workflow.py` now requires:
+
+- all six desktop runner/RID pairs;
+- RID-specific self-contained publish output;
+- RID-specific archive naming;
+- RID-specific artifact naming;
+- the existing exact-tag/source-version/preflight/release-safety contracts.
+
+The validator's success message now explicitly covers x64/ARM64 desktop publication.
+
+### Regression coverage expanded
+
+`tools/tests/test_validate_release_workflow.py` now locks:
+
+- the complete six-target desktop inventory;
+- x64 + ARM64 coverage for Windows;
+- x64 + ARM64 coverage for Linux;
+- x64 + ARM64 coverage for macOS.
+
+The existing repository-workflow validation test remains in place, so the real release workflow must satisfy the validator.
+
+### Documentation synchronized
+
+Updated current-facing documentation:
+
+- `docs/BUILDING.md` — six release RIDs plus explicit publish commands for Windows/Linux/macOS x64 and ARM64;
+- `docs/PLATFORM_SUPPORT.md` — native x64/ARM64 desktop release source contracts and architecture-specific evidence guidance;
+- `docs/RELEASE.md` — six automated desktop artifact families and release-validator protections;
+- `CHANGELOG.md` — post-2.8.03 maintenance record;
+- `PROJECT_STATE.md` — authoritative current maintenance checkpoint;
+- `what_changed.md` — this live continuation record.
+
+### External support verification
+
+Current Avalonia 12 documentation identifies x64 and ARM64 support across maintained Windows/macOS targets and x64/ARM64 support on representative maintained Linux distributions. The .NET runtime identifier catalog defines `win-arm64`, `linux-arm64`, and `osx-arm64` alongside their x64 equivalents.
+
+That external platform information was used only to justify the source release targets. Actual CalcNova artifact execution remains evidence-based and must be recorded per target as `PASS`, `FAIL`, `BLOCKED`, or `NOT RUN`.
+
+### Validation environment status
+
+A fresh repository clone was attempted from the assistant container after this maintenance change. The container still could not resolve `github.com`, so a materialized full-tree local preflight could not run there.
+
+No PASS result was invented. The repository now contains the strengthened release validator and regression source; CI/runtime/package execution remains separately observable evidence.
+
+### Version/status unchanged
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Mobile build code: `20803`
+- Application id: `in.sanskar.calcnova`
+- Product scope: **COMPLETE**
+- This continuation: **POST-COMPLETION MAINTENANCE / RELEASE ENHANCEMENT**
+
 ## Documentation consistency pass — 2026-08-20
 
 The maintained CalcNova documentation was audited against the completed 2.8.03 source tree. The product/version classification is unchanged: **CalcNova 2.8.03 remains COMPLETE**.
