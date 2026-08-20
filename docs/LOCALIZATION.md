@@ -1,154 +1,221 @@
-# CalcNova Localization
+# CalcNova 2.8.03 Localization
 
-CalcNova should be ready for reviewed translations without allowing locale formatting to change mathematical meaning.
+CalcNova's localization architecture keeps mathematical meaning culture-independent while providing reviewed live localization for the completed 2.8.03 semantic baseline.
 
-## Current implementation state
+The current reviewed languages are English and Hindi. Additional languages and further migration of non-semantic/technical UI text are optional post-2.8.03 improvements rather than incomplete release requirements.
 
-The application layer now contains a reviewed two-catalog localization foundation:
+## Completed localization baseline
 
-- `AppStringKey` defines stable semantic keys for core shell modes, common actions, common labels, status text, and baseline errors;
-- `EnglishAppStrings` is the complete source-language catalog;
-- `HindiAppStrings` is the complete reviewed Hindi semantic catalog for the currently defined key set;
-- `IAppLocalizer` defines culture selection and lookup behavior;
-- `AppLocalizer` validates every supported catalog at startup, exposes English and Hindi, accepts regional cultures such as `en-IN` and `hi-IN`, and rejects unsupported/unreviewed cultures without changing the active culture;
-- `AppSettings.CultureName` persists the preferred application culture through native JSON and browser settings storage;
-- `SettingsViewModel` exposes the reviewed supported-culture list, restores a saved culture, normalizes unsupported saved preferences back to English, and rejects unsupported selections during save;
-- `MainViewModel` shares one localizer instance with the settings workflow so culture selection and application string lookup use the same active state;
-- native and browser settings validation reject malformed culture names before they reach the application layer;
-- source/test coverage checks catalog completeness, fallback behavior, English/Hindi regional selection, preference persistence, unsupported cultures, invalid culture names, and culture-change behavior;
-- the SDK-independent localization validator now verifies both catalogs and has its own regression tests in CI.
+The application layer includes:
 
-This foundation is **not yet a claim that the shared XAML has been fully migrated to localized bindings**. Existing visible English strings still need incremental migration after the binding approach is validated with Avalonia compilation and UI tests. The supported semantic catalogs are English and Hindi, while the current shared XAML remains predominantly English.
+- `AppStringKey` stable semantic keys;
+- complete English semantic catalog for the current key set;
+- complete Hindi semantic catalog for the current key set;
+- `IAppLocalizer` culture-selection/lookup abstraction;
+- `AppLocalizer` catalog validation and fallback behavior;
+- regional English/Hindi culture selection such as `en-IN` and `hi-IN`;
+- persisted `AppSettings.CultureName` preference;
+- settings validation/fallback for malformed or unsupported cultures;
+- shared localizer state used by application/settings workflows;
+- live refresh for reviewed shared surfaces;
+- source validators for catalog completeness, duplicate/unknown keys, preferences, and live-localization contracts;
+- application/headless regression coverage for reviewed localized surfaces.
 
-## Supported semantic catalogs
+## Reviewed languages
 
 ### English
 
-English remains the source language and fallback language.
+English is the source/fallback catalog.
 
-Regional English preferences such as `en-IN` can be preserved as the active culture while using the reviewed English catalog. This allows locale-aware presentation work without inventing a separate translation.
+Regional English preferences such as `en-IN` can remain the active culture while using the reviewed English semantic catalog.
 
 ### Hindi
 
-Hindi (`hi`) and Hindi regional cultures such as `hi-IN` use the reviewed `HindiAppStrings` catalog.
+Hindi (`hi`) and Hindi regional cultures such as `hi-IN` use the reviewed Hindi semantic catalog.
 
-The catalog currently covers the same semantic key set as English. New `AppStringKey` entries must be translated in both catalogs before the localization source validator can pass.
+The Hindi catalog contains the same current semantic key set as English. Adding a new required semantic key requires catalog updates so completeness validation continues to pass.
 
-Hindi support should not be described as complete UI localization until hard-coded visible XAML strings, accessibility descriptions, units, date formatting, and all runtime text are migrated and visually reviewed.
+## Reviewed live-localized surfaces
+
+The 2.8.03 baseline includes reviewed live localization across major shared product surfaces, including:
+
+- application shell/header and primary mode names;
+- Calculator reviewed title/prompt/action surfaces;
+- onboarding welcome/feature/privacy/action text;
+- Settings reviewed labels/actions/accessibility preferences;
+- History reviewed headings/search/management/export surfaces;
+- Currency reviewed heading/privacy/input/refresh surfaces;
+- About/support/footer surfaces;
+- Converter local preference/privacy notice and related reviewed controls;
+- major mode headings;
+- Graph viewport controls and related reviewed strings.
+
+Culture changes refresh the reviewed shared strings without changing mathematical parser semantics.
+
+See [LIVE_LOCALIZATION.md](LIVE_LOCALIZATION.md) for the live-refresh architecture and exact scope.
+
+## Semantic catalogs versus technical data
+
+Not every visible token should be translated as prose.
+
+The following generally remain invariant or are handled by specialist formatting rules:
+
+- parser keywords/function identifiers;
+- mathematical symbols;
+- persisted mathematical syntax;
+- stable unit IDs;
+- ISO currency codes;
+- URLs/email addresses;
+- technical identifiers;
+- user-entered expressions/data.
+
+A localized display label must not silently change the canonical machine/persisted meaning.
 
 ## Persisted preference contract
 
-The preferred culture is stored in `AppSettings.CultureName` and follows the same local settings repository abstraction as other CalcNova preferences.
+The preferred culture is stored in `AppSettings.CultureName` through the shared local settings abstraction.
 
-Current rules:
+Current rules include:
 
-- default culture is `en`;
-- syntactically malformed stored culture names are rejected by persistence validation;
-- well-formed but unsupported cultures are normalized to `en` by the application localization layer;
-- supported English regional cultures may be persisted, for example `en-IN`;
-- supported Hindi regional cultures may be persisted, for example `hi-IN`;
-- selecting an unsupported culture through the settings view model does not overwrite a valid persisted preference;
-- parser syntax and persisted mathematical meaning do not change when the UI culture changes.
+- default culture: `en`;
+- malformed stored culture names are rejected by persistence validation;
+- well-formed but unsupported preferences fall back safely to English through application localization behavior;
+- supported regional English/Hindi cultures can be persisted;
+- unsupported selections do not replace a valid supported persisted preference;
+- parser syntax/persisted mathematical meaning remains invariant across UI culture changes.
 
-## What should be localizable
-
-Application resources should eventually cover:
-
-- mode names;
-- menu/navigation labels;
-- settings;
-- error messages;
-- onboarding/help text;
-- button semantic labels;
-- accessibility descriptions;
-- unit/category display names;
-- date/time labels;
-- empty states;
-- About/Support text.
-
-Mathematical symbols and function identifiers should be reviewed separately because translating them can make expression syntax ambiguous.
+Native and Browser storage use the same settings schema/validation contract while retaining target-appropriate persistence implementations.
 
 ## Internal expression syntax
 
-The parser's canonical mathematical syntax is culture-independent.
+The expression parser remains culture-independent.
 
-Internal numeric meaning should use invariant representations. Locale-specific presentation belongs at input/display boundaries.
+This avoids ambiguity such as a persisted expression changing meaning when the operating-system language/region changes.
 
-This avoids cases where the same persisted expression means different things after a device locale change.
+Localized input presentation must normalize safely before it reaches canonical parser syntax.
 
-## Decimal separator
+## Decimal and grouping separators
 
-User-facing input may eventually accept the locale's decimal separator when it can be normalized unambiguously to the internal parser format.
+Locale-aware display/input formatting must not blindly replace punctuation.
 
-Do not globally replace commas with decimal points because commas also separate function arguments.
+In particular, commas can represent function-argument separators, so a locale-aware decimal-input feature must distinguish localized numeric entry from expression punctuation.
 
-A robust input layer must distinguish localized numeric entry from expression punctuation.
+Grouping separators are presentation concerns and must not silently alter persisted mathematical meaning.
 
-## Grouping separators
+## Units
 
-Thousands/grouping separators are presentation only. They should not silently become part of internal persisted expression meaning.
+Unit IDs and conversion definitions remain stable/invariant.
 
-Copy actions may offer display-formatted and invariant/raw values if the distinction becomes useful.
+Localized display names can change without changing the persisted conversion-pair identity.
 
-## Unit names
+This separation allows converter state to survive a language change safely.
 
-Unit IDs and conversion definitions remain stable/invariant. Display names can be localized.
+## Date/time presentation
 
-For example, a unit record may retain internal ID `km` even when its localized display name changes.
+Date/time labels and history timestamps may use locale-aware presentation while underlying stored timestamps/data remain unambiguous.
 
-## Date/time formatting
-
-History grouping can use locale-aware date/time presentation while storing timestamps in an unambiguous representation.
+Formatting changes must not change the represented instant/duration/date calculation semantics.
 
 ## Layout impact
 
-Translations can be longer or structurally different from English. UI must avoid fixed-width assumptions for navigation labels, settings rows, word-based buttons, error messages, and dialog actions.
+Localized strings may be longer or have different glyph/line metrics.
 
-Hindi also requires verification at large text sizes because Devanagari glyph metrics and line heights can differ from Latin text. Scientific symbol buttons can remain compact, but their accessible names need localized strings.
+The adaptive UI must therefore avoid assuming English-width labels. Review should include:
 
-The current compact/medium/expanded shell is a useful baseline for long-string testing, but target-language layout must still be validated rather than inferred from English behavior.
+- compact/medium/expanded layouts;
+- large text;
+- Hindi Devanagari line height/glyph metrics;
+- navigation/tab headers;
+- settings rows;
+- errors/status text;
+- onboarding;
+- graph/converter/history actions.
+
+Source/headless coverage reduces regression risk, but real target-language rendering remains runtime evidence.
+
+## Accessibility localization
+
+Accessible names/descriptions that are part of the reviewed semantic catalog should use localized semantic strings rather than relying only on visual English text.
+
+Mathematical symbol keys may retain their visual symbol while exposing an understandable localized semantic name where the accessibility contract requires one.
+
+Screen-reader pronunciation/quality must be validated on target assistive technologies; catalog presence alone is not runtime evidence.
 
 ## Right-to-left languages
 
-Future RTL support needs intentional testing for navigation direction, text alignment, expression editing, keypad ordering, mixed mathematical/RTL text, and directional icons.
+RTL languages are not part of the reviewed 2.8.03 language baseline.
 
-Do not simply mirror mathematical expressions without confirming correct behavior.
+A future RTL language pack requires intentional design/testing for:
+
+- navigation direction;
+- alignment;
+- expression editing;
+- keypad ordering;
+- mixed mathematical/RTL text;
+- directional icons;
+- accessibility reading order.
+
+Do not simply mirror mathematical expressions without proving correct semantics.
 
 ## Translation quality
 
-Machine-generated translations may be useful as draft material but should not be shipped as reviewed translations without human-quality checking, especially for mathematical, accessibility, privacy, and security terminology.
+Machine translation may assist drafting, but a language must not be advertised as reviewed merely because automated text exists.
 
-Every supported catalog must remain complete. The source validator rejects missing, unknown, and duplicate semantic keys.
+Mathematical, privacy, security, onboarding, and accessibility terminology requires quality review.
+
+Every supported semantic catalog must remain complete. The source validator rejects missing, duplicate, and unknown keys.
 
 ## Resource organization
 
-As localization infrastructure is expanded:
+Localization maintenance should preserve these rules:
 
-- keep `AppStringKey` entries stable and semantic;
+- keep semantic keys stable;
 - keep one reviewed catalog per supported language;
-- validate that every supported catalog contains every required key;
-- avoid concatenating translated fragments to build sentences;
+- require every supported catalog to contain every required current semantic key;
+- avoid sentence construction by concatenating translated fragments;
 - use formatting placeholders for values;
-- add translator context for ambiguous terms;
-- test missing-resource fallback;
-- keep source strings out of calculation/domain code where they represent UI messages;
-- never localize parser keywords or persisted unit IDs without an explicit canonicalization layer.
+- provide translator context for ambiguous terms;
+- test fallback behavior;
+- keep canonical parser/unit identifiers invariant;
+- update live-localization/headless tests when a reviewed surface gains semantic localization.
 
-## Tests
+## Validation
 
-Current automated source/test coverage includes:
+Focused checks include localization catalog/preferences/live-surface validators and their Python regression tests.
 
-- English and Hindi catalog completeness;
-- English fallback;
-- English regional culture selection;
-- Hindi regional culture selection and semantic string lookup;
-- unsupported/invalid culture rejection;
-- culture-change event behavior;
-- settings culture restore and fallback;
-- persisted regional culture round-trip on native JSON settings storage;
-- malformed persisted culture rejection;
-- duplicate localization-key detection;
-- localization preference source-contract validation in CI;
-- localization-validator regression tests in CI.
+The integrated SDK-independent gate is:
 
-Future localization tests should cover localized XAML/view-model binding refresh, long-string layout samples, decimal/grouping normalization, locale changes without corruption of stored values, history timestamp formatting, and RTL smoke tests when RTL locales are supported.
+```bash
+python tools/release_preflight.py
+```
+
+Compiled/headless application localization coverage runs through the normal .NET test workflows described in [TESTING.md](TESTING.md) and [UI_AUTOMATION.md](UI_AUTOMATION.md).
+
+Runtime language/layout/screen-reader evidence should be recorded using:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+## Optional post-2.8.03 localization work
+
+Possible optional improvements include:
+
+- additional reviewed language packs;
+- further semantic migration of remaining technical/detail labels;
+- richer locale-aware numeric entry where ambiguity can be resolved safely;
+- additional localized date/time presentation;
+- RTL support after dedicated design/testing.
+
+These are optional enhancements, not missing requirements for the completed English/Hindi 2.8.03 semantic baseline.
+
+## 2.8.03 classification
+
+- semantic localization architecture: **COMPLETE**;
+- English current semantic catalog: **COMPLETE**;
+- Hindi current semantic catalog: **COMPLETE**;
+- regional English/Hindi selection: **COMPLETE**;
+- culture preference persistence: **COMPLETE**;
+- reviewed live localized major surfaces: **COMPLETE**;
+- catalog/source validation: **COMPLETE**;
+- additional languages/further text migration: **OPTIONAL POST-2.8.03**.
