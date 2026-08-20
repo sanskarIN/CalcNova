@@ -44,6 +44,11 @@ def validate(root: Path) -> list[str]:
         'dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true --output publish/${{ matrix.rid }}',
         'name: desktop-${{ matrix.rid }}',
         'path: CalcNova-${{ matrix.rid }}.zip',
+        "permissions:\n  contents: read",
+        "actions/attest@v4",
+        "release-assets/**/*.zip",
+        "release-assets/**/*.aab",
+        "release-assets/SHA256SUMS.txt",
     )
     for marker in required_markers:
         if marker not in source:
@@ -72,6 +77,30 @@ def validate(root: Path) -> list[str]:
             "Release tag/source-version consistency and tagged source preflight must run after tag checkout and before .NET validation."
         )
 
+    publish_position = source.find("  publish-release:")
+    publication_permissions = "    permissions:\n      contents: write\n      id-token: write\n      attestations: write"
+    permission_position = source.find(publication_permissions, publish_position)
+    checksum_position = source.find("      - name: Generate checksums", publish_position)
+    attestation_position = source.find("      - name: Attest release artifacts", publish_position)
+    release_position = source.find("      - name: Create or reuse GitHub Release", publish_position)
+    if not (
+        publish_position >= 0
+        and permission_position > publish_position
+        and checksum_position > permission_position
+        and attestation_position > checksum_position
+        and release_position > attestation_position
+    ):
+        failures.append(
+            "Release publication must use job-scoped contents/OIDC/attestation permissions and attest packaged artifacts after checksums but before GitHub Release upload."
+        )
+
+    if source.count("contents: write") != 1:
+        failures.append("Release workflow must grant contents: write only to the publication job.")
+    if source.count("id-token: write") != 1:
+        failures.append("Release workflow must grant id-token: write only once for artifact attestation.")
+    if source.count("attestations: write") != 1:
+        failures.append("Release workflow must grant attestations: write only once for artifact attestation.")
+
     forbidden_markers = (
         "gh release delete",
         "git tag -f",
@@ -79,10 +108,12 @@ def validate(root: Path) -> list[str]:
         "AndroidSigningKeyPass>password",
         '-p:ApplicationDisplayVersion="$VERSION"',
         '-p:ApplicationVersion="${{ github.run_number }}"',
+        "actions/attest-build-provenance@",
+        "actions/attest-sbom@",
     )
     for marker in forbidden_markers:
         if marker in source:
-            failures.append(f"Release workflow contains forbidden destructive/insecure/version-drift marker: {marker}")
+            failures.append(f"Release workflow contains forbidden destructive/insecure/version-drift/deprecated marker: {marker}")
 
     return failures
 
@@ -100,7 +131,7 @@ def main() -> int:
         return 1
 
     print(
-        "Validated tag/source version alignment, tagged preflight, x64/ARM64 desktop publication, build, signing, and publication workflow contracts."
+        "Validated tag/source version alignment, tagged preflight, x64/ARM64 desktop publication, least-privilege provenance attestation, signing, and publication workflow contracts."
     )
     return 0
 
