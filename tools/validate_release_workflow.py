@@ -46,9 +46,7 @@ def validate(root: Path) -> list[str]:
         'path: CalcNova-${{ matrix.rid }}.zip',
         "permissions:\n  contents: read",
         "actions/attest@v4",
-        "release-assets/**/*.zip",
-        "release-assets/**/*.aab",
-        "release-assets/SHA256SUMS.txt",
+        "subject-path: release-assets/**/*",
     )
     for marker in required_markers:
         if marker not in source:
@@ -78,7 +76,13 @@ def validate(root: Path) -> list[str]:
         )
 
     publish_position = source.find("  publish-release:")
-    publication_permissions = "    permissions:\n      contents: write\n      id-token: write\n      attestations: write"
+    publication_permissions = (
+        "    permissions:\n"
+        "      contents: write\n"
+        "      id-token: write\n"
+        "      attestations: write\n"
+        "      artifact-metadata: write"
+    )
     permission_position = source.find(publication_permissions, publish_position)
     checksum_position = source.find("      - name: Generate checksums", publish_position)
     attestation_position = source.find("      - name: Attest release artifacts", publish_position)
@@ -91,7 +95,7 @@ def validate(root: Path) -> list[str]:
         and release_position > attestation_position
     ):
         failures.append(
-            "Release publication must use job-scoped contents/OIDC/attestation permissions and attest packaged artifacts after checksums but before GitHub Release upload."
+            "Release publication must use job-scoped contents/OIDC/attestation/artifact-metadata permissions and attest packaged artifacts after checksums but before GitHub Release upload."
         )
 
     if source.count("contents: write") != 1:
@@ -100,6 +104,8 @@ def validate(root: Path) -> list[str]:
         failures.append("Release workflow must grant id-token: write only once for artifact attestation.")
     if source.count("attestations: write") != 1:
         failures.append("Release workflow must grant attestations: write only once for artifact attestation.")
+    if source.count("artifact-metadata: write") != 1:
+        failures.append("Release workflow must grant artifact-metadata: write only once for artifact attestation.")
 
     forbidden_markers = (
         "gh release delete",
