@@ -41,7 +41,7 @@ The completed 2.8.03 baseline now includes stronger cross-platform release and s
 - repository-level NuGet Audit explicitly enabled for direct and transitive packages with `NuGetAudit=true`, `NuGetAuditMode=all`, and `NuGetAuditLevel=moderate`;
 - warnings-as-errors retained so moderate-or-higher NuGet audit warnings fail restore/build gates when observed;
 - `tools/validate_dependency_security.py` protects the NuGet audit policy against disablement, direct-only drift, threshold weakening, duplicate definitions, and protected NU190x suppression markers;
-- regression tests protect the dependency-security validator;
+- regression tests protect the dependency-security validator, including composite `NoWarn` / `WarningsNotAsErrors` lists;
 - C# CodeQL scanning on pushes and pull requests to `main`, weekly schedule, and manual dispatch;
 - pull-request dependency review with `moderate` vulnerability severity enforcement;
 - existing Dependabot coverage for NuGet and GitHub Actions retained;
@@ -49,15 +49,20 @@ The completed 2.8.03 baseline now includes stronger cross-platform release and s
 - focused `Security Automation Validate` workflow watches `Directory.Build.props` and runs both security validators plus their regression suites with read-only repository permission;
 - security workflow and dependency-policy validation are integrated into the SDK-independent release preflight.
 
-### Release provenance and least privilege
+### Release provenance, checksums, and least privilege
 
 - release workflow defaults to `contents: read`;
 - only the publication job receives `contents: write`, `id-token: write`, `attestations: write`, and `artifact-metadata: write`;
+- publication validates that prepared release assets exist, have unique basenames, and do not preempt the reserved `SHA256SUMS.txt` name;
+- `SHA256SUMS.txt` records the flat published basenames users download rather than runner-local `release-assets/<artifact>/...` paths;
+- the flat checksum manifest can be used with `sha256sum -c SHA256SUMS.txt` after release files are downloaded into one directory;
 - `actions/attest@v4` generates provenance attestations for the prepared `release-assets/**/*` tree, covering desktop/Browser ZIP archives, the Android AAB when present, and `SHA256SUMS.txt`;
+- the checksum manifest is excluded from its own hash set and then included in the attested release tree;
 - the inclusive release-tree subject keeps optional Android output conditional without requiring a separate potentially absent AAB path;
-- provenance generation occurs after checksum creation and before GitHub Release asset upload;
-- release workflow validator requires the permission/attestation/order/subject contract and rejects deprecated provenance wrapper actions;
-- release-workflow regression tests lock the provenance action, inclusive subject set, and permission counts;
+- filename validation occurs before checksum generation, which occurs before provenance generation and GitHub Release asset upload;
+- release workflow validator requires the permission/filename/checksum/attestation/order/subject contract and rejects deprecated provenance wrappers plus the old nested-path checksum implementation;
+- release-workflow regression tests lock the provenance action, flat checksum behavior, inclusive subject set, filename guards, and permission counts;
+- release-document validation protects the security automation, provenance, current state, and live handoff documentation contracts;
 - `docs/SECURITY_AUTOMATION.md` and `docs/ARTIFACT_PROVENANCE.md` document operation, evidence semantics, and verification guidance.
 
 These are post-completion maintenance improvements. They do not change the public product version, normalized package version, release tag mapping, or mobile build code.
@@ -95,6 +100,7 @@ The public `2.8.03` format is intentionally preserved. Strict SemVer tooling use
 - Centralized package management
 - Nullable reference types, analyzers, warnings-as-errors, deterministic build settings, and explicit moderate-or-higher direct/transitive NuGet vulnerability auditing
 - Automated dependency review and CodeQL source scanning
+- Download-friendly SHA-256 release manifests with filename collision protection
 - Provenance-attested stable release artifact publication
 
 ## Completed Calculator Capabilities
@@ -318,6 +324,7 @@ SDK-independent source contracts cover:
 - exact-tag iOS simulator workflow;
 - release workflow and documentation contracts;
 - six-target x64/ARM64 desktop release matrix validation;
+- release filename collision/checksum usability validation;
 - release least-privilege/provenance attestation validation;
 - release-tag syntax;
 - artifact manifest/checksum integrity;
@@ -335,7 +342,8 @@ Maintained security controls include:
 
 Stable release publication includes:
 
-- SHA-256 checksum generation;
+- release filename uniqueness/reserved-name validation;
+- SHA-256 checksum generation using flat published basenames;
 - provenance attestations using `actions/attest@v4` for the prepared release-assets tree;
 - job-scoped release `contents: write`, OIDC, attestation, and artifact-metadata permissions.
 
@@ -352,7 +360,10 @@ The release workflow:
 5. runs tagged source preflight, including dependency-security policy validation;
 6. restores the .NET solution, which executes the configured NuGet direct/transitive vulnerability audit when advisory sources are available;
 7. proceeds to .NET validation and platform publication only after those checks;
-8. generates checksums and artifact provenance before publishing stable release assets.
+8. validates flat release filename uniqueness and the reserved checksum name;
+9. generates a download-friendly basename checksum manifest;
+10. attests the prepared release tree;
+11. publishes stable GitHub Release assets.
 
 The Android publication job does not replace source-owned display/build versions with the tag text or GitHub run number.
 
@@ -393,13 +404,14 @@ python tools/release_preflight.py
 python tools/validate_security_workflows.py .
 python tools/validate_dependency_security.py .
 python tools/validate_release_workflow.py .
+python tools/validate_release_docs.py .
 dotnet restore CalcNova.slnx
 dotnet format CalcNova.slnx --verify-no-changes --no-restore
 dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
-Platform signing, notarization, provisioning, GitHub-hosted security scanning, online NuGet advisory lookup, artifact attestation execution, and store processing additionally require their respective external environments/services/credentials.
+Platform signing, notarization, provisioning, GitHub-hosted security scanning, online NuGet advisory lookup, checksum verification against published downloads, artifact attestation execution, and store processing additionally require their respective external environments/services/credentials.
 
 ## Final Classification
 
@@ -410,6 +422,7 @@ Platform signing, notarization, provisioning, GitHub-hosted security scanning, o
 - x64/ARM64 desktop release source contract: **COMPLETE**
 - Security automation source contract: **COMPLETE**
 - NuGet dependency-security policy source contract: **COMPLETE**
+- Release checksum/integrity source contract: **COMPLETE**
 - Release provenance/least-privilege source contract: **COMPLETE**
 - Documentation baseline: **COMPLETE**
 - Source validation infrastructure: **COMPLETE**
