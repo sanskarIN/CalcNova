@@ -76,6 +76,32 @@ dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
 ```
 
+### Restore is also a dependency-security gate
+
+`Directory.Build.props` explicitly configures:
+
+```xml
+<NuGetAudit>true</NuGetAudit>
+<NuGetAuditMode>all</NuGetAuditMode>
+<NuGetAuditLevel>moderate</NuGetAuditLevel>
+<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+```
+
+Therefore a normal .NET 10 restore is also the execution layer for CalcNova's direct/transitive NuGet vulnerability audit. When the configured audit sources report a known moderate, high, or critical advisory, the corresponding NuGet audit warning is expected to fail restore because warnings are treated as errors.
+
+Do not broadly suppress `NU1901`–`NU1904` to make a restore pass. Investigate the dependency chain and update/remediate the affected package where practical.
+
+The SDK-independent policy-source checks are:
+
+```bash
+python tools/validate_dependency_security.py .
+python -m unittest tools.tests.test_validate_dependency_security
+```
+
+Those checks verify that the repository-level audit policy has not been disabled or weakened, but they do not perform the online advisory query themselves.
+
+See [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md) for the complete dependency-security policy and evidence rules.
+
 To apply formatter changes locally rather than verify them:
 
 ```bash
@@ -108,6 +134,8 @@ The `build-desktop.yml` workflow restores and builds the desktop project in Rele
 dotnet restore src/CalcNova.Desktop/CalcNova.Desktop.csproj
 dotnet build src/CalcNova.Desktop/CalcNova.Desktop.csproj --configuration Release --no-restore
 ```
+
+The restore step uses the same repository-level NuGet Audit policy described above.
 
 ### Release publish targets
 
@@ -336,7 +364,6 @@ Example Apple Silicon simulator commands:
 ```bash
 dotnet restore src/CalcNova.iOS/CalcNova.iOS.csproj \
   -p:RuntimeIdentifier=iossimulator-arm64
-
 dotnet build src/CalcNova.iOS/CalcNova.iOS.csproj \
   --configuration Release \
   --no-restore \
@@ -395,6 +422,8 @@ PASS / FAIL / BLOCKED / NOT RUN
 ```
 
 A platform source head may be complete while a device/signing/store check remains `NOT RUN` or `BLOCKED` in a particular environment. Never convert an unexecuted operation into PASS.
+
+The same evidence rule applies to dependency security: policy-source validation is distinct from an online NuGet advisory query performed by restore.
 
 ## Common failures
 
