@@ -2,59 +2,132 @@
 
 **Project status: Complete for version 2.8.03.**
 
-This index links the authoritative product, engineering, quality, packaging, and release documentation for the completed CalcNova 2.8.03 baseline.
+This directory contains the authoritative product, engineering, quality, platform, packaging, validation, and release documentation for the completed CalcNova 2.8.03 baseline.
 
-## Release identity and completion
+Use this page as the documentation map. Current guides are grouped by responsibility; dated continuation/audit records are grouped separately so historical checkpoints are not confused with current product status.
 
-- [Versioning](VERSIONING.md)
-- [Completed feature inventory](FEATURES.md)
-- [Completed roadmap](ROADMAP.md)
-- [Project state](../PROJECT_STATE.md)
-- [Changelog](../CHANGELOG.md)
-- [Final source audit — 2026-08-19](FINAL_SOURCE_AUDIT_2026-08-19.md)
-- [What changed](../what_changed.md)
+## Start here
 
-## Engineering and release
+- [Project state](../PROJECT_STATE.md) — authoritative completion/status record.
+- [Main README](../README.md) — product overview and major capabilities.
+- [Versioning](VERSIONING.md) — mapping between public `2.8.03`, normalized package `2.8.3`, and tag `v2.8.3`.
+- [Completed feature inventory](FEATURES.md) — implemented 2.8.03 product scope.
+- [Completed roadmap](ROADMAP.md) — completed milestone record and optional post-release ideas.
+- [Platform support](PLATFORM_SUPPORT.md) — Desktop, Browser/WebAssembly, Android, and iOS composition status.
+- [Building](BUILDING.md) — current build/run/publish commands and platform prerequisites.
+- [Testing](TESTING.md) — test layers and responsibilities.
+- [Troubleshooting](TROUBLESHOOTING.md) — common toolchain and platform problems.
+
+## Architecture and engineering
 
 - [Architecture](ARCHITECTURE.md)
-- [Building](BUILDING.md)
-- [Testing](TESTING.md)
-- [UI automation](UI_AUTOMATION.md)
-- [Troubleshooting](TROUBLESHOOTING.md)
-- [Release process](RELEASE.md)
-- [Release readiness checklist](RELEASE_READINESS_CHECKLIST.md)
-- [SDK-independent source preflight](SOURCE_PREFLIGHT.md)
-- [Machine-readable validation evidence](VALIDATION_EVIDENCE.md)
+- [Design system](DESIGN_SYSTEM.md)
+- [Adaptive layout](ADAPTIVE_LAYOUT.md)
+- [Input safety and expression import](INPUT_SAFETY.md)
+- [Settings storage contract](SETTINGS_STORAGE_CONTRACT.md)
 - [Settings migration](SETTINGS_MIGRATION.md)
-- [Platform support](PLATFORM_SUPPORT.md)
+- [Privacy](PRIVACY.md)
+- [Security engineering](SECURITY.md)
 
-## Calculation and feature contracts
+## Calculator and mathematical features
 
 - [Calculation engine](CALCULATION_ENGINE.md)
 - [Calculator expression editing](CALCULATOR_EDITING.md)
-- [Input safety and expression import](INPUT_SAFETY.md)
+- [Calculator keyboard input](CALCULATOR_KEYBOARD_INPUT.md)
+- [Keyboard shortcuts](KEYBOARD_SHORTCUTS.md)
 - [Exact rational arithmetic](EXACT_RATIONALS.md)
 - [Engineering notation](ENGINEERING_NOTATION.md)
 - [Programmer mode](PROGRAMMER_MODE.md)
 - [Unicode scalar metadata](UNICODE_METADATA.md)
 - [Converter mode](CONVERTER_MODE.md)
+- [Converter defaults and privacy](CONVERTER_DEFAULTS_AND_PRIVACY.md)
 - [Bivariate statistics](BIVARIATE_STATISTICS.md)
-- [Graph numerical analysis](NUMERICAL_ANALYSIS.md)
-- [Graph numerical safety and workload bounds](GRAPH_NUMERICAL_SAFETY.md)
-- [Graph interaction](GRAPH_INTERACTION.md)
-- [Bounded export previews](EXPORT_PREVIEWS.md)
-- [Keyboard shortcuts](KEYBOARD_SHORTCUTS.md)
+- [Numerical analysis](NUMERICAL_ANALYSIS.md)
+- [Numerical safety](NUMERICAL_SAFETY.md)
 
-## Product quality
+## Graphing
+
+- [Graph interaction](GRAPH_INTERACTION.md)
+- [Graph viewport controls](GRAPH_VIEWPORT_CONTROLS.md)
+- [Graph series presentation](GRAPH_SERIES_PRESENTATION.md)
+- [Graph numerical safety and workload bounds](GRAPH_NUMERICAL_SAFETY.md)
+
+## History, export, onboarding, and localization
+
+- [Bounded export previews](EXPORT_PREVIEWS.md)
+- [Onboarding](ONBOARDING.md)
+- [Localization architecture and catalogs](LOCALIZATION.md)
+- [Live localization behavior](LIVE_LOCALIZATION.md)
+
+## Accessibility and UI quality
 
 - [Accessibility](ACCESSIBILITY.md)
 - [Accessibility runtime test matrix](ACCESSIBILITY_TEST_MATRIX.md)
 - [Focus visibility contract](FOCUS_VISIBILITY.md)
 - [Adaptive layout](ADAPTIVE_LAYOUT.md)
-- [Design system](DESIGN_SYSTEM.md)
-- [Localization](LOCALIZATION.md)
-- [Privacy](PRIVACY.md)
-- [Security engineering](SECURITY.md)
+- [UI automation](UI_AUTOMATION.md)
+- [XAML validation](XAML_VALIDATION.md)
+
+## Platform and runtime validation
+
+- [Platform support](PLATFORM_SUPPORT.md)
+- [Building](BUILDING.md)
+- [Runtime validation runbook](RUNTIME_VALIDATION_RUNBOOK.md)
+- [iOS release validation](IOS_RELEASE_VALIDATION.md)
+- [Machine-readable validation evidence](VALIDATION_EVIDENCE.md)
+
+Platform build workflow source contracts live in:
+
+- `.github/workflows/build-desktop.yml`;
+- `.github/workflows/build-browser.yml`;
+- `.github/workflows/build-android.yml`;
+- `.github/workflows/build-ios.yml`.
+
+Release publication is defined by `.github/workflows/release.yml`.
+
+## Testing and source validation
+
+- [Testing](TESTING.md)
+- [SDK-independent source preflight](SOURCE_PREFLIGHT.md)
+- [Source hardening suite](SOURCE_HARDENING_SUITE.md)
+- [UI automation](UI_AUTOMATION.md)
+- [XAML validation](XAML_VALIDATION.md)
+- [Runtime validation runbook](RUNTIME_VALIDATION_RUNBOOK.md)
+- [Validation evidence model](VALIDATION_EVIDENCE.md)
+- [Release evidence JSON schema](release-evidence.schema.json)
+
+The integrated SDK-independent gate is:
+
+```bash
+python tools/release_preflight.py
+```
+
+The compiled .NET gate is documented in [BUILDING.md](BUILDING.md) and [TESTING.md](TESTING.md).
+
+## Release and packaging
+
+- [Release process](RELEASE.md)
+- [Release readiness checklist](RELEASE_READINESS_CHECKLIST.md)
+- [Versioning](VERSIONING.md)
+- [Platform support](PLATFORM_SUPPORT.md)
+- [iOS release validation](IOS_RELEASE_VALIDATION.md)
+- [Packaging overview](../packaging/README.md)
+- [Changelog](../CHANGELOG.md)
+
+Current release artifact families include Desktop (`win-x64`, `linux-x64`, `osx-x64`), Browser/WebAssembly, and a signed Android AAB when signing secrets are configured. iOS simulator validation is maintained separately from signed App Store distribution.
+
+## Completion and audit records
+
+These records describe completed source passes/checkpoints and should not override newer authoritative files such as `PROJECT_STATE.md`:
+
+- [Final source audit — 2026-08-19](FINAL_SOURCE_AUDIT_2026-08-19.md)
+- [Release source checkpoint — 2026-08-19](RELEASE_SOURCE_CHECKPOINT_2026-08-19.md)
+- [Continuation checkpoint — 2026-08-19](CONTINUATION_CHECKPOINT_2026-08-19.md)
+- [Continuation pass 2 — 2026-08-19](CONTINUATION_2026-08-19_PASS2.md)
+- [What changed](../what_changed.md)
+- [`docs/history/`](history/) — archived historical records.
+
+When a historical statement differs from a current authoritative guide, use the current guide.
 
 ## Community and maintenance
 
@@ -68,13 +141,37 @@ This index links the authoritative product, engineering, quality, packaging, and
 - Product/display version: `2.8.03`
 - Normalized package version: `2.8.3`
 - Normalized release tag: `v2.8.3`
+- Assembly/file version: `2.8.3.0`
+- Android/iOS display version: `2.8.03`
 - Android/iOS numeric build code: `20803`
+- Application id: `in.sanskar.calcnova`
 
 Strict SemVer tooling uses `2.8.3` because leading zeroes are not allowed in numeric SemVer components. The public CalcNova product version remains `2.8.03`.
+
+## Documentation source-of-truth rules
+
+Use these files when resolving conflicting wording:
+
+1. `PROJECT_STATE.md` for completion status;
+2. `Directory.Build.props` and [VERSIONING.md](VERSIONING.md) for release version identity;
+3. actual `src/CalcNova.*` project files for target frameworks/platform metadata;
+4. `.github/workflows/build-*.yml` and `.github/workflows/release.yml` for automated build/release commands;
+5. [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) for platform source status;
+6. [BUILDING.md](BUILDING.md) for developer build instructions;
+7. [RELEASE.md](RELEASE.md) for release publication behavior;
+8. [VALIDATION_EVIDENCE.md](VALIDATION_EVIDENCE.md) for evidence-state semantics.
+
+When code or a workflow changes, update the corresponding documentation in the same maintenance change.
 
 ## Evidence note
 
 A runtime/platform check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 2.8.03 implementation is an unfinished project.
+
+Use the vocabulary:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
 
 ## External project links
 
