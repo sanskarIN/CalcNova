@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -16,6 +17,20 @@ EXPECTED_PROPERTIES = {
     "NuGetAuditMode": "all",
     "NuGetAuditLevel": "moderate",
 }
+AUDIT_WARNING_CODES = {"NU1901", "NU1902", "NU1903", "NU1904"}
+SUPPRESSION_PROPERTIES = {"NoWarn", "WarningsNotAsErrors"}
+
+
+def _local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+def _warning_tokens(value: str) -> set[str]:
+    return {
+        token.upper()
+        for token in re.split(r"[;,\s]+", value)
+        if token and not token.startswith("$(")
+    }
 
 
 def validate(root: Path) -> list[str]:
@@ -30,9 +45,15 @@ def validate(root: Path) -> list[str]:
         return [f"Invalid XML in {BUILD_PROPS}: {exception}"]
 
     values: dict[str, list[str]] = {name: [] for name in EXPECTED_PROPERTIES}
+    suppressed_audit_codes: set[str] = set()
+
     for element in tree.getroot().iter():
-        if element.tag in values:
-            values[element.tag].append((element.text or "").strip())
+        name = _local_name(element.tag)
+        text = (element.text or "").strip()
+        if name in values:
+            values[name].append(text)
+        if name in SUPPRESSION_PROPERTIES:
+            suppressed_audit_codes.update(_warning_tokens(text) & AUDIT_WARNING_CODES)
 
     for name, expected in EXPECTED_PROPERTIES.items():
         observed = values[name]
@@ -47,19 +68,11 @@ def validate(root: Path) -> list[str]:
                 f"{BUILD_PROPS} must set {name}={expected}; found {observed[0] or '<empty>'}"
             )
 
-    source = path.read_text(encoding="utf-8")
-    forbidden_markers = (
-        "<NuGetAudit>false</NuGetAudit>",
-        "<NuGetAuditMode>direct</NuGetAuditMode>",
-        "<WarningsNotAsErrors>NU1901",
-        "<NoWarn>NU1901",
-        "<NoWarn>NU1902",
-        "<NoWarn>NU1903",
-        "<NoWarn>NU1904",
-    )
-    for marker in forbidden_markers:
-        if marker in source:
-            failures.append(f"{BUILD_PROPS} contains forbidden NuGet-audit weakening marker: {marker}")
+    if suppressed_audit_codes:
+        failures.append(
+            f"{BUILD_PROPS} must not suppress NuGet audit warnings through NoWarn/WarningsNotAsErrors: "
+            + ", ".join(sorted(suppressed_audit_codes))
+        )
 
     return failures
 
