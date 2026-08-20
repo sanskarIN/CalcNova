@@ -67,11 +67,11 @@ The integrated preflight is intentionally broader than any one focused workflow.
 - Desktop/Browser/Android/iOS build-workflow contracts;
 - CodeQL/dependency-review/focused-security workflow contracts;
 - repository-level NuGet dependency-security policy contracts;
-- the Source Preflight workflow's own trigger/least-privilege/execution contract;
+- the Source Preflight workflow's own always-run PR/push, least-privilege, concurrency, and execution contract;
 - exact-tag unsigned iOS simulator release-workflow contracts;
 - tag-first release workflow contracts;
 - six-target x64/ARM64 desktop release publication contracts;
-- release least-privilege and artifact-provenance contracts;
+- release filename/checksum/provenance/least-privilege contracts;
 - release documentation/evidence contracts;
 - artifact-manifest and SHA-256 integrity infrastructure;
 - machine-readable release-evidence model, runner, verifier, and infrastructure.
@@ -167,36 +167,52 @@ The SDK-independent validator only verifies policy source. The actual online vul
 
 ## Source Preflight workflow trigger contract
 
-`.github/workflows/source-preflight.yml` runs the integrated command for relevant pushes and pull requests and supports manual dispatch.
+`.github/workflows/source-preflight.yml` now runs on **every** push to `main` and **every** pull request targeting `main`, plus manual dispatch.
 
-The workflow deliberately watches the broad repository surfaces the preflight can inspect:
+It intentionally has **no** `paths` or `paths-ignore` filters. This makes `Source Preflight / source-preflight` suitable for use as a required branch-protection check: a documentation-only, metadata-only, or otherwise unusual pull request cannot omit the check merely because its files fall outside a path list.
 
-- `src/**`;
-- `tests/**`;
-- `tools/**`;
-- `docs/**`;
-- `packaging/**`;
-- `.github/workflows/**`;
-- release/build root metadata such as the solution, SDK/package/build properties, README/changelog/project-state/checkpoint files, and `.gitignore`.
+The workflow remains least-privilege:
 
-The workflow remains least-privilege with `contents: read` and runs the preflight on Ubuntu with the pinned Python setup used by the repository.
+```yaml
+permissions:
+  contents: read
+```
 
-This workflow contract is itself protected by:
+It also cancels superseded runs through a workflow/ref concurrency group, reducing unnecessary CI work when a branch receives multiple rapid updates.
+
+This always-run workflow contract is itself protected by:
 
 ```bash
 python tools/validate_source_preflight_workflow.py .
 python -m unittest tools.tests.test_validate_source_preflight_workflow
 ```
 
-Those checks are also part of `tools/release_preflight.py`, so narrowing the master gate or making it unnecessarily privileged becomes a source-preflight failure.
+The validator requires:
+
+- push to `main`;
+- pull requests targeting `main`;
+- manual dispatch;
+- no path filters;
+- read-only repository contents permission;
+- concurrency cancellation;
+- Ubuntu execution;
+- Python 3.13 setup;
+- the integrated `python tools/release_preflight.py` command;
+- rejection of `pull_request_target` and repository/Actions write privileges.
+
+Those checks are also part of `tools/release_preflight.py`, so narrowing the master gate, making it path-filtered, or making it unnecessarily privileged becomes a source-preflight failure.
+
+## Branch-protection readiness
+
+The always-run Source Preflight change is a source prerequisite for reliable branch protection, but branch protection itself is a GitHub repository setting rather than a file in the source tree.
+
+See [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md) for the observed repository state, recommended required checks, and the external setting that still needs to be enabled in GitHub.
 
 ## Focused CI workflows
 
-Specialized workflows remain in place because they provide narrower failure signals and path filtering. Focused gates cover keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bivariate statistics, bounded exports, headless UI setup/execution, focus/accessibility/adaptive/touch contracts, localization, settings/converter preferences, packaging/platform workflows, dynamic controls accessibility, security automation/dependency policy, iOS release-tag validation, artifact integrity, structured release evidence, and release workflow/documentation contracts.
+Specialized workflows remain in place because they provide narrower failure signals and useful path filtering. Focused gates cover keyboard/calculator editing, graph interaction/presentation/numerical budgets, Unicode metadata, exact rationals, engineering notation, bivariate statistics, bounded exports, headless UI setup/execution, focus/accessibility/adaptive/touch contracts, localization, settings/converter preferences, packaging/platform workflows, dynamic controls accessibility, security automation/dependency policy, iOS release-tag validation, artifact integrity, structured release evidence, and release workflow/documentation contracts.
 
-The engineering focused gate watches its core formatter/tests, App view model/panel/tests, validator, and validator tests so its input-budget contract cannot be changed through an unwatched App path.
-
-The integrated workflow is an additional cross-contract gate, not a replacement for focused checks.
+The integrated Source Preflight is different: it is intentionally always present on pull requests so it can act as a stable required policy check.
 
 ## Headless UI distinction
 
@@ -209,8 +225,9 @@ It does **not** execute `Avalonia.Headless.XUnit` tests because that requires th
 Artifact integrity, release provenance, and release evidence are separate but complementary contracts:
 
 - artifact tooling generates/verifies manifests with SHA-256 checks and repository/commit identity safeguards;
+- the stable release workflow validates flat release filenames and generates a download-friendly basename checksum manifest;
 - the stable release workflow generates GitHub provenance attestations for the prepared `release-assets/**/*` tree;
-- `tools/validate_release_workflow.py` verifies the global read-only default, job-scoped `contents: write` / `id-token: write` / `attestations: write` / `artifact-metadata: write` permissions, attestation action, inclusive subject glob, and publication ordering;
+- `tools/validate_release_workflow.py` verifies filename guards, flat checksum behavior, the global read-only default, job-scoped `contents: write` / `id-token: write` / `attestations: write` / `artifact-metadata: write` permissions, attestation action, inclusive subject glob, and publication ordering;
 - structured release evidence records whether commands actually passed, failed, were blocked, or were not run;
 - source validation verifies that those toolchains and their tests remain present and wired correctly.
 
@@ -228,22 +245,23 @@ A successful source preflight validates deterministic repository contracts. It d
 - Windows/macOS/Linux packaging tools;
 - CodeQL's GitHub-hosted analysis service;
 - GitHub dependency-review service evaluation;
+- GitHub branch-protection/ruleset enforcement;
 - GitHub artifact-attestation execution;
 - signing/notarization/provisioning tools;
 - screen readers or accessibility inspection tools.
 
-Those checks are external execution evidence. They are recorded only when actually run and observed.
+Those checks are external execution/settings evidence. They are recorded only when actually run, observed, or enabled.
 
 An environment-specific `NOT RUN` or `BLOCKED` result does **not** change the completed implementation status of CalcNova 2.8.03; it only records whether that external verification operation executed in that environment.
 
-See [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md), [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md), [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md), [FOCUS_VISIBILITY.md](FOCUS_VISIBILITY.md), and [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
+See [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md), [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md), [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md), [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md), [FOCUS_VISIBILITY.md](FOCUS_VISIBILITY.md), and [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
 
 ## Failure behavior
 
 The preflight runs every configured source check so one invocation can surface multiple independent problems. It exits non-zero if any check fails.
 
-Fix concrete failures and rerun the command. Source-level success is one evidence layer; external compiled/platform/security-service/NuGet-audit evidence remains independently recorded.
+Fix concrete failures and rerun the command. Source-level success is one evidence layer; external compiled/platform/security-service/NuGet-audit/repository-setting evidence remains independently recorded.
 
 ## Current completion note
 
-CalcNova 2.8.03 is the completed product baseline. The source preflight protects its source, documentation, dependency-security policy, security automation, release identity/provenance, and completion-status contracts against regression.
+CalcNova 2.8.03 is the completed product baseline. The source preflight protects its source, documentation, dependency-security policy, security automation, release identity/integrity/provenance, and completion-status contracts against regression.
