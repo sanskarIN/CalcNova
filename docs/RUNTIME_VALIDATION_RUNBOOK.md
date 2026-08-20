@@ -1,6 +1,8 @@
-# CalcNova Runtime Validation Runbook
+# CalcNova 2.8.03 Runtime Validation Runbook
 
 Use this runbook only from a trusted checkout of the exact commit/tag being evaluated. Record the environment and the observed result for every command. Do not convert an unavailable or unobserved check into PASS.
+
+For platform prerequisites and exact project commands, use [BUILDING.md](BUILDING.md). For the release process, use [RELEASE.md](RELEASE.md).
 
 ## Evidence vocabulary
 
@@ -18,6 +20,9 @@ A workflow definition, source validator, test file, or package template is not r
 Record:
 
 ```text
+Product version: 2.8.03
+Normalized package version: 2.8.3
+Normalized release tag: v2.8.3
 Commit SHA:
 Branch/tag:
 Repository URL:
@@ -25,7 +30,7 @@ Validation date:
 Validator/operator:
 ```
 
-For release validation, use the exact release tag and verify it resolves to the expected commit before testing artifacts.
+For release validation, use the exact normalized release tag `v2.8.3` and verify that it resolves to the expected commit before testing artifacts.
 
 ## 2. SDK-independent source preflight
 
@@ -35,10 +40,10 @@ From the repository root:
 python tools/release_preflight.py
 ```
 
-For a release tag:
+For the CalcNova 2.8.03 release tag:
 
 ```bash
-python tools/release_preflight.py --tag v0.1.0
+python tools/release_preflight.py --tag v2.8.3
 ```
 
 Record the Python version and full command result.
@@ -51,6 +56,7 @@ Record the installed SDK:
 
 ```bash
 dotnet --info
+dotnet workload list
 ```
 
 Then run:
@@ -84,11 +90,15 @@ dotnet restore tests/CalcNova.App.Tests/CalcNova.App.Tests.csproj
 dotnet test tests/CalcNova.App.Tests/CalcNova.App.Tests.csproj --configuration Release --no-restore
 ```
 
-Current headless scenarios cover shared shell loading, Calculator command binding/selection editing, compact layout state, keyboard mode navigation, high contrast, onboarding, and graph keyboard viewport behavior.
+Current headless scenarios cover shared shell loading, Calculator command binding/selection editing, compact layout state, keyboard mode navigation, high contrast, onboarding, graph keyboard viewport behavior, and other shared-control regression contracts documented in [UI_AUTOMATION.md](UI_AUTOMATION.md).
 
 Record the exact failing test name and exception if any scenario fails.
 
 ## 5. Desktop validation
+
+The maintained Desktop head is `src/CalcNova.Desktop`.
+
+The current automated build matrix runs on Ubuntu, Windows, and macOS. The release workflow publishes self-contained artifacts for `win-x64`, `linux-x64`, and `osx-x64`.
 
 ### Windows
 
@@ -103,13 +113,15 @@ Run/build the Desktop head and verify:
 - high-DPI/text scaling;
 - keyboard focus visibility;
 - long graph/history/programmer surfaces;
-- release publish/package installation if Windows packaging is part of the candidate.
+- `win-x64` release publish;
+- Appx/MSIX packaging/install behavior if that packaging path is part of the candidate.
 
 ### Linux
 
 Verify the same shared workflows plus:
 
-- representative supported distribution/runtime dependencies;
+- `linux-x64` release publish;
+- representative target distribution/runtime dependencies;
 - clipboard integration;
 - `.desktop`/AppStream metadata where packaged;
 - chosen distributable package behavior.
@@ -118,7 +130,8 @@ Verify the same shared workflows plus:
 
 Verify the same shared workflows plus:
 
-- launch on intended architecture;
+- `osx-x64` release publish for the current automated release artifact;
+- launch on the intended test architecture;
 - clipboard/persistence;
 - keyboard conventions;
 - bundle metadata;
@@ -128,7 +141,9 @@ Record Windows, Linux, and macOS independently. Success on one Desktop OS is not
 
 ## 6. Browser/WebAssembly validation
 
-Run the Browser publish path with the required WebAssembly workload and verify in every browser claimed by the release:
+The maintained Browser head is `src/CalcNova.Browser` and requires the `wasm-tools` workload.
+
+Use the build path documented in [BUILDING.md](BUILDING.md), then verify in every browser claimed by the release:
 
 - application loads from the intended base path;
 - calculations work after startup;
@@ -138,15 +153,21 @@ Run the Browser publish path with the required WebAssembly workload and verify i
 - Ctrl+PageUp/PageDown/Home/End conflicts;
 - graph keyboard shortcut conflicts;
 - browser zoom and large-text behavior;
-- offline/cached behavior if the release claims it.
+- optional currency network/offline behavior;
+- offline/cached behavior only if the deployment claims it.
 
 Do not infer Browser storage behavior from native JSON repository tests.
 
 ## 7. Android validation
 
+The maintained Android head is `src/CalcNova.Android`, targets `net10.0-android`, uses minimum API 23, and CI uses JDK 17.
+
 On a supported Android emulator/device, verify:
 
-- Release build succeeds with the required workload/toolchain;
+- Android workload/toolchain restore/build succeeds;
+- application id is `in.sanskar.calcnova`;
+- display version is `2.8.03`;
+- numeric build code is `20803`;
 - application launches;
 - portrait and landscape layouts;
 - representative phone/tablet widths;
@@ -161,11 +182,20 @@ On a supported Android emulator/device, verify:
 - signed AAB only when external signing secrets are configured;
 - store pre-launch/report checks when preparing publication.
 
+A normal build and a production-signed AAB are separate evidence rows.
+
 Never place signing passwords/private keys in repository files or logs.
 
 ## 8. iOS validation
 
-The tag-time simulator workflow can validate unsigned simulator compilation for the exact release tag. For runtime/release evidence also verify, as applicable:
+The maintained iOS head is `src/CalcNova.iOS`, targets `net10.0-ios`, and declares minimum iOS platform version 15.0.
+
+The normal simulator build workflow chooses:
+
+- `iossimulator-arm64` on Apple Silicon runners;
+- `iossimulator-x64` on Intel runners.
+
+The exact-tag simulator workflow can validate unsigned simulator compilation for the selected release tag. For runtime/release evidence also verify, as applicable:
 
 - simulator launch;
 - physical-device launch;
@@ -179,11 +209,11 @@ The tag-time simulator workflow can validate unsigned simulator compilation for 
 - archive/export;
 - TestFlight/App Store processing.
 
-Simulator compilation alone is not App Store readiness.
+Simulator compilation alone is not App Store readiness. See [IOS_RELEASE_VALIDATION.md](IOS_RELEASE_VALIDATION.md).
 
 ## 9. Accessibility matrix
 
-Use `docs/ACCESSIBILITY_TEST_MATRIX.md` as the result ledger.
+Use [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md) as the result ledger.
 
 At minimum test representative workflows with:
 
@@ -222,7 +252,7 @@ Repeat the relevant checks for native and Browser storage rather than assuming o
 
 For every artifact intended for publication:
 
-- prove it came from the release tag;
+- prove it came from `v2.8.3` or the exact maintenance tag being evaluated;
 - record build runner/toolchain;
 - verify expected architecture/runtime identifier;
 - verify checksum;
@@ -231,11 +261,35 @@ For every artifact intended for publication:
 - verify no debug-only configuration or signing secret is embedded;
 - verify required notices/licenses are present.
 
-## 12. Final release evidence block
+For the 2.8.03 automated release workflow, expected artifact families are:
+
+- Windows `win-x64` desktop ZIP;
+- Linux `linux-x64` desktop ZIP;
+- macOS `osx-x64` desktop ZIP;
+- Browser/WebAssembly bundle;
+- signed Android AAB when signing secrets are configured;
+- generated SHA-256 checksum material.
+
+iOS exact-tag simulator validation is a separate validation path and is not represented as a signed App Store artifact.
+
+## 12. Security/privacy/documentation review
+
+Before release promotion, verify:
+
+- no secret/signing file is tracked;
+- privacy documentation matches current dependencies/network behavior;
+- platform/build documentation matches current project/workflow metadata;
+- security/support contacts are current;
+- release/version identity is consistent across project metadata and docs;
+- user-facing known limitations are documented without overstating evidence.
+
+## 13. Final release evidence block
 
 Use a record similar to:
 
 ```text
+Product: CalcNova 2.8.03 — COMPLETE
+Normalized tag: v2.8.3
 Source preflight: PASS / FAIL / BLOCKED / NOT RUN
 Restore: PASS / FAIL / BLOCKED / NOT RUN
 Format/analyzers: PASS / FAIL / BLOCKED / NOT RUN
@@ -254,4 +308,4 @@ Packaging/signing: PASS / FAIL / BLOCKED / NOT RUN
 Security/privacy/docs review: PASS / FAIL / BLOCKED / NOT RUN
 ```
 
-A stable tag/release should only be promoted after every release-required row has acceptable observed evidence and any known limitation is documented.
+A stable release should only be promoted after every release-required evidence row has an acceptable observed result and any known limitation is documented. This evidence discipline is separate from the completed 2.8.03 source/product classification.
