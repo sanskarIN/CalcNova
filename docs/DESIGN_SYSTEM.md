@@ -1,230 +1,313 @@
-# CalcNova Design System
+# CalcNova 2.8.03 Design System
 
-CalcNova should feel calm, precise, modern, and efficient rather than like a generic tutorial calculator. The design system exists to keep that quality consistent across modes and platforms.
+CalcNova's shared UI is designed to feel calm, precise, modern, efficient, and consistent across Desktop, Browser/WebAssembly, Android, and iOS.
+
+This document describes the implemented 2.8.03 design baseline and the rules future maintenance/enhancement work must preserve.
 
 ## Principles
 
-1. **Calculation first.** The current expression/result should always have clear visual priority.
-2. **Progressive disclosure.** Advanced tools are discoverable without overcrowding Standard mode.
-3. **Input confidence.** Pressed, focused, selected, disabled, and error states should be unambiguous.
-4. **Adaptive, not stretched.** Tablet/desktop layouts should use additional space meaningfully.
-5. **Accessible by default.** Typography, contrast, keyboard focus, semantics, and text scaling are design constraints.
-6. **Minimal interruption.** Support/about/promotional surfaces must never block calculation work.
+1. **Calculation first.** The active expression/result has clear visual priority.
+2. **Progressive disclosure.** Advanced modes remain discoverable without overcrowding ordinary calculator workflows.
+3. **Input confidence.** Focused, selected, disabled, error, and active states must be understandable.
+4. **Adaptive, not stretched.** Layout responds to available width rather than device-name assumptions.
+5. **Accessible by default.** Typography, interaction targets, focus, semantics, contrast, keyboard behavior, and text scaling are design constraints.
+6. **Color is not the only signal.** Programmer/graph/state information uses text, patterns, labels, grouping, or other redundant cues.
+7. **Minimal interruption.** About/support/donation/onboarding surfaces must not turn ordinary calculation into a promotional flow.
+8. **Local-first trust.** UI must make network-enhanced behavior distinguishable from offline calculation where relevant.
 
-## Layout scale
+## Shared interaction baseline
 
-Use a consistent spacing scale rather than arbitrary margins. Initial guidance:
+The shared Avalonia styles/contracts include:
+
+- 44-DIP minimum interaction height for common controls;
+- 54-DIP normal calculator-key height;
+- at least 50-DIP calculator-key height in compact mode;
+- explicit visible keyboard focus;
+- stronger focus/border treatment under CalcNova high contrast;
+- compact/medium/expanded shell classes;
+- focus bring-into-view behavior;
+- scrollable content for long/wide modes;
+- reduced-motion state;
+- keyboard mode navigation;
+- accessible automation labels for symbol-heavy controls.
+
+See [ACCESSIBILITY.md](ACCESSIBILITY.md) and [ADAPTIVE_LAYOUT.md](ADAPTIVE_LAYOUT.md).
+
+## Adaptive width profiles
+
+`AdaptiveLayoutProfile` is the source-level width classifier:
+
+```text
+Compact   <= 599 DIPs
+Medium     600–979 DIPs
+Expanded  >= 980 DIPs
+```
+
+The shell applies `compact`, `medium`, or `expanded` state from available layout width rather than checking a device model.
+
+Invalid/non-finite/non-positive width input falls back to the compact profile so uncertain measurement fails toward the safer narrow layout.
+
+### Compact
+
+Compact mode:
+
+- reduces non-essential shell spacing;
+- preserves shared interaction-target baselines;
+- keeps calculator keys touch-friendly;
+- uses denser mode/header spacing;
+- allows horizontal overflow where a wide control group cannot structurally fit;
+- keeps vertical scrolling available;
+- brings focused controls into view where supported.
+
+### Medium
+
+Medium mode gives additional working space while retaining a single shared application structure suitable for tablet/compact-window use.
+
+### Expanded
+
+Expanded mode uses wider workspace availability for desktop/tablet layouts without changing domain behavior.
+
+Long values, graph content, programmer grids, history/export content, and localized labels must wrap, scroll, or otherwise remain reachable rather than forcing the application beyond the viewport.
+
+## Spacing
+
+Use a consistent spacing scale rather than arbitrary margins. The shared design language follows a compact progression such as:
 
 ```text
 2  4  8  12  16  20  24  32  40  48
 ```
 
-Use tighter values for internal icon/text spacing and larger values for page/section separation.
+Smaller values suit icon/text or closely related controls; larger values separate sections/workspaces.
 
-## Radius scale
+New screens should reuse existing application resources/styles before introducing one-off dimensions.
 
-Recommended semantic radius levels:
+## Radius and surfaces
 
-- small: compact chips/inline controls;
-- medium: ordinary buttons/fields;
-- large: cards/panels;
-- extra-large: sheets/major surfaces when appropriate.
+Use semantic corner/surface treatment consistently:
 
-Exact pixel values should live in reusable Avalonia resources once the component library is established.
+- small radius for compact inline controls;
+- medium radius for ordinary controls;
+- larger radius for cards/major surfaces where the existing UI language calls for it.
 
-## Typography
+Do not duplicate arbitrary hard-coded values across feature views when a shared resource/style can express the same role.
 
-Typography hierarchy should cover:
+## Typography hierarchy
 
-- display/result;
-- expression;
-- page title;
+The UI should maintain recognizable roles for:
+
+- primary result/display;
+- expression/input;
+- page/mode title;
 - section title;
-- body;
-- secondary/metadata;
-- button/key label;
-- code/programmer bit labels.
+- body text;
+- secondary/metadata text;
+- button/key labels;
+- programmer/code/bit representations.
 
-Results must remain legible at large text sizes and should adapt/wrap/scroll rather than clip silently.
+Results and metadata must remain readable under long values and text scaling. Wrapping/scrolling/adaptive structure is preferred to silent clipping.
 
 ## Semantic colors
 
-Define resource tokens for roles rather than hard-coding feature-specific colors:
+Color should express roles rather than feature-specific arbitrary values.
+
+Relevant semantic roles include:
 
 - background;
 - surface;
 - raised surface;
-- primary text;
-- secondary text;
+- primary/secondary text;
 - border/divider;
-- accent;
-- accent foreground;
-- error;
-- warning;
-- success;
+- accent/accent foreground;
+- error/warning/success;
 - focus;
 - selected;
 - disabled.
 
-Graph series colors are a separate palette and must have non-color identifiers.
+Graph series use a separate presentation identity that includes deterministic non-color line patterns and a text legend so line color is never the only series identifier.
 
-## Theme support
+## Theme and accessibility state
 
-Required long-term themes:
+The application settings model includes persisted theme preference plus high-contrast and reduced-motion preferences.
 
-- Light;
-- Dark;
-- System.
+The default theme preference is system-driven. Shared UI state reacts to theme/accessibility settings rather than treating them as unrelated per-view styling.
 
-Possible later options:
+Theme/accessibility changes must not reduce focus visibility, interaction-target size, or semantic clarity.
 
-- AMOLED dark;
-- high-contrast preset;
-- user accent selection.
+Platform-specific theme/high-contrast rendering remains runtime evidence and should be tested on representative targets.
 
-Theme changes must not reduce text/focus contrast.
+## Calculator interaction design
 
-## Core reusable controls
+Calculator controls preserve:
 
-Planned reusable components include:
+- consistent key sizing;
+- semantic labels/automation names;
+- keyboard equivalence where appropriate;
+- expression editing with caret/selection behavior;
+- explicit paste/copy actions;
+- clear result/error presentation;
+- memory/percentage/repeated-equals workflows without changing expression-language semantics.
 
-### CalcButton
+Operators and scientific functions may be visually grouped, but grouping must not depend only on color.
 
-Primary calculator key with consistent sizing, focus/pressed semantics, automation/accessibility name, and responsive layout behavior.
+See [CALCULATOR_EDITING.md](CALCULATOR_EDITING.md) and [CALCULATOR_KEYBOARD_INPUT.md](CALCULATOR_KEYBOARD_INPUT.md).
 
-### FunctionButton
+## Programmer presentation
 
-Scientific/programmer function key with denser visual weight than digits but equal accessibility quality.
+Programmer mode uses structural/textual redundancy:
 
-### ModeChip
+- synchronized radix text;
+- fixed-width bit patterns;
+- interactive bit cells with state-aware accessible labels;
+- grouping for large word sizes;
+- signed/unsigned textual interpretation;
+- explicit copy actions.
 
-Mode/angle/base selection control with explicit selected state.
+64/128-bit presentation must remain reachable under compact layouts rather than shrinking controls below shared target baselines.
 
-### ExpressionDisplay
+See [PROGRAMMER_MODE.md](PROGRAMMER_MODE.md).
 
-Editable mathematical expression surface with selection/cursor behavior and error preservation.
+## Graph presentation
 
-### ResultDisplay
+Graphing follows these design rules:
 
-High-priority result surface supporting long values, copy/reuse, and future exact/approximate indicators.
+- series identity is stable;
+- line differentiation is not color-only;
+- text legend remains synchronized with the visual graph;
+- focusable graph control exposes keyboard alternatives;
+- trace/sample/analysis text remains available;
+- numerical analysis is visibly approximate where appropriate;
+- CSV/SVG export remains an explicit user action.
 
-### HistoryItemView
+See [GRAPH_SERIES_PRESENTATION.md](GRAPH_SERIES_PRESENTATION.md) and [GRAPH_INTERACTION.md](GRAPH_INTERACTION.md).
 
-Expression/result/time/favorite actions without exposing implementation storage details.
+## Converter presentation
 
-### SectionCard
+Converter mode keeps offline fixed-unit behavior visually distinct from optional network-enhanced currency behavior.
 
-Reusable settings/about/converter grouping container.
+The fixed converter supports:
 
-### SettingsItemView
+- category/default-pair selection;
+- search and From/To assignment;
+- swap;
+- precision selection;
+- recents/favorites;
+- clear recents;
+- result copy;
+- local preference notice/state.
 
-Label/description/control pattern with keyboard and screen-reader semantics.
+See [CONVERTER_MODE.md](CONVERTER_MODE.md).
 
-### SupportCard
+## Onboarding
 
-Non-intrusive optional support surface. It must never interrupt calculations or imply payment is required.
+Onboarding is a short shared surface rather than a forced multi-page tour.
 
-### AdaptiveShell
+Design requirements include:
 
-Responsive mode navigation/workspace layout that changes structure at available-width thresholds.
+- explicit Skip/Start actions;
+- scrollability under large text/narrow height;
+- keyboard/shortcut containment while open;
+- predictable focus entry/restoration;
+- persisted completion;
+- ability to reopen the introduction from settings.
 
-The initial AdaptiveShell behavior is implemented through a shared width profile and root style classes. The current source breakpoints are:
+It must not obscure the application's privacy/local-first posture.
+
+See [ONBOARDING.md](ONBOARDING.md).
+
+## Support and donation surfaces
+
+Support/donation content is optional and must remain separate from core functionality.
+
+It must not:
+
+- block calculator use;
+- imply payment is required;
+- interrupt repeated calculation workflows;
+- disguise an external link as a calculator action.
+
+## Branding
+
+CalcNova has a repository-owned geometric brand mark generated without external image/font dependencies by:
 
 ```text
-Compact   <= 599 logical px
-Medium     600–979 logical px
-Expanded  >= 980 logical px
+tools/scripts/generate_brand_assets.py
 ```
 
-These breakpoints are based on available layout width, not device names. `AdaptiveLayoutProfile` is the source of truth for classification. The shell applies `compact`, `medium`, or `expanded` classes when its width changes.
+The mark combines a calculator/grid form with a restrained nova/spark motif.
 
-In compact mode:
+Generated asset targets include Browser/PWA icons and desktop packaging assets for Linux, Windows, and macOS. Platform-specific mobile resources are maintained through their platform source/packaging structure.
 
-- outer shell margin is reduced;
-- ordinary button padding is reduced without reducing common controls below the shared 44-pixel target baseline;
-- calculator keys remain at least 50 pixels tall;
-- tab headers use denser padding and a 44-pixel minimum width;
-- mode `ScrollViewer` containers enable horizontal scrolling as a safe fallback for still-wide control groups;
-- focus changes request bring-into-view behavior.
+Do not substitute copied/unlicensed third-party calculator branding.
 
-Horizontal scrolling is a safety fallback, not the final mobile design for every mode. Wide calculator/scientific/date grids and large programmer bit collections still require target-device structural review.
-
-## Calculator keys
-
-Keys need consistent:
-
-- minimum touch size;
-- pressed/hover/focus state;
-- typography;
-- semantic label;
-- spacing;
-- keyboard equivalence where appropriate.
-
-Operators/functions may use visual grouping but should not depend on color alone.
-
-## Responsive structure
-
-### Compact
-
-- expression/result at top;
-- keypad below;
-- mode navigation through compact selector/navigation;
-- history/settings as page/sheet;
-- temporary horizontal overflow fallback only where deeper reflow is not yet implemented.
-
-### Medium
-
-- larger keypad/work area;
-- optional secondary panel;
-- more scientific controls visible.
-
-### Expanded
-
-- persistent mode navigation;
-- main calculation workspace;
-- optional history/secondary pane;
-- keyboard hints where useful;
-- resizable content.
-
-Breakpoints should derive from available layout width rather than device model names.
+Brand assets should remain recognizable at small sizes, retain adequate contrast, and use source-controlled generation/metadata where practical.
 
 ## Motion
 
-Use motion to explain state/location changes, not as decoration.
+Motion should explain state/location changes rather than decorate routine calculation.
 
-- keep durations short;
-- respect reduced-motion preference where possible;
+Rules:
+
 - never delay startup artificially;
-- do not animate a result in a way that slows repeated calculation.
-
-## Icons and branding
-
-CalcNova's future logo should combine a clean calculator/grid idea with a restrained nova/spark motif. It must remain recognizable at small sizes and be original.
-
-Do not reuse another calculator app's icon or unlicensed brand assets.
+- never slow repeated calculation for animation;
+- do not encode essential meaning only in motion;
+- honor reduced-motion state for any future transitions that are not essential.
 
 ## Error states
 
 Errors should:
 
-- preserve expression text;
+- preserve useful expression/input context;
 - explain what can be corrected;
-- remain visually distinct without relying only on red;
+- remain distinguishable without relying only on red;
 - avoid raw exception/stack output;
-- avoid replacing the entire workspace.
+- avoid replacing the entire workspace unnecessarily;
+- remain accessible under keyboard/screen-reader/text-scaling workflows.
+
+## Localization design
+
+English and Hindi catalogs are part of the 2.8.03 baseline.
+
+Layouts must tolerate:
+
+- longer localized strings;
+- regional English/Hindi culture selection;
+- text scaling;
+- narrow widths;
+- no hard-coded layout assumptions tied to one language.
+
+See [LOCALIZATION.md](LOCALIZATION.md) and [LIVE_LOCALIZATION.md](LIVE_LOCALIZATION.md).
 
 ## Design review checklist
 
-Before merging a stable UI change, review:
+For a UI maintenance/enhancement change, review as applicable:
 
 - compact/medium/expanded widths;
-- light/dark themes;
-- keyboard focus;
-- text scaling;
+- Desktop/Browser/mobile composition impact;
+- light/dark/system theme behavior;
+- CalcNova high contrast;
+- reduced motion;
+- keyboard focus/order;
 - touch targets;
-- screen-reader labels;
-- long localized strings;
+- screen-reader semantics;
+- large text;
+- English/Hindi strings;
 - long expressions/results;
-- error states;
-- empty states;
-- hover/pressed/disabled states.
+- error/empty/loading/offline states;
+- hover/pressed/selected/disabled states;
+- non-color information redundancy;
+- clipboard/external-link behavior;
+- privacy/network distinction.
+
+Automated source/headless checks should be updated when a new deterministic design contract is introduced. Target-platform visual/accessibility behavior remains runtime evidence.
+
+## 2.8.03 classification
+
+- shared adaptive shell: **COMPLETE**;
+- interaction-target/focus baseline: **COMPLETE**;
+- theme/high-contrast/reduced-motion state: **COMPLETE**;
+- programmer non-color/grouped presentation: **COMPLETE**;
+- graph non-color/textual presentation: **COMPLETE**;
+- onboarding design baseline: **COMPLETE**;
+- repository-owned brand asset generation: **COMPLETE**.
+
+Future design changes are maintenance or optional refinement rather than missing 2.8.03 product requirements.
