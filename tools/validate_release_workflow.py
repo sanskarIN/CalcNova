@@ -43,7 +43,13 @@ def validate(root: Path) -> list[str]:
         'rm -f "$RUNNER_TEMP/calcnova-release.keystore"',
         'dotnet publish src/CalcNova.Desktop/CalcNova.Desktop.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true --output publish/${{ matrix.rid }}',
         'name: desktop-${{ matrix.rid }}',
-        'path: CalcNova-${{ matrix.rid }}.zip',
+        'CalcNova-${{ matrix.rid }}.zip',
+        'python tools/generate_sbom.py --assets src/CalcNova.Desktop/obj/project.assets.json --name CalcNova-${{ matrix.rid }} --output CalcNova-${{ matrix.rid }}.sbom.cdx.json',
+        'CalcNova-${{ matrix.rid }}.sbom.cdx.json',
+        'python tools/generate_sbom.py --assets src/CalcNova.Browser/obj/project.assets.json --name CalcNova-browser --output CalcNova-browser.sbom.cdx.json',
+        'CalcNova-browser.sbom.cdx.json',
+        'python tools/generate_sbom.py --assets src/CalcNova.Android/obj/project.assets.json --name CalcNova-android --output CalcNova-android.sbom.cdx.json',
+        'CalcNova-android.sbom.cdx.json',
         "permissions:\n  contents: read",
         "actions/attest@v4",
         "subject-path: release-assets/**/*",
@@ -78,6 +84,36 @@ def validate(root: Path) -> list[str]:
         failures.append(
             "Release tag/source-version consistency and tagged source preflight must run after tag checkout and before .NET validation."
         )
+
+    desktop_publish = source.find("      - name: Publish desktop")
+    desktop_sbom = source.find("      - name: Generate desktop CycloneDX SBOM", desktop_publish)
+    desktop_archive = source.find("      - name: Archive desktop artifact", desktop_publish)
+    desktop_upload = source.find("      - name: Upload desktop artifact", desktop_publish)
+    if not (
+        desktop_publish >= 0
+        and desktop_sbom > desktop_publish
+        and desktop_archive > desktop_sbom
+        and desktop_upload > desktop_archive
+    ):
+        failures.append("Desktop release publication must generate its CycloneDX SBOM before artifact upload.")
+
+    browser_publish = source.find("      - name: Publish Browser")
+    browser_sbom = source.find("      - name: Generate Browser CycloneDX SBOM", browser_publish)
+    browser_archive = source.find("      - name: Archive Browser artifact", browser_publish)
+    browser_upload = source.find("      - name: Upload Browser artifact", browser_publish)
+    if not (
+        browser_publish >= 0
+        and browser_sbom > browser_publish
+        and browser_archive > browser_sbom
+        and browser_upload > browser_archive
+    ):
+        failures.append("Browser release publication must generate its CycloneDX SBOM before artifact upload.")
+
+    android_publish = source.find("      - name: Publish signed Android App Bundle")
+    android_sbom = source.find("      - name: Generate Android CycloneDX SBOM", android_publish)
+    android_upload = source.find("      - name: Upload Android artifact", android_publish)
+    if not (android_publish >= 0 and android_sbom > android_publish and android_upload > android_sbom):
+        failures.append("Signed Android release publication must generate its CycloneDX SBOM before artifact upload.")
 
     publish_position = source.find("  publish-release:")
     publication_permissions = (
@@ -146,7 +182,7 @@ def main() -> int:
         return 1
 
     print(
-        "Validated tag/source version alignment, x64/ARM64 publication, flat checksum manifests, least-privilege provenance attestation, signing, and release publication contracts."
+        "Validated tag/source version alignment, x64/ARM64 publication, CycloneDX SBOM publication, flat checksum manifests, least-privilege provenance attestation, signing, and release publication contracts."
     )
     return 0
 
