@@ -119,6 +119,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             "tools.tests.test_validate_platform_workflows",
             "tools.tests.test_validate_security_workflows",
             "tools.tests.test_validate_dependency_security",
+            "tools.tests.test_generate_sbom",
             "tools.tests.test_artifact_manifest",
             "tools.tests.test_verify_artifact_manifest",
             "tools.tests.test_validate_artifact_integrity",
