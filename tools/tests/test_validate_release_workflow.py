@@ -46,6 +46,25 @@ class ReleaseWorkflowValidatorTests(unittest.TestCase):
         self.assertTrue({("ubuntu-latest", "linux-x64"), ("ubuntu-latest", "linux-arm64")} <= targets)
         self.assertTrue({("macos-latest", "osx-x64"), ("macos-latest", "osx-arm64")} <= targets)
 
+    def test_release_artifacts_include_cyclonedx_sboms(self) -> None:
+        source = RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn(
+            "python tools/generate_sbom.py --assets src/CalcNova.Desktop/obj/project.assets.json",
+            source,
+        )
+        self.assertIn("CalcNova-${{ matrix.rid }}.sbom.cdx.json", source)
+        self.assertIn(
+            "python tools/generate_sbom.py --assets src/CalcNova.Browser/obj/project.assets.json",
+            source,
+        )
+        self.assertIn("CalcNova-browser.sbom.cdx.json", source)
+        self.assertIn(
+            "python tools/generate_sbom.py --assets src/CalcNova.Android/obj/project.assets.json",
+            source,
+        )
+        self.assertIn("CalcNova-android.sbom.cdx.json", source)
+        self.assertGreaterEqual(source.count("actions/setup-python@v6"), 4)
+
     def test_release_provenance_uses_current_attest_action_and_scoped_permissions(self) -> None:
         source = RELEASE_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("permissions:\n  contents: read", source)
