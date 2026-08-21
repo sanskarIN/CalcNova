@@ -60,7 +60,8 @@ class GenerateSbomTests(unittest.TestCase):
 
         self.assertEqual(first, second)
         self.assertEqual("CycloneDX", first["bomFormat"])
-        self.assertEqual("1.5", first["specVersion"])
+        self.assertEqual("1.7", first["specVersion"])
+        self.assertEqual("https://cyclonedx.org/schema/bom-1.7.schema.json", first["$schema"])
         self.assertEqual("CalcNova.Desktop", first["metadata"]["component"]["name"])
         self.assertEqual("2.8.3", first["metadata"]["component"]["version"])
         self.assertEqual(["Package.A", "Package.B"], [item["name"] for item in first["components"]])
@@ -93,10 +94,29 @@ class GenerateSbomTests(unittest.TestCase):
         self.assertEqual("CalcNova-win-x64", sbom["metadata"]["component"]["name"])
         self.assertEqual("2.8.3", sbom["metadata"]["component"]["version"])
 
+    def test_unsupported_assets_format_is_rejected(self) -> None:
+        generator = load_generator()
+        assets = sample_assets()
+        assets["version"] = 4
+        with self.assertRaisesRegex(ValueError, "Unsupported project.assets.json format version"):
+            generator.build_sbom(assets)
+
     def test_invalid_assets_shape_is_rejected(self) -> None:
         generator = load_generator()
+        assets = sample_assets()
+        del assets["libraries"]
         with self.assertRaisesRegex(ValueError, "libraries"):
-            generator.build_sbom({"project": {}})
+            generator.build_sbom(assets)
+
+    def test_generator_metadata_records_assets_format_contract(self) -> None:
+        generator = load_generator()
+        sbom = generator.build_sbom(sample_assets())
+        properties = {
+            item["name"]: item["value"]
+            for item in sbom["metadata"]["properties"]
+        }
+        self.assertEqual("3", properties["calcnova:nuget-assets-format-version"])
+        self.assertEqual("2", properties["calcnova:sbom-generator-version"])
 
     def test_write_sbom_is_stable_json_with_trailing_newline(self) -> None:
         generator = load_generator()
@@ -111,6 +131,7 @@ class GenerateSbomTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertTrue(first.endswith("\n"))
         self.assertIn('"bomFormat": "CycloneDX"', first)
+        self.assertIn('"$schema": "https://cyclonedx.org/schema/bom-1.7.schema.json"', first)
 
 
 if __name__ == "__main__":
