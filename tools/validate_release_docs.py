@@ -24,9 +24,11 @@ REQUIRED_MARKERS: dict[str, tuple[str, ...]] = {
     ),
     "docs/ARTIFACT_PROVENANCE.md": (
         "# CalcNova Release Artifact Provenance",
-        "CycloneDX 1.5",
+        "CycloneDX 1.7",
+        "https://cyclonedx.org/schema/bom-1.7.schema.json",
         "tools/generate_sbom.py",
         ".sbom.cdx.json",
+        "top-level format version `3`",
         "tools/tests/test_generate_sbom.py",
         "actions/attest@v4",
         "artifact-metadata: write",
