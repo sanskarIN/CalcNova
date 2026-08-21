@@ -47,6 +47,10 @@ class ReleaseDocumentationValidatorTests(unittest.TestCase):
         self.assertIn("docs/SECURITY_AUTOMATION.md", validator.REQUIRED_MARKERS)
         provenance = validator.REQUIRED_MARKERS["docs/ARTIFACT_PROVENANCE.md"]
         security = validator.REQUIRED_MARKERS["docs/SECURITY_AUTOMATION.md"]
+        self.assertIn("CycloneDX 1.5", provenance)
+        self.assertIn("tools/generate_sbom.py", provenance)
+        self.assertIn(".sbom.cdx.json", provenance)
+        self.assertIn("tools/tests/test_generate_sbom.py", provenance)
         self.assertIn("sha256sum -c SHA256SUMS.txt", provenance)
         self.assertIn("artifact-metadata: write", provenance)
         self.assertIn("<NuGetAuditMode>all</NuGetAuditMode>", security)
