@@ -1,5 +1,129 @@
 # What Changed
 
+## Deterministic CycloneDX release SBOM hardening — 2026-08-21
+
+CalcNova 2.8.03 remains the completed product baseline. This continuation added a new post-completion software-supply-chain control: deterministic per-platform release SBOM generation, integrated validation, checksum/provenance coverage, and current documentation.
+
+### Deterministic CycloneDX generator added
+
+Added:
+
+- `tools/generate_sbom.py`;
+- `tools/tests/test_generate_sbom.py`.
+
+The generator is standard-library-only Python and reads the restored NuGet dependency graph from each platform project's `project.assets.json`. It emits deterministic CycloneDX **1.7** JSON and declares:
+
+```text
+https://cyclonedx.org/schema/bom-1.7.schema.json
+```
+
+The generated BOM records:
+
+- the CalcNova platform component and normalized package version;
+- restored NuGet package names and versions;
+- NuGet Package URLs (`pkg:nuget/...`);
+- NuGet SHA-512 package hashes when a valid restore hash is available;
+- direct and resolved transitive dependency edges available in the restore graph;
+- a deterministic UUIDv5 serial derived from release identity and package inventory;
+- generator and supported NuGet assets-format metadata.
+
+No wall-clock timestamp is emitted, so identical dependency metadata and release identity produce stable JSON rather than time-dependent output.
+
+### NuGet restore-format drift now fails closed
+
+NuGet explicitly documents `project.assets.json` as an implementation contract that can evolve rather than a permanently stable public data format. The generator therefore does not silently assume arbitrary future formats.
+
+It currently requires:
+
+- top-level assets format version `3`;
+- a `libraries` object;
+- a `targets` object;
+- a `project` object.
+
+An unexpected assets-format version aborts SBOM generation with an explicit review-required error. This turns future NuGet format drift into a visible release failure instead of risking an incomplete or misleading BOM.
+
+### Release workflow publishes SBOMs beside packages
+
+`.github/workflows/release.yml` now produces:
+
+- `CalcNova-win-x64.sbom.cdx.json`;
+- `CalcNova-win-arm64.sbom.cdx.json`;
+- `CalcNova-linux-x64.sbom.cdx.json`;
+- `CalcNova-linux-arm64.sbom.cdx.json`;
+- `CalcNova-osx-x64.sbom.cdx.json`;
+- `CalcNova-osx-arm64.sbom.cdx.json`;
+- `CalcNova-browser.sbom.cdx.json`;
+- `CalcNova-android.sbom.cdx.json` when signed Android publication is enabled.
+
+Desktop and Browser SBOMs are generated after platform publish and before workflow-artifact upload. The Android SBOM is generated only after the signed AAB is successfully produced.
+
+Because SBOMs are ordinary files in the existing release artifact tree, they inherit all current release-integrity controls:
+
+1. duplicate/reserved flat-filename validation;
+2. inclusion in `SHA256SUMS.txt` using published basenames;
+3. inclusion in the existing `actions/attest@v4` `release-assets/**/*` attestation subject set;
+4. upload to the GitHub Release beside the package they describe.
+
+### Release/source contracts strengthened
+
+Updated:
+
+- `tools/validate_release_workflow.py`;
+- `tools/tests/test_validate_release_workflow.py`;
+- `tools/release_preflight.py`;
+- `tools/tests/test_release_preflight.py`;
+- `tools/validate_release_docs.py`;
+- `tools/tests/test_validate_release_docs.py`.
+
+The release workflow validator now requires Desktop, Browser, and signed Android SBOM generation, expected `.sbom.cdx.json` filenames, and correct generation-before-upload ordering.
+
+The integrated SDK-independent preflight now executes:
+
+```text
+python -m unittest tools.tests.test_generate_sbom
+```
+
+and its inventory regression test requires that SBOM suite to remain integrated.
+
+The documentation validator now protects the CycloneDX 1.7 schema identity, generator path, SBOM filename convention, supported NuGet assets-format contract, and regression-test reference.
+
+### Documentation/state synchronized
+
+Updated:
+
+- `docs/ARTIFACT_PROVENANCE.md`;
+- `PROJECT_STATE.md`;
+- this live `what_changed.md` handoff.
+
+The provenance guide now explains package/SBOM pairing, deterministic output, fail-closed NuGet format handling, checksum and attestation coverage, JSON inspection, provenance verification, and evidence semantics.
+
+### Validation evidence
+
+A focused Python smoke execution of the committed generator logic observed `PASS` for:
+
+- deterministic output;
+- CycloneDX 1.7 schema identity;
+- package inventory;
+- direct/transitive dependency edges;
+- NuGet SHA-512 conversion;
+- rejection of an unsupported assets-format version.
+
+This focused result is not represented as a full repository preflight or release run.
+
+A fresh repository clone in the assistant container still could not resolve `github.com`, so the complete materialized repository preflight and .NET 10 restore/build/test sequence were not executed there. The available legacy commit-status surface also returned no statuses for the checked maintenance head; that is not interpreted as either GitHub Actions success or failure.
+
+Actual release-generated `.sbom.cdx.json` files, checksum verification against published downloads, GitHub attestations, NuGet advisory-query execution, compiled/runtime behavior, signing, and store processing remain evidence only after those operations actually run and are observed.
+
+### Version/status unchanged
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Mobile build code: `20803`
+- Application id: `in.sanskar.calcnova`
+- Product scope: **COMPLETE**
+- This continuation: **POST-COMPLETION SBOM / SUPPLY-CHAIN MAINTENANCE**
+
 ## Release checksum manifest hardening — 2026-08-20
 
 The stable release workflow received one additional integrity/usability fix after the NuGet-audit and attestation follow-up below.
