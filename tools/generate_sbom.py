@@ -14,8 +14,10 @@ from typing import Any
 from urllib.parse import quote
 
 
-CYCLONEDX_SPEC_VERSION = "1.5"
-SBOM_GENERATOR_VERSION = "1"
+CYCLONEDX_SPEC_VERSION = "1.7"
+CYCLONEDX_SCHEMA_URL = f"https://cyclonedx.org/schema/bom-{CYCLONEDX_SPEC_VERSION}.schema.json"
+SUPPORTED_ASSETS_FORMAT_VERSION = 3
+SBOM_GENERATOR_VERSION = "2"
 
 
 def _package_identity(library_key: str) -> tuple[str, str] | None:
@@ -65,16 +67,37 @@ def _project_version(assets: dict[str, Any]) -> str:
     return "0.0.0"
 
 
+def _validate_assets_contract(assets: dict[str, Any]) -> None:
+    format_version = assets.get("version")
+    if format_version != SUPPORTED_ASSETS_FORMAT_VERSION:
+        raise ValueError(
+            "Unsupported project.assets.json format version: "
+            f"expected {SUPPORTED_ASSETS_FORMAT_VERSION}, got {format_version!r}. "
+            "Review NuGet restore-format changes before updating the SBOM generator."
+        )
+
+    libraries = assets.get("libraries")
+    if not isinstance(libraries, dict):
+        raise ValueError("project.assets.json must contain a 'libraries' object")
+
+    targets = assets.get("targets")
+    if not isinstance(targets, dict):
+        raise ValueError("project.assets.json must contain a 'targets' object")
+
+    project = assets.get("project")
+    if not isinstance(project, dict):
+        raise ValueError("project.assets.json must contain a 'project' object")
+
+
 def build_sbom(
     assets: dict[str, Any],
     *,
     component_name: str | None = None,
     component_version: str | None = None,
 ) -> dict[str, Any]:
-    """Build a deterministic CycloneDX 1.5 JSON document from NuGet restore assets."""
-    libraries = assets.get("libraries")
-    if not isinstance(libraries, dict):
-        raise ValueError("project.assets.json must contain a 'libraries' object")
+    """Build a deterministic CycloneDX 1.7 JSON document from NuGet restore assets."""
+    _validate_assets_contract(assets)
+    libraries = assets["libraries"]
 
     name = component_name.strip() if component_name and component_name.strip() else _project_name(assets)
     version = (
@@ -116,51 +139,49 @@ def build_sbom(
 
     root_ref = f"pkg:generic/{quote(name, safe='')}@{quote(version, safe='')}"
     direct_names: set[str] = set()
-    project = assets.get("project")
-    if isinstance(project, dict):
-        frameworks = project.get("frameworks")
-        if isinstance(frameworks, dict):
-            for framework in frameworks.values():
-                if not isinstance(framework, dict):
-                    continue
-                dependencies = framework.get("dependencies")
-                if isinstance(dependencies, dict):
-                    direct_names.update(str(dep).casefold() for dep in dependencies)
+    project = assets["project"]
+    frameworks = project.get("frameworks")
+    if isinstance(frameworks, dict):
+        for framework in frameworks.values():
+            if not isinstance(framework, dict):
+                continue
+            dependencies = framework.get("dependencies")
+            if isinstance(dependencies, dict):
+                direct_names.update(str(dep).casefold() for dep in dependencies)
 
     dependency_edges: dict[str, set[str]] = {ref: set() for ref in package_refs.values()}
     direct_refs: set[str] = set()
-    targets = assets.get("targets")
-    if isinstance(targets, dict):
-        for target in targets.values():
-            if not isinstance(target, dict):
+    targets = assets["targets"]
+    for target in targets.values():
+        if not isinstance(target, dict):
+            continue
+
+        target_by_name: dict[str, str] = {}
+        for library_key, metadata in target.items():
+            if not isinstance(metadata, dict) or metadata.get("type") != "package":
                 continue
+            identity = _package_identity(library_key)
+            if identity is None:
+                continue
+            resolved_ref = package_refs.get(library_key.casefold())
+            if resolved_ref is not None:
+                target_by_name[identity[0].casefold()] = resolved_ref
+                if identity[0].casefold() in direct_names:
+                    direct_refs.add(resolved_ref)
 
-            target_by_name: dict[str, str] = {}
-            for library_key, metadata in target.items():
-                if not isinstance(metadata, dict) or metadata.get("type") != "package":
-                    continue
-                identity = _package_identity(library_key)
-                if identity is None:
-                    continue
-                resolved_ref = package_refs.get(library_key.casefold())
-                if resolved_ref is not None:
-                    target_by_name[identity[0].casefold()] = resolved_ref
-                    if identity[0].casefold() in direct_names:
-                        direct_refs.add(resolved_ref)
-
-            for library_key, metadata in target.items():
-                if not isinstance(metadata, dict) or metadata.get("type") != "package":
-                    continue
-                source_ref = package_refs.get(library_key.casefold())
-                if source_ref is None:
-                    continue
-                dependencies = metadata.get("dependencies")
-                if not isinstance(dependencies, dict):
-                    continue
-                for dependency_name in dependencies:
-                    dependency_ref = target_by_name.get(str(dependency_name).casefold())
-                    if dependency_ref is not None and dependency_ref != source_ref:
-                        dependency_edges[source_ref].add(dependency_ref)
+        for library_key, metadata in target.items():
+            if not isinstance(metadata, dict) or metadata.get("type") != "package":
+                continue
+            source_ref = package_refs.get(library_key.casefold())
+            if source_ref is None:
+                continue
+            dependencies = metadata.get("dependencies")
+            if not isinstance(dependencies, dict):
+                continue
+            for dependency_name in dependencies:
+                dependency_ref = target_by_name.get(str(dependency_name).casefold())
+                if dependency_ref is not None and dependency_ref != source_ref:
+                    dependency_edges[source_ref].add(dependency_ref)
 
     if direct_names and not direct_refs:
         # Some assets omit target-level package metadata. Fall back to matching the
@@ -181,6 +202,7 @@ def build_sbom(
     serial = uuid.uuid5(uuid.NAMESPACE_URL, f"https://github.com/sanskarIN/CalcNova#sbom:{serial_seed}")
 
     return {
+        "$schema": CYCLONEDX_SCHEMA_URL,
         "bomFormat": "CycloneDX",
         "specVersion": CYCLONEDX_SPEC_VERSION,
         "serialNumber": f"urn:uuid:{serial}",
@@ -195,6 +217,10 @@ def build_sbom(
             "properties": [
                 {"name": "calcnova:sbom-generator", "value": "tools/generate_sbom.py"},
                 {"name": "calcnova:sbom-generator-version", "value": SBOM_GENERATOR_VERSION},
+                {
+                    "name": "calcnova:nuget-assets-format-version",
+                    "value": str(SUPPORTED_ASSETS_FORMAT_VERSION),
+                },
             ],
         },
         "components": components,
@@ -222,7 +248,7 @@ def write_sbom(sbom: dict[str, Any], output: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Generate a deterministic CycloneDX 1.5 SBOM from a .NET project.assets.json file."
+        description="Generate a deterministic CycloneDX 1.7 SBOM from a .NET project.assets.json file."
     )
     parser.add_argument("--assets", required=True, type=Path, help="Path to project.assets.json")
     parser.add_argument("--output", required=True, type=Path, help="Output CycloneDX JSON path")
