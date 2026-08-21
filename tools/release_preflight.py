@@ -81,6 +81,7 @@ CHECKS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("Platform-workflow validator tests", ("-m", "unittest", "tools.tests.test_validate_platform_workflows")),
     ("Security-workflow validator tests", ("-m", "unittest", "tools.tests.test_validate_security_workflows")),
     ("Dependency-security validator tests", ("-m", "unittest", "tools.tests.test_validate_dependency_security")),
+    ("CycloneDX SBOM generator tests", ("-m", "unittest", "tools.tests.test_generate_sbom")),
     ("Artifact-manifest tests", ("-m", "unittest", "tools.tests.test_artifact_manifest")),
     ("Artifact-verifier tests", ("-m", "unittest", "tools.tests.test_verify_artifact_manifest")),
     ("Artifact-integrity validator tests", ("-m", "unittest", "tools.tests.test_validate_artifact_integrity")),
