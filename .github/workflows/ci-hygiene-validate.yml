@@ -1,0 +1,47 @@
+name: CI Hygiene Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - "tools/validate_ci_hygiene.py"
+      - "tools/tests/test_validate_ci_hygiene.py"
+      - "tools/release_preflight.py"
+      - "tools/tests/test_release_preflight.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - "tools/validate_ci_hygiene.py"
+      - "tools/tests/test_validate_ci_hygiene.py"
+      - "tools/release_preflight.py"
+      - "tools/tests/test_release_preflight.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-hygiene-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate CI hygiene
+        run: python tools/validate_ci_hygiene.py .
+
+      - name: Run CI hygiene regression tests
+        run: python -m unittest tools.tests.test_validate_ci_hygiene
