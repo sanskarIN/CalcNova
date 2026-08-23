@@ -28,7 +28,10 @@ jobs:
             docs/FEATURES.md docs/KEYBOARD_SHORTCUTS.md docs/ACCESSIBILITY.md
             docs/PRIVACY.md docs/SECURITY.md docs/TESTING.md docs/RELEASE.md
             docs/PLATFORM_SUPPORT.md docs/TROUBLESHOOTING.md docs/DESIGN_SYSTEM.md
-            docs/LOCALIZATION.md docs/ROADMAP.md
+            docs/LOCALIZATION.md docs/ROADMAP.md docs/SOURCE_PREFLIGHT.md
+            docs/BRANCH_PROTECTION.md docs/SECURITY_AUTOMATION.md
+            docs/ARTIFACT_PROVENANCE.md docs/CI_HYGIENE.md
+            docs/VALIDATION_EVIDENCE.md docs/RELEASE_READINESS_CHECKLIST.md
           )
           missing=0
           for file in "${required[@]}"; do
