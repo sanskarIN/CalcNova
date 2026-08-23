@@ -2,7 +2,7 @@
 
 CalcNova's source and CI gates are designed to protect the completed 2.8.03 baseline, but those checks only become merge enforcement when GitHub branch protection or a repository ruleset requires them.
 
-## Observed repository state — 2026-08-20
+## Observed repository state — 2026-08-23
 
 The GitHub branch metadata for `main` currently reports:
 
@@ -19,15 +19,17 @@ This is an external repository configuration state, not a missing CalcNova sourc
 
 Before documenting this external gap, CalcNova was hardened so the main policy check is safe to require:
 
-- `.github/workflows/source-preflight.yml` now runs on every pull request targeting `main`;
+- `.github/workflows/source-preflight.yml` runs on every pull request targeting `main`;
 - it also runs on every push to `main` and supports manual dispatch;
 - it has no `paths` or `paths-ignore` filters;
 - it uses read-only repository contents permission;
 - it cancels superseded runs;
 - `tools/validate_source_preflight_workflow.py` rejects path-filtered or privileged drift;
-- the validator and regression suite are part of the integrated preflight itself.
+- the validator and regression suite are part of the integrated preflight itself;
+- `tools/validate_ci_hygiene.py` now protects canonical .NET 10 CI workflows from starter-template and obsolete-action drift;
+- obsolete generic .NET 8 and WPF/MSIX starter workflows have been removed.
 
-The absence of path filters is important. GitHub required checks should be checks that reliably appear on every pull request; a required workflow that is skipped by path filters can leave a pull request waiting for a check that never starts.
+The absence of path filters on Source Preflight is important. GitHub required checks should be checks that reliably appear on every pull request; a required workflow that is skipped by path filters can leave a pull request waiting for a check that never starts.
 
 ## Recommended GitHub ruleset
 
@@ -67,7 +69,7 @@ Job:
 source-preflight
 ```
 
-This is the SDK-independent policy/integrity gate and is intentionally always present on pull requests.
+This is the SDK-independent policy/integrity gate and is intentionally always present on pull requests. It now includes the CI-hygiene validator and its regression suite through `tools/release_preflight.py`.
 
 ### Cross-platform core build/test gate
 
@@ -125,7 +127,7 @@ Require this check when GitHub exposes it as an eligible branch/ruleset status c
 
 Many CalcNova focused workflows use path filters intentionally. They are valuable diagnostic gates but should not automatically be made required status checks unless GitHub's configuration guarantees a successful neutral/skipped status for unchanged paths.
 
-Examples include feature-specific accessibility, graph, localization, packaging, and other focused validators.
+Examples include feature-specific accessibility, graph, localization, packaging, CI-hygiene, and other focused validators.
 
 The always-run Source Preflight exists to provide one stable policy check that covers those source contracts without requiring every path-filtered workflow independently.
 
@@ -163,9 +165,10 @@ Current source readiness:
 
 ```text
 Always-run Source Preflight source contract: COMPLETE
+CI workflow hygiene source contract: COMPLETE
 ```
 
-Current observed GitHub repository-setting state on 2026-08-20:
+Current observed GitHub repository-setting state on 2026-08-23:
 
 ```text
 main branch protection/ruleset enforcement: FAIL / NOT ENABLED
@@ -177,9 +180,12 @@ This repository-setting gap does not change CalcNova 2.8.03's completed product/
 
 - `.github/workflows/source-preflight.yml`
 - `.github/workflows/build-test.yml`
+- `.github/workflows/ci-hygiene-validate.yml`
 - `.github/workflows/codeql.yml`
 - `.github/workflows/dependency-review.yml`
 - `tools/validate_source_preflight_workflow.py`
+- `tools/validate_ci_hygiene.py`
 - [SOURCE_PREFLIGHT.md](SOURCE_PREFLIGHT.md)
+- [CI_HYGIENE.md](CI_HYGIENE.md)
 - [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md)
 - [SECURITY.md](SECURITY.md)
