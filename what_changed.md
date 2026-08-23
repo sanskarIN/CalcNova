@@ -1,5 +1,156 @@
 # What Changed
 
+## CI hygiene and stale workflow cleanup — 2026-08-23
+
+CalcNova 2.8.03 remains the completed product baseline. This continuation focused on post-completion CI correctness, repository hygiene, regression protection, governance documentation, and stale pull-request cleanup without changing the product version or redefining already completed feature scope.
+
+### Canonical GitHub Actions upgraded
+
+The active repository-wide workflows were updated to use the current checkout major:
+
+- `.github/workflows/build-test.yml` → `actions/checkout@v7`;
+- `.github/workflows/format.yml` → `actions/checkout@v7`;
+- `.github/workflows/docs-check.yml` → `actions/checkout@v7`.
+
+The Build and Test / Formatting workflows continue to use `actions/setup-dotnet@v6` and the repository's `.NET 10.0.x` baseline with explicit `CalcNova.slnx` restore/build/test/format commands.
+
+### Obsolete GitHub starter workflows removed
+
+Removed:
+
+- `.github/workflows/dotnet.yml`;
+- `.github/workflows/dotnet-desktop.yml`.
+
+The removed files were generic GitHub starter templates rather than CalcNova-specific CI:
+
+- the generic .NET workflow targeted .NET 8 and generic solution commands;
+- the desktop workflow targeted WPF/Windows Forms + Windows Application Packaging/MSIX;
+- it contained unresolved starter placeholders such as `your-solution-name`, `your-test-project-path`, `your-wap-project-directory-name`, and `your-wap-project-path`;
+- it required WAP signing/package secrets unrelated to CalcNova's Avalonia desktop release pipeline.
+
+Removing the templates prevents duplicate, misleading, or predictably failing checks and avoids preserving obsolete source merely to merge dependency-update pull requests against it.
+
+### CI hygiene source contract added
+
+Added:
+
+- `tools/validate_ci_hygiene.py`;
+- `tools/tests/test_validate_ci_hygiene.py`;
+- `.github/workflows/ci-hygiene-validate.yml`;
+- `docs/CI_HYGIENE.md`.
+
+`tools/validate_ci_hygiene.py` now protects:
+
+- presence and core commands of the canonical Build and Test, Formatting, and Documentation Check workflows;
+- `actions/checkout@v7` in those canonical workflows;
+- `actions/setup-dotnet@v6` plus `.NET 10.0.x` in canonical .NET workflows;
+- read-only repository contents permissions in the canonical workflows;
+- permanent absence of the retired generic `dotnet.yml` and `dotnet-desktop.yml` starter templates;
+- absence of known unresolved starter-template project-path markers across `.github/workflows`;
+- rejection of `actions/checkout` majors 1 through 5;
+- rejection of `actions/setup-dotnet` majors 1 through 5.
+
+The lower-bound action-major checks intentionally allow independently protected workflows that still use checkout v6 while preventing older v1-v5 drift.
+
+The regression suite covers the real repository, retired-template reintroduction, starter placeholders, obsolete checkout/setup-dotnet majors, and canonical .NET SDK downgrade.
+
+### Integrated Source Preflight strengthened
+
+`tools/release_preflight.py` now runs:
+
+```text
+tools/validate_ci_hygiene.py
+```
+
+and:
+
+```text
+python -m unittest tools.tests.test_validate_ci_hygiene
+```
+
+`tools/tests/test_release_preflight.py` now requires both the CI-hygiene validator and its regression module in the integrated inventory so this maintenance protection cannot silently disappear.
+
+The focused `.github/workflows/ci-hygiene-validate.yml` watches workflow/preflight hygiene source, uses read-only contents permission, runs on relevant pushes/pull requests, supports manual dispatch, cancels superseded runs, and executes both the validator and regression suite.
+
+### Required documentation protection expanded
+
+`.github/workflows/docs-check.yml` now treats the following maintenance/governance/release-evidence guides as mandatory non-empty repository documents in addition to the existing documentation baseline:
+
+- `docs/SOURCE_PREFLIGHT.md`;
+- `docs/BRANCH_PROTECTION.md`;
+- `docs/SECURITY_AUTOMATION.md`;
+- `docs/ARTIFACT_PROVENANCE.md`;
+- `docs/CI_HYGIENE.md`;
+- `docs/VALIDATION_EVIDENCE.md`;
+- `docs/RELEASE_READINESS_CHECKLIST.md`.
+
+This closes the earlier gap where important post-completion security/governance guides existed but were not part of the mandatory-document gate.
+
+### Branch-protection evidence refreshed
+
+The GitHub branch metadata was checked again on 2026-08-23. It still reports:
+
+```text
+protected: false
+required status checks: enforcement off
+```
+
+`docs/BRANCH_PROTECTION.md` now records the 2026-08-23 observation, includes the CI-hygiene source contract, and keeps the same conservative recommendation: use the always-run Source Preflight plus Build and Test / Dependency Review / CodeQL checks as appropriate after a GitHub ruleset is actually enabled.
+
+The new focused CI-hygiene workflow is path-filtered by design and therefore is not recommended as a blindly required status check; its contract is already included in the always-run Source Preflight.
+
+No branch-protection PASS is claimed because the repository setting remains disabled.
+
+### Stale pull-request queue cleaned
+
+All previously open CalcNova pull requests were reviewed and then closed as superseded rather than merged into the completed/current `main` state:
+
+- PR #1 — checkout v7 Dependabot update: active canonical workflows were updated directly and obsolete target templates were removed;
+- PR #2 — upload-artifact v7 Dependabot update: only targeted the removed WPF/MSIX starter template;
+- PR #3 — setup-msbuild v3 Dependabot update: only targeted the removed WPF/MSIX starter template;
+- PR #4 — setup-dotnet v6 Dependabot update: canonical CalcNova workflows already use setup-dotnet v6 / .NET 10, while its old template targets were removed;
+- PR #6 — old 150-commit baseline integration PR: closed as superseded by the completed `main` baseline and later maintenance; it was based on older source and reported non-mergeable.
+
+Each pull request received a supersession note before closure. The repository was then re-queried and returned no open pull requests.
+
+### Commits created in this continuation
+
+This pass intentionally used small, independent commits:
+
+1. `f4c27b74cfc2c38cc133d070194aa568ad303183` — `ci: upgrade build checkout action to v7`
+2. `533343c772cfa8ad976021771d6d58f0d41fb35e` — `ci: upgrade formatting checkout action to v7`
+3. `3858f75a3052b8a3e8b7d312b04fdf4a566a3c60` — `ci: upgrade documentation checkout action to v7`
+4. `eb4e6aaa2bc4516fdc49a41fa61f505837a1e17a` — `ci: remove obsolete .NET 8 template workflow`
+5. `0e85b9a47666e6a1f95fec986fabf058dc75d602` — `ci: remove obsolete WPF MSIX template workflow`
+6. `50fb53a7d5c20fefd8014d653f6cf20241dc0e8a` — `ci: add workflow hygiene validator`
+7. `66dcd2b331c661dcc6f9dbf81185225b6c27e113` — `test: cover CI hygiene validator`
+8. `188fb011bad223c93349952607c6d7a9a0b24fcf` — `ci: add focused workflow hygiene gate`
+9. `3c7f74df987ea41630f3ab72b395ecdbc2563853` — `ci: integrate workflow hygiene into source preflight`
+10. `73cc7b626252748277d060ff1b50ad9249079925` — `test: require CI hygiene in integrated preflight`
+11. `fba213afe98ba740df37ceb273b400f054f67ea5` — `docs: document CI workflow hygiene policy`
+12. `b6f88b1c1cc8e09670487fce8cf6b8ccf9fdc937` — `docs: protect maintenance and governance guides`
+13. `a567aae56b2a4c32f4334328e3cecb4fbffc5423` — `docs: refresh branch protection evidence`
+
+This `what_changed.md` synchronization is an additional dedicated handoff commit after those source/documentation commits.
+
+### Validation/evidence status
+
+Repository source inspection found no remaining indexed `checkout@v4`, `setup-dotnet@v4`, or `setup-dotnet@v5` references after the stale templates were removed. The focused source validator and regression source are committed and integrated into the preflight inventory.
+
+A fresh local clone was attempted again from the assistant container. DNS resolution for `github.com` still failed, so the complete materialized repository preflight and .NET restore/build/test sequence were not executed in that container.
+
+No GitHub Actions, CodeQL, Dependency Review, release, signing, device, or store PASS is inferred merely from source changes. Hosted/runtime evidence remains `PASS`, `FAIL`, `BLOCKED`, or `NOT RUN` only when an actual execution result is observed.
+
+### Version/status unchanged
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Mobile build code: `20803`
+- Application id: `in.sanskar.calcnova`
+- Product scope: **COMPLETE**
+- This continuation: **POST-COMPLETION CI / GOVERNANCE / REPOSITORY-HYGIENE MAINTENANCE**
+
 ## Deterministic CycloneDX release SBOM hardening — 2026-08-21
 
 CalcNova 2.8.03 remains the completed product baseline. This continuation added a new post-completion software-supply-chain control: deterministic per-platform release SBOM generation, integrated validation, checksum/provenance coverage, and current documentation.
