@@ -102,7 +102,7 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path "publish/${{ matrix.rid }}/*" -DestinationPath "CalcNova-${{ matrix.rid }}.zip"
       - name: Upload desktop artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: desktop-${{ matrix.rid }}
           path: |
@@ -133,7 +133,7 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path "publish/browser/*" -DestinationPath "CalcNova-browser.zip"
       - name: Upload Browser artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: browser
           path: |
@@ -199,7 +199,7 @@ jobs:
         run: python tools/generate_sbom.py --assets src/CalcNova.Android/obj/project.assets.json --name CalcNova-android --output CalcNova-android.sbom.cdx.json
       - name: Upload Android artifact
         if: steps.signing.outputs.configured == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android
           path: |
