@@ -4,16 +4,20 @@
 from __future__ import annotations
 
 import argparse
+from datetime import date
 import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+try:
+    from tools.release_identity import load_release_identity
+except ModuleNotFoundError:  # Direct execution via `python tools/validate_packaging_metadata.py`.
+    from release_identity import load_release_identity
+
+
 APP_ID = "in.sanskar.calcnova"
 APP_NAME = "CalcNova"
-DISPLAY_VERSION = "2.8.03"
-SEMVER_VERSION = "2.8.3"
-MOBILE_BUILD_CODE = "20803"
 
 
 def read(path: Path, failures: list[str]) -> str:
@@ -28,15 +32,26 @@ def require(source: str, marker: str, label: str, failures: list[str]) -> None:
         failures.append(f"{label} is missing required marker: {marker}")
 
 
-def parse_xml(path: Path, failures: list[str]) -> None:
+def parse_xml(path: Path, failures: list[str]) -> ET.ElementTree | None:
     try:
-        ET.parse(path)
+        return ET.parse(path)
     except (ET.ParseError, OSError) as exception:
         failures.append(f"Invalid XML in {path}: {exception}")
+        return None
 
 
 def validate(root: Path) -> list[str]:
     failures: list[str] = []
+
+    try:
+        identity = load_release_identity(root)
+    except ValueError as exception:
+        failures.append(str(exception))
+        return failures
+
+    display_version = identity.display_version
+    semver_version = identity.semver_version
+    mobile_build_code = identity.mobile_build_code
 
     build_props_path = root / "Directory.Build.props"
     android_path = root / "src" / "CalcNova.Android" / "CalcNova.Android.csproj"
@@ -61,20 +76,20 @@ def validate(root: Path) -> list[str]:
     windows_manifest = read(windows_manifest_path, failures)
 
     for marker in (
-        f"<ProductDisplayVersion>{DISPLAY_VERSION}</ProductDisplayVersion>",
-        f"<Version>{SEMVER_VERSION}</Version>",
-        f"<VersionPrefix>{SEMVER_VERSION}</VersionPrefix>",
-        f"<PackageVersion>{SEMVER_VERSION}</PackageVersion>",
-        f"<AssemblyVersion>{SEMVER_VERSION}.0</AssemblyVersion>",
-        f"<FileVersion>{SEMVER_VERSION}.0</FileVersion>",
-        f"<InformationalVersion>{DISPLAY_VERSION}</InformationalVersion>",
+        f"<ProductDisplayVersion>{display_version}</ProductDisplayVersion>",
+        f"<Version>{semver_version}</Version>",
+        f"<VersionPrefix>{semver_version}</VersionPrefix>",
+        f"<PackageVersion>{semver_version}</PackageVersion>",
+        f"<AssemblyVersion>{identity.assembly_version}</AssemblyVersion>",
+        f"<FileVersion>{identity.assembly_version}</FileVersion>",
+        f"<InformationalVersion>{display_version}</InformationalVersion>",
     ):
         require(build_props, marker, "Directory.Build.props", failures)
 
     for label, source in (("Android project", android), ("iOS project", ios_project)):
         require(source, f"<ApplicationId>{APP_ID}</ApplicationId>", label, failures)
         require(source, f"<ApplicationTitle>{APP_NAME}</ApplicationTitle>", label, failures)
-        require(source, f"<ApplicationVersion>{MOBILE_BUILD_CODE}</ApplicationVersion>", label, failures)
+        require(source, f"<ApplicationVersion>{mobile_build_code}</ApplicationVersion>", label, failures)
         require(
             source,
             "<ApplicationDisplayVersion>$(ProductDisplayVersion)</ApplicationDisplayVersion>",
@@ -95,18 +110,34 @@ def validate(root: Path) -> list[str]:
     require(linux_desktop, f"Icon={APP_ID}", "Linux desktop entry", failures)
     require(linux_meta, f"<id>{APP_ID}</id>", "Linux AppStream metadata", failures)
     require(linux_meta, "<name>CalcNova</name>", "Linux AppStream metadata", failures)
-    require(
-        linux_meta,
-        f'<release version="{DISPLAY_VERSION}" date="2026-08-19" type="stable">',
-        "Linux AppStream metadata",
-        failures,
-    )
-    require(
-        linux_meta,
-        f"CalcNova {DISPLAY_VERSION} completed cross-platform product baseline.",
-        "Linux AppStream metadata",
-        failures,
-    )
+
+    linux_tree = parse_xml(linux_meta_path, failures) if linux_meta_path.is_file() else None
+    if linux_tree is not None:
+        matching_releases = [
+            release
+            for release in linux_tree.getroot().findall("./releases/release")
+            if release.attrib.get("version") == display_version
+        ]
+        if len(matching_releases) != 1:
+            failures.append(
+                f"Linux AppStream metadata must contain exactly one release entry for {display_version}."
+            )
+        else:
+            release = matching_releases[0]
+            if release.attrib.get("type") != "stable":
+                failures.append(f"Linux AppStream {display_version} release must be type=stable.")
+            release_date = release.attrib.get("date", "")
+            try:
+                date.fromisoformat(release_date)
+            except ValueError:
+                failures.append(
+                    f"Linux AppStream {display_version} release has an invalid ISO date: {release_date!r}."
+                )
+            description_text = " ".join(release.itertext())
+            if f"CalcNova {display_version}" not in description_text:
+                failures.append(
+                    f"Linux AppStream {display_version} release description must identify CalcNova {display_version}."
+                )
 
     require(macos_plist, f"<string>{APP_ID}</string>", "macOS plist template", failures)
     require(macos_plist, "<string>__VERSION__</string>", "macOS plist template", failures)
@@ -117,7 +148,7 @@ def validate(root: Path) -> list[str]:
     require(windows_manifest, 'Version="__MSIX_VERSION__"', "Windows manifest template", failures)
     require(windows_manifest, "<DisplayName>CalcNova</DisplayName>", "Windows manifest template", failures)
 
-    for path in (ios_plist_path, linux_meta_path, macos_plist_path, windows_manifest_path):
+    for path in (ios_plist_path, macos_plist_path, windows_manifest_path):
         if path.is_file():
             parse_xml(path, failures)
 
@@ -141,15 +172,17 @@ def main() -> int:
     parser.add_argument("root", nargs="?", default=".", help="Repository root")
     args = parser.parse_args()
 
-    failures = validate(Path(args.root).resolve())
+    root = Path(args.root).resolve()
+    failures = validate(root)
     if failures:
         print("Packaging metadata validation failed:", file=sys.stderr)
         for failure in failures:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
+    identity = load_release_identity(root)
     print(
-        f"Validated CalcNova {DISPLAY_VERSION} identity across shared, mobile, Desktop/Browser, "
+        f"Validated CalcNova {identity.display_version} identity across shared, mobile, Desktop/Browser, "
         "Linux/macOS/Windows packaging contracts without requiring platform SDKs."
     )
     return 0
