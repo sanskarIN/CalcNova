@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0-ios</TargetFramework>
+    <RuntimeIdentifiers>ios-arm64;iossimulator-arm64;iossimulator-x64</RuntimeIdentifiers>
     <OutputType>Exe</OutputType>
     <ApplicationId>in.sanskar.calcnova</ApplicationId>
     <ApplicationTitle>CalcNova</ApplicationTitle>
