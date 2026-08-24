@@ -70,6 +70,20 @@ class PlatformSupportValidatorTests(unittest.TestCase):
 
         self.assertTrue(any("RuntimeIdentifiers" in failure for failure in failures), failures)
 
+    def test_mobile_build_code_drift_is_rejected(self) -> None:
+        validator = load_validator()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            copy_fixture(root, validator)
+            project = root / "src/CalcNova.Android/CalcNova.Android.csproj"
+            source = project.read_text(encoding="utf-8")
+            source = source.replace("<ApplicationVersion>20905</ApplicationVersion>", "<ApplicationVersion>20900</ApplicationVersion>")
+            project.write_text(source, encoding="utf-8")
+
+            failures = validator.validate(root)
+
+        self.assertTrue(any("current mobile build marker" in failure for failure in failures), failures)
+
     def test_browser_offline_resource_drift_is_rejected(self) -> None:
         validator = load_validator()
         with tempfile.TemporaryDirectory() as directory:
