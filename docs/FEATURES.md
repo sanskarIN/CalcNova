@@ -1,12 +1,12 @@
-# CalcNova 2.9.5 Features
+# CalcNova 2.9.6 Features
 
 ## Status
 
-**Complete for version 2.9.5.**
+**Complete for version 2.9.6.**
 
-This document is the completed feature inventory for CalcNova 2.9.5. Environment-specific verification results are evidence records, not unfinished feature requirements.
+This document is the completed feature inventory for CalcNova 2.9.6. Environment-specific verification results are evidence records, not unfinished feature requirements.
 
-The 2.9 series preserves the completed calculator feature set while adding stronger release-identity and cross-platform source validation. The requested 2.9.0 checkpoint is preserved in [`releases/2.9.0.md`](releases/2.9.0.md); current source is 2.9.5.
+The 2.9 series preserves the completed calculator feature set while adding stronger release-identity and cross-platform source validation. Earlier 2.9.0 and 2.9.5 checkpoints are preserved in [`releases/2.9.0.md`](releases/2.9.0.md) and [`releases/2.9.5.md`](releases/2.9.5.md); current source is 2.9.6.
 
 ## Standard calculator
 
@@ -293,7 +293,7 @@ See [`SETTINGS_MIGRATION.md`](SETTINGS_MIGRATION.md).
 - Runtime accessibility evidence vocabulary: PASS / FAIL / BLOCKED / NOT RUN
 - Source validators for accessibility markup, focus, dynamic controls, adaptive layout, touch targets, and evidence discipline
 
-Runtime evidence remains recorded only when actually observed; this does not change the completed 2.9.5 implementation status.
+Runtime evidence remains recorded only when actually observed; this does not change the completed 2.9.6 implementation status.
 
 ## Localization
 
@@ -306,7 +306,7 @@ Runtime evidence remains recorded only when actually observed; this does not cha
 - Live localization of reviewed shell, calculator, onboarding, settings, history, currency, About, and related surfaces
 - Settings checkbox localization in the live capture/apply path
 
-Additional languages or translation expansion are optional post-2.9.5 contributions.
+Additional languages or translation expansion are optional post-2.9.6 contributions.
 
 ## Platforms
 
@@ -335,8 +335,8 @@ Maintained architecture/runtime source matrix:
 - Android: `android-arm`, `android-arm64`, `android-x86`, `android-x64`
 - iOS: `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`
 
-Android/iOS display version: `2.9.5`  
-Android/iOS numeric build code: `20905`
+Android/iOS display version: `2.9.6`  
+Android/iOS numeric build code: `20906`
 
 See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md).
 
@@ -347,15 +347,16 @@ See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md).
 - Release tag derives as `v<Version>`
 - Mobile build code derives as `MAJOR * 10000 + MINOR * 100 + PATCH`
 - 2.9.0 checkpoint: `v2.9.0`, build code `20900`
-- Current 2.9.5 baseline: `v2.9.5`, build code `20905`
+- 2.9.5 checkpoint: `v2.9.5`, build code `20905`
+- Current 2.9.6 baseline: `v2.9.6`, build code `20906`
 - Packaging validator derives current version/build expectations instead of hardcoding release constants
 - Completion-status validator derives current documentation/About expectations from central metadata
 - Cross-platform source validator derives mobile build identity from central metadata
 - Release-document validator derives current release/documentation markers from central metadata
 - Release-identity regression coverage is integrated into Source Preflight
-- Linux AppStream preserves stable entries for 2.8.03, 2.9.0, and 2.9.5
+- Linux AppStream preserves stable entries for 2.8.03, 2.9.0, 2.9.5, and 2.9.6
 
-See [`VERSIONING.md`](VERSIONING.md) and [`releases/2.9.0.md`](releases/2.9.0.md).
+See [`VERSIONING.md`](VERSIONING.md), [`releases/2.9.0.md`](releases/2.9.0.md), and [`releases/2.9.5.md`](releases/2.9.5.md).
 
 ## Release and validation infrastructure
 
@@ -395,17 +396,17 @@ See [`SOURCE_PREFLIGHT.md`](SOURCE_PREFLIGHT.md), [`VALIDATION_EVIDENCE.md`](VAL
 
 ## Version identity
 
-- Product/display version: `2.9.5`
-- Package version: `2.9.5`
-- Release tag: `v2.9.5`
-- Assembly/file version: `2.9.5.0`
-- Mobile build code: `20905`
+- Product/display version: `2.9.6`
+- Package version: `2.9.6`
+- Release tag: `v2.9.6`
+- Assembly/file version: `2.9.6.0`
+- Mobile build code: `20906`
 
 See [`VERSIONING.md`](VERSIONING.md).
 
 ## Completion classification
 
-- 2.9.5 feature scope: **COMPLETE**
+- 2.9.6 feature scope: **COMPLETE**
 - Shared application integration: **COMPLETE**
 - Platform source composition: **COMPLETE**
 - Cross-platform source validation: **COMPLETE**
@@ -413,4 +414,4 @@ See [`VERSIONING.md`](VERSIONING.md).
 - Documentation baseline: **COMPLETE**
 - Source validation/release infrastructure: **COMPLETE**
 
-Later changes are maintenance, compatibility/security updates, translations, tests, evidence collection, or optional enhancements rather than missing 2.9.5 features.
+Later changes are maintenance, compatibility/security updates, translations, tests, evidence collection, or optional enhancements rather than missing 2.9.6 features.
