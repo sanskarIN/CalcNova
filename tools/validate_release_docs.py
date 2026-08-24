@@ -17,7 +17,7 @@ def required_markers(identity: ReleaseIdentity) -> dict[str, tuple[str, ...]]:
     display = identity.display_version
     tag = identity.release_tag
     build = identity.mobile_build_code
-    return {
+    markers: dict[str, tuple[str, ...]] = {
         "docs/RELEASE.md": (
             f"# CalcNova {display} Release Process",
             f"python tools/release_preflight.py --tag {tag}",
@@ -117,7 +117,21 @@ def required_markers(identity: ReleaseIdentity) -> dict[str, tuple[str, ...]]:
             "Android/iOS build code: `20900`",
             "advanced from this checkpoint to CalcNova **2.9.5**",
         ),
+        "docs/releases/2.9.5.md": (
+            "# CalcNova 2.9.5 Release Checkpoint",
+            "Release tag: `v2.9.5`",
+            "Android/iOS build code: `20905`",
+            "advanced from this checkpoint to CalcNova **2.9.6**",
+        ),
     }
+
+    markers[f"docs/releases/{display}.md"] = (
+        f"# CalcNova {display} Release Checkpoint",
+        f"Release tag: `{tag}`",
+        f"Android/iOS build code: `{build}`",
+        "This checkpoint records completed source/release preparation.",
+    )
+    return markers
 
 
 def validate(root: Path) -> list[str]:
