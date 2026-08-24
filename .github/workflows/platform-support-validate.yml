@@ -1,0 +1,59 @@
+name: Platform Support Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Desktop/**"
+      - "src/CalcNova.Browser/**"
+      - "src/CalcNova.Android/**"
+      - "src/CalcNova.iOS/**"
+      - "src/CalcNova.Platform/**"
+      - "docs/PLATFORM_SUPPORT.md"
+      - "tools/validate_platform_support.py"
+      - "tools/tests/test_validate_platform_support.py"
+      - "tools/release_preflight.py"
+      - "tools/tests/test_release_preflight.py"
+      - ".github/workflows/platform-support-validate.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/CalcNova.Desktop/**"
+      - "src/CalcNova.Browser/**"
+      - "src/CalcNova.Android/**"
+      - "src/CalcNova.iOS/**"
+      - "src/CalcNova.Platform/**"
+      - "docs/PLATFORM_SUPPORT.md"
+      - "tools/validate_platform_support.py"
+      - "tools/tests/test_validate_platform_support.py"
+      - "tools/release_preflight.py"
+      - "tools/tests/test_release_preflight.py"
+      - ".github/workflows/platform-support-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platform-support-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Validate cross-platform source contracts
+        run: python tools/validate_platform_support.py .
+
+      - name: Run cross-platform regression tests
+        run: python -m unittest tools.tests.test_validate_platform_support
