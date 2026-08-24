@@ -29,7 +29,7 @@ public sealed class AboutViewModel : ViewModelBase
 
     public string ProjectName => "CalcNova";
 
-    public string Version => "2.8.03";
+    public string Version => "2.9.0";
 
     public string CompletionStatus => "Complete";
 
