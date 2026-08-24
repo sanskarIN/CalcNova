@@ -1,4 +1,4 @@
-name: CalcNova 2.8.03 Completion Validate
+name: CalcNova Current Release Completion Validate
 
 on:
   push:
@@ -15,12 +15,12 @@ on:
       - "docs/README.md"
       - "docs/FEATURES.md"
       - "docs/ROADMAP.md"
-      - "docs/FINAL_SOURCE_AUDIT_2026-08-19.md"
       - "docs/VERSIONING.md"
       - "docs/RELEASE.md"
       - "docs/RELEASE_READINESS_CHECKLIST.md"
       - "docs/PLATFORM_SUPPORT.md"
       - "docs/SOURCE_PREFLIGHT.md"
+      - "docs/releases/**"
       - "src/CalcNova.App/ViewModels/AboutViewModel.cs"
       - "src/CalcNova.App/Views/MainView.BivariateStatistics.cs"
       - "src/CalcNova.Android/CalcNova.Android.csproj"
@@ -28,12 +28,15 @@ on:
       - "packaging/linux/in.sanskar.calcnova.metainfo.xml"
       - "tests/CalcNova.App.Tests/AboutReleaseIdentityTests.cs"
       - "tests/CalcNova.App.Tests/AboutReleaseIdentityHeadlessTests.cs"
+      - "tools/release_identity.py"
       - "tools/validate_completion_status.py"
       - "tools/validate_packaging_metadata.py"
+      - "tools/tests/test_release_identity.py"
       - "tools/tests/test_validate_completion_status.py"
       - "tools/tests/test_validate_packaging_metadata.py"
       - ".github/workflows/completion-status-validate.yml"
   pull_request:
+    branches: [main]
     paths:
       - "Directory.Build.props"
       - "README.md"
@@ -46,12 +49,12 @@ on:
       - "docs/README.md"
       - "docs/FEATURES.md"
       - "docs/ROADMAP.md"
-      - "docs/FINAL_SOURCE_AUDIT_2026-08-19.md"
       - "docs/VERSIONING.md"
       - "docs/RELEASE.md"
       - "docs/RELEASE_READINESS_CHECKLIST.md"
       - "docs/PLATFORM_SUPPORT.md"
       - "docs/SOURCE_PREFLIGHT.md"
+      - "docs/releases/**"
       - "src/CalcNova.App/ViewModels/AboutViewModel.cs"
       - "src/CalcNova.App/Views/MainView.BivariateStatistics.cs"
       - "src/CalcNova.Android/CalcNova.Android.csproj"
@@ -59,8 +62,10 @@ on:
       - "packaging/linux/in.sanskar.calcnova.metainfo.xml"
       - "tests/CalcNova.App.Tests/AboutReleaseIdentityTests.cs"
       - "tests/CalcNova.App.Tests/AboutReleaseIdentityHeadlessTests.cs"
+      - "tools/release_identity.py"
       - "tools/validate_completion_status.py"
       - "tools/validate_packaging_metadata.py"
+      - "tools/tests/test_release_identity.py"
       - "tools/tests/test_validate_completion_status.py"
       - "tools/tests/test_validate_packaging_metadata.py"
       - ".github/workflows/completion-status-validate.yml"
@@ -68,6 +73,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: completion-status-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   completion-status:
@@ -81,6 +90,9 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+
+      - name: Run release-identity regression tests
+        run: python -m unittest tools.tests.test_release_identity
 
       - name: Validate completed product status
         run: python tools/validate_completion_status.py .
