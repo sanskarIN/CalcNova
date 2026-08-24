@@ -11,7 +11,7 @@ from pathlib import Path
 WORKFLOW_CONTRACTS: dict[str, tuple[str, ...]] = {
     ".github/workflows/build-desktop.yml": (
         "os: [ubuntu-latest, windows-latest, macos-latest]",
-        "actions/checkout@v6",
+        "actions/checkout@v7",
         "actions/setup-dotnet@v6",
         "dotnet-version: 10.0.x",
         "dotnet restore src/CalcNova.Desktop/CalcNova.Desktop.csproj",
@@ -19,7 +19,7 @@ WORKFLOW_CONTRACTS: dict[str, tuple[str, ...]] = {
     ),
     ".github/workflows/build-browser.yml": (
         "runs-on: ubuntu-latest",
-        "actions/checkout@v6",
+        "actions/checkout@v7",
         "actions/setup-dotnet@v6",
         "dotnet-version: 10.0.x",
         "dotnet workload install wasm-tools",
@@ -28,7 +28,7 @@ WORKFLOW_CONTRACTS: dict[str, tuple[str, ...]] = {
     ),
     ".github/workflows/build-android.yml": (
         "runs-on: ubuntu-latest",
-        "actions/checkout@v6",
+        "actions/checkout@v7",
         "actions/setup-dotnet@v6",
         "actions/setup-java@v5",
         'java-version: "17"',
@@ -38,7 +38,7 @@ WORKFLOW_CONTRACTS: dict[str, tuple[str, ...]] = {
     ),
     ".github/workflows/build-ios.yml": (
         "runs-on: macos-latest",
-        "actions/checkout@v6",
+        "actions/checkout@v7",
         "actions/setup-dotnet@v6",
         "dotnet workload install ios",
         "iossimulator-arm64",
