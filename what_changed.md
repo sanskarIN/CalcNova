@@ -1,5 +1,147 @@
 # What Changed
 
+## CalcNova 2.9.0 → 2.9.5 release preparation — 2026-08-24
+
+CalcNova advanced from the completed 2.8.03 baseline through a preserved 2.9.0 checkpoint and then to the current completed 2.9.5 source/release baseline.
+
+### Current release identity
+
+- Product/display version: `2.9.5`
+- .NET/NuGet package version: `2.9.5`
+- Release tag contract: `v2.9.5`
+- Assembly/file version: `2.9.5.0`
+- Android/iOS numeric build code: `20905`
+- Application id: `in.sanskar.calcnova`
+- In-app About label: `Version 2.9.5 • Complete`
+
+### 2.9.0 prepared first and preserved
+
+The repository was intentionally advanced to 2.9.0 first. That checkpoint used:
+
+- display/package version `2.9.0`;
+- tag contract `v2.9.0`;
+- assembly/file version `2.9.0.0`;
+- mobile build code `20900`.
+
+The checkpoint is preserved in `docs/releases/2.9.0.md`, Linux AppStream history, and the changelog before the source tree was intentionally advanced to 2.9.5.
+
+### Central release-identity infrastructure
+
+Added `tools/release_identity.py` and regression coverage so SDK-independent tooling derives release identity from `Directory.Build.props` rather than duplicating hardcoded release constants.
+
+The helper validates and derives:
+
+- display version;
+- normalized SemVer/package version;
+- release tag;
+- assembly/file version;
+- mobile build code using `MAJOR * 10000 + MINOR * 100 + PATCH`.
+
+Regression coverage explicitly protects `2.9.0 -> 20900` and `2.9.5 -> 20905` and fails closed when central version properties disagree.
+
+### Release validators made current-version aware
+
+The following source gates were converted away from hardcoded 2.8.03 release assumptions:
+
+- `tools/validate_packaging_metadata.py`;
+- `tools/validate_completion_status.py`;
+- `tools/validate_platform_support.py`;
+- `tools/validate_release_docs.py`.
+
+Their regression suites now derive current release expectations from the central release identity. This prevents a valid future version bump from failing only because an SDK-independent validator retained an old release number.
+
+A Python importlib/dataclass compatibility edge case in the new identity helper was also fixed so the repository's importlib-based regression harness can load it reliably.
+
+### Cross-platform release identity synchronized
+
+Android and iOS now use build code `20905` while continuing to inherit the visible application version from `$(ProductDisplayVersion)`.
+
+The maintained architecture/source contracts remain:
+
+- Windows: `win-x64`, `win-arm64`;
+- Linux: `linux-x64`, `linux-arm64`;
+- macOS: `osx-x64`, `osx-arm64`;
+- Browser/WebAssembly/PWA;
+- Android: `android-arm`, `android-arm64`, `android-x86`, `android-x64`;
+- iOS: `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`.
+
+Linux AppStream metadata preserves stable entries for 2.8.03, 2.9.0, and 2.9.5.
+
+### Completion workflow modernized
+
+`.github/workflows/completion-status-validate.yml` is no longer named for a single release. It now uses the release-neutral name `CalcNova Current Release Completion Validate`, watches the shared release-identity helper and release checkpoints, runs release-identity tests before completion/package validation, limits pull requests to `main`, and cancels superseded runs.
+
+### Current documentation synchronized
+
+The maintained current-facing baseline was advanced to 2.9.5 across:
+
+- `README.md`;
+- `PROJECT_STATE.md`;
+- `CHANGELOG.md`;
+- `SECURITY.md`;
+- `SUPPORT.md`;
+- `CONTRIBUTING.md`;
+- `docs/README.md`;
+- `docs/FEATURES.md`;
+- `docs/ROADMAP.md`;
+- `docs/VERSIONING.md`;
+- `docs/PLATFORM_SUPPORT.md`;
+- `docs/SOURCE_PREFLIGHT.md`;
+- `docs/RELEASE.md`;
+- `docs/RELEASE_READINESS_CHECKLIST.md`.
+
+Historical 2.8.03 and 2.9.0 records remain historical instead of being rewritten as if those releases never existed.
+
+### Major commits in the 2.9 preparation
+
+- `5bc17a4cc7550b98fe04dc90e9404f4a72de6cfa` — `release: prepare CalcNova 2.9.0 identity`
+- `148f8f3476fc4cd915735d22c00839cfb912ff3a` — `release: set Android build code for 2.9.0`
+- `4bea94c3da1df50f533b265c4c8976ff1f7e27fc` — `release: set iOS build code for 2.9.0`
+- `eade08ea6cf3a6258a8be3aad7713d38ab530f88` — `release: show CalcNova 2.9.0 in About`
+- `c68a956b8a5c5ed0bdff5acb45824ae8807a1920` — `docs: record CalcNova 2.9.0 release checkpoint`
+- `1f3a88d2cda38c446937e94281179a1ef4c50a7b` — `release: prepare CalcNova 2.9.5 identity`
+- `7bece8a69a327a7b6c3b60556a950fdc242f10e0` — `release: set Android build code for 2.9.5`
+- `0d4010d3dcce8969fe67840910b3500462f66f15` — `release: set iOS build code for 2.9.5`
+- `6ee8dff80cf643b832c0c9515c09fe53c39641fc` — `release: show CalcNova 2.9.5 in About`
+- `f0e568336d594acd8a1c333c978240c11e78978e` — `release: add CalcNova 2.9.5 AppStream entry`
+- `3544ed263b8620c179861e4a367ed29512beb7c1` — `docs: advance project state to CalcNova 2.9.5`
+- `e64cb22a2187e5b7b4e0924b4c44380b7124e5bd` — `docs: advance README to CalcNova 2.9.5`
+- `c0e077cbd85fc02b368bbf7a58241a9f26116cf3` — `docs: define CalcNova 2.9.5 version mapping`
+- `138408f20b04453d54afa4f9c744356b2246201f` — `docs: advance platform support to CalcNova 2.9.5`
+- `759aee9c9f91c35a771c0315dffba24b02463e4c` — `docs: define CalcNova 2.9.5 release process`
+- `c686ae3b08215b2f109326ce0e444ece7c6e2b9f` — `fix: make platform support validation version-aware`
+- `270714a09b3e25c6da715fd4d616ee38799110ff` — `fix: make release documentation validation version-aware`
+- `0a6060571fa56844342f10824095fc7415dd8f56` — `fix: keep release identity importlib-safe`
+- `6c92b0a5d61b585438c3f032fffc0f64251f1370` — `docs: add CalcNova 2.9.0 and 2.9.5 releases`
+- `65861a9e381c85e4bc75f20940678388b1915bcd` — `ci: make completion gate current-release aware`
+
+### Evidence boundary and remaining operational work
+
+Source/release preparation is complete for the 2.9.5 baseline. The following are still execution evidence, not source-completeness claims:
+
+- hosted Source Preflight and platform workflow results;
+- .NET restore/format/build/test execution;
+- downloaded Windows/Linux/macOS x64/ARM64 artifact launch checks;
+- representative Browser install/offline/storage/clipboard/accessibility checks;
+- Android emulator/physical-device smoke and accessibility checks;
+- iOS simulator/physical-device smoke and accessibility checks;
+- Android signing and Play Console validation;
+- macOS signing/notarization when required;
+- iOS signing/provisioning/TestFlight/App Store validation;
+- actual release SBOM/checksum/provenance publication.
+
+No PASS is inferred for an operation that was not actually observed.
+
+### 2.9.5 classification
+
+- Product scope: **COMPLETE**
+- Current release source identity: **2.9.5**
+- Cross-platform maintained source matrix: **COMPLETE**
+- Version-aware release validation: **COMPLETE**
+- Documentation synchronization: **COMPLETE**
+- Runtime/signing/store evidence: **SEPARATE EXTERNAL EVIDENCE**
+- Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**
+
 ## Cross-platform source hardening — 2026-08-24
 
 CalcNova 2.8.03 remains the completed product baseline. This continuation strengthened the maintained Windows, Linux, macOS, Browser/WebAssembly/PWA, Android, and iOS source contracts without changing the public product version or redefining completed calculator scope.
