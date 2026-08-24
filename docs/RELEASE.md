@@ -1,37 +1,58 @@
-# CalcNova 2.8.03 Release Process
+# CalcNova 2.9.5 Release Process
 
 ## Release identity
 
-CalcNova 2.8.03 uses:
+CalcNova 2.9.5 uses:
 
-- product/display version: `2.8.03`;
-- normalized .NET/NuGet version: `2.8.3`;
-- normalized release tag: `v2.8.3`;
-- assembly/file version: `2.8.3.0`;
-- Android/iOS display version: `2.8.03`;
-- Android/iOS numeric build code: `20803`.
+- product/display version: `2.9.5`;
+- .NET/NuGet version: `2.9.5`;
+- release tag: `v2.9.5`;
+- assembly/file version: `2.9.5.0`;
+- Android/iOS display version: `2.9.5`;
+- Android/iOS numeric build code: `20905`.
 
 See [VERSIONING.md](VERSIONING.md).
 
-Strict Semantic Versioning does not allow leading zeroes in numeric identifiers, so `v2.8.03` is intentionally invalid as a Git release tag. The correct normalized tag for the public 2.8.03 release is `v2.8.3`.
+The requested 2.9.0 checkpoint was prepared first using tag `v2.9.0` and mobile build code `20900`; see [releases/2.9.0.md](releases/2.9.0.md). The current source then advanced to 2.9.5.
 
 ## Release evidence principle
 
-CalcNova 2.8.03 is the completed product baseline. Release execution evidence is recorded independently.
+CalcNova 2.9.5 is the completed product baseline. Release execution evidence is recorded independently.
 
-A command, build, test, device check, signing operation, accessibility audit, security-service run, attestation, or store validation is marked PASS only after it actually executes and the result is observed. `NOT RUN` and `BLOCKED` are evidence states for unavailable environments/tools/credentials/services; they do not describe the product as unfinished.
+A command, build, test, browser/device check, signing operation, accessibility audit, security-service run, attestation, or store validation is marked PASS only after it actually executes and the result is observed. `NOT RUN` and `BLOCKED` are evidence states for unavailable environments/tools/credentials/services; they do not describe the product as unfinished.
 
 ## Source release gate
 
-From the exact 2.8.03 release-tag checkout, run:
+From the exact 2.9.5 release-tag checkout, run:
 
 ```bash
-python tools/release_preflight.py --tag v2.8.3
+python tools/release_preflight.py --tag v2.9.5
 ```
 
-The preflight validates repository/security structure, XAML/UI/navigation/keyboard contracts, calculator editing, graph/numerical contracts, Unicode metadata, exact rationals, engineering notation, bounded exports, bivariate statistics, accessibility/adaptive/localization contracts, settings/onboarding, package metadata, the 2.8.03 completion status, platform workflows, security-automation workflows, release workflows, artifact integrity, structured release evidence, and regression suites for the SDK-independent validators/tooling.
+The preflight validates repository/security structure, centralized release identity, XAML/UI/navigation/keyboard contracts, calculator editing, graph/numerical contracts, Unicode metadata, exact rationals, engineering notation, bounded exports, bivariate statistics, accessibility/adaptive/localization contracts, settings/onboarding, package metadata, current completion status, platform workflows, cross-platform source composition, security automation, release workflows, artifact integrity, structured release evidence, SBOM generation, and regression suites for SDK-independent validators/tooling.
 
 The preflight also rejects obsolete current-status wording in authoritative completion documents.
+
+## Release identity gate
+
+Current release-version consistency can be checked independently with:
+
+```bash
+python -m unittest tools.tests.test_release_identity
+python tools/validate_packaging_metadata.py .
+python tools/validate_completion_status.py .
+```
+
+`tools/release_identity.py` parses `Directory.Build.props`, validates display/package/assembly/file/informational fields, derives the release tag, and derives mobile build code as `MAJOR * 10000 + MINOR * 100 + PATCH`.
+
+For the 2.9 series:
+
+```text
+2.9.0 -> v2.9.0 -> 20900
+2.9.5 -> v2.9.5 -> 20905
+```
+
+This prevents release validators from remaining silently pinned to an earlier product version.
 
 ## .NET quality gate
 
@@ -50,7 +71,7 @@ The SDK-independent preflight and compiled quality gate are separate evidence la
 
 ## Automated security gates
 
-The maintained branch also contains:
+The maintained branch contains:
 
 - `.github/workflows/codeql.yml` — C# CodeQL scanning;
 - `.github/workflows/dependency-review.yml` — PR dependency vulnerability review at moderate severity or higher;
@@ -59,16 +80,16 @@ The maintained branch also contains:
 
 See [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md).
 
-A release maintainer should review relevant CodeQL, dependency-review, Dependabot, and repository security alerts before publication. The presence of workflow source is not equivalent to a successful service run.
+A release maintainer should review relevant CodeQL, dependency-review, Dependabot, and repository security alerts before publication. Workflow source is not equivalent to a successful hosted service run.
 
 ## Automated release flow
 
 `.github/workflows/release.yml` supports:
 
 - a pushed `v*` tag;
-- manual `workflow_dispatch` referencing an existing normalized SemVer tag.
+- manual `workflow_dispatch` referencing an existing SemVer tag.
 
-For CalcNova 2.8.03, use `v2.8.3`.
+For CalcNova 2.9.5, use `v2.9.5`.
 
 The validation job follows this order:
 
@@ -76,7 +97,7 @@ The validation job follows this order:
 2. validate requested tag syntax;
 3. verify the exact tag exists;
 4. detach at the requested tag;
-5. read the normalized `<Version>` from `Directory.Build.props`;
+5. read `<Version>` from `Directory.Build.props`;
 6. require the tag to equal `v` plus that source version;
 7. run tagged source preflight;
 8. set up .NET 10;
@@ -90,7 +111,27 @@ The Desktop job publishes six self-contained architecture-specific archives:
 - Linux: `linux-x64`, `linux-arm64`;
 - macOS: `osx-x64`, `osx-arm64`.
 
-The release workflow validator requires all six target/runner pairs, the RID-specific archive naming contract, and the RID-specific artifact naming contract. This prevents a maintenance edit from silently dropping native ARM64 or x64 desktop publication.
+The release workflow validator requires all six target/runner pairs, RID-specific archive naming, and RID-specific artifact naming.
+
+## Cross-platform release source matrix
+
+The maintained source matrix includes:
+
+- Windows Desktop: x64 + ARM64;
+- Linux Desktop: x64 + ARM64;
+- macOS Desktop: Intel x64 + Apple Silicon ARM64;
+- Browser/WebAssembly/PWA;
+- Android source RIDs: `android-arm`, `android-arm64`, `android-x86`, `android-x64`;
+- iOS source RIDs: `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`.
+
+Validate source composition with:
+
+```bash
+python tools/validate_platform_support.py .
+python tools/validate_platform_workflows.py .
+```
+
+Actual package/device/browser compatibility remains external evidence.
 
 ## Release workflow permissions
 
@@ -101,7 +142,7 @@ permissions:
   contents: read
 ```
 
-Only `publish-release` receives the privileges needed to create/update the GitHub Release and generate current `actions/attest@v4` provenance metadata/attestations:
+Only `publish-release` receives the privileges needed to create/update the GitHub Release and generate provenance metadata/attestations:
 
 ```yaml
 permissions:
@@ -119,12 +160,12 @@ This keeps release-write, OIDC, attestation, and artifact-metadata write privile
 
 `Directory.Build.props` is the release-version source of truth.
 
-The Android release job intentionally does **not** replace:
+The Android release job intentionally does not replace:
 
-- `ApplicationDisplayVersion` from the tag text;
+- `ApplicationDisplayVersion` from tag text;
 - `ApplicationVersion` from `github.run_number`.
 
-Android and iOS use the source-defined `2.8.03` display version and `20803` build code.
+Android and iOS use the source-defined `2.9.5` display version and `20905` build code.
 
 This prevents a rerun or tag-format difference from changing package identity.
 
@@ -134,18 +175,20 @@ Current source identities are:
 
 - common application identifier: `in.sanskar.calcnova` where supported;
 - application display name: `CalcNova`;
-- product display version: `2.8.03`;
-- normalized package version: `2.8.3`;
-- mobile application/build version: `20803`;
+- product display version: `2.9.5`;
+- package version: `2.9.5`;
+- release tag: `v2.9.5`;
+- mobile application/build version: `20905`;
 - desktop assembly: `CalcNova.Desktop`;
 - browser assembly: `CalcNova.Browser`.
 
 `tools/validate_packaging_metadata.py` cross-checks:
 
-- central release version properties;
+- central release version properties through the shared release-identity parser;
 - Android/iOS project metadata;
 - iOS launch metadata;
 - Linux desktop/AppStream files;
+- exactly one stable Linux AppStream entry for the current release;
 - macOS plist template;
 - Windows Appx/MSIX manifest template;
 - signing-secret safety markers.
@@ -161,20 +204,21 @@ python tools/validate_completion_status.py .
 python -m unittest tools.tests.test_validate_completion_status
 ```
 
-It protects:
+It derives the current version/tag/build expectations from `Directory.Build.props` and protects:
 
 - README completion status;
 - project state;
-- dated 2.8.03 changelog entry;
+- current changelog entry;
 - completed roadmap;
 - completed feature inventory;
 - documentation index;
-- final completion audit;
 - versioning guide;
+- release and release-readiness docs;
+- platform/source-preflight docs;
 - live `what_changed.md` checkpoint;
-- in-app About `Version 2.8.03 • Complete` label.
+- in-app About `Version 2.9.5 • Complete` label and regressions.
 
-Historical records under `docs/history/` remain historical and do not define the current status.
+Historical 2.8.03/2.9.0 records remain historical and do not define the current status.
 
 ## Settings migration gate
 
@@ -192,7 +236,7 @@ An older build must not silently overwrite settings created by an unsupported ne
 
 ## Accessibility evidence gate
 
-Source accessibility contracts are complete for 2.8.03. Runtime/device evidence is recorded separately in [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
+Source accessibility contracts are complete for 2.9.5. Runtime/device evidence is recorded separately in [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
 
 Do not mark a runtime scenario PASS merely because focus styles, automation names, keyboard mappings, or validators exist in source.
 
@@ -208,11 +252,11 @@ with enough target/tool context to reproduce the result where useful.
 
 For the release commit/tag, confirm:
 
-- `README.md` identifies version 2.8.03 as complete;
-- `PROJECT_STATE.md` identifies version 2.8.03 as complete;
-- `CHANGELOG.md` contains the dated 2.8.03 release entry;
-- `docs/VERSIONING.md` maps 2.8.03 to normalized 2.8.3 / `v2.8.3`;
-- `what_changed.md` contains the current maintenance checkpoint;
+- `README.md` identifies version 2.9.5 as complete;
+- `PROJECT_STATE.md` identifies version 2.9.5 as complete;
+- `CHANGELOG.md` contains the dated 2.9.5 release entry and preserves the 2.9.0 checkpoint;
+- `docs/VERSIONING.md` maps 2.9.5 to package `2.9.5`, tag `v2.9.5`, and build code `20905`;
+- `what_changed.md` contains the current 2.9.5 checkpoint;
 - package/version identifiers are consistent;
 - source preflight is run or its evidence state is recorded;
 - no release-critical placeholder implementation exists;
@@ -223,7 +267,7 @@ For the release commit/tag, confirm:
 - privacy/security documentation matches dependencies/network behavior;
 - contact/support links are correct;
 - license/third-party notices are complete;
-- release provenance/checksum behavior still satisfies the release workflow validator.
+- release provenance/checksum/SBOM behavior still satisfies the release workflow validator.
 
 ## Mathematical verification
 
@@ -261,15 +305,16 @@ For keyboard-capable targets, verify as applicable:
 Record each target independently:
 
 ```text
-Windows: PASS / FAIL / BLOCKED / NOT RUN
-Linux: PASS / FAIL / BLOCKED / NOT RUN
-macOS: PASS / FAIL / BLOCKED / NOT RUN
+Windows x64: PASS / FAIL / BLOCKED / NOT RUN
+Windows ARM64: PASS / FAIL / BLOCKED / NOT RUN
+Linux x64: PASS / FAIL / BLOCKED / NOT RUN
+Linux ARM64: PASS / FAIL / BLOCKED / NOT RUN
+macOS x64: PASS / FAIL / BLOCKED / NOT RUN
+macOS ARM64: PASS / FAIL / BLOCKED / NOT RUN
 Android: PASS / FAIL / BLOCKED / NOT RUN
 iOS: PASS / FAIL / BLOCKED / NOT RUN
 Browser: PASS / FAIL / BLOCKED / NOT RUN
 ```
-
-For desktop release evidence, record x64 and ARM64 separately when both architecture artifacts are evaluated.
 
 Package metadata correctness and actual package execution are separate evidence layers.
 
@@ -283,20 +328,20 @@ The Android release workflow produces a signed AAB only when all required signin
 
 The iOS exact-tag simulator validation path is intentionally unsigned and does not claim App Store signing/provisioning.
 
-## Release artifacts
+## Release artifacts and SBOMs
 
 Publish only artifacts built from the release tag through the documented workflow or an equivalent recorded process.
 
 Current automated artifact families include:
 
-- Windows x64 self-contained desktop archive;
-- Windows ARM64 self-contained desktop archive;
-- Linux x64 self-contained desktop archive;
-- Linux ARM64 self-contained desktop archive;
-- macOS Intel x64 self-contained desktop archive;
-- macOS Apple Silicon ARM64 self-contained desktop archive;
-- Browser bundle;
-- Android AAB when signing secrets are configured;
+- Windows x64 self-contained desktop archive + SBOM;
+- Windows ARM64 self-contained desktop archive + SBOM;
+- Linux x64 self-contained desktop archive + SBOM;
+- Linux ARM64 self-contained desktop archive + SBOM;
+- macOS Intel x64 self-contained desktop archive + SBOM;
+- macOS Apple Silicon ARM64 self-contained desktop archive + SBOM;
+- Browser bundle + SBOM;
+- Android AAB + SBOM when signing secrets are configured;
 - checksum material.
 
 An iOS archive remains credential/provisioning dependent and is not represented by the unsigned simulator-validation workflow.
@@ -305,7 +350,7 @@ Do not publish debug builds as stable release artifacts.
 
 ## Checksums and provenance attestations
 
-Release publication generates SHA-256 checksum material and then creates GitHub artifact provenance attestations before publishing the GitHub Release assets.
+Release publication validates flat release filenames, generates SHA-256 checksum material, then creates GitHub artifact provenance attestations before publishing GitHub Release assets.
 
 The workflow passes the inclusive subject glob:
 
@@ -313,9 +358,7 @@ The workflow passes the inclusive subject glob:
 release-assets/**/*
 ```
 
-to `actions/attest@v4`, so every file in the prepared release-asset tree is covered. For the current topology this includes all desktop/Browser ZIP archives, the Android AAB when present, and `SHA256SUMS.txt`.
-
-The inclusive release-tree glob also keeps optional Android output conditional without requiring a separate potentially absent AAB path.
+to `actions/attest@v4`, so every file in the prepared release-asset tree is covered, including package archives, generated SBOMs, optional Android output, and `SHA256SUMS.txt`.
 
 Provenance attestation binds artifacts to GitHub workflow/repository/commit identity; it does not claim that the artifact is vulnerability-free.
 
@@ -327,9 +370,7 @@ A downloaded artifact can be checked with a current GitHub CLI installation usin
 gh attestation verify PATH_TO_ARTIFACT -R sanskarIN/CalcNova
 ```
 
-Checksum verification remains useful as a separate integrity check. Verify both the provenance of the release material and the expected checksum when high-assurance distribution verification is required.
-
-CalcNova also includes manifest generation/verification tooling that binds structured artifact evidence to repository/commit identity.
+Checksum verification remains useful as a separate integrity check.
 
 ## GitHub Release behavior
 
@@ -337,6 +378,7 @@ The workflow:
 
 - creates a GitHub Release only if one does not already exist;
 - preserves existing release notes/history on rerun;
+- validates release filename uniqueness/reserved names;
 - generates checksums before provenance attestations;
 - attests the prepared `release-assets/` tree before upload;
 - uploads intended packaged artifacts with `--clobber`;
@@ -346,11 +388,13 @@ The workflow:
 
 Release notes should identify:
 
-- product version `2.8.03`;
-- normalized tag `v2.8.3`;
+- product version `2.9.5`;
+- tag `v2.9.5`;
+- 2.9.0 intermediate checkpoint where relevant;
 - major capabilities;
 - important fixes;
 - platform changes;
+- release-identity consistency changes;
 - security changes where relevant;
 - migration notes where relevant;
 - documentation links;
@@ -360,13 +404,13 @@ Do not claim universal compatibility, zero defects, or successful provenance gen
 
 ## Maintenance / hotfix process
 
-For a post-2.8.03 defect:
+For a post-2.9.5 defect:
 
 1. reproduce and scope impact;
 2. add regression coverage where practical;
 3. fix the issue;
 4. run applicable source/compiled/platform/security checks;
 5. update changelog/release notes;
-6. issue the appropriate normalized SemVer maintenance tag/version when publication is required.
+6. issue the appropriate SemVer maintenance tag/version when publication is required.
 
 Avoid destructive repository history rewrites for ordinary release corrections.
