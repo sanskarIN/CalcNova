@@ -2,11 +2,11 @@
 
 **Fast. Precise. Private. Everywhere.**
 
-**Current product version: 2.8.03**
+**Current product version: 2.9.5**
 
 CalcNova is a completed, open-source, privacy-first, cross-platform calculator built with C#, .NET, and Avalonia UI. It combines a project-owned expression engine with scientific, exact-rational, engineering-notation, programmer, Unicode, conversion, graphing, statistics, equation, matrix, date/time, currency, history, persistence, accessibility, localization, packaging, and release-validation capabilities while keeping ordinary calculations local.
 
-> **Project status: Complete for version 2.8.03.** Future repository changes may provide maintenance, compatibility updates, security fixes, translations, or optional enhancements; they are not required to complete the 2.8.03 product scope.
+> **Project status: Complete for version 2.9.5.** Future repository changes may provide maintenance, compatibility updates, security fixes, translations, or optional enhancements; they are not required to complete the 2.9.5 product scope.
 
 ## Status
 
@@ -16,9 +16,25 @@ CalcNova is a completed, open-source, privacy-first, cross-platform calculator b
 [![Source Preflight](https://github.com/sanskarIN/CalcNova/actions/workflows/source-preflight.yml/badge.svg)](https://github.com/sanskarIN/CalcNova/actions/workflows/source-preflight.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-## Version 2.8.03
+## Version 2.9.5
 
-The public/product version is **2.8.03**. Strict SemVer tooling uses the normalized equivalent **2.8.3**, and the corresponding normalized release tag is **`v2.8.3`**. See [`docs/VERSIONING.md`](docs/VERSIONING.md) for the complete mapping.
+The public/product version is **2.9.5**, the .NET/NuGet package version is **2.9.5**, and the corresponding normalized release tag is **`v2.9.5`**. Android and iOS use numeric build code **`20905`**. See [`docs/VERSIONING.md`](docs/VERSIONING.md) for the complete mapping.
+
+The requested **2.9.0** checkpoint was prepared first with build code `20900` and is preserved in [`docs/releases/2.9.0.md`](docs/releases/2.9.0.md). The repository then advanced to the current 2.9.5 baseline.
+
+### 2.9-series release and platform maintenance
+
+The 2.9 series adds release-consistency and cross-platform maintenance without removing the completed calculator feature set:
+
+- centralized SDK-independent release identity parsing in `tools/release_identity.py`;
+- fail-closed consistency checks for display, SemVer, package, assembly/file, informational, release-tag, and mobile-build identities;
+- version-aware packaging and completion-status validators instead of hardcoded 2.8.03 constants;
+- integrated release-identity regression coverage in Source Preflight;
+- explicit Android ARM/ARM64/x86/x64 runtime identifiers;
+- explicit iOS ARM64 device and ARM64/x64 simulator runtime identifiers;
+- focused cross-platform source validation and GitHub Actions coverage;
+- `actions/checkout@v7` alignment for platform workflow contracts;
+- retained deterministic SBOM, checksum, provenance, dependency-security, CodeQL, and release-evidence controls.
 
 ## Core calculator
 
@@ -284,29 +300,40 @@ CalcNova includes:
 - catalog completeness/duplicate/unknown-key validation;
 - live localization for reviewed shell, calculator, onboarding, settings, history, currency, About, and related surfaces.
 
-Additional translations or further UI-string migration may be contributed as optional localization improvements; they are not required to define version 2.8.03 as complete.
+Additional translations or further UI-string migration may be contributed as optional localization improvements; they are not required to define version 2.9.5 as complete.
 
 ## Platforms
 
 CalcNova contains composition heads for:
 
 - Desktop — Windows, Linux, and macOS targets;
-- Browser/WebAssembly;
-- Android;
-- iOS.
+- Browser/WebAssembly/PWA;
+- Android — `android-arm`, `android-arm64`, `android-x86`, and `android-x64` source runtime identifiers;
+- iOS — `ios-arm64`, `iossimulator-arm64`, and `iossimulator-x64` source runtime identifiers.
 
-The product display version for Android and iOS is `2.8.03`, with numeric mobile build code `20803`.
+The product display version for Android and iOS is `2.9.5`, with numeric mobile build code `20905`.
+
+Desktop release source targets remain `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, and `osx-arm64`.
 
 Platform package generation still depends on the appropriate external SDK/workload, signing identity, and store credentials. Those environment requirements are separate from project implementation completeness.
 
 ## Source validation and release evidence
 
-CalcNova includes SDK-independent validators covering repository/security contracts, XAML, UI/navigation/keyboard behavior, graph/numerical contracts, Unicode, exact rationals, engineering notation, exports, bivariate statistics, accessibility/adaptive contracts, localization/settings, packaging metadata, platform workflows, release workflows, artifact integrity, and structured release evidence.
+CalcNova includes SDK-independent validators covering repository/security contracts, release identity, XAML, UI/navigation/keyboard behavior, graph/numerical contracts, Unicode, exact rationals, engineering notation, exports, bivariate statistics, accessibility/adaptive contracts, localization/settings, packaging metadata, platform workflows, cross-platform source composition, release workflows, artifact integrity, and structured release evidence.
 
-Run the integrated source gate:
+Run the integrated source gate for the current release:
 
 ```bash
-python tools/release_preflight.py
+python tools/release_preflight.py --tag v2.9.5
+```
+
+Focused current-release checks include:
+
+```bash
+python -m unittest tools.tests.test_release_identity
+python tools/validate_packaging_metadata.py .
+python tools/validate_completion_status.py .
+python tools/validate_platform_support.py .
 ```
 
 Collect structured evidence:
@@ -321,18 +348,19 @@ See [`docs/SOURCE_PREFLIGHT.md`](docs/SOURCE_PREFLIGHT.md), [`docs/VALIDATION_EV
 
 ## Release identity
 
-The release workflow uses the source tree as the version authority. It verifies that the normalized release tag equals `v` plus the normalized `<Version>` in `Directory.Build.props` before restore/build/test begins.
+`Directory.Build.props` is the source of truth. The shared release-identity helper verifies the central version fields agree, derives the mobile build code, and exposes the expected release tag to SDK-independent validators.
 
-For CalcNova 2.8.03:
+For CalcNova 2.9.5:
 
 ```text
-Product version: 2.8.03
-Normalized package version: 2.8.3
-Normalized release tag: v2.8.3
-Mobile build code: 20803
+Product version: 2.9.5
+Normalized package version: 2.9.5
+Normalized release tag: v2.9.5
+Assembly/file version: 2.9.5.0
+Mobile build code: 20905
 ```
 
-The Android release job does not replace the product display version with the tag text or GitHub run number.
+The release workflow verifies that the requested tag equals `v` plus the source `<Version>` before restore/build/test begins. The Android release job does not replace the product display version with tag text or GitHub run number.
 
 See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
@@ -363,6 +391,7 @@ CalcNova/
 ├── .github/
 │   └── workflows/
 ├── docs/
+│   └── releases/
 ├── packaging/
 ├── src/
 │   ├── CalcNova.App/
@@ -398,7 +427,7 @@ The repository pins a .NET 10 SDK feature band through [`global.json`](global.js
 Run the SDK-independent source gate:
 
 ```bash
-python tools/release_preflight.py
+python tools/release_preflight.py --tag v2.9.5
 ```
 
 Then run the compiled verification sequence in a suitable .NET environment:
@@ -424,7 +453,7 @@ This requires a working .NET/Avalonia desktop environment.
 
 A feature is not considered runtime-verified merely because source code or tests exist. Build/test/platform evidence must be based on commands or workflows that actually ran and whose results were observed. When an environment is unavailable, evidence records `NOT RUN` or `BLOCKED` instead of inventing PASS.
 
-This evidence policy does not change the product-completion status of version 2.8.03; it preserves accuracy about where a particular verification command was or was not executed.
+This evidence policy does not change the product-completion status of version 2.9.5; it preserves accuracy about where a particular verification command was or was not executed.
 
 ## Privacy
 
@@ -475,4 +504,4 @@ Support is optional. Core features must never be blocked behind donations or int
 
 ---
 
-For the authoritative 2.8.03 completion state, read [`PROJECT_STATE.md`](PROJECT_STATE.md), [`CHANGELOG.md`](CHANGELOG.md), [`docs/VERSIONING.md`](docs/VERSIONING.md), and [`what_changed.md`](what_changed.md).
+For the authoritative 2.9.5 completion state, read [`PROJECT_STATE.md`](PROJECT_STATE.md), [`CHANGELOG.md`](CHANGELOG.md), [`docs/VERSIONING.md`](docs/VERSIONING.md), [`docs/releases/2.9.0.md`](docs/releases/2.9.0.md), and [`what_changed.md`](what_changed.md).
