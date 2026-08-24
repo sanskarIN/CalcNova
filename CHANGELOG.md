@@ -2,6 +2,58 @@
 
 All notable CalcNova changes are recorded here.
 
+## [2.9.6] - 2026-08-24
+
+**Status: Complete**
+
+Public/product version: `2.9.6`  
+Package version: `2.9.6`  
+Normalized release tag: `v2.9.6`  
+Assembly/file version: `2.9.6.0`  
+Mobile build code: `20906`
+
+### Release preparation and identity
+
+- Preserved the completed 2.9.5 source/release checkpoint in `docs/releases/2.9.5.md` before advancing current source.
+- Advanced `Directory.Build.props` to 2.9.6 and retained the existing direct/transitive NuGet Audit policy.
+- Set Android/iOS numeric build code to `20906` while preserving source-owned display-version inheritance.
+- Updated the in-app About identity to `Version 2.9.6 • Complete`.
+- Updated compiled/headless About regressions to protect the visible 2.9.6 identity.
+- Updated release-identity regression expectations to `2.9.6`, `v2.9.6`, `2.9.6.0`, and `20906` while retaining checks for earlier 2.9-series build-code mappings.
+- Added a stable Linux AppStream 2.9.6 entry while preserving 2.9.5, 2.9.0, and 2.8.03 history.
+
+### Current baseline synchronization
+
+- Advanced the maintained security baseline to 2.9.6 and marked 2.9.5 as superseded.
+- Advanced support and contributor guidance to 2.9.6.
+- Updated the README, authoritative project state, documentation index, feature inventory, roadmap, versioning guide, platform-support guide, Source Preflight guide, release process, and release evidence checklist to 2.9.6.
+- Preserved earlier 2.9.0 and 2.9.5 checkpoint documents rather than rewriting them as current.
+- Updated the live `what_changed.md` handoff so current status no longer stops at the earlier 2.8.03 maintenance record.
+
+### Release-validation consistency
+
+- Retained centralized release identity parsing through `tools/release_identity.py`.
+- Retained version-aware packaging, completion-status, platform-support, and release-document validators.
+- Retained integrated release-identity regression coverage in Source Preflight.
+- Retained explicit Android ARM/ARM64/x86/x64 and iOS device/simulator RID contracts.
+- Retained current-release completion validation through the release-neutral focused workflow.
+
+### Security, supply chain, and cross-platform infrastructure retained
+
+- Direct/transitive NuGet auditing at moderate-or-higher severity with warnings-as-errors.
+- CodeQL and Dependency Review source automation contracts.
+- Windows/Linux/macOS x64 + ARM64 Desktop release source matrix.
+- Browser/WebAssembly/PWA composition.
+- Deterministic CycloneDX 1.7 SBOM generation.
+- Flat release filename collision protection and `SHA256SUMS.txt` generation.
+- `actions/attest@v4` provenance over `release-assets/**/*`.
+- Job-scoped release write/OIDC/attestation/artifact-metadata permissions.
+- Structured PASS / FAIL / BLOCKED / NOT RUN release evidence model.
+
+### Evidence boundary
+
+This release record documents completed source/release preparation. Hosted CI, compiled .NET validation, downloaded package execution, representative Browser testing, Android/iOS device tests, signing, notarization, TestFlight/App Store, Play Console, SBOM/checksum publication, and provenance execution are PASS only after those operations actually run and are observed.
+
 ## [2.9.5] - 2026-08-24
 
 **Status: Complete**
@@ -34,15 +86,16 @@ Mobile build code: `20905`
 - Added regression coverage that rejects Android mobile build-code drift.
 - Retained platform workflow contracts aligned with `actions/checkout@v7`.
 
-### Current product identity
+### Current product identity at that checkpoint
 
 - Advanced `Directory.Build.props` to 2.9.5.
 - Set Android/iOS numeric build code to `20905`.
 - Updated the in-app About identity to `Version 2.9.5 • Complete`.
 - Updated About unit/headless regressions to protect the visible 2.9.5 identity.
 - Added Linux AppStream stable release metadata for 2.9.5 while preserving 2.9.0 and 2.8.03 entries.
-- Updated the maintained security/support baseline to 2.9.5.
+- Updated the maintained security/support baseline to 2.9.5 at that checkpoint.
 - Updated README, project state, versioning, feature inventory, roadmap, platform support, Source Preflight, release process, release evidence checklist, contributor guidance, and documentation index to 2.9.5.
+- Preserved this completed checkpoint in `docs/releases/2.9.5.md` before advancing to 2.9.6.
 
 ### Existing release/security infrastructure retained
 
@@ -60,7 +113,7 @@ This release entry records completed source/release preparation. Hosted CI, comp
 
 ## [2.9.0] - 2026-08-24
 
-**Status: Complete checkpoint; superseded by 2.9.5**
+**Status: Complete checkpoint; superseded by later 2.9 releases**
 
 Public/product version: `2.9.0`  
 Package version: `2.9.0`  
@@ -70,12 +123,12 @@ Mobile build code: `20900`
 
 ### Prepared first as requested
 
-- Advanced central release identity to 2.9.0 before beginning the 2.9.5 preparation.
+- Advanced central release identity to 2.9.0 before beginning later 2.9-series preparation.
 - Set Android/iOS build code to `20900`.
 - Updated in-app About and compiled/headless release identity regressions to 2.9.0.
 - Added a stable Linux AppStream 2.9.0 entry while preserving the 2.8.03 release entry.
 - Established centralized release identity parsing and version-aware packaging/completion validation as the foundation for the 2.9 series.
-- Preserved the full checkpoint in `docs/releases/2.9.0.md` before intentionally advancing current source to 2.9.5.
+- Preserved the full checkpoint in `docs/releases/2.9.0.md` before intentionally advancing current source.
 
 ## Post-2.8.03 maintenance - 2026-08-20
 
@@ -293,4 +346,4 @@ A final fresh-clone attempt from the assistant container could not resolve `gith
 
 ## Maintenance policy
 
-CalcNova 2.9.5 is the current completed product baseline. Later repository changes may contain security fixes, compatibility maintenance, documentation corrections, translations, test improvements, dependency updates, evidence improvements, or optional features.
+CalcNova 2.9.6 is the current completed product baseline. Later repository changes may contain security fixes, compatibility maintenance, documentation corrections, translations, test improvements, dependency updates, evidence improvements, or optional features.
