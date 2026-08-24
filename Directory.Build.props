@@ -15,15 +15,14 @@
     <NuGetAuditMode>all</NuGetAuditMode>
     <NuGetAuditLevel>moderate</NuGetAuditLevel>
 
-    <!-- Public/product release identity. 2.8.03 is the user-facing version requested for CalcNova. -->
-    <ProductDisplayVersion>2.8.03</ProductDisplayVersion>
-    <!-- NuGet/MSBuild package versions follow SemVer 2.0, where leading zero patch values are invalid. -->
-    <Version>2.8.3</Version>
-    <VersionPrefix>2.8.3</VersionPrefix>
-    <PackageVersion>2.8.3</PackageVersion>
-    <AssemblyVersion>2.8.3.0</AssemblyVersion>
-    <FileVersion>2.8.3.0</FileVersion>
-    <InformationalVersion>2.8.03</InformationalVersion>
+    <!-- Public/product release identity. -->
+    <ProductDisplayVersion>2.9.0</ProductDisplayVersion>
+    <Version>2.9.0</Version>
+    <VersionPrefix>2.9.0</VersionPrefix>
+    <PackageVersion>2.9.0</PackageVersion>
+    <AssemblyVersion>2.9.0.0</AssemblyVersion>
+    <FileVersion>2.9.0.0</FileVersion>
+    <InformationalVersion>2.9.0</InformationalVersion>
 
     <Authors>Sanskar</Authors>
     <RepositoryUrl>https://github.com/sanskarIN/CalcNova</RepositoryUrl>
