@@ -2,6 +2,81 @@
 
 All notable CalcNova changes are recorded here.
 
+## [2.9.5] - 2026-08-24
+
+**Status: Complete**
+
+Public/product version: `2.9.5`  
+Package version: `2.9.5`  
+Normalized release tag: `v2.9.5`  
+Assembly/file version: `2.9.5.0`  
+Mobile build code: `20905`
+
+### Release identity consistency
+
+- Added `tools/release_identity.py` as the shared SDK-independent release identity parser.
+- Added deterministic release tag, display-version normalization, assembly/file-version, and mobile build-code derivation.
+- Defined the mobile build code as `MAJOR * 10000 + MINOR * 100 + PATCH`, with explicit tests for `2.9.0 -> 20900` and `2.9.5 -> 20905`.
+- Made packaging validation derive current release/build expectations from `Directory.Build.props` instead of hardcoded 2.8.03 constants.
+- Made completion-status validation derive current documentation, tag, build code, and About expectations from central release identity.
+- Made cross-platform source validation derive the current Android/iOS build code rather than pinning `20803`.
+- Made release-document validation derive current documentation/evidence markers from central release identity.
+- Integrated release-identity regression coverage into the SDK-independent Source Preflight.
+- Fixed importlib compatibility for the release-identity dataclass regression harness.
+
+### Cross-platform maintenance
+
+- Retained native x64/ARM64 Desktop release targets for Windows, Linux, and macOS.
+- Retained Browser/WebAssembly/PWA source composition and offline resources.
+- Retained explicit Android source runtime identifiers: `android-arm`, `android-arm64`, `android-x86`, `android-x64`.
+- Retained explicit iOS source runtime identifiers: `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`.
+- Strengthened the cross-platform source validator to check mobile build identity against central release metadata.
+- Added regression coverage that rejects Android mobile build-code drift.
+- Retained platform workflow contracts aligned with `actions/checkout@v7`.
+
+### Current product identity
+
+- Advanced `Directory.Build.props` to 2.9.5.
+- Set Android/iOS numeric build code to `20905`.
+- Updated the in-app About identity to `Version 2.9.5 • Complete`.
+- Updated About unit/headless regressions to protect the visible 2.9.5 identity.
+- Added Linux AppStream stable release metadata for 2.9.5 while preserving 2.9.0 and 2.8.03 entries.
+- Updated the maintained security/support baseline to 2.9.5.
+- Updated README, project state, versioning, feature inventory, roadmap, platform support, Source Preflight, release process, release evidence checklist, contributor guidance, and documentation index to 2.9.5.
+
+### Existing release/security infrastructure retained
+
+- Direct/transitive NuGet auditing at moderate-or-higher severity with warnings-as-errors.
+- CodeQL and Dependency Review source automation contracts.
+- Deterministic CycloneDX 1.7 SBOM generation.
+- Flat release filename collision protection and `SHA256SUMS.txt` generation.
+- `actions/attest@v4` provenance over `release-assets/**/*`.
+- Job-scoped release write/OIDC/attestation/artifact-metadata permissions.
+- Structured PASS / FAIL / BLOCKED / NOT RUN release evidence model.
+
+### Evidence boundary
+
+This release entry records completed source/release preparation. Hosted CI, compiled .NET validation, downloaded package execution, Browser runtime checks, Android/iOS device tests, signing, notarization, TestFlight/App Store, and Play Console results remain separate evidence and are PASS only when actually executed and observed.
+
+## [2.9.0] - 2026-08-24
+
+**Status: Complete checkpoint; superseded by 2.9.5**
+
+Public/product version: `2.9.0`  
+Package version: `2.9.0`  
+Normalized release tag: `v2.9.0`  
+Assembly/file version: `2.9.0.0`  
+Mobile build code: `20900`
+
+### Prepared first as requested
+
+- Advanced central release identity to 2.9.0 before beginning the 2.9.5 preparation.
+- Set Android/iOS build code to `20900`.
+- Updated in-app About and compiled/headless release identity regressions to 2.9.0.
+- Added a stable Linux AppStream 2.9.0 entry while preserving the 2.8.03 release entry.
+- Established centralized release identity parsing and version-aware packaging/completion validation as the foundation for the 2.9 series.
+- Preserved the full checkpoint in `docs/releases/2.9.0.md` before intentionally advancing current source to 2.9.5.
+
 ## Post-2.8.03 maintenance - 2026-08-20
 
 ### Cross-platform release architecture
@@ -49,7 +124,7 @@ All notable CalcNova changes are recorded here.
 - Expanded release-document validation to protect the artifact-provenance and security-automation guides as current release contracts.
 - Documented direct verification with `sha256sum -c SHA256SUMS.txt` after downloading release assets into one directory.
 
-The product/display version remains `2.8.03`; these are repository maintenance/security/release-quality enhancements, not a new product-version declaration.
+The product/display version remains `2.8.03` for this historical maintenance checkpoint; these were repository maintenance/security/release-quality enhancements before the later 2.9-series preparation.
 
 ## [2.8.03] - 2026-08-19
 
@@ -205,10 +280,10 @@ Mobile build code: `20803`
 - Closed the 2.8.03 roadmap and replaced provisional feature-status sections with a completed feature inventory.
 - Converted release readiness documentation into a release **evidence** checklist so unexecuted environment checks are not described as missing product implementation.
 - Updated platform support documentation to classify Desktop, Browser, Android, and iOS source composition as complete while recording runtime/device/signing results separately.
-- Updated `SECURITY.md` so CalcNova 2.8.03 is the current completed and supported security baseline.
-- Updated `SUPPORT.md` so feature requests are categorized as optional post-2.8.03 enhancements unless they address correctness, security, or compatibility.
-- Updated `CONTRIBUTING.md` to describe a completed 2.8.03 baseline and contributor setup/maintenance work instead of a provisional project posture.
-- Preserved earlier audit/continuation records under `docs/history/` for historical traceability; current authoritative status is defined by the 2.8.03 completion documents.
+- Updated `SECURITY.md` so CalcNova 2.8.03 is the current completed and supported security baseline at that release point.
+- Updated `SUPPORT.md` so feature requests were categorized as optional post-2.8.03 enhancements unless they addressed correctness, security, or compatibility.
+- Updated `CONTRIBUTING.md` to describe the completed 2.8.03 baseline and contributor setup/maintenance work instead of a provisional project posture.
+- Preserved earlier audit/continuation records under `docs/history/` for historical traceability.
 
 ### Evidence policy
 
@@ -218,4 +293,4 @@ A final fresh-clone attempt from the assistant container could not resolve `gith
 
 ## Maintenance policy
 
-Version 2.8.03 is the completed product baseline. Later repository changes may contain security fixes, compatibility maintenance, documentation corrections, translations, test improvements, dependency updates, or optional features.
+CalcNova 2.9.5 is the current completed product baseline. Later repository changes may contain security fixes, compatibility maintenance, documentation corrections, translations, test improvements, dependency updates, evidence improvements, or optional features.
