@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Shared CalcNova release-identity helpers used by SDK-independent tooling."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 import re
 import xml.etree.ElementTree as ET
