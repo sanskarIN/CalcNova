@@ -25,11 +25,11 @@ class ReleaseIdentityTests(unittest.TestCase):
     def test_repository_release_identity_is_consistent(self) -> None:
         module = load_module()
         identity = module.load_release_identity(ROOT)
-        self.assertEqual("2.8.03", identity.display_version)
-        self.assertEqual("2.8.3", identity.semver_version)
-        self.assertEqual("20803", identity.mobile_build_code)
-        self.assertEqual("v2.8.3", identity.release_tag)
-        self.assertEqual("2.8.3.0", identity.assembly_version)
+        self.assertEqual("2.9.0", identity.display_version)
+        self.assertEqual("2.9.0", identity.semver_version)
+        self.assertEqual("20900", identity.mobile_build_code)
+        self.assertEqual("v2.9.0", identity.release_tag)
+        self.assertEqual("2.9.0.0", identity.assembly_version)
 
     def test_mobile_build_code_supports_2_9_series(self) -> None:
         module = load_module()
