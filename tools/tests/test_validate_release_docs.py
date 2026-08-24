@@ -43,10 +43,22 @@ class ReleaseDocumentationValidatorTests(unittest.TestCase):
         self.assertIn(f"python tools/release_preflight.py --tag {identity.release_tag}", release_markers)
         self.assertIn(f"release tag: `{identity.release_tag}`", release_markers)
 
-    def test_release_contract_includes_versioning_and_2_9_0_checkpoint(self) -> None:
-        _, _, markers = self.current_markers()
+    def test_release_contract_protects_2_9_checkpoint_chain(self) -> None:
+        _, identity, markers = self.current_markers()
         self.assertIn("docs/VERSIONING.md", markers)
         self.assertIn("docs/releases/2.9.0.md", markers)
+        self.assertIn("docs/releases/2.9.5.md", markers)
+        current_checkpoint = f"docs/releases/{identity.display_version}.md"
+        self.assertIn(current_checkpoint, markers)
+        self.assertIn(
+            f"# CalcNova {identity.display_version} Release Checkpoint",
+            markers[current_checkpoint],
+        )
+        self.assertIn(f"Release tag: `{identity.release_tag}`", markers[current_checkpoint])
+        self.assertIn(
+            f"Android/iOS build code: `{identity.mobile_build_code}`",
+            markers[current_checkpoint],
+        )
 
     def test_release_contract_protects_security_and_provenance_guides(self) -> None:
         _, _, markers = self.current_markers()
@@ -87,7 +99,10 @@ class ReleaseDocumentationValidatorTests(unittest.TestCase):
         validator, _, markers = self.current_markers()
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / "Directory.Build.props").write_text((ROOT / "Directory.Build.props").read_text(encoding="utf-8"), encoding="utf-8")
+            (root / "Directory.Build.props").write_text(
+                (ROOT / "Directory.Build.props").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
             failures = validator.validate(root)
         self.assertEqual(len(markers), len(failures))
 
