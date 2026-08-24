@@ -56,13 +56,13 @@ class PackagingMetadataValidatorTests(unittest.TestCase):
             root = Path(directory)
             (root / "Directory.Build.props").write_text(
                 """<Project><PropertyGroup>
-<ProductDisplayVersion>2.9.5</ProductDisplayVersion>
-<Version>2.9.5</Version>
-<VersionPrefix>2.9.5</VersionPrefix>
-<PackageVersion>2.9.5</PackageVersion>
-<AssemblyVersion>2.9.5.0</AssemblyVersion>
-<FileVersion>2.9.5.0</FileVersion>
-<InformationalVersion>2.9.5</InformationalVersion>
+<ProductDisplayVersion>2.9.6</ProductDisplayVersion>
+<Version>2.9.6</Version>
+<VersionPrefix>2.9.6</VersionPrefix>
+<PackageVersion>2.9.6</PackageVersion>
+<AssemblyVersion>2.9.6.0</AssemblyVersion>
+<FileVersion>2.9.6.0</FileVersion>
+<InformationalVersion>2.9.6</InformationalVersion>
 </PropertyGroup></Project>""",
                 encoding="utf-8",
             )
