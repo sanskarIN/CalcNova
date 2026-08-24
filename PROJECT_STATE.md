@@ -2,11 +2,11 @@
 
 ## Current Version
 
-**2.9.5**
+**2.9.6**
 
-Normalized .NET/NuGet version: `2.9.5`  
-Normalized release tag: `v2.9.5`  
-Mobile numeric build code: `20905`
+Normalized .NET/NuGet version: `2.9.6`  
+Normalized release tag: `v2.9.6`  
+Mobile numeric build code: `20906`
 
 See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
@@ -16,28 +16,30 @@ See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
 ## Completion Status
 
-**COMPLETE — CalcNova version 2.9.5**
+**COMPLETE — CalcNova version 2.9.6**
 
-The defined 2.9.5 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization infrastructure and reviewed localized surfaces, accessibility/adaptive contracts, Desktop/Browser/Android/iOS composition, source validation, dependency vulnerability policy, artifact integrity, structured release evidence, packaging metadata, release workflows, security automation, release provenance controls, deterministic release SBOM generation, cross-platform source-contract validation, and centralized release-identity validation are present as completed source capabilities.
+The defined 2.9.6 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization infrastructure and reviewed localized surfaces, accessibility/adaptive contracts, Desktop/Browser/Android/iOS composition, source validation, dependency vulnerability policy, artifact integrity, structured release evidence, packaging metadata, release workflows, security automation, release provenance controls, deterministic release SBOM generation, cross-platform source-contract validation, and centralized release-identity validation are present as completed source capabilities.
 
-Future repository changes are classified as maintenance, compatibility updates, security fixes, documentation changes, translation additions, or optional enhancements. They are not required to define the 2.9.5 project as complete.
+Future repository changes are classified as maintenance, compatibility updates, security fixes, documentation changes, translation additions, or optional enhancements. They are not required to define the 2.9.6 project as complete.
 
 ## Current Maintenance Enhancements — 2026-08-24
 
-The completed 2.9.5 baseline includes the cross-platform, release-consistency, security, provenance, and software-supply-chain controls accumulated after 2.8.03.
+The completed 2.9.6 baseline includes the cross-platform, release-consistency, security, provenance, and software-supply-chain controls accumulated after 2.8.03.
 
 ### 2.9-series release identity consistency
 
 - `tools/release_identity.py` is the SDK-independent parser for `Directory.Build.props` release identity;
 - it validates `ProductDisplayVersion`, normalized SemVer, package/version-prefix identity, assembly/file version, and informational version as one consistent contract;
 - it derives CalcNova's mobile build code using `MAJOR * 10000 + MINOR * 100 + PATCH`;
-- regression coverage explicitly protects `2.9.0 -> 20900` and `2.9.5 -> 20905`;
-- `tools/validate_packaging_metadata.py` derives the current release identity instead of hardcoding 2.8.03 constants;
+- regression coverage explicitly protects `2.9.0 -> 20900`, `2.9.5 -> 20905`, and `2.9.6 -> 20906`;
+- `tools/validate_packaging_metadata.py` derives the current release identity instead of hardcoding release constants;
 - Linux AppStream validation requires exactly one stable release entry for the current source version and validates its ISO release date;
 - `tools/validate_completion_status.py` derives current documentation/About expectations from the central release identity;
+- `tools/validate_platform_support.py` derives current mobile build identity from the same central release contract;
+- `tools/validate_release_docs.py` derives current release-document expectations from the central release contract;
 - the release identity regression suite is integrated into `tools/release_preflight.py` and protected by the preflight inventory tests;
-- the 2.9.0 intermediate preparation checkpoint is preserved in `docs/releases/2.9.0.md`;
-- the current source identity is 2.9.5 / `v2.9.5` / mobile build code `20905`.
+- the 2.9.0 and 2.9.5 intermediate checkpoints are preserved in `docs/releases/2.9.0.md` and `docs/releases/2.9.5.md`;
+- the current source identity is 2.9.6 / `v2.9.6` / mobile build code `20906`.
 
 ### Cross-platform source hardening
 
@@ -108,24 +110,24 @@ The completed 2.9.5 baseline includes the cross-platform, release-consistency, s
 - release-document validation protects the security automation, provenance/SBOM guide, current state, and live handoff documentation contracts;
 - `docs/SECURITY_AUTOMATION.md` and `docs/ARTIFACT_PROVENANCE.md` document operation, evidence semantics, and verification guidance.
 
-These controls are part of the current 2.9.5 baseline. The 2.9-series version changes are intentional release preparation, while runtime/service evidence remains separately observed.
+These controls are part of the current 2.9.6 baseline. The 2.9-series version changes are intentional release preparation, while runtime/service evidence remains separately observed.
 
 ## Product Identity
 
 - Product name: CalcNova
-- Public version: `2.9.5`
-- SemVer/package equivalent: `2.9.5`
-- Release tag equivalent: `v2.9.5`
-- Android/iOS display version: `2.9.5`
-- Android/iOS numeric build code: `20905`
-- Assembly version: `2.9.5.0`
-- File version: `2.9.5.0`
-- Informational version: `2.9.5`
+- Public version: `2.9.6`
+- SemVer/package equivalent: `2.9.6`
+- Release tag equivalent: `v2.9.6`
+- Android/iOS display version: `2.9.6`
+- Android/iOS numeric build code: `20906`
+- Assembly version: `2.9.6.0`
+- File version: `2.9.6.0`
+- Informational version: `2.9.6`
 - Application id: `in.sanskar.calcnova`
 - License: Apache-2.0
 - Repository: `https://github.com/sanskarIN/CalcNova`
 
-CalcNova 2.9.5 is already strict SemVer, so the public, package, and normalized numeric version strings are identical.
+CalcNova 2.9.6 is already strict SemVer, so the public, package, and normalized numeric version strings are identical.
 
 ## Technical Foundation
 
@@ -322,7 +324,7 @@ CalcNova 2.9.5 is already strict SemVer, so the public, package, and normalized 
 - Catalog completeness/duplicate/unknown-key validation
 - Runtime localization for reviewed shell, calculator, onboarding, settings, history, currency, About, and related surfaces
 
-Additional language packs or further localization expansion are optional post-release contributions, not completion requirements for 2.9.5.
+Additional language packs or further localization expansion are optional post-release contributions, not completion requirements for 2.9.6.
 
 ## Completed Platform Composition
 
@@ -339,7 +341,7 @@ Additional language packs or further localization expansion are optional post-re
 - explicit iOS device ARM64 and simulator ARM64/x64 source runtime identifiers
 - focused cross-platform source validator/workflow and integrated preflight coverage
 
-Android and iOS source metadata uses display version `2.9.5` and numeric build code `20905`.
+Android and iOS source metadata uses display version `2.9.6` and numeric build code `20906`.
 
 Desktop release source packages `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, and `osx-arm64`. Runtime/package evidence for those architecture artifacts remains separately recorded.
 
@@ -448,12 +450,12 @@ A fresh-clone attempt on 2026-08-24 again could not resolve `github.com`, so the
 
 The available legacy commit-status surface is not treated as a substitute for observed GitHub Actions results. No hosted workflow, runtime, signing, notarization, device, browser, TestFlight/App Store, or Play Console PASS is inferred unless that operation actually executes and its result is observed.
 
-This evidence notation does **not** mean CalcNova 2.9.5 is incomplete. It means a particular command or service check was not observed in that environment/tool surface.
+This evidence notation does **not** mean CalcNova 2.9.6 is incomplete. It means a particular command or service check was not observed in that environment/tool surface.
 
 Typical environment-specific verification commands include:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.5
+python tools/release_preflight.py --tag v2.9.6
 python -m unittest tools.tests.test_release_identity
 python -m unittest tools.tests.test_generate_sbom
 python tools/validate_platform_support.py .
@@ -471,7 +473,7 @@ Platform signing, notarization, provisioning, GitHub-hosted security scanning, o
 
 ## Final Classification
 
-- Product scope for 2.9.5: **COMPLETE**
+- Product scope for 2.9.6: **COMPLETE**
 - Core features: **COMPLETE**
 - Shared application features: **COMPLETE**
 - Platform source composition: **COMPLETE**
@@ -499,5 +501,6 @@ For details, see:
 - [`docs/SECURITY_AUTOMATION.md`](docs/SECURITY_AUTOMATION.md)
 - [`docs/ARTIFACT_PROVENANCE.md`](docs/ARTIFACT_PROVENANCE.md)
 - [`docs/releases/2.9.0.md`](docs/releases/2.9.0.md)
+- [`docs/releases/2.9.5.md`](docs/releases/2.9.5.md)
 - [`docs/FINAL_SOURCE_AUDIT_2026-08-19.md`](docs/FINAL_SOURCE_AUDIT_2026-08-19.md)
 - [`what_changed.md`](what_changed.md)
