@@ -2,60 +2,105 @@
 
 ## Current release
 
-**CalcNova 2.8.03** is the public/product release version.
+**CalcNova 2.9.5** is the public/product release version.
 
-The repository uses two equivalent representations because strict Semantic Versioning does not allow leading zeroes in numeric identifiers:
+The current 2.9.5 release already uses strict Semantic Versioning-compatible numeric components, so the public/product and .NET/NuGet versions are identical:
 
 | Purpose | Value |
 | --- | --- |
-| Product/display version | `2.8.03` |
-| .NET/NuGet package version | `2.8.3` |
-| Normalized Git release tag | `v2.8.3` |
-| Assembly version | `2.8.3.0` |
-| File version | `2.8.3.0` |
-| Informational version | `2.8.03` |
-| Android/iOS numeric build code | `20803` |
+| Product/display version | `2.9.5` |
+| .NET/NuGet package version | `2.9.5` |
+| Normalized Git release tag | `v2.9.5` |
+| Assembly version | `2.9.5.0` |
+| File version | `2.9.5.0` |
+| Informational version | `2.9.5` |
+| Android/iOS numeric build code | `20905` |
 
-`2.8.03` and `2.8.3` identify the same CalcNova release. The normalized form exists only where package/tag tooling requires SemVer-compatible numeric identifiers.
+The requested intermediate 2.9.0 preparation used `2.9.0`, tag `v2.9.0`, and mobile build code `20900`; that checkpoint is preserved in [`releases/2.9.0.md`](releases/2.9.0.md).
 
 ## Source of truth
 
 `Directory.Build.props` owns the shared release identity:
 
-- `ProductDisplayVersion` = `2.8.03`;
-- `Version`, `VersionPrefix`, and `PackageVersion` = `2.8.3`;
-- `AssemblyVersion` and `FileVersion` = `2.8.3.0`;
-- `InformationalVersion` = `2.8.03`.
+- `ProductDisplayVersion` = `2.9.5`;
+- `Version`, `VersionPrefix`, and `PackageVersion` = `2.9.5`;
+- `AssemblyVersion` and `FileVersion` = `2.9.5.0`;
+- `InformationalVersion` = `2.9.5`.
 
-Android and iOS use `$(ProductDisplayVersion)` for their visible application version and `20803` for the platform numeric build code.
+Android and iOS use `$(ProductDisplayVersion)` for their visible application version and `20905` for the platform numeric build code.
+
+## SDK-independent release identity contract
+
+`tools/release_identity.py` parses the central build properties and fails closed when the release fields disagree.
+
+It validates:
+
+- display-version syntax;
+- stable `MAJOR.MINOR.PATCH` SemVer package syntax;
+- display-version normalization against `<Version>`;
+- `VersionPrefix` and `PackageVersion` equality;
+- assembly/file version equality to `<Version>.0`;
+- informational version equality to the product display version;
+- deterministic release tag `v<Version>`;
+- deterministic mobile build code using `MAJOR * 10000 + MINOR * 100 + PATCH`.
+
+The mobile calculation therefore gives:
+
+```text
+2.9.0 -> 20900
+2.9.5 -> 20905
+```
+
+Minor and patch components above 99 are rejected by that mobile build-code contract instead of silently producing an ambiguous code.
 
 ## Release-tag contract
 
 CalcNova's release workflow accepts strict `vMAJOR.MINOR.PATCH` Semantic Versioning tags. For this release the correct release tag is:
 
 ```text
-v2.8.3
+v2.9.5
 ```
 
-The visually formatted tag `v2.8.03` is intentionally rejected because a leading zero in a SemVer numeric patch identifier is invalid.
-
-Before build and publication, the release workflow checks that the requested tag equals `v` plus the normalized `<Version>` stored in `Directory.Build.props`. This prevents publishing a tag whose package version does not match the source tree.
+Before build and publication, the release workflow checks that the requested tag equals `v` plus the `<Version>` stored in `Directory.Build.props`. This prevents publishing a tag whose package version does not match the source tree.
 
 ## Mobile release identity
 
 The Android and iOS projects use:
 
 ```text
-ApplicationDisplayVersion = 2.8.03
-ApplicationVersion = 20803
+ApplicationDisplayVersion = 2.9.5
+ApplicationVersion = 20905
 ```
 
-Release publishing does not override those values from the GitHub run number or from the normalized tag. The source tree therefore remains the authoritative release identity.
+Release publishing does not override those values from the GitHub run number or from the tag. The source tree therefore remains the authoritative release identity.
+
+Android currently declares source runtime identifiers:
+
+```text
+android-arm;android-arm64;android-x86;android-x64
+```
+
+iOS currently declares source runtime identifiers:
+
+```text
+ios-arm64;iossimulator-arm64;iossimulator-x64
+```
 
 ## Packaging templates
 
 Windows and macOS packaging templates remain parameterized because their package-generation steps have platform-specific version formats. Generated packages must use the release identity represented by this document while satisfying each platform's native version syntax.
 
+Linux AppStream metadata preserves stable entries for 2.8.03, 2.9.0, and the current 2.9.5 release. The packaging validator requires exactly one stable AppStream entry for the current source display version and validates that entry's release date and description.
+
 ## Verification
 
-The SDK-independent packaging validator checks the shared version properties and the mobile source metadata. Release-workflow validation also protects tag/source consistency and prevents publish-time display-version drift.
+Current SDK-independent checks include:
+
+```bash
+python -m unittest tools.tests.test_release_identity
+python tools/validate_packaging_metadata.py .
+python tools/validate_completion_status.py .
+python tools/release_preflight.py --tag v2.9.5
+```
+
+The packaging/completion validators derive their current version expectations from `Directory.Build.props`, reducing the risk of a future release bump leaving hardcoded validator constants behind.
