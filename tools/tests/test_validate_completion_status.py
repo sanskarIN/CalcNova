@@ -8,12 +8,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 VALIDATOR = ROOT / "tools" / "validate_completion_status.py"
+IDENTITY_MODULE = ROOT / "tools" / "release_identity.py"
 
 
-def load_validator():
-    spec = importlib.util.spec_from_file_location("validate_completion_status", VALIDATOR)
+def load_module(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
-        raise RuntimeError("Unable to load completion-status validator")
+        raise RuntimeError(f"Unable to load {name}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -21,17 +22,22 @@ def load_validator():
 
 class CompletionStatusValidatorTests(unittest.TestCase):
     def test_repository_completion_contract_is_valid(self) -> None:
-        validator = load_validator()
+        validator = load_module(VALIDATOR, "validate_completion_status")
         self.assertEqual([], validator.validate(ROOT))
 
-    def test_release_identity_constants_are_stable(self) -> None:
-        validator = load_validator()
-        self.assertEqual("2.8.03", validator.DISPLAY_VERSION)
-        self.assertEqual("2.8.3", validator.NORMALIZED_VERSION)
-        self.assertEqual("20803", validator.MOBILE_BUILD_CODE)
+    def test_release_identity_is_loaded_from_central_metadata(self) -> None:
+        validator = load_module(VALIDATOR, "validate_completion_status_identity")
+        identity_module = load_module(IDENTITY_MODULE, "release_identity_for_completion_test")
+        identity = identity_module.load_release_identity(ROOT)
+        contracts = validator.current_status_contracts(identity)
+        self.assertIn(identity.display_version, contracts["README.md"][0])
+        self.assertIn(identity.release_tag, contracts["README.md"][2])
+        self.assertIn(identity.mobile_build_code, contracts["docs/VERSIONING.md"][2])
 
     def test_authoritative_status_inventory_is_stable(self) -> None:
-        validator = load_validator()
+        validator = load_module(VALIDATOR, "validate_completion_status_inventory")
+        identity_module = load_module(IDENTITY_MODULE, "release_identity_for_inventory_test")
+        identity = identity_module.load_release_identity(ROOT)
         self.assertEqual(
             {
                 "README.md",
@@ -44,18 +50,17 @@ class CompletionStatusValidatorTests(unittest.TestCase):
                 "docs/README.md",
                 "docs/FEATURES.md",
                 "docs/ROADMAP.md",
-                "docs/FINAL_SOURCE_AUDIT_2026-08-19.md",
                 "docs/VERSIONING.md",
                 "docs/RELEASE.md",
                 "docs/RELEASE_READINESS_CHECKLIST.md",
                 "docs/PLATFORM_SUPPORT.md",
                 "docs/SOURCE_PREFLIGHT.md",
             },
-            set(validator.CURRENT_STATUS_CONTRACTS),
+            set(validator.current_status_contracts(identity)),
         )
 
     def test_obsolete_status_phrases_remain_forbidden(self) -> None:
-        validator = load_validator()
+        validator = load_module(VALIDATOR, "validate_completion_status_forbidden")
         forbidden = set(validator.FORBIDDEN_CURRENT_STATUS_MARKERS)
         self.assertIn("under active development", forbidden)
         self.assertIn("active pre-release development", forbidden)
