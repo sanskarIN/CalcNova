@@ -1,8 +1,8 @@
-# CalcNova 2.9.5 SDK-Independent Source Preflight
+# CalcNova 2.9.6 SDK-Independent Source Preflight
 
 CalcNova includes a deterministic source-level validation command for environments where the .NET SDK or target-platform workloads are unavailable.
 
-**CalcNova 2.9.5 is the completed product baseline.**
+**CalcNova 2.9.6 is the completed product baseline.**
 
 ## Run it
 
@@ -15,12 +15,12 @@ python tools/release_preflight.py
 For the current release identity, include the exact release tag when validating a tagged source tree:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.5
+python tools/release_preflight.py --tag v2.9.6
 ```
 
-The public/product version, strict SemVer package version, and normalized tag are `2.9.5`, `2.9.5`, and `v2.9.5`. Android/iOS use numeric build code `20905`.
+The public/product version, strict SemVer package version, and normalized tag are `2.9.6`, `2.9.6`, and `v2.9.6`. Android/iOS use numeric build code `20906`.
 
-The requested 2.9.0 checkpoint was prepared first with tag `v2.9.0` and build code `20900`; see [`releases/2.9.0.md`](releases/2.9.0.md).
+Earlier 2.9.0 and 2.9.5 checkpoints are preserved in [`releases/2.9.0.md`](releases/2.9.0.md) and [`releases/2.9.5.md`](releases/2.9.5.md).
 
 ## What it runs
 
@@ -63,7 +63,7 @@ The integrated preflight is intentionally broader than any one focused workflow.
 
 - current release identity loaded from `Directory.Build.props`;
 - current release completion-status contracts;
-- in-app About release label `Version 2.9.5 • Complete`;
+- in-app About release label `Version 2.9.6 • Complete`;
 - converter default-pair and preference-notice contracts;
 - versioned settings schema/shared codec/shared validation;
 - onboarding persistence/visual/focus behavior;
@@ -114,14 +114,14 @@ python tools/validate_completion_status.py .
 
 `tools/release_identity.py` parses `Directory.Build.props` and requires:
 
-- display version `2.9.5` to normalize to package version `2.9.5`;
+- display version `2.9.6` to normalize to package version `2.9.6`;
 - `VersionPrefix` and `PackageVersion` to match `Version`;
-- assembly/file versions to match `2.9.5.0`;
+- assembly/file versions to match `2.9.6.0`;
 - informational version to match the display version;
-- release tag to derive as `v2.9.5`;
-- mobile build code to derive as `20905` from `MAJOR * 10000 + MINOR * 100 + PATCH`.
+- release tag to derive as `v2.9.6`;
+- mobile build code to derive as `20906` from `MAJOR * 10000 + MINOR * 100 + PATCH`.
 
-This removes the earlier maintenance risk where validators could remain pinned to an old release after source workflows or version metadata advanced.
+This removes the maintenance risk where validators could remain pinned to an old release after source workflows or version metadata advanced.
 
 ## Current completion-status contract
 
@@ -156,7 +156,7 @@ python tools/validate_platform_workflows.py .
 python -m unittest tools.tests.test_validate_platform_workflows
 ```
 
-The platform-source validator protects Desktop, Browser/PWA, Android, iOS, shared platform abstractions, platform service composition, Browser storage/PWA resources, and explicit mobile runtime identifiers.
+The platform-source validator protects Desktop, Browser/PWA, Android, iOS, shared platform abstractions, platform service composition, Browser storage/PWA resources, and explicit mobile runtime identifiers. Its current mobile build-code expectation is derived through `tools/release_identity.py` rather than hardcoded.
 
 The workflow validator separately protects .NET/platform workload setup, `actions/checkout@v7`, Java 17 for Android, the Desktop OS runner matrix, and read-only validation permissions.
 
@@ -283,6 +283,6 @@ A successful source preflight validates deterministic repository contracts. It d
 
 Those checks are external execution/settings evidence. They are recorded only when actually run, observed, or enabled.
 
-An environment-specific `NOT RUN` or `BLOCKED` result does not change the completed implementation status of CalcNova 2.9.5; it only records whether that external verification operation executed in that environment.
+An environment-specific `NOT RUN` or `BLOCKED` result does not change the completed implementation status of CalcNova 2.9.6; it only records whether that external verification operation executed in that environment.
 
 See [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md), [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md), [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md), [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md), [FOCUS_VISIBILITY.md](FOCUS_VISIBILITY.md), and [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
