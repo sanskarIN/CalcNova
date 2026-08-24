@@ -2,11 +2,11 @@
 
 ## Current Version
 
-**2.8.03**
+**2.9.5**
 
-Normalized .NET/NuGet version: `2.8.3`  
-Normalized release tag: `v2.8.3`  
-Mobile numeric build code: `20803`
+Normalized .NET/NuGet version: `2.9.5`  
+Normalized release tag: `v2.9.5`  
+Mobile numeric build code: `20905`
 
 See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
@@ -16,15 +16,39 @@ See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
 ## Completion Status
 
-**COMPLETE — CalcNova version 2.8.03**
+**COMPLETE — CalcNova version 2.9.5**
 
-The defined 2.8.03 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization infrastructure and reviewed localized surfaces, accessibility/adaptive contracts, Desktop/Browser/Android/iOS composition, source validation, dependency vulnerability policy, artifact integrity, structured release evidence, packaging metadata, release workflows, security automation, release provenance controls, and deterministic release SBOM generation are present as completed source capabilities.
+The defined 2.9.5 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization infrastructure and reviewed localized surfaces, accessibility/adaptive contracts, Desktop/Browser/Android/iOS composition, source validation, dependency vulnerability policy, artifact integrity, structured release evidence, packaging metadata, release workflows, security automation, release provenance controls, deterministic release SBOM generation, cross-platform source-contract validation, and centralized release-identity validation are present as completed source capabilities.
 
-Future repository changes are classified as maintenance, compatibility updates, security fixes, documentation changes, translation additions, or optional enhancements. They are not required to define the 2.8.03 project as complete.
+Future repository changes are classified as maintenance, compatibility updates, security fixes, documentation changes, translation additions, or optional enhancements. They are not required to define the 2.9.5 project as complete.
 
-## Current Maintenance Enhancements — 2026-08-21
+## Current Maintenance Enhancements — 2026-08-24
 
-The completed 2.8.03 baseline now includes stronger cross-platform release and supply-chain controls.
+The completed 2.9.5 baseline includes the cross-platform, release-consistency, security, provenance, and software-supply-chain controls accumulated after 2.8.03.
+
+### 2.9-series release identity consistency
+
+- `tools/release_identity.py` is the SDK-independent parser for `Directory.Build.props` release identity;
+- it validates `ProductDisplayVersion`, normalized SemVer, package/version-prefix identity, assembly/file version, and informational version as one consistent contract;
+- it derives CalcNova's mobile build code using `MAJOR * 10000 + MINOR * 100 + PATCH`;
+- regression coverage explicitly protects `2.9.0 -> 20900` and `2.9.5 -> 20905`;
+- `tools/validate_packaging_metadata.py` derives the current release identity instead of hardcoding 2.8.03 constants;
+- Linux AppStream validation requires exactly one stable release entry for the current source version and validates its ISO release date;
+- `tools/validate_completion_status.py` derives current documentation/About expectations from the central release identity;
+- the release identity regression suite is integrated into `tools/release_preflight.py` and protected by the preflight inventory tests;
+- the 2.9.0 intermediate preparation checkpoint is preserved in `docs/releases/2.9.0.md`;
+- the current source identity is 2.9.5 / `v2.9.5` / mobile build code `20905`.
+
+### Cross-platform source hardening
+
+- Desktop remains shared across Windows, Linux, and macOS with native x64 and ARM64 release targets;
+- Browser/WebAssembly/PWA composition remains separately validated;
+- Android explicitly declares `android-arm`, `android-arm64`, `android-x86`, and `android-x64` runtime identifiers;
+- iOS explicitly declares `ios-arm64`, `iossimulator-arm64`, and `iossimulator-x64` runtime identifiers;
+- `tools/validate_platform_support.py` validates maintained source composition, platform services, browser/PWA resources, mobile architecture inventory, and shared platform contracts;
+- `.github/workflows/platform-support-validate.yml` provides a focused read-only platform-source gate;
+- platform source validation and regressions are integrated into the always-run source preflight;
+- platform workflow validation is aligned with `actions/checkout@v7`.
 
 ### Deterministic CycloneDX release SBOMs
 
@@ -84,24 +108,24 @@ The completed 2.8.03 baseline now includes stronger cross-platform release and s
 - release-document validation protects the security automation, provenance/SBOM guide, current state, and live handoff documentation contracts;
 - `docs/SECURITY_AUTOMATION.md` and `docs/ARTIFACT_PROVENANCE.md` document operation, evidence semantics, and verification guidance.
 
-These are post-completion maintenance improvements. They do not change the public product version, normalized package version, release tag mapping, or mobile build code.
+These controls are part of the current 2.9.5 baseline. The 2.9-series version changes are intentional release preparation, while runtime/service evidence remains separately observed.
 
 ## Product Identity
 
 - Product name: CalcNova
-- Public version: `2.8.03`
-- SemVer/package equivalent: `2.8.3`
-- Release tag equivalent: `v2.8.3`
-- Android/iOS display version: `2.8.03`
-- Android/iOS numeric build code: `20803`
-- Assembly version: `2.8.3.0`
-- File version: `2.8.3.0`
-- Informational version: `2.8.03`
+- Public version: `2.9.5`
+- SemVer/package equivalent: `2.9.5`
+- Release tag equivalent: `v2.9.5`
+- Android/iOS display version: `2.9.5`
+- Android/iOS numeric build code: `20905`
+- Assembly version: `2.9.5.0`
+- File version: `2.9.5.0`
+- Informational version: `2.9.5`
 - Application id: `in.sanskar.calcnova`
 - License: Apache-2.0
 - Repository: `https://github.com/sanskarIN/CalcNova`
 
-The public `2.8.03` format is intentionally preserved. Strict SemVer tooling uses `2.8.3` because numeric SemVer components cannot contain leading zeroes.
+CalcNova 2.9.5 is already strict SemVer, so the public, package, and normalized numeric version strings are identical.
 
 ## Technical Foundation
 
@@ -298,7 +322,7 @@ The public `2.8.03` format is intentionally preserved. Strict SemVer tooling use
 - Catalog completeness/duplicate/unknown-key validation
 - Runtime localization for reviewed shell, calculator, onboarding, settings, history, currency, About, and related surfaces
 
-Additional language packs or further localization expansion are optional post-release contributions, not completion requirements for 2.8.03.
+Additional language packs or further localization expansion are optional post-release contributions, not completion requirements for 2.9.5.
 
 ## Completed Platform Composition
 
@@ -311,8 +335,11 @@ Additional language packs or further localization expansion are optional post-re
 - External-link abstraction
 - Settings/history composition appropriate to native and Browser environments
 - x64 + ARM64 self-contained desktop release matrix for Windows, Linux, and macOS
+- explicit Android ARM/ARM64/x86/x64 source runtime identifiers
+- explicit iOS device ARM64 and simulator ARM64/x64 source runtime identifiers
+- focused cross-platform source validator/workflow and integrated preflight coverage
 
-Android and iOS source metadata uses display version `2.8.03` and numeric build code `20803`.
+Android and iOS source metadata uses display version `2.9.5` and numeric build code `20905`.
 
 Desktop release source packages `win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, and `osx-arm64`. Runtime/package evidence for those architecture artifacts remains separately recorded.
 
@@ -337,7 +364,9 @@ SDK-independent source contracts cover:
 - settings schema;
 - onboarding;
 - packaging metadata;
+- current release identity and completion-status consistency;
 - Desktop/Browser/Android/iOS workflow contracts;
+- cross-platform source composition and mobile architecture contracts;
 - security automation workflow contracts and focused-workflow self-validation;
 - NuGet dependency-security policy contracts;
 - Source Preflight workflow self-validation;
@@ -380,7 +409,7 @@ The release workflow:
 2. checks out the exact requested tag;
 3. reads the normalized `<Version>` from `Directory.Build.props`;
 4. verifies the tag equals `v` plus that normalized source version;
-5. runs tagged source preflight, including dependency-security/SBOM-generator regression coverage;
+5. runs tagged source preflight, including release-identity, dependency-security, and SBOM-generator regression coverage;
 6. restores the .NET solution, which executes the configured NuGet direct/transitive vulnerability audit when advisory sources are available;
 7. proceeds to .NET validation and platform publication only after those checks;
 8. publishes each target package and generates its matching CycloneDX 1.7 SBOM from the restored dependency graph;
@@ -413,23 +442,21 @@ Focused Avalonia headless test source covers the shared shell and key product sc
 
 Product implementation completeness and environment execution evidence are separate concepts.
 
-The repository records a check as PASS only when it actually executes and its result is observed. In the assistant environment used for the source pass, the required .NET 10/platform toolchains were not available for direct execution, so local compiled/platform/NuGet-audit execution evidence remains recorded conservatively as `NOT RUN` rather than being invented.
+The repository records a check as PASS only when it actually executes and its result is observed. In the assistant environment used for this source pass, the required .NET 10/platform toolchains were not available for direct execution, so local compiled/platform/NuGet-audit execution evidence remains recorded conservatively as `NOT RUN` rather than being invented.
 
-A fresh-clone attempt also could not resolve `github.com`, so the updated repository could not be materialized in that container for a local full-tree preflight. The current maintenance work was therefore validated through repository source contracts, regression-source updates, GitHub repository reads/writes, documentation consistency checks, and a focused local Python SBOM smoke execution built from the committed generator logic.
+A fresh-clone attempt on 2026-08-24 again could not resolve `github.com`, so the updated repository could not be materialized in that container for a local full-tree preflight. Repository changes were therefore made and inspected through the connected GitHub source interface.
 
-The focused SBOM smoke execution observed `PASS` for deterministic output, CycloneDX 1.7 schema identity, package inventory, direct/transitive dependency edges, SHA-512 conversion, and rejection of an unsupported assets-format version. This is focused generator evidence only; it is not a substitute for the repository's full Source Preflight workflow or a real release run.
+The available legacy commit-status surface is not treated as a substitute for observed GitHub Actions results. No hosted workflow, runtime, signing, notarization, device, browser, TestFlight/App Store, or Play Console PASS is inferred unless that operation actually executes and its result is observed.
 
-The commit-status endpoint exposed no legacy commit statuses for the checked maintenance head. That is not treated as proof that GitHub Actions checks passed or failed; no Actions service PASS was inferred from it.
-
-Compiled/runtime/GitHub-hosted security-service/NuGet advisory-query/release-SBOM publication evidence remains environment/service dependent. A real `.sbom.cdx.json` release asset is `PASS` evidence only after the release workflow actually creates and publishes it.
-
-This evidence notation does **not** mean CalcNova 2.8.03 is incomplete. It means a particular command or service check was not observed in that environment/tool surface.
+This evidence notation does **not** mean CalcNova 2.9.5 is incomplete. It means a particular command or service check was not observed in that environment/tool surface.
 
 Typical environment-specific verification commands include:
 
 ```bash
-python tools/release_preflight.py
+python tools/release_preflight.py --tag v2.9.5
+python -m unittest tools.tests.test_release_identity
 python -m unittest tools.tests.test_generate_sbom
+python tools/validate_platform_support.py .
 python tools/validate_security_workflows.py .
 python tools/validate_dependency_security.py .
 python tools/validate_release_workflow.py .
@@ -444,11 +471,13 @@ Platform signing, notarization, provisioning, GitHub-hosted security scanning, o
 
 ## Final Classification
 
-- Product scope for 2.8.03: **COMPLETE**
+- Product scope for 2.9.5: **COMPLETE**
 - Core features: **COMPLETE**
 - Shared application features: **COMPLETE**
 - Platform source composition: **COMPLETE**
+- Cross-platform source validation: **COMPLETE**
 - x64/ARM64 desktop release source contract: **COMPLETE**
+- Release identity consistency contract: **COMPLETE**
 - Security automation source contract: **COMPLETE**
 - NuGet dependency-security policy source contract: **COMPLETE**
 - Deterministic release SBOM source contract: **COMPLETE**
@@ -458,7 +487,7 @@ Platform signing, notarization, provisioning, GitHub-hosted security scanning, o
 - Source validation infrastructure: **COMPLETE**
 - Packaging/release workflow infrastructure: **COMPLETE**
 - Artifact/release-evidence infrastructure: **COMPLETE**
-- Future repository changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**
+- Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**
 
 For details, see:
 
@@ -469,5 +498,6 @@ For details, see:
 - [`docs/ROADMAP.md`](docs/ROADMAP.md)
 - [`docs/SECURITY_AUTOMATION.md`](docs/SECURITY_AUTOMATION.md)
 - [`docs/ARTIFACT_PROVENANCE.md`](docs/ARTIFACT_PROVENANCE.md)
+- [`docs/releases/2.9.0.md`](docs/releases/2.9.0.md)
 - [`docs/FINAL_SOURCE_AUDIT_2026-08-19.md`](docs/FINAL_SOURCE_AUDIT_2026-08-19.md)
 - [`what_changed.md`](what_changed.md)
