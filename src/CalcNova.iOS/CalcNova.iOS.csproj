@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <ApplicationId>in.sanskar.calcnova</ApplicationId>
     <ApplicationTitle>CalcNova</ApplicationTitle>
-    <ApplicationVersion>20900</ApplicationVersion>
+    <ApplicationVersion>20905</ApplicationVersion>
     <ApplicationDisplayVersion>$(ProductDisplayVersion)</ApplicationDisplayVersion>
     <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
   </PropertyGroup>
