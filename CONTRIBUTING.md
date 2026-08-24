@@ -1,6 +1,6 @@
 # Contributing to CalcNova
 
-Thank you for considering a contribution to CalcNova. **CalcNova 2.9.5 is the completed product baseline.** Contributions now focus on maintenance, correctness, security, compatibility, documentation, translations, tests, dependency updates, or explicitly proposed optional enhancements.
+Thank you for considering a contribution to CalcNova. **CalcNova 2.9.6 is the completed product baseline.** Contributions now focus on maintenance, correctness, security, compatibility, documentation, translations, tests, dependency updates, or explicitly proposed optional enhancements.
 
 The project values correctness, accessibility, maintainability, privacy, and focused changes over feature count.
 
@@ -23,7 +23,7 @@ dotnet restore CalcNova.slnx
 Before opening a pull request, run as many of the following checks as your environment supports:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.5
+python tools/release_preflight.py --tag v2.9.6
 dotnet format CalcNova.slnx --verify-no-changes --no-restore
 dotnet build CalcNova.slnx --configuration Release --no-restore
 dotnet test CalcNova.slnx --configuration Release --no-build
@@ -129,7 +129,7 @@ For significant maintenance or enhancement sessions, update as applicable:
 - `what_changed.md`;
 - `PROJECT_STATE.md` when the supported baseline/status changes;
 - `CHANGELOG.md` when the change is user-visible or release-relevant;
-- `docs/ROADMAP.md` only when optional post-2.9.5 planning is intentionally changed.
+- `docs/ROADMAP.md` only when optional post-2.9.6 planning is intentionally changed.
 
 Do not reintroduce provisional-status wording into current authoritative documents unless a future release is explicitly being reclassified.
 
