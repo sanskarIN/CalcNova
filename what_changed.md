@@ -1,5 +1,162 @@
 # What Changed
 
+## Cross-platform source hardening — 2026-08-24
+
+CalcNova 2.8.03 remains the completed product baseline. This continuation strengthened the maintained Windows, Linux, macOS, Browser/WebAssembly/PWA, Android, and iOS source contracts without changing the public product version or redefining completed calculator scope.
+
+### Platform workflow validator drift fixed
+
+A concrete post-maintenance defect was found in `tools/validate_platform_workflows.py`: the real platform workflows had already moved to `actions/checkout@v7`, while the validator still required `actions/checkout@v6`.
+
+Because `tools/release_preflight.py` includes that validator, the stale marker could make the integrated source gate reject the newer valid workflows.
+
+The validator now requires `actions/checkout@v7` for Desktop, Browser, Android, and iOS workflows. Its regression suite now explicitly mutates a platform workflow back to checkout v6 and requires that drift to fail validation.
+
+### Android architecture contract made explicit
+
+`src/CalcNova.Android/CalcNova.Android.csproj` now declares:
+
+```xml
+<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
+```
+
+The existing Android identity remains unchanged:
+
+- target framework: `net10.0-android`;
+- application id: `in.sanskar.calcnova`;
+- display version: `2.8.03`;
+- build code: `20803`;
+- minimum supported Android platform source contract: API 23.
+
+The Android head continues to use app-local native storage, SQLite calculation history, JSON settings/currency cache, shared clipboard composition, and Android external-link integration.
+
+### iOS device/simulator architecture contract made explicit
+
+`src/CalcNova.iOS/CalcNova.iOS.csproj` now declares:
+
+```xml
+<RuntimeIdentifiers>ios-arm64;iossimulator-arm64;iossimulator-x64</RuntimeIdentifiers>
+```
+
+The existing iOS identity remains unchanged:
+
+- target framework: `net10.0-ios`;
+- application id: `in.sanskar.calcnova`;
+- display version: `2.8.03`;
+- build code: `20803`;
+- minimum supported iOS platform source contract: iOS 15.0.
+
+The iOS head continues to use native local-data storage with a documents fallback, SQLite calculation history, JSON settings/currency cache, shared clipboard composition, and iOS external-link integration.
+
+### Cross-platform composition validator added
+
+Added:
+
+- `tools/validate_platform_support.py`;
+- `tools/tests/test_validate_platform_support.py`.
+
+The new standard-library-only validator protects the maintained platform source itself rather than only checking workflow YAML. It verifies:
+
+- Desktop `net10.0` + Avalonia Desktop composition;
+- Desktop platform detection and native persistence/link/clipboard/cache services;
+- Browser `net10.0-browser` + Avalonia Browser composition;
+- Browser-safe history/settings/cache/link/clipboard services;
+- required Browser/PWA resources including `index.html`, `manifest.webmanifest`, `service-worker.js`, and icons;
+- Android target/application/version metadata, all four declared Android runtime identifiers, and native composition services;
+- iOS target/application/version metadata, device/simulator runtime identifiers, and native composition services;
+- shared `CalcNova.Platform` targeting and clipboard/external-link/history/settings contracts;
+- presence of `docs/PLATFORM_SUPPORT.md`.
+
+The regression suite covers the real repository, mobile runtime-identifier inventory, Android architecture drift, Browser service-worker loss, and a missing-source-tree failure case.
+
+### Focused platform-support CI gate added
+
+Added `.github/workflows/platform-support-validate.yml`.
+
+The focused workflow:
+
+- runs for relevant platform-source/documentation/validator changes on pushes and pull requests to `main`;
+- supports manual dispatch;
+- uses read-only repository contents permission;
+- cancels superseded runs;
+- uses `actions/checkout@v7` and `actions/setup-python@v6` with Python 3.13;
+- runs `python tools/validate_platform_support.py .`;
+- runs `python -m unittest tools.tests.test_validate_platform_support`.
+
+### Integrated Source Preflight strengthened
+
+`tools/release_preflight.py` now includes:
+
+```text
+Cross-platform source contracts -> tools/validate_platform_support.py .
+```
+
+and:
+
+```text
+Cross-platform source validator tests -> python -m unittest tools.tests.test_validate_platform_support
+```
+
+`tools/tests/test_release_preflight.py` now requires both entries so cross-platform composition protection cannot silently disappear from the integrated SDK-independent source gate.
+
+### Platform-support documentation expanded
+
+`docs/PLATFORM_SUPPORT.md` now contains a single maintained matrix covering:
+
+- Windows `win-x64` / `win-arm64`;
+- Linux `linux-x64` / `linux-arm64`;
+- macOS `osx-x64` / `osx-arm64`;
+- Browser/WebAssembly/PWA;
+- Android `android-arm`, `android-arm64`, `android-x86`, `android-x64`;
+- iOS `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`.
+
+The document also separates platform-source completeness from runtime evidence and records the operational follow-up that still requires hosted runners, physical devices, representative browsers, signing/notarization identities, or store services.
+
+### Commits created in this continuation
+
+1. `5ef60dd46b5678e329a94aa57b49fac049cbc2c9` — `fix: align platform validator with checkout v7`
+2. `f4b9ac7d8fbd5b519d8dc6eccc6a04bd1d0a2922` — `build: declare Android architecture support`
+3. `3197b6ae9d29a9be0b9a9cc2b383084193f87b82` — `build: declare iOS device and simulator RIDs`
+4. `6431ed4da48a9293f73e655f4d06849615e3a6d7` — `ci: add cross-platform source contract validator`
+5. `38e3c985c10be31dde8a26b15c24038020fb202d` — `test: cover cross-platform source contracts`
+6. `7b9399d41bb8e6bc26f8add8513a238f2b982915` — `ci: add focused cross-platform validation gate`
+7. `a098450603b1b49a437e001f8332ee16ccb47bd8` — `ci: integrate cross-platform contracts into preflight`
+8. `acd199dfe9c1b08a9fb9095a06204fc05751c578` — `test: require cross-platform checks in preflight`
+9. `33b83574217ffe28ad1fafb21fe9140d6d398de9` — `docs: define complete cross-platform support matrix`
+10. `5fedaacee1a740e02bc70d26322430aab91aab5e` — `test: prevent platform checkout contract regressions`
+
+This `what_changed.md` synchronization is a dedicated handoff commit after those source, test, CI, and documentation commits.
+
+### Evidence and operational follow-up
+
+Source inspection confirmed the maintained Desktop, Browser, Android, iOS, and shared-platform files contain the markers required by the new validator. The existing solution intentionally keeps platform-workload heads out of the general `CalcNova.slnx` build and validates Browser/Android/iOS through dedicated workflows, avoiding a requirement to install every platform workload in ordinary shared/desktop CI.
+
+The available legacy combined commit-status surface returned no statuses for the checked maintenance head. That is not interpreted as GitHub Actions success or failure.
+
+No hosted build, physical-device, signed package, notarization, TestFlight/App Store, Play Console, or representative-browser PASS is inferred from source changes alone. Those operations remain evidence only when actually executed and observed.
+
+Operational follow-up includes:
+
+- observe hosted Desktop/Browser/Android/iOS and Source Preflight results for the new head;
+- execute representative Windows/Linux/macOS x64 and ARM64 release artifacts;
+- run Android emulator/physical-device smoke and accessibility checks;
+- run iOS simulator/physical-device smoke and accessibility checks;
+- run representative browser load/install/offline/storage/clipboard/accessibility checks;
+- perform signing, notarization, TestFlight/App Store, and Play Console validation when the required external credentials/services are available;
+- keep .NET/Avalonia/platform workloads and CI actions compatible as upstream tooling evolves;
+- optionally add further OS/CPU/store/package targets only when a concrete support requirement exists.
+
+### Version/status unchanged
+
+- Product/display version: `2.8.03`
+- Normalized package version: `2.8.3`
+- Normalized release tag: `v2.8.3`
+- Mobile build code: `20803`
+- Application id: `in.sanskar.calcnova`
+- Product scope: **COMPLETE**
+- Cross-platform maintained source matrix: **COMPLETE**
+- This continuation: **POST-COMPLETION CROSS-PLATFORM / CI-CORRECTNESS MAINTENANCE**
+
 ## CI hygiene and stale workflow cleanup — 2026-08-23
 
 CalcNova 2.8.03 remains the completed product baseline. This continuation focused on post-completion CI correctness, repository hygiene, regression protection, governance documentation, and stale pull-request cleanup without changing the product version or redefining already completed feature scope.
