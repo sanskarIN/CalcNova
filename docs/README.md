@@ -1,13 +1,13 @@
-# CalcNova 2.9.5 Documentation
+# CalcNova 2.9.6 Documentation
 
-**Project status: Complete for version 2.9.5.**
+**Project status: Complete for version 2.9.6.**
 
-This directory contains the authoritative product, engineering, quality, platform, packaging, validation, security-maintenance, and release documentation for the completed CalcNova 2.9.5 baseline.
+This directory contains the authoritative product, engineering, quality, platform, packaging, validation, security-maintenance, and release documentation for the completed CalcNova 2.9.6 baseline.
 
-Normalized release tag: `v2.9.5`  
-Android/iOS numeric build code: `20905`
+Normalized release tag: `v2.9.6`  
+Android/iOS numeric build code: `20906`
 
-The requested 2.9.0 intermediate preparation is preserved in [releases/2.9.0.md](releases/2.9.0.md). Current-facing guides use 2.9.5; dated older records remain historical.
+Earlier 2.9-series preparations are preserved in [releases/2.9.0.md](releases/2.9.0.md) and [releases/2.9.5.md](releases/2.9.5.md). Current-facing guides use 2.9.6; dated older records remain historical.
 
 Use this page as the documentation map. Current guides are grouped by responsibility; dated continuation/audit/release-checkpoint records are grouped separately so history is not confused with current product status.
 
@@ -15,11 +15,12 @@ Use this page as the documentation map. Current guides are grouped by responsibi
 
 - [Project state](../PROJECT_STATE.md) — authoritative completion/status record.
 - [Main README](../README.md) — product overview and major capabilities.
-- [Versioning](VERSIONING.md) — current `2.9.5` / `v2.9.5` / `20905` mapping and centralized release-identity contract.
-- [Completed feature inventory](FEATURES.md) — implemented 2.9.5 product scope.
+- [Versioning](VERSIONING.md) — current `2.9.6` / `v2.9.6` / `20906` mapping and centralized release-identity contract.
+- [Completed feature inventory](FEATURES.md) — implemented 2.9.6 product scope.
 - [Completed roadmap](ROADMAP.md) — completed milestone record and optional post-release ideas.
 - [2.9.0 release checkpoint](releases/2.9.0.md) — preserved requested intermediate release preparation.
-- [Platform support](PLATFORM_SUPPORT.md) — Windows/Linux/macOS, Browser/PWA, Android, and iOS composition status.
+- [2.9.5 release checkpoint](releases/2.9.5.md) — preserved completed baseline before 2.9.6.
+- [Platform support](PLATFORM_SUPPORT.md) — Windows/Linux/macOS, Browser/WebAssembly/PWA, Android, and iOS composition status.
 - [Building](BUILDING.md) — current build/run/publish commands and platform prerequisites.
 - [Testing](TESTING.md) — test layers and responsibilities.
 - [Troubleshooting](TROUBLESHOOTING.md) — common toolchain and platform problems.
@@ -110,11 +111,11 @@ The maintained source matrix covers:
 Current identity:
 
 ```text
-Product/display: 2.9.5
-Package: 2.9.5
-Tag: v2.9.5
-Assembly/file: 2.9.5.0
-Mobile build code: 20905
+Product/display: 2.9.6
+Package: 2.9.6
+Tag: v2.9.6
+Assembly/file: 2.9.6.0
+Mobile build code: 20906
 ```
 
 Focused checks:
@@ -125,7 +126,7 @@ python tools/validate_packaging_metadata.py .
 python tools/validate_completion_status.py .
 ```
 
-The 2.9.0 checkpoint used `v2.9.0` and build code `20900` before the repository intentionally advanced to 2.9.5.
+The 2.9.0 and 2.9.5 checkpoints remain preserved before the repository intentionally advanced to 2.9.6.
 
 ## Security maintenance and supply-chain checks
 
@@ -170,7 +171,7 @@ These checks are also integrated into the main source preflight. The online NuGe
 The integrated SDK-independent current-release gate is:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.5
+python tools/release_preflight.py --tag v2.9.6
 ```
 
 The compiled .NET gate is documented in [BUILDING.md](BUILDING.md) and [TESTING.md](TESTING.md).
@@ -202,6 +203,7 @@ See [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md) for checksum, SBOM, and att
 
 These records describe completed source passes/checkpoints and should not override newer authoritative files such as `PROJECT_STATE.md`:
 
+- [2.9.5 release checkpoint — 2026-08-24](releases/2.9.5.md)
 - [2.9.0 release checkpoint — 2026-08-24](releases/2.9.0.md)
 - [Documentation consistency audit — 2026-08-20](DOCUMENTATION_AUDIT_2026-08-20.md)
 - [Final source audit — 2026-08-19](FINAL_SOURCE_AUDIT_2026-08-19.md)
@@ -222,12 +224,12 @@ When a historical statement differs from a current authoritative guide, use the 
 
 ## Version summary
 
-- Product/display version: `2.9.5`
-- Package version: `2.9.5`
-- Normalized release tag: `v2.9.5`
-- Assembly/file version: `2.9.5.0`
-- Android/iOS display version: `2.9.5`
-- Android/iOS numeric build code: `20905`
+- Product/display version: `2.9.6`
+- Package version: `2.9.6`
+- Normalized release tag: `v2.9.6`
+- Assembly/file version: `2.9.6.0`
+- Android/iOS display version: `2.9.6`
+- Android/iOS numeric build code: `20906`
 - Application id: `in.sanskar.calcnova`
 
 ## Documentation source-of-truth rules
@@ -248,7 +250,7 @@ When code or a workflow changes, update the corresponding documentation in the s
 
 ## Evidence note
 
-A runtime/platform/network/service check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 2.9.5 implementation is unfinished.
+A runtime/platform/network/service check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 2.9.6 implementation is unfinished.
 
 That distinction applies to CodeQL, Dependency Review, online NuGet vulnerability queries, provenance generation, signing, packaging, device/browser execution, and store processing.
 
