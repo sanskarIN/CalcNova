@@ -1,10 +1,12 @@
-# CalcNova 2.8.03 Features
+# CalcNova 2.9.5 Features
 
 ## Status
 
-**Complete for version 2.8.03.**
+**Complete for version 2.9.5.**
 
-This document is the completed feature inventory for CalcNova 2.8.03. Environment-specific verification results are evidence records, not unfinished feature requirements.
+This document is the completed feature inventory for CalcNova 2.9.5. Environment-specific verification results are evidence records, not unfinished feature requirements.
+
+The 2.9 series preserves the completed calculator feature set while adding stronger release-identity and cross-platform source validation. The requested 2.9.0 checkpoint is preserved in [`releases/2.9.0.md`](releases/2.9.0.md); current source is 2.9.5.
 
 ## Standard calculator
 
@@ -291,7 +293,7 @@ See [`SETTINGS_MIGRATION.md`](SETTINGS_MIGRATION.md).
 - Runtime accessibility evidence vocabulary: PASS / FAIL / BLOCKED / NOT RUN
 - Source validators for accessibility markup, focus, dynamic controls, adaptive layout, touch targets, and evidence discipline
 
-Runtime evidence remains recorded only when actually observed; this does not change the completed 2.8.03 implementation status.
+Runtime evidence remains recorded only when actually observed; this does not change the completed 2.9.5 implementation status.
 
 ## Localization
 
@@ -304,14 +306,14 @@ Runtime evidence remains recorded only when actually observed; this does not cha
 - Live localization of reviewed shell, calculator, onboarding, settings, history, currency, About, and related surfaces
 - Settings checkbox localization in the live capture/apply path
 
-Additional languages or translation expansion are optional post-2.8.03 contributions.
+Additional languages or translation expansion are optional post-2.9.5 contributions.
 
 ## Platforms
 
 Completed source composition exists for:
 
 - Desktop — Windows/Linux/macOS targets
-- Browser/WebAssembly
+- Browser/WebAssembly/PWA
 - Android
 - iOS
 
@@ -322,10 +324,38 @@ Shared platform infrastructure includes:
 - External-link abstraction
 - Native/Browser persistence composition
 - Platform build workflows
+- Cross-platform source validator/workflow
 - Packaging metadata contracts
 
-Android/iOS display version: `2.8.03`  
-Android/iOS numeric build code: `20803`
+Maintained architecture/runtime source matrix:
+
+- Windows: `win-x64`, `win-arm64`
+- Linux: `linux-x64`, `linux-arm64`
+- macOS: `osx-x64`, `osx-arm64`
+- Android: `android-arm`, `android-arm64`, `android-x86`, `android-x64`
+- iOS: `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`
+
+Android/iOS display version: `2.9.5`  
+Android/iOS numeric build code: `20905`
+
+See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md).
+
+## Release identity and 2.9-series maintenance
+
+- `Directory.Build.props` remains the shared release source of truth
+- `tools/release_identity.py` validates display/package/assembly/file/informational identity
+- Release tag derives as `v<Version>`
+- Mobile build code derives as `MAJOR * 10000 + MINOR * 100 + PATCH`
+- 2.9.0 checkpoint: `v2.9.0`, build code `20900`
+- Current 2.9.5 baseline: `v2.9.5`, build code `20905`
+- Packaging validator derives current version/build expectations instead of hardcoding release constants
+- Completion-status validator derives current documentation/About expectations from central metadata
+- Cross-platform source validator derives mobile build identity from central metadata
+- Release-document validator derives current release/documentation markers from central metadata
+- Release-identity regression coverage is integrated into Source Preflight
+- Linux AppStream preserves stable entries for 2.8.03, 2.9.0, and 2.9.5
+
+See [`VERSIONING.md`](VERSIONING.md) and [`releases/2.9.0.md`](releases/2.9.0.md).
 
 ## Release and validation infrastructure
 
@@ -340,35 +370,47 @@ Android/iOS numeric build code: `20803`
 - Bivariate-statistics validation
 - Headless UI source validation
 - Accessibility/adaptive/localization/settings/onboarding validation
+- Central release-identity consistency validation
 - Packaging metadata validation
 - Desktop/Browser/Android/iOS workflow validation
+- Cross-platform source composition validation
 - Exact-tag iOS simulator workflow validation
 - Release-tag syntax validation
 - Release workflow validation
+- Release-documentation validation
 - Source Preflight workflow self-validation
+- CI hygiene validation
+- Direct/transitive NuGet audit policy validation
+- CodeQL/dependency-review workflow source validation
+- Deterministic CycloneDX 1.7 release SBOM generation
+- Release basename collision protection
+- Flat published-name `SHA256SUMS.txt`
+- `actions/attest@v4` release provenance
 - Artifact manifest/checksum integrity infrastructure
 - Structured release-evidence schema/model/runner/verifier
 - Python regression suites
 - Unified SDK-independent source preflight
 
-See [`SOURCE_PREFLIGHT.md`](SOURCE_PREFLIGHT.md), [`VALIDATION_EVIDENCE.md`](VALIDATION_EVIDENCE.md), and [`RELEASE_READINESS_CHECKLIST.md`](RELEASE_READINESS_CHECKLIST.md).
+See [`SOURCE_PREFLIGHT.md`](SOURCE_PREFLIGHT.md), [`VALIDATION_EVIDENCE.md`](VALIDATION_EVIDENCE.md), [`ARTIFACT_PROVENANCE.md`](ARTIFACT_PROVENANCE.md), and [`RELEASE_READINESS_CHECKLIST.md`](RELEASE_READINESS_CHECKLIST.md).
 
 ## Version identity
 
-- Product/display version: `2.8.03`
-- Normalized package version: `2.8.3`
-- Normalized release tag: `v2.8.3`
-- Assembly/file version: `2.8.3.0`
-- Mobile build code: `20803`
+- Product/display version: `2.9.5`
+- Package version: `2.9.5`
+- Release tag: `v2.9.5`
+- Assembly/file version: `2.9.5.0`
+- Mobile build code: `20905`
 
 See [`VERSIONING.md`](VERSIONING.md).
 
 ## Completion classification
 
-- 2.8.03 feature scope: **COMPLETE**
+- 2.9.5 feature scope: **COMPLETE**
 - Shared application integration: **COMPLETE**
 - Platform source composition: **COMPLETE**
+- Cross-platform source validation: **COMPLETE**
+- Release identity consistency: **COMPLETE**
 - Documentation baseline: **COMPLETE**
 - Source validation/release infrastructure: **COMPLETE**
 
-Later changes are maintenance, compatibility/security updates, translations, tests, or optional enhancements rather than missing 2.8.03 features.
+Later changes are maintenance, compatibility/security updates, translations, tests, evidence collection, or optional enhancements rather than missing 2.9.5 features.
