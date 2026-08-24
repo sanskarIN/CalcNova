@@ -90,6 +90,7 @@ class ReleasePreflightContractTests(unittest.TestCase):
             if len(arguments) >= 3 and arguments[0:2] == ("-m", "unittest")
         }
         expected_modules = {
+            "tools.tests.test_release_identity",
             "tools.tests.test_validate_release_workflow",
             "tools.tests.test_validate_release_docs",
             "tools.tests.test_validate_source_preflight_workflow",
