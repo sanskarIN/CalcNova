@@ -1,10 +1,10 @@
-# CalcNova 2.8.03 Completed Roadmap
+# CalcNova 2.9.5 Completed Roadmap
 
 ## Status
 
-**All milestones defined for CalcNova 2.8.03 are complete.**
+**All milestones defined for CalcNova 2.9.5 are complete.**
 
-This document is now a record of the completed product roadmap. Items added after 2.8.03 are maintenance or optional enhancement ideas and do not represent missing requirements for the completed release.
+This document is a record of the completed product roadmap. Items added after 2.9.5 are maintenance or optional enhancement ideas and do not represent missing requirements for the completed release.
 
 ## Milestone 1 — Core calculation — Complete
 
@@ -141,18 +141,22 @@ This document is now a record of the completed product roadmap. Items added afte
 - Catalog completeness/duplicate/unknown-key validation
 - Reviewed live localization across shell, calculator, onboarding, settings, history, currency, About, and related surfaces
 
-Additional languages and extra UI-string migration are optional translation improvements rather than incomplete 2.8.03 requirements.
+Additional languages and extra UI-string migration are optional translation improvements rather than incomplete 2.9.5 requirements.
 
 ## Milestone 10 — Cross-platform composition — Complete
 
-- Desktop
-- Browser/WebAssembly
+- Desktop — Windows, Linux, macOS
+- Browser/WebAssembly/PWA
 - Android
 - iOS
 - Shared clipboard abstraction
 - External-link abstraction
 - Native/Browser persistence composition
-- Mobile release identity `2.8.03` / build code `20803`
+- Windows/Linux/macOS x64 + ARM64 release targets
+- Android ARM/ARM64/x86/x64 source runtime identifiers
+- iOS ARM64 device and ARM64/x64 simulator source runtime identifiers
+- Focused cross-platform source validator/workflow
+- Mobile release identity `2.9.5` / build code `20905`
 
 ## Milestone 11 — Validation and release infrastructure — Complete
 
@@ -163,44 +167,71 @@ Additional languages and extra UI-string migration are optional translation impr
 - Unicode/exact-rational/engineering/statistics/export validators
 - Accessibility/adaptive/localization/settings/onboarding validators
 - Packaging/platform workflow validators
+- Cross-platform source composition validator
 - Source Preflight workflow self-validation
 - Release workflow and exact-tag validation
 - iOS simulator release-tag workflow contract
 - Artifact manifest/checksum integrity tooling
 - Structured release evidence model/runner/verifier/schema
+- Deterministic CycloneDX 1.7 release SBOM generation
+- Release checksum/provenance/least-privilege contracts
 - Unified SDK-independent source preflight
 - Focused GitHub Actions workflows
 
-## Milestone 12 — Version 2.8.03 finalization — Complete
+## Milestone 12 — Version 2.8.03 finalization — Complete historical baseline
 
-- Public version set to `2.8.03`
-- Strict SemVer/package equivalent set to `2.8.3`
-- Normalized release tag defined as `v2.8.3`
-- Assembly/file version set to `2.8.3.0`
-- Mobile build code set to `20803`
-- Mobile display version sourced from central `ProductDisplayVersion`
-- Packaging validator updated to protect release identity
-- Release workflow checks tag/source version consistency
-- Release publication no longer overwrites source-owned Android version identity
-- README, project state, changelog, roadmap, versioning guide, and continuation checkpoint synchronized to completed status
+- Public version `2.8.03`
+- Strict SemVer/package equivalent `2.8.3`
+- Normalized release tag `v2.8.3`
+- Assembly/file version `2.8.3.0`
+- Mobile build code `20803`
+- Completed 2.8.03 product baseline
+
+The 2.8.03 completion remains preserved in the changelog and historical audit documents.
+
+## Milestone 13 — 2.9-series release consistency — Complete
+
+### 2.9.0 checkpoint
+
+- Central source version set to `2.9.0`
+- Release tag contract `v2.9.0`
+- Android/iOS build code `20900`
+- About and release-label regressions updated to 2.9.0
+- Linux AppStream 2.9.0 stable entry added
+- Historical checkpoint preserved in `docs/releases/2.9.0.md`
+
+### 2.9.5 current baseline
+
+- Central source version set to `2.9.5`
+- Release tag contract `v2.9.5`
+- Android/iOS build code `20905`
+- About and release-label regressions updated to 2.9.5
+- Linux AppStream 2.9.5 stable entry added while retaining 2.9.0 and 2.8.03
+- `tools/release_identity.py` centralizes SDK-independent release identity parsing and mobile build-code derivation
+- packaging validation derives version/build expectations from central metadata
+- completion-status validation derives documentation/About expectations from central metadata
+- release-identity regression coverage is integrated into Source Preflight
+- current documentation/status is synchronized to 2.9.5
 
 ## Environment Verification
 
-Build, device, signing, notarization, provisioning, accessibility-tool, and store checks require their corresponding environments and credentials. Results are recorded only when actually observed.
+Build, device, browser, signing, notarization, provisioning, accessibility-tool, and store checks require their corresponding environments and credentials. Results are recorded only when actually observed.
 
 An environment-specific `NOT RUN` or `BLOCKED` record is evidence metadata, not an incomplete roadmap item.
 
-## Optional Post-2.8.03 Ideas
+## Optional Post-2.9.5 Ideas
 
-The following may be considered later without changing the completed status of 2.8.03:
+The following may be considered later without changing the completed status of 2.9.5:
 
 - additional language packs;
 - optional UI refinements based on user feedback;
 - additional export/share integrations;
 - extra mathematical utilities;
 - platform compatibility updates;
+- additional distribution formats where there is a concrete support requirement;
 - performance optimizations proven useful by profiling;
 - dependency/security maintenance;
-- additional automated regression coverage.
+- additional automated regression coverage;
+- runtime/device/browser evidence expansion.
 
-No optional idea in this section is required for CalcNova 2.8.03 completion.
+No optional idea in this section is required for CalcNova 2.9.5 completion.
