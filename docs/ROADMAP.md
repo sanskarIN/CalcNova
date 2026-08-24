@@ -1,10 +1,10 @@
-# CalcNova 2.9.5 Completed Roadmap
+# CalcNova 2.9.6 Completed Roadmap
 
 ## Status
 
-**All milestones defined for CalcNova 2.9.5 are complete.**
+**All milestones defined for CalcNova 2.9.6 are complete.**
 
-This document is a record of the completed product roadmap. Items added after 2.9.5 are maintenance or optional enhancement ideas and do not represent missing requirements for the completed release.
+This document is a record of the completed product roadmap. Items added after 2.9.6 are maintenance or optional enhancement ideas and do not represent missing requirements for the completed release.
 
 ## Milestone 1 — Core calculation — Complete
 
@@ -141,7 +141,7 @@ This document is a record of the completed product roadmap. Items added after 2.
 - Catalog completeness/duplicate/unknown-key validation
 - Reviewed live localization across shell, calculator, onboarding, settings, history, currency, About, and related surfaces
 
-Additional languages and extra UI-string migration are optional translation improvements rather than incomplete 2.9.5 requirements.
+Additional languages and extra UI-string migration are optional translation improvements rather than incomplete 2.9.6 requirements.
 
 ## Milestone 10 — Cross-platform composition — Complete
 
@@ -156,7 +156,7 @@ Additional languages and extra UI-string migration are optional translation impr
 - Android ARM/ARM64/x86/x64 source runtime identifiers
 - iOS ARM64 device and ARM64/x64 simulator source runtime identifiers
 - Focused cross-platform source validator/workflow
-- Mobile release identity `2.9.5` / build code `20905`
+- Mobile release identity `2.9.6` / build code `20906`
 
 ## Milestone 11 — Validation and release infrastructure — Complete
 
@@ -200,18 +200,27 @@ The 2.8.03 completion remains preserved in the changelog and historical audit do
 - Linux AppStream 2.9.0 stable entry added
 - Historical checkpoint preserved in `docs/releases/2.9.0.md`
 
-### 2.9.5 current baseline
+### 2.9.5 checkpoint
 
 - Central source version set to `2.9.5`
 - Release tag contract `v2.9.5`
 - Android/iOS build code `20905`
 - About and release-label regressions updated to 2.9.5
 - Linux AppStream 2.9.5 stable entry added while retaining 2.9.0 and 2.8.03
-- `tools/release_identity.py` centralizes SDK-independent release identity parsing and mobile build-code derivation
-- packaging validation derives version/build expectations from central metadata
-- completion-status validation derives documentation/About expectations from central metadata
-- release-identity regression coverage is integrated into Source Preflight
-- current documentation/status is synchronized to 2.9.5
+- `tools/release_identity.py` centralized SDK-independent release identity parsing and mobile build-code derivation
+- packaging/completion/platform/release-document validation became current-version aware
+- checkpoint preserved in `docs/releases/2.9.5.md`
+
+### 2.9.6 current baseline
+
+- Central source version set to `2.9.6`
+- Release tag contract `v2.9.6`
+- Android/iOS build code `20906`
+- About and release-label regressions updated to 2.9.6
+- Linux AppStream 2.9.6 stable entry added while retaining prior release history
+- release identity regression coverage protects the current baseline and 2.9-series build-code mapping
+- security/support/contributor policy advanced to 2.9.6
+- current documentation/status synchronized to 2.9.6
 
 ## Environment Verification
 
@@ -219,9 +228,9 @@ Build, device, browser, signing, notarization, provisioning, accessibility-tool,
 
 An environment-specific `NOT RUN` or `BLOCKED` record is evidence metadata, not an incomplete roadmap item.
 
-## Optional Post-2.9.5 Ideas
+## Optional Post-2.9.6 Ideas
 
-The following may be considered later without changing the completed status of 2.9.5:
+The following may be considered later without changing the completed status of 2.9.6:
 
 - additional language packs;
 - optional UI refinements based on user feedback;
@@ -234,4 +243,4 @@ The following may be considered later without changing the completed status of 2
 - additional automated regression coverage;
 - runtime/device/browser evidence expansion.
 
-No optional idea in this section is required for CalcNova 2.9.5 completion.
+No optional idea in this section is required for CalcNova 2.9.6 completion.
