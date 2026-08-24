@@ -1,10 +1,171 @@
 # What Changed
 
-## CalcNova 2.9.0 → 2.9.5 release preparation — 2026-08-24
+## CalcNova 2.9.6 release preparation — 2026-08-24
 
-CalcNova advanced from the completed 2.8.03 baseline through a preserved 2.9.0 checkpoint and then to the current completed 2.9.5 source/release baseline.
+CalcNova has been advanced from the preserved 2.9.5 checkpoint to the current completed **2.9.6** source/release baseline.
 
 ### Current release identity
+
+- Product/display version: `2.9.6`
+- .NET/NuGet package version: `2.9.6`
+- Release tag contract: `v2.9.6`
+- Assembly/file version: `2.9.6.0`
+- Android/iOS numeric build code: `20906`
+- Application id: `in.sanskar.calcnova`
+- In-app About label: `Version 2.9.6 • Complete`
+
+### Previous 2.9 checkpoints preserved
+
+Before this bump, the completed 2.9.5 source/release state was preserved in `docs/releases/2.9.5.md`. The earlier requested 2.9.0 checkpoint remains preserved in `docs/releases/2.9.0.md`.
+
+The release sequence now remains auditable as:
+
+```text
+2.8.03 -> 2.9.0 -> 2.9.5 -> 2.9.6
+```
+
+Linux AppStream metadata also preserves stable entries for all four release identities.
+
+### Central version and mobile identities advanced
+
+`Directory.Build.props` now defines:
+
+```text
+ProductDisplayVersion = 2.9.6
+Version = 2.9.6
+VersionPrefix = 2.9.6
+PackageVersion = 2.9.6
+AssemblyVersion = 2.9.6.0
+FileVersion = 2.9.6.0
+InformationalVersion = 2.9.6
+```
+
+Android and iOS retain `$(ProductDisplayVersion)` for their visible version and now use numeric build code `20906`.
+
+The release-identity regression suite now explicitly protects:
+
+```text
+2.9.0 -> 20900
+2.9.5 -> 20905
+2.9.6 -> 20906
+```
+
+### In-app release identity synchronized
+
+`AboutViewModel` now exposes `2.9.6`, and both the direct view-model regression and Avalonia headless shell regression protect the visible `Version 2.9.6 • Complete` label.
+
+### Version-aware source validation retained
+
+The release preparation continues to use `tools/release_identity.py` as the SDK-independent source of current release expectations for:
+
+- packaging metadata validation;
+- completion-status validation;
+- cross-platform source validation;
+- release-document validation.
+
+This means those validators follow `Directory.Build.props` rather than requiring a hand-edited hardcoded release constant for each future bump.
+
+### Cross-platform source matrix retained
+
+The maintained source/release matrix remains:
+
+- Windows: `win-x64`, `win-arm64`;
+- Linux: `linux-x64`, `linux-arm64`;
+- macOS: `osx-x64`, `osx-arm64`;
+- Browser/WebAssembly/PWA;
+- Android: `android-arm`, `android-arm64`, `android-x86`, `android-x64`;
+- iOS: `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`.
+
+No existing maintained platform head was removed during the 2.9.6 preparation.
+
+### Current documentation synchronized
+
+The current 2.9.6 baseline is synchronized across:
+
+- `README.md`;
+- `PROJECT_STATE.md`;
+- `CHANGELOG.md`;
+- `SECURITY.md`;
+- `SUPPORT.md`;
+- `CONTRIBUTING.md`;
+- `docs/README.md`;
+- `docs/FEATURES.md`;
+- `docs/ROADMAP.md`;
+- `docs/VERSIONING.md`;
+- `docs/PLATFORM_SUPPORT.md`;
+- `docs/SOURCE_PREFLIGHT.md`;
+- `docs/RELEASE.md`;
+- `docs/RELEASE_READINESS_CHECKLIST.md`;
+- this live handoff.
+
+### Commits in the 2.9.6 continuation
+
+- `03fa3210ea67df2525fe1c5a3326c29d20f720c0` — `docs: record CalcNova 2.9 series handoff`
+- `c3fd3832b9cecd09668253f00f29d5c79aaf14ac` — `docs: preserve CalcNova 2.9.5 release checkpoint`
+- `f16bf31c475125f7dad55dbfee6d5ba96d86d699` — `release: prepare CalcNova 2.9.6 identity`
+- `46bd5d10a9c2f463e08d1222d05ad9f40519908a` — `release: set Android build code for 2.9.6`
+- `4d818904d6889b02bf0ed3c494d02f6cbfcd65ea` — `release: set iOS build code for 2.9.6`
+- `dea2f53a81ad7ba9c78475259ae3bace4f692cbe` — `release: show CalcNova 2.9.6 in About`
+- `16deb005f60d492a2c6b4670e992fc0fe501eb2b` — `test: protect CalcNova 2.9.6 About identity`
+- `8e53de2433dcd98c9b9bc4fe854ff69c6dc2dd68` — `test: protect visible CalcNova 2.9.6 identity`
+- `470385e8abb0fcdbc4f6b2cbfdca8ffc6cdf4c16` — `test: set release identity baseline to 2.9.6`
+- `60cae31229419ec8e5db54f1dfe021d70d2560e1` — `release: add CalcNova 2.9.6 AppStream entry`
+- `b5857843b078fe06c62aecca877070f842fab2eb` — `test: align packaging fixture with 2.9.6`
+- `3c26f054bf44f6cee2ee6ace43ccdb567f93e400` — `docs: support CalcNova 2.9.6 security baseline`
+- `e71fdcc0488ef8e26c6d83f62af23462321f569c` — `docs: support CalcNova 2.9.6 baseline`
+- `da21446b754491848feaed5ec425e48e1098999a` — `docs: advance contributor baseline to 2.9.6`
+- `b5cf5e80b7a94920aa40afc4f8ce29823f6a18da` — `docs: define CalcNova 2.9.6 version mapping`
+- `dfbe537d066b15070f75923deff8c232db420df3` — `docs: advance README to CalcNova 2.9.6`
+- `a5b672bde6edf9ec3a13ef236cc44a9d3b38a93d` — `docs: advance project state to CalcNova 2.9.6`
+- `1a80fca307c60d835533b346e00d5d999cf738a8` — `docs: advance documentation index to 2.9.6`
+- `c428aad89f23a7f4b9cc57e49b28f3c9ac65fa48` — `docs: advance feature inventory to CalcNova 2.9.6`
+- `23ca6906b82fdb52e35895283c35f216ce6d419b` — `docs: complete CalcNova 2.9.6 roadmap`
+- `13470bf49806f80fa3a228523c827280ca26ecfa` — `docs: advance platform support to CalcNova 2.9.6`
+- `b2e9dc28bb1c6221ff6a2256059d64e2ce1c2f24` — `docs: advance source preflight to CalcNova 2.9.6`
+- `48470d476232868eebcc234208f4fd79a3bdbefb` — `docs: define CalcNova 2.9.6 release process`
+- `d5c38788fc5dc604c60d79a78c0e45af1a230117` — `docs: advance release evidence checklist to 2.9.6`
+- `965282c98b461f870f3352f63689010effd92507` — `docs: add CalcNova 2.9.6 release record`
+
+### Evidence policy
+
+Source/release preparation and execution evidence remain separate.
+
+No hosted CI, .NET restore/build/test, runtime, physical-device, representative-browser, signing, notarization, TestFlight/App Store, Play Console, release-SBOM publication, checksum verification, or provenance PASS is inferred unless the operation actually runs and the result is observed.
+
+Use only:
+
+```text
+PASS / FAIL / BLOCKED / NOT RUN
+```
+
+for external execution evidence.
+
+### Current remaining operational work
+
+- observe hosted Source Preflight and focused platform/security/release workflow results;
+- execute representative Windows/Linux/macOS x64/ARM64 artifacts;
+- run representative Browser install/offline/storage/clipboard/accessibility checks;
+- run Android emulator/physical-device smoke and accessibility checks;
+- run iOS simulator/physical-device smoke and accessibility checks;
+- perform Android signing/Play Console validation where credentials are available;
+- perform macOS signing/notarization where the chosen distribution path requires it;
+- perform iOS signing/provisioning/TestFlight/App Store validation where credentials are available;
+- verify actual generated SBOMs, `SHA256SUMS.txt`, and provenance attestations from a real release execution.
+
+CalcNova 2.9.6 product scope: **COMPLETE**
+
+- Current release source identity: **2.9.6**
+- Cross-platform maintained source matrix: **COMPLETE**
+- Release identity consistency: **COMPLETE**
+- Documentation baseline: **COMPLETE**
+- Runtime/signing/store evidence: **SEPARATE EXTERNAL EVIDENCE**
+- Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**
+
+## CalcNova 2.9.0 → 2.9.5 release preparation — 2026-08-24
+
+CalcNova advanced from the completed 2.8.03 baseline through a preserved 2.9.0 checkpoint and then to the completed 2.9.5 source/release baseline.
+
+### Current release identity at that checkpoint
 
 - Product/display version: `2.9.5`
 - .NET/NuGet package version: `2.9.5`
@@ -54,9 +215,9 @@ A Python importlib/dataclass compatibility edge case in the new identity helper 
 
 ### Cross-platform release identity synchronized
 
-Android and iOS now use build code `20905` while continuing to inherit the visible application version from `$(ProductDisplayVersion)`.
+Android and iOS used build code `20905` while continuing to inherit the visible application version from `$(ProductDisplayVersion)`.
 
-The maintained architecture/source contracts remain:
+The maintained architecture/source contracts remained:
 
 - Windows: `win-x64`, `win-arm64`;
 - Linux: `linux-x64`, `linux-arm64`;
@@ -65,32 +226,17 @@ The maintained architecture/source contracts remain:
 - Android: `android-arm`, `android-arm64`, `android-x86`, `android-x64`;
 - iOS: `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`.
 
-Linux AppStream metadata preserves stable entries for 2.8.03, 2.9.0, and 2.9.5.
+Linux AppStream metadata preserved stable entries for 2.8.03, 2.9.0, and 2.9.5.
 
 ### Completion workflow modernized
 
-`.github/workflows/completion-status-validate.yml` is no longer named for a single release. It now uses the release-neutral name `CalcNova Current Release Completion Validate`, watches the shared release-identity helper and release checkpoints, runs release-identity tests before completion/package validation, limits pull requests to `main`, and cancels superseded runs.
+`.github/workflows/completion-status-validate.yml` is no longer named for a single release. It uses the release-neutral name `CalcNova Current Release Completion Validate`, watches the shared release-identity helper and release checkpoints, runs release-identity tests before completion/package validation, limits pull requests to `main`, and cancels superseded runs.
 
-### Current documentation synchronized
+### Current documentation synchronized at that checkpoint
 
-The maintained current-facing baseline was advanced to 2.9.5 across:
+The maintained current-facing baseline was advanced to 2.9.5 across README, project state, changelog, security/support/contributor policy, documentation index, feature inventory, roadmap, versioning, platform support, Source Preflight, release process, and release evidence checklist.
 
-- `README.md`;
-- `PROJECT_STATE.md`;
-- `CHANGELOG.md`;
-- `SECURITY.md`;
-- `SUPPORT.md`;
-- `CONTRIBUTING.md`;
-- `docs/README.md`;
-- `docs/FEATURES.md`;
-- `docs/ROADMAP.md`;
-- `docs/VERSIONING.md`;
-- `docs/PLATFORM_SUPPORT.md`;
-- `docs/SOURCE_PREFLIGHT.md`;
-- `docs/RELEASE.md`;
-- `docs/RELEASE_READINESS_CHECKLIST.md`.
-
-Historical 2.8.03 and 2.9.0 records remain historical instead of being rewritten as if those releases never existed.
+Historical 2.8.03 and 2.9.0 records remained historical instead of being rewritten as if those releases never existed.
 
 ### Major commits in the 2.9 preparation
 
@@ -117,34 +263,22 @@ Historical 2.8.03 and 2.9.0 records remain historical instead of being rewritten
 
 ### Evidence boundary and remaining operational work
 
-Source/release preparation is complete for the 2.9.5 baseline. The following are still execution evidence, not source-completeness claims:
+Source/release preparation was complete for the 2.9.5 baseline. Hosted CI, .NET execution, downloaded artifacts, representative browsers, mobile devices, signing/notarization, store processing, and actual release supply-chain publication remained separately observed evidence.
 
-- hosted Source Preflight and platform workflow results;
-- .NET restore/format/build/test execution;
-- downloaded Windows/Linux/macOS x64/ARM64 artifact launch checks;
-- representative Browser install/offline/storage/clipboard/accessibility checks;
-- Android emulator/physical-device smoke and accessibility checks;
-- iOS simulator/physical-device smoke and accessibility checks;
-- Android signing and Play Console validation;
-- macOS signing/notarization when required;
-- iOS signing/provisioning/TestFlight/App Store validation;
-- actual release SBOM/checksum/provenance publication.
-
-No PASS is inferred for an operation that was not actually observed.
+No PASS was inferred for an operation that was not actually observed.
 
 ### 2.9.5 classification
 
 - Product scope: **COMPLETE**
-- Current release source identity: **2.9.5**
+- Release source identity: **2.9.5**
 - Cross-platform maintained source matrix: **COMPLETE**
 - Version-aware release validation: **COMPLETE**
 - Documentation synchronization: **COMPLETE**
 - Runtime/signing/store evidence: **SEPARATE EXTERNAL EVIDENCE**
-- Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**
 
 ## Cross-platform source hardening — 2026-08-24
 
-CalcNova 2.8.03 remains the completed product baseline. This continuation strengthened the maintained Windows, Linux, macOS, Browser/WebAssembly/PWA, Android, and iOS source contracts without changing the public product version or redefining completed calculator scope.
+CalcNova 2.8.03 was the completed product baseline at this checkpoint. This continuation strengthened the maintained Windows, Linux, macOS, Browser/WebAssembly/PWA, Android, and iOS source contracts without changing that checkpoint's public product version or redefining completed calculator scope.
 
 ### Platform workflow validator drift fixed
 
@@ -152,107 +286,49 @@ A concrete post-maintenance defect was found in `tools/validate_platform_workflo
 
 Because `tools/release_preflight.py` includes that validator, the stale marker could make the integrated source gate reject the newer valid workflows.
 
-The validator now requires `actions/checkout@v7` for Desktop, Browser, Android, and iOS workflows. Its regression suite now explicitly mutates a platform workflow back to checkout v6 and requires that drift to fail validation.
+The validator now requires `actions/checkout@v7` for Desktop, Browser, Android, and iOS workflows. Its regression suite explicitly mutates a platform workflow back to checkout v6 and requires that drift to fail validation.
 
 ### Android architecture contract made explicit
 
-`src/CalcNova.Android/CalcNova.Android.csproj` now declares:
+`src/CalcNova.Android/CalcNova.Android.csproj` declared:
 
 ```xml
 <RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
 ```
 
-The existing Android identity remains unchanged:
+The Android identity at that checkpoint was target framework `net10.0-android`, application id `in.sanskar.calcnova`, display version `2.8.03`, build code `20803`, and minimum supported Android platform source contract API 23.
 
-- target framework: `net10.0-android`;
-- application id: `in.sanskar.calcnova`;
-- display version: `2.8.03`;
-- build code: `20803`;
-- minimum supported Android platform source contract: API 23.
-
-The Android head continues to use app-local native storage, SQLite calculation history, JSON settings/currency cache, shared clipboard composition, and Android external-link integration.
+The Android head continued to use app-local native storage, SQLite calculation history, JSON settings/currency cache, shared clipboard composition, and Android external-link integration.
 
 ### iOS device/simulator architecture contract made explicit
 
-`src/CalcNova.iOS/CalcNova.iOS.csproj` now declares:
+`src/CalcNova.iOS/CalcNova.iOS.csproj` declared:
 
 ```xml
 <RuntimeIdentifiers>ios-arm64;iossimulator-arm64;iossimulator-x64</RuntimeIdentifiers>
 ```
 
-The existing iOS identity remains unchanged:
+The iOS identity at that checkpoint was target framework `net10.0-ios`, application id `in.sanskar.calcnova`, display version `2.8.03`, build code `20803`, and minimum supported iOS platform source contract iOS 15.0.
 
-- target framework: `net10.0-ios`;
-- application id: `in.sanskar.calcnova`;
-- display version: `2.8.03`;
-- build code: `20803`;
-- minimum supported iOS platform source contract: iOS 15.0.
-
-The iOS head continues to use native local-data storage with a documents fallback, SQLite calculation history, JSON settings/currency cache, shared clipboard composition, and iOS external-link integration.
+The iOS head continued to use native local-data storage with a documents fallback, SQLite calculation history, JSON settings/currency cache, shared clipboard composition, and iOS external-link integration.
 
 ### Cross-platform composition validator added
 
-Added:
+Added `tools/validate_platform_support.py` and `tools/tests/test_validate_platform_support.py` to protect maintained platform source itself rather than only workflow YAML.
 
-- `tools/validate_platform_support.py`;
-- `tools/tests/test_validate_platform_support.py`.
-
-The new standard-library-only validator protects the maintained platform source itself rather than only checking workflow YAML. It verifies:
-
-- Desktop `net10.0` + Avalonia Desktop composition;
-- Desktop platform detection and native persistence/link/clipboard/cache services;
-- Browser `net10.0-browser` + Avalonia Browser composition;
-- Browser-safe history/settings/cache/link/clipboard services;
-- required Browser/PWA resources including `index.html`, `manifest.webmanifest`, `service-worker.js`, and icons;
-- Android target/application/version metadata, all four declared Android runtime identifiers, and native composition services;
-- iOS target/application/version metadata, device/simulator runtime identifiers, and native composition services;
-- shared `CalcNova.Platform` targeting and clipboard/external-link/history/settings contracts;
-- presence of `docs/PLATFORM_SUPPORT.md`.
-
-The regression suite covers the real repository, mobile runtime-identifier inventory, Android architecture drift, Browser service-worker loss, and a missing-source-tree failure case.
+The validator verifies Desktop/Avalonia composition, Browser/PWA resources and Browser-safe services, Android/iOS target/application/runtime metadata and native services, shared platform contracts, and the platform-support document.
 
 ### Focused platform-support CI gate added
 
-Added `.github/workflows/platform-support-validate.yml`.
-
-The focused workflow:
-
-- runs for relevant platform-source/documentation/validator changes on pushes and pull requests to `main`;
-- supports manual dispatch;
-- uses read-only repository contents permission;
-- cancels superseded runs;
-- uses `actions/checkout@v7` and `actions/setup-python@v6` with Python 3.13;
-- runs `python tools/validate_platform_support.py .`;
-- runs `python -m unittest tools.tests.test_validate_platform_support`.
+Added `.github/workflows/platform-support-validate.yml` with read-only permissions, concurrency cancellation, checkout v7, Python 3.13, source validation, and regression execution.
 
 ### Integrated Source Preflight strengthened
 
-`tools/release_preflight.py` now includes:
-
-```text
-Cross-platform source contracts -> tools/validate_platform_support.py .
-```
-
-and:
-
-```text
-Cross-platform source validator tests -> python -m unittest tools.tests.test_validate_platform_support
-```
-
-`tools/tests/test_release_preflight.py` now requires both entries so cross-platform composition protection cannot silently disappear from the integrated SDK-independent source gate.
+`tools/release_preflight.py` gained cross-platform source validation and its regression suite, and `tools/tests/test_release_preflight.py` protects their presence.
 
 ### Platform-support documentation expanded
 
-`docs/PLATFORM_SUPPORT.md` now contains a single maintained matrix covering:
-
-- Windows `win-x64` / `win-arm64`;
-- Linux `linux-x64` / `linux-arm64`;
-- macOS `osx-x64` / `osx-arm64`;
-- Browser/WebAssembly/PWA;
-- Android `android-arm`, `android-arm64`, `android-x86`, `android-x64`;
-- iOS `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`.
-
-The document also separates platform-source completeness from runtime evidence and records the operational follow-up that still requires hosted runners, physical devices, representative browsers, signing/notarization identities, or store services.
+`docs/PLATFORM_SUPPORT.md` gained the maintained Windows/Linux/macOS x64/ARM64, Browser/PWA, Android four-RID, and iOS device/simulator matrix and separated source completeness from runtime evidence.
 
 ### Commits created in this continuation
 
@@ -267,400 +343,99 @@ The document also separates platform-source completeness from runtime evidence a
 9. `33b83574217ffe28ad1fafb21fe9140d6d398de9` — `docs: define complete cross-platform support matrix`
 10. `5fedaacee1a740e02bc70d26322430aab91aab5e` — `test: prevent platform checkout contract regressions`
 
-This `what_changed.md` synchronization is a dedicated handoff commit after those source, test, CI, and documentation commits.
-
 ### Evidence and operational follow-up
 
-Source inspection confirmed the maintained Desktop, Browser, Android, iOS, and shared-platform files contain the markers required by the new validator. The existing solution intentionally keeps platform-workload heads out of the general `CalcNova.slnx` build and validates Browser/Android/iOS through dedicated workflows, avoiding a requirement to install every platform workload in ordinary shared/desktop CI.
+Source inspection confirmed the maintained Desktop, Browser, Android, iOS, and shared-platform files contained the markers required by the new validator. The solution intentionally kept platform-workload heads out of the general `CalcNova.slnx` build and validated Browser/Android/iOS through dedicated workflows.
 
-The available legacy combined commit-status surface returned no statuses for the checked maintenance head. That is not interpreted as GitHub Actions success or failure.
+The available legacy combined commit-status surface returned no statuses for the checked maintenance head. That was not interpreted as GitHub Actions success or failure.
 
-No hosted build, physical-device, signed package, notarization, TestFlight/App Store, Play Console, or representative-browser PASS is inferred from source changes alone. Those operations remain evidence only when actually executed and observed.
-
-Operational follow-up includes:
-
-- observe hosted Desktop/Browser/Android/iOS and Source Preflight results for the new head;
-- execute representative Windows/Linux/macOS x64 and ARM64 release artifacts;
-- run Android emulator/physical-device smoke and accessibility checks;
-- run iOS simulator/physical-device smoke and accessibility checks;
-- run representative browser load/install/offline/storage/clipboard/accessibility checks;
-- perform signing, notarization, TestFlight/App Store, and Play Console validation when the required external credentials/services are available;
-- keep .NET/Avalonia/platform workloads and CI actions compatible as upstream tooling evolves;
-- optionally add further OS/CPU/store/package targets only when a concrete support requirement exists.
-
-### Version/status unchanged
-
-- Product/display version: `2.8.03`
-- Normalized package version: `2.8.3`
-- Normalized release tag: `v2.8.3`
-- Mobile build code: `20803`
-- Application id: `in.sanskar.calcnova`
-- Product scope: **COMPLETE**
-- Cross-platform maintained source matrix: **COMPLETE**
-- This continuation: **POST-COMPLETION CROSS-PLATFORM / CI-CORRECTNESS MAINTENANCE**
+No hosted build, physical-device, signed package, notarization, TestFlight/App Store, Play Console, or representative-browser PASS was inferred from source changes alone.
 
 ## CI hygiene and stale workflow cleanup — 2026-08-23
 
-CalcNova 2.8.03 remains the completed product baseline. This continuation focused on post-completion CI correctness, repository hygiene, regression protection, governance documentation, and stale pull-request cleanup without changing the product version or redefining already completed feature scope.
+CalcNova 2.8.03 was the completed product baseline at this checkpoint. This continuation focused on post-completion CI correctness, repository hygiene, regression protection, governance documentation, and stale pull-request cleanup without changing the product version or redefining already completed feature scope.
 
 ### Canonical GitHub Actions upgraded
 
-The active repository-wide workflows were updated to use the current checkout major:
+The active repository-wide workflows were updated to use `actions/checkout@v7`:
 
-- `.github/workflows/build-test.yml` → `actions/checkout@v7`;
-- `.github/workflows/format.yml` → `actions/checkout@v7`;
-- `.github/workflows/docs-check.yml` → `actions/checkout@v7`.
+- `.github/workflows/build-test.yml`;
+- `.github/workflows/format.yml`;
+- `.github/workflows/docs-check.yml`.
 
-The Build and Test / Formatting workflows continue to use `actions/setup-dotnet@v6` and the repository's `.NET 10.0.x` baseline with explicit `CalcNova.slnx` restore/build/test/format commands.
+Build and Test / Formatting continued to use `actions/setup-dotnet@v6` and the repository's .NET 10.0.x baseline.
 
 ### Obsolete GitHub starter workflows removed
 
-Removed:
-
-- `.github/workflows/dotnet.yml`;
-- `.github/workflows/dotnet-desktop.yml`.
-
-The removed files were generic GitHub starter templates rather than CalcNova-specific CI:
-
-- the generic .NET workflow targeted .NET 8 and generic solution commands;
-- the desktop workflow targeted WPF/Windows Forms + Windows Application Packaging/MSIX;
-- it contained unresolved starter placeholders such as `your-solution-name`, `your-test-project-path`, `your-wap-project-directory-name`, and `your-wap-project-path`;
-- it required WAP signing/package secrets unrelated to CalcNova's Avalonia desktop release pipeline.
-
-Removing the templates prevents duplicate, misleading, or predictably failing checks and avoids preserving obsolete source merely to merge dependency-update pull requests against it.
+Removed generic `.github/workflows/dotnet.yml` and `.github/workflows/dotnet-desktop.yml` starter templates that targeted unrelated .NET 8/WPF/MSIX flows and contained unresolved starter placeholders.
 
 ### CI hygiene source contract added
 
-Added:
-
-- `tools/validate_ci_hygiene.py`;
-- `tools/tests/test_validate_ci_hygiene.py`;
-- `.github/workflows/ci-hygiene-validate.yml`;
-- `docs/CI_HYGIENE.md`.
-
-`tools/validate_ci_hygiene.py` now protects:
-
-- presence and core commands of the canonical Build and Test, Formatting, and Documentation Check workflows;
-- `actions/checkout@v7` in those canonical workflows;
-- `actions/setup-dotnet@v6` plus `.NET 10.0.x` in canonical .NET workflows;
-- read-only repository contents permissions in the canonical workflows;
-- permanent absence of the retired generic `dotnet.yml` and `dotnet-desktop.yml` starter templates;
-- absence of known unresolved starter-template project-path markers across `.github/workflows`;
-- rejection of `actions/checkout` majors 1 through 5;
-- rejection of `actions/setup-dotnet` majors 1 through 5.
-
-The lower-bound action-major checks intentionally allow independently protected workflows that still use checkout v6 while preventing older v1-v5 drift.
-
-The regression suite covers the real repository, retired-template reintroduction, starter placeholders, obsolete checkout/setup-dotnet majors, and canonical .NET SDK downgrade.
+Added `tools/validate_ci_hygiene.py`, its tests, `.github/workflows/ci-hygiene-validate.yml`, and `docs/CI_HYGIENE.md` to protect canonical workflows, action majors, SDK baseline, read-only permissions, retired-template absence, and starter-placeholder absence.
 
 ### Integrated Source Preflight strengthened
 
-`tools/release_preflight.py` now runs:
-
-```text
-tools/validate_ci_hygiene.py
-```
-
-and:
-
-```text
-python -m unittest tools.tests.test_validate_ci_hygiene
-```
-
-`tools/tests/test_release_preflight.py` now requires both the CI-hygiene validator and its regression module in the integrated inventory so this maintenance protection cannot silently disappear.
-
-The focused `.github/workflows/ci-hygiene-validate.yml` watches workflow/preflight hygiene source, uses read-only contents permission, runs on relevant pushes/pull requests, supports manual dispatch, cancels superseded runs, and executes both the validator and regression suite.
+The CI-hygiene validator and tests were integrated into `tools/release_preflight.py` and protected by the preflight inventory tests.
 
 ### Required documentation protection expanded
 
-`.github/workflows/docs-check.yml` now treats the following maintenance/governance/release-evidence guides as mandatory non-empty repository documents in addition to the existing documentation baseline:
-
-- `docs/SOURCE_PREFLIGHT.md`;
-- `docs/BRANCH_PROTECTION.md`;
-- `docs/SECURITY_AUTOMATION.md`;
-- `docs/ARTIFACT_PROVENANCE.md`;
-- `docs/CI_HYGIENE.md`;
-- `docs/VALIDATION_EVIDENCE.md`;
-- `docs/RELEASE_READINESS_CHECKLIST.md`.
-
-This closes the earlier gap where important post-completion security/governance guides existed but were not part of the mandatory-document gate.
+The documentation check made Source Preflight, branch protection, security automation, artifact provenance, CI hygiene, validation evidence, and release readiness mandatory non-empty repository documents.
 
 ### Branch-protection evidence refreshed
 
-The GitHub branch metadata was checked again on 2026-08-23. It still reports:
-
-```text
-protected: false
-required status checks: enforcement off
-```
-
-`docs/BRANCH_PROTECTION.md` now records the 2026-08-23 observation, includes the CI-hygiene source contract, and keeps the same conservative recommendation: use the always-run Source Preflight plus Build and Test / Dependency Review / CodeQL checks as appropriate after a GitHub ruleset is actually enabled.
-
-The new focused CI-hygiene workflow is path-filtered by design and therefore is not recommended as a blindly required status check; its contract is already included in the always-run Source Preflight.
-
-No branch-protection PASS is claimed because the repository setting remains disabled.
+The GitHub branch metadata checked on 2026-08-23 reported branch protection disabled. That was recorded conservatively and no branch-protection PASS was claimed.
 
 ### Stale pull-request queue cleaned
 
-All previously open CalcNova pull requests were reviewed and then closed as superseded rather than merged into the completed/current `main` state:
+Previously open stale/superseded CalcNova pull requests were reviewed and closed after supersession notes rather than being merged into the completed current baseline.
 
-- PR #1 — checkout v7 Dependabot update: active canonical workflows were updated directly and obsolete target templates were removed;
-- PR #2 — upload-artifact v7 Dependabot update: only targeted the removed WPF/MSIX starter template;
-- PR #3 — setup-msbuild v3 Dependabot update: only targeted the removed WPF/MSIX starter template;
-- PR #4 — setup-dotnet v6 Dependabot update: canonical CalcNova workflows already use setup-dotnet v6 / .NET 10, while its old template targets were removed;
-- PR #6 — old 150-commit baseline integration PR: closed as superseded by the completed `main` baseline and later maintenance; it was based on older source and reported non-mergeable.
+### Evidence status
 
-Each pull request received a supersession note before closure. The repository was then re-queried and returned no open pull requests.
-
-### Commits created in this continuation
-
-This pass intentionally used small, independent commits:
-
-1. `f4c27b74cfc2c38cc133d070194aa568ad303183` — `ci: upgrade build checkout action to v7`
-2. `533343c772cfa8ad976021771d6d58f0d41fb35e` — `ci: upgrade formatting checkout action to v7`
-3. `3858f75a3052b8a3e8b7d312b04fdf4a566a3c60` — `ci: upgrade documentation checkout action to v7`
-4. `eb4e6aaa2bc4516fdc49a41fa61f505837a1e17a` — `ci: remove obsolete .NET 8 template workflow`
-5. `0e85b9a47666e6a1f95fec986fabf058dc75d602` — `ci: remove obsolete WPF MSIX template workflow`
-6. `50fb53a7d5c20fefd8014d653f6cf20241dc0e8a` — `ci: add workflow hygiene validator`
-7. `66dcd2b331c661dcc6f9dbf81185225b6c27e113` — `test: cover CI hygiene validator`
-8. `188fb011bad223c93349952607c6d7a9a0b24fcf` — `ci: add focused workflow hygiene gate`
-9. `3c7f74df987ea41630f3ab72b395ecdbc2563853` — `ci: integrate workflow hygiene into source preflight`
-10. `73cc7b626252748277d060ff1b50ad9249079925` — `test: require CI hygiene in integrated preflight`
-11. `fba213afe98ba740df37ceb273b400f054f67ea5` — `docs: document CI workflow hygiene policy`
-12. `b6f88b1c1cc8e09670487fce8cf6b8ccf9fdc937` — `docs: protect maintenance and governance guides`
-13. `a567aae56b2a4c32f4334328e3cecb4fbffc5423` — `docs: refresh branch protection evidence`
-
-This `what_changed.md` synchronization is an additional dedicated handoff commit after those source/documentation commits.
-
-### Validation/evidence status
-
-Repository source inspection found no remaining indexed `checkout@v4`, `setup-dotnet@v4`, or `setup-dotnet@v5` references after the stale templates were removed. The focused source validator and regression source are committed and integrated into the preflight inventory.
-
-A fresh local clone was attempted again from the assistant container. DNS resolution for `github.com` still failed, so the complete materialized repository preflight and .NET restore/build/test sequence were not executed in that container.
-
-No GitHub Actions, CodeQL, Dependency Review, release, signing, device, or store PASS is inferred merely from source changes. Hosted/runtime evidence remains `PASS`, `FAIL`, `BLOCKED`, or `NOT RUN` only when an actual execution result is observed.
-
-### Version/status unchanged
-
-- Product/display version: `2.8.03`
-- Normalized package version: `2.8.3`
-- Normalized release tag: `v2.8.3`
-- Mobile build code: `20803`
-- Application id: `in.sanskar.calcnova`
-- Product scope: **COMPLETE**
-- This continuation: **POST-COMPLETION CI / GOVERNANCE / REPOSITORY-HYGIENE MAINTENANCE**
+A fresh local clone could not resolve `github.com`, so the materialized repository preflight and .NET restore/build/test sequence were not executed in that container. No hosted/runtime PASS was inferred from source presence.
 
 ## Deterministic CycloneDX release SBOM hardening — 2026-08-21
 
-CalcNova 2.8.03 remains the completed product baseline. This continuation added a new post-completion software-supply-chain control: deterministic per-platform release SBOM generation, integrated validation, checksum/provenance coverage, and current documentation.
+CalcNova 2.8.03 was the completed product baseline at this checkpoint. This continuation added deterministic per-platform release SBOM generation, integrated validation, checksum/provenance coverage, and current documentation.
 
 ### Deterministic CycloneDX generator added
 
-Added:
+Added `tools/generate_sbom.py` and `tools/tests/test_generate_sbom.py`.
 
-- `tools/generate_sbom.py`;
-- `tools/tests/test_generate_sbom.py`.
-
-The generator is standard-library-only Python and reads the restored NuGet dependency graph from each platform project's `project.assets.json`. It emits deterministic CycloneDX **1.7** JSON and declares:
+The standard-library-only generator reads restored NuGet dependency graphs from `project.assets.json`, emits deterministic CycloneDX 1.7 JSON declaring:
 
 ```text
 https://cyclonedx.org/schema/bom-1.7.schema.json
 ```
 
-The generated BOM records:
+and records package names/versions, Package URLs, valid NuGet SHA-512 hashes, dependency edges, a deterministic UUIDv5 serial, and generator/assets-format metadata without a wall-clock timestamp.
 
-- the CalcNova platform component and normalized package version;
-- restored NuGet package names and versions;
-- NuGet Package URLs (`pkg:nuget/...`);
-- NuGet SHA-512 package hashes when a valid restore hash is available;
-- direct and resolved transitive dependency edges available in the restore graph;
-- a deterministic UUIDv5 serial derived from release identity and package inventory;
-- generator and supported NuGet assets-format metadata.
+### NuGet restore-format drift fails closed
 
-No wall-clock timestamp is emitted, so identical dependency metadata and release identity produce stable JSON rather than time-dependent output.
-
-### NuGet restore-format drift now fails closed
-
-NuGet explicitly documents `project.assets.json` as an implementation contract that can evolve rather than a permanently stable public data format. The generator therefore does not silently assume arbitrary future formats.
-
-It currently requires:
-
-- top-level assets format version `3`;
-- a `libraries` object;
-- a `targets` object;
-- a `project` object.
-
-An unexpected assets-format version aborts SBOM generation with an explicit review-required error. This turns future NuGet format drift into a visible release failure instead of risking an incomplete or misleading BOM.
+The generator requires top-level assets format version `3` and expected `libraries`, `targets`, and `project` objects. Unsupported future format changes abort generation for explicit review.
 
 ### Release workflow publishes SBOMs beside packages
 
-`.github/workflows/release.yml` now produces:
-
-- `CalcNova-win-x64.sbom.cdx.json`;
-- `CalcNova-win-arm64.sbom.cdx.json`;
-- `CalcNova-linux-x64.sbom.cdx.json`;
-- `CalcNova-linux-arm64.sbom.cdx.json`;
-- `CalcNova-osx-x64.sbom.cdx.json`;
-- `CalcNova-osx-arm64.sbom.cdx.json`;
-- `CalcNova-browser.sbom.cdx.json`;
-- `CalcNova-android.sbom.cdx.json` when signed Android publication is enabled.
-
-Desktop and Browser SBOMs are generated after platform publish and before workflow-artifact upload. The Android SBOM is generated only after the signed AAB is successfully produced.
-
-Because SBOMs are ordinary files in the existing release artifact tree, they inherit all current release-integrity controls:
-
-1. duplicate/reserved flat-filename validation;
-2. inclusion in `SHA256SUMS.txt` using published basenames;
-3. inclusion in the existing `actions/attest@v4` `release-assets/**/*` attestation subject set;
-4. upload to the GitHub Release beside the package they describe.
+The release workflow produces per-RID Desktop SBOMs, a Browser SBOM, and an Android SBOM when signed Android publication is enabled. These files inherit flat filename collision protection, checksum inclusion, provenance attestation, and GitHub Release upload behavior.
 
 ### Release/source contracts strengthened
 
-Updated:
-
-- `tools/validate_release_workflow.py`;
-- `tools/tests/test_validate_release_workflow.py`;
-- `tools/release_preflight.py`;
-- `tools/tests/test_release_preflight.py`;
-- `tools/validate_release_docs.py`;
-- `tools/tests/test_validate_release_docs.py`.
-
-The release workflow validator now requires Desktop, Browser, and signed Android SBOM generation, expected `.sbom.cdx.json` filenames, and correct generation-before-upload ordering.
-
-The integrated SDK-independent preflight now executes:
-
-```text
-python -m unittest tools.tests.test_generate_sbom
-```
-
-and its inventory regression test requires that SBOM suite to remain integrated.
-
-The documentation validator now protects the CycloneDX 1.7 schema identity, generator path, SBOM filename convention, supported NuGet assets-format contract, and regression-test reference.
-
-### Documentation/state synchronized
-
-Updated:
-
-- `docs/ARTIFACT_PROVENANCE.md`;
-- `PROJECT_STATE.md`;
-- this live `what_changed.md` handoff.
-
-The provenance guide now explains package/SBOM pairing, deterministic output, fail-closed NuGet format handling, checksum and attestation coverage, JSON inspection, provenance verification, and evidence semantics.
+Release workflow/document/preflight validators and regression tests protect SBOM generation, filenames, ordering, schema identity, generator path, and supported NuGet assets format.
 
 ### Validation evidence
 
-A focused Python smoke execution of the committed generator logic observed `PASS` for:
-
-- deterministic output;
-- CycloneDX 1.7 schema identity;
-- package inventory;
-- direct/transitive dependency edges;
-- NuGet SHA-512 conversion;
-- rejection of an unsupported assets-format version.
-
-This focused result is not represented as a full repository preflight or release run.
-
-A fresh repository clone in the assistant container still could not resolve `github.com`, so the complete materialized repository preflight and .NET 10 restore/build/test sequence were not executed there. The available legacy commit-status surface also returned no statuses for the checked maintenance head; that is not interpreted as either GitHub Actions success or failure.
-
-Actual release-generated `.sbom.cdx.json` files, checksum verification against published downloads, GitHub attestations, NuGet advisory-query execution, compiled/runtime behavior, signing, and store processing remain evidence only after those operations actually run and are observed.
-
-### Version/status unchanged
-
-- Product/display version: `2.8.03`
-- Normalized package version: `2.8.3`
-- Normalized release tag: `v2.8.3`
-- Mobile build code: `20803`
-- Application id: `in.sanskar.calcnova`
-- Product scope: **COMPLETE**
-- This continuation: **POST-COMPLETION SBOM / SUPPLY-CHAIN MAINTENANCE**
+A focused Python generator smoke execution observed PASS for deterministic output, CycloneDX 1.7 identity, package/dependency inventory, hash conversion, and unsupported-format rejection. This did not substitute for full repository/release execution.
 
 ## Release checksum manifest hardening — 2026-08-20
 
-The stable release workflow received one additional integrity/usability fix after the NuGet-audit and attestation follow-up below.
+The stable release workflow was corrected so `SHA256SUMS.txt` uses the flat basenames users actually download from a GitHub Release rather than runner-local nested paths.
 
-### Downloaded checksum verification now matches GitHub Release filenames
+A duplicate/reserved basename guard was added before checksum generation. The publication order became artifact download, filename validation, checksum generation, checksum copy into the release tree, provenance attestation, release creation/reuse, then asset upload.
 
-Previously, checksum generation hashed files directly from the nested GitHub Actions download tree. That produced manifest entries containing runner-local paths such as:
-
-```text
-release-assets/desktop-win-x64/CalcNova-win-x64.zip
-```
-
-GitHub Release downloads are presented by flat filenames, so a user downloading the release assets into one directory could not reliably use a normal:
-
-```bash
-sha256sum -c SHA256SUMS.txt
-```
-
-The release workflow now writes checksum entries using each published asset basename, for example:
-
-```text
-<sha256>  CalcNova-win-x64.zip
-```
-
-### Release filename collision guard added
-
-Before checksum generation, `publish-release` now:
-
-- requires at least one prepared release file;
-- rejects duplicate basenames across nested downloaded workflow artifacts;
-- reserves `SHA256SUMS.txt` so no build artifact can collide with the generated manifest.
-
-This matters because separate GitHub Actions artifacts can live in different subdirectories while GitHub Release assets ultimately share one flat filename namespace.
-
-### Checksum/provenance ordering
-
-The publication order is now:
-
-1. download packaged workflow artifacts;
-2. validate unique/reserved release filenames;
-3. generate `SHA256SUMS.txt` using published basenames;
-4. copy the checksum manifest into `release-assets/`;
-5. attest the full `release-assets/**/*` tree with `actions/attest@v4`;
-6. create/reuse the GitHub Release;
-7. upload the prepared assets.
-
-The checksum manifest is not included in its own checksum set, but it **is** covered by artifact provenance after being copied into the attested release tree.
-
-### Regression and documentation protection
-
-Updated:
-
-- `.github/workflows/release.yml`;
-- `tools/validate_release_workflow.py`;
-- `tools/tests/test_validate_release_workflow.py`;
-- `tools/validate_release_docs.py`;
-- `tools/tests/test_validate_release_docs.py`;
-- `docs/ARTIFACT_PROVENANCE.md`;
-- `docs/README.md`;
-- `CHANGELOG.md`;
-- this live handoff record.
-
-The release workflow validator now requires the filename-validation step, flat basename checksum generation, correct ordering, and rejects the previous nested-path `xargs -0 sha256sum > SHA256SUMS.txt` implementation.
-
-The release-document validator now also protects the current security-automation and artifact-provenance guides, including the NuGet transitive-audit and release-attestation contracts.
-
-### Evidence status
-
-No release execution PASS is inferred from these source changes. Actual checksum validation, provenance generation, GitHub Release publication, .NET restore/build/test, CodeQL, Dependency Review, signing, and runtime results remain evidence only after those operations actually execute and are observed.
-
-### Version/status unchanged
-
-- Product/display version: `2.8.03`
-- Normalized package version: `2.8.3`
-- Normalized release tag: `v2.8.3`
-- Mobile build code: `20803`
-- Application id: `in.sanskar.calcnova`
-- Product scope: **COMPLETE**
-- This change: **POST-COMPLETION RELEASE-INTEGRITY MAINTENANCE**
+No release execution PASS was inferred from these source changes.
 
 ## NuGet audit and attestation compatibility follow-up — 2026-08-20
 
-This follow-up supersedes the security/provenance implementation details in the earlier 2026-08-20 checkpoint below while preserving that checkpoint as historical context.
-
-### NuGet vulnerability auditing is now explicit and enforced
-
-`Directory.Build.props` now defines:
+The current repository-level dependency policy introduced here remains:
 
 ```xml
 <NuGetAudit>true</NuGetAudit>
@@ -669,35 +444,9 @@ This follow-up supersedes the security/provenance implementation details in the 
 <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 ```
 
-This makes CalcNova's .NET 10 restore path explicitly audit direct and transitive NuGet dependencies and keeps the enforced threshold aligned with the Dependency Review gate. When configured audit sources actually report a moderate, high, or critical advisory, the corresponding audit warning is expected to fail restore because warnings are treated as errors.
+The dependency-security validator/tests protect direct/transitive audit, severity threshold, warnings-as-errors, duplicate policy drift, and protected NU190x suppression markers.
 
-Added:
-
-- `tools/validate_dependency_security.py`;
-- `tools/tests/test_validate_dependency_security.py`.
-
-The validator protects the audit-enabled state, transitive `all` mode, `moderate` threshold, warnings-as-errors enforcement, duplicate-policy drift, and `NU1901`–`NU1904` suppression through `NoWarn` / `WarningsNotAsErrors`, including composite warning lists.
-
-Unrelated warning configuration remains allowed.
-
-### Focused security validation strengthened
-
-`.github/workflows/security-automation-validate.yml` now watches `Directory.Build.props` for both pushes and pull requests and runs:
-
-```text
-python tools/validate_security_workflows.py .
-python tools/validate_dependency_security.py .
-python -m unittest tools.tests.test_validate_security_workflows
-python -m unittest tools.tests.test_validate_dependency_security
-```
-
-`tools/validate_security_workflows.py` now also validates that focused workflow itself, including read-only permissions, path coverage, commands, and rejection of `pull_request_target`/unnecessary write permissions.
-
-Both security validators and both regression suites are integrated into `tools/release_preflight.py`, and the preflight inventory tests require them.
-
-### Final release-attestation contract corrected
-
-The stable release workflow's current publication permissions are:
+The stable release publication permission contract introduced here remains:
 
 ```yaml
 permissions:
@@ -707,581 +456,73 @@ permissions:
   artifact-metadata: write
 ```
 
-Only `publish-release` receives those permissions. The workflow-level default remains:
+on `publish-release`, while the workflow-level default remains `contents: read`.
 
-```yaml
-permissions:
-  contents: read
-```
-
-The current `actions/attest@v4` step uses one inclusive subject:
+The current provenance subject remains:
 
 ```text
 release-assets/**/*
 ```
 
-This covers every prepared release asset, including desktop/Browser ZIP archives, `SHA256SUMS.txt`, and the Android AAB when signing secrets produce it, without requiring a separate potentially absent Android path.
-
-`tools/validate_release_workflow.py` and `tools/tests/test_validate_release_workflow.py` now lock the four-permission publication contract, inclusive subject glob, ordering, and single-job privilege grants.
-
-### Documentation synchronized
-
-Updated current-facing documentation includes:
-
-- `PROJECT_STATE.md`;
-- `CHANGELOG.md`;
-- root `SECURITY.md`;
-- `docs/SECURITY.md`;
-- `docs/SECURITY_AUTOMATION.md`;
-- `docs/SOURCE_PREFLIGHT.md`;
-- `docs/BUILDING.md`;
-- `docs/RELEASE.md`;
-- `docs/ARTIFACT_PROVENANCE.md`;
-- this live `what_changed.md` record.
-
-`PROJECT_STATE.md` now records the four attestation permissions and inclusive release-tree subject rather than the earlier three-permission snapshot.
-
-### Evidence status
-
-No execution result was fabricated. The available commit-status surface returned no legacy status records for the checked maintenance commits, which is not interpreted as either CI success or CI failure.
-
-The assistant environment still did not provide a materialized .NET 10 repository execution path for the full restore/build/test suite. Therefore:
-
-- security policy/source contracts are present on `main`;
-- GitHub-hosted CodeQL/Dependency Review execution remains separately observable service evidence;
-- online NuGet advisory-query success remains separate restore evidence;
-- artifact-attestation execution remains separate release-service evidence;
-- compiled/runtime/signing/store evidence remains environment dependent.
-
-Use `PASS / FAIL / BLOCKED / NOT RUN` only from actual observed execution.
-
-### Version/status unchanged
-
-- Product/display version: `2.8.03`
-- Normalized package version: `2.8.3`
-- Normalized release tag: `v2.8.3`
-- Mobile build code: `20803`
-- Application id: `in.sanskar.calcnova`
-- Product scope: **COMPLETE**
-- This follow-up: **POST-COMPLETION SECURITY / DEPENDENCY / RELEASE-PROVENANCE MAINTENANCE**
+No execution result was fabricated; service/runtime evidence remained separate.
 
 ## Security automation and release provenance maintenance — 2026-08-20
 
-CalcNova 2.8.03 remains the completed product baseline. This continuation strengthened automated security review, release least privilege, and supply-chain provenance without changing the public version, normalized package version, release-tag mapping, application id, or mobile build code.
+This checkpoint added CodeQL, dependency review, focused security validation, release least-privilege separation, artifact provenance, and related documentation/source validators.
 
-### Automated security gates added
-
-The maintained `main` branch now contains:
-
-- `.github/workflows/codeql.yml` — C# CodeQL analysis on pushes and pull requests to `main`, a weekly schedule, and manual dispatch;
-- `.github/workflows/dependency-review.yml` — pull-request dependency review using `actions/dependency-review-action@v5` with `fail-on-severity: moderate`;
-- `.github/workflows/security-automation-validate.yml` — focused read-only validation for the security workflow contracts;
-- the existing `.github/dependabot.yml` — weekly NuGet and GitHub Actions update proposals.
-
-CodeQL uses `github/codeql-action/init@v4` and `github/codeql-action/analyze@v4` for `csharp` with `build-mode: none`.
-
-### Security workflow source contract added
-
-Added:
-
-- `tools/validate_security_workflows.py`;
-- `tools/tests/test_validate_security_workflows.py`.
-
-The validator protects:
-
-- CodeQL push/PR/schedule/manual triggers;
-- CodeQL Action major v4;
-- C# language selection and source-analysis build mode;
-- CodeQL result-publication permission without unnecessary repository/OIDC write privileges;
-- Dependency Review Action major v5;
-- moderate-or-higher vulnerability enforcement;
-- read-only dependency-review permissions;
-- rejection of `pull_request_target` for these workflows;
-- rejection of unnecessary write/OIDC/package permissions.
-
-The security validator and regression suite are integrated into `tools/release_preflight.py`, and the preflight inventory tests require that integration.
-
-### Release least privilege hardened
-
-`.github/workflows/release.yml` now defaults to:
-
-```yaml
-permissions:
-  contents: read
-```
-
-Only `publish-release` receives:
-
-```yaml
-permissions:
-  contents: write
-  id-token: write
-  attestations: write
-```
-
-Validation and build jobs therefore do not inherit release-write or OIDC privileges.
-
-### Release provenance added
-
-The release publication job now uses `actions/attest@v4` after checksum generation and before GitHub Release asset upload.
-
-The attested release subject set includes:
-
-- all packaged release ZIP files;
-- the Android AAB when signing secrets produce one;
-- `SHA256SUMS.txt`.
-
-`tools/validate_release_workflow.py` now requires the provenance action, subject paths, ordering, global read-only permission, job-scoped publication permissions, and exactly one grant of each publication write/OIDC/attestation permission. It also rejects deprecated provenance-wrapper action references in the release workflow.
-
-`tools/tests/test_validate_release_workflow.py` locks the same provenance and permission contract.
-
-### Documentation synchronized
-
-Added:
-
-- `docs/SECURITY_AUTOMATION.md`;
-- `docs/ARTIFACT_PROVENANCE.md`.
-
-Updated:
-
-- root `SECURITY.md`;
-- `docs/SECURITY.md`;
-- `docs/RELEASE.md`;
-- `docs/SOURCE_PREFLIGHT.md`;
-- `docs/README.md`;
-- `CHANGELOG.md`;
-- `PROJECT_STATE.md`;
-- repository required-document validation;
-- this live `what_changed.md` checkpoint.
-
-The provenance guide documents `gh attestation verify PATH_TO_ARTIFACT -R sanskarIN/CalcNova`, checksum/provenance separation, least-privilege permissions, and offline-verification considerations.
-
-### Evidence status
-
-The assistant container still could not resolve `github.com` during the fresh-clone attempt, so a materialized local full-tree preflight and .NET build/test run were not executed there.
-
-A checked maintenance commit exposed no legacy combined commit statuses through the available connector surface. That is not treated as proof that GitHub Actions passed or failed.
-
-No CodeQL, Dependency Review, provenance-attestation, compiled, runtime, signing, or store-service PASS was invented. Their execution evidence remains `NOT RUN`/unobserved from this tool surface unless an actual service result is later retrieved.
-
-The repository source contracts, workflow files, validator source, regression source, and documentation changes are present on `main`.
-
-### Version/status unchanged
-
-- Product/display version: `2.8.03`
-- Normalized package version: `2.8.3`
-- Normalized release tag: `v2.8.3`
-- Mobile build code: `20803`
-- Application id: `in.sanskar.calcnova`
-- Product scope: **COMPLETE**
-- This continuation: **POST-COMPLETION SECURITY / RELEASE-QUALITY MAINTENANCE**
+No CodeQL, Dependency Review, provenance-attestation, compiled, runtime, signing, or store-service PASS was invented merely from source presence.
 
 ## Native x64 + ARM64 desktop release maintenance — 2026-08-20
 
-CalcNova 2.8.03 remains the completed product baseline. This continuation improved the release/distribution layer without changing the public version, normalized package version, release-tag mapping, application id, or mobile build code.
+This checkpoint expanded the release workflow to six self-contained Desktop archives:
 
-### Desktop release matrix expanded
+- Windows `win-x64`, `win-arm64`;
+- Linux `linux-x64`, `linux-arm64`;
+- macOS `osx-x64`, `osx-arm64`.
 
-`.github/workflows/release.yml` now publishes six self-contained desktop archives:
+The release validator and regression suite protect the complete six-target inventory and RID-specific naming.
 
-- Windows x64: `win-x64`;
-- Windows ARM64: `win-arm64`;
-- Linux x64: `linux-x64`;
-- Linux ARM64: `linux-arm64`;
-- macOS Intel: `osx-x64`;
-- macOS Apple Silicon: `osx-arm64`.
-
-Each RID keeps an independent `CalcNova-<rid>.zip` archive and `desktop-<rid>` workflow artifact. This improves first-class native release coverage for current ARM64 desktop systems instead of requiring architecture emulation where a native package can be produced.
-
-### Release source contract hardened
-
-`tools/validate_release_workflow.py` now requires:
-
-- all six desktop runner/RID pairs;
-- RID-specific self-contained publish output;
-- RID-specific archive naming;
-- RID-specific artifact naming;
-- the existing exact-tag/source-version/preflight/release-safety contracts.
-
-The validator's success message now explicitly covers x64/ARM64 desktop publication.
-
-### Regression coverage expanded
-
-`tools/tests/test_validate_release_workflow.py` now locks:
-
-- the complete six-target desktop inventory;
-- x64 + ARM64 coverage for Windows;
-- x64 + ARM64 coverage for Linux;
-- x64 + ARM64 coverage for macOS.
-
-The existing repository-workflow validation test remains in place, so the real release workflow must satisfy the validator.
-
-### Documentation synchronized
-
-Updated current-facing documentation:
-
-- `docs/BUILDING.md` — six release RIDs plus explicit publish commands for Windows/Linux/macOS x64 and ARM64;
-- `docs/PLATFORM_SUPPORT.md` — native x64/ARM64 desktop release source contracts and architecture-specific evidence guidance;
-- `docs/RELEASE.md` — six automated desktop artifact families and release-validator protections;
-- `CHANGELOG.md` — post-2.8.03 maintenance record;
-- `PROJECT_STATE.md` — authoritative current maintenance checkpoint;
-- `what_changed.md` — this live continuation record.
-
-### External support verification
-
-Current Avalonia 12 documentation identifies x64 and ARM64 support across maintained Windows/macOS targets and x64/ARM64 support on representative maintained Linux distributions. The .NET runtime identifier catalog defines `win-arm64`, `linux-arm64`, and `osx-arm64` alongside their x64 equivalents.
-
-That external platform information was used only to justify the source release targets. Actual CalcNova artifact execution remains evidence-based and must be recorded per target as `PASS`, `FAIL`, `BLOCKED`, or `NOT RUN`.
-
-### Validation environment status
-
-A fresh repository clone was attempted from the assistant container after this maintenance change. The container still could not resolve `github.com`, so a materialized full-tree local preflight could not run there.
-
-No PASS result was invented. The repository now contains the strengthened release validator and regression source; CI/runtime/package execution remains separately observable evidence.
-
-### Version/status unchanged
-
-- Product/display version: `2.8.03`
-- Normalized package version: `2.8.3`
-- Normalized release tag: `v2.8.3`
-- Mobile build code: `20803`
-- Application id: `in.sanskar.calcnova`
-- Product scope: **COMPLETE**
-- This continuation: **POST-COMPLETION MAINTENANCE / RELEASE ENHANCEMENT**
+Actual CalcNova artifact execution remains evidence-based per target.
 
 ## Documentation consistency pass — 2026-08-20
 
-The maintained CalcNova documentation was audited against the completed 2.8.03 source tree. The product/version classification is unchanged: **CalcNova 2.8.03 remains COMPLETE**.
+The maintained documentation was audited against the then-current completed 2.8.03 source tree. Platform heads, build requirements, storage composition, currency behavior, completed mathematical tools, localization, keyboard input, and evidence wording were reconciled with source.
 
-The authoritative record for this documentation pass is:
-
-- `docs/DOCUMENTATION_AUDIT_2026-08-20.md`.
-
-The documentation index now links that audit and provides a comprehensive current-guide map with explicit source-of-truth rules.
-
-### Current-facing documentation corrected
-
-This pass corrected stale development-era or environment-specific wording across:
-
-- `docs/BUILDING.md`;
-- `docs/README.md`;
-- `docs/TROUBLESHOOTING.md`;
-- `docs/ARCHITECTURE.md`;
-- `docs/RUNTIME_VALIDATION_RUNBOOK.md`;
-- `docs/PRIVACY.md`;
-- `docs/SECURITY.md`;
-- `docs/CALCULATION_ENGINE.md`;
-- `docs/CALCULATOR_EDITING.md`;
-- `docs/INPUT_SAFETY.md`;
-- `docs/KEYBOARD_SHORTCUTS.md`;
-- `docs/NUMERICAL_ANALYSIS.md`;
-- `docs/BIVARIATE_STATISTICS.md`;
-- `docs/EXACT_RATIONALS.md`;
-- `docs/ENGINEERING_NOTATION.md`;
-- `docs/CONVERTER_MODE.md`;
-- `docs/PROGRAMMER_MODE.md`;
-- `docs/ACCESSIBILITY.md`;
-- `docs/DESIGN_SYSTEM.md`;
-- `docs/LOCALIZATION.md`;
-- `docs/LIVE_LOCALIZATION.md`;
-- `docs/ONBOARDING.md`;
-- `docs/UI_AUTOMATION.md`.
-
-### Major reconciliations
-
-- Desktop, Browser/WebAssembly, Android, and iOS are documented as present maintained source heads rather than future work.
-- `BUILDING.md` now reflects the actual platform workflows, including Browser `wasm-tools`, Android workload + JDK 17, iOS workload/simulator RIDs, Android API 23, iOS 15.0, and current Desktop release RIDs.
-- Android signed-AAB publication is documented with the current external CI secret contract without embedding credentials.
-- Native SQLite history and Browser-safe settings/history composition are documented as current implementation.
-- Optional network-enhanced currency provider/cache/offline behavior is documented consistently in architecture, privacy, and security guidance.
-- Exact rational arithmetic, engineering notation, graph trace/multi-series/export, converter search/recents/favorites/copy, and programmer large-word grouping/copy are documented as completed 2.8.03 features rather than remaining work.
-- English/Hindi semantic localization and reviewed live-localized onboarding/shared surfaces are documented as the completed 2.8.03 baseline; additional languages/detail migration remain optional enhancements.
-- Shift-only top-row Calculator mappings for `+`, `*`, `(`, `)`, `^`, and `%` are documented as implemented rather than planned.
-- Permanent feature documentation no longer freezes one assistant/environment's unavailable SDK state as a global `NOT RUN` status; execution evidence remains per-run and conservative.
-
-### Evidence policy preserved
-
-The documentation pass does **not** manufacture runtime results. Runtime/device/signing/store checks continue to use:
-
-```text
-PASS / FAIL / BLOCKED / NOT RUN
-```
-
-Source completeness does not imply a runtime PASS, and an unexecuted runtime check does not redefine a completed source feature as unfinished.
-
-### Historical records preserved
-
-Dated 2026-08-19 continuation/source-audit records and `docs/history/` remain intact as historical evidence. Current authoritative documentation wins when a historical checkpoint describes an earlier implementation state.
-
-### Product scope unchanged
-
-No product-code behavior or release version was changed by this documentation pass.
-
-- Product/display version: `2.8.03`
-- Normalized package version: `2.8.3`
-- Normalized release tag: `v2.8.3`
-- Mobile build code: `20803`
-- Application id: `in.sanskar.calcnova`
-- Product/source scope: **COMPLETE**
+Dated 2026-08-19 continuation/source-audit records and `docs/history/` remained intact as historical evidence.
 
 ## CalcNova 2.8.03 final completion checkpoint — 2026-08-19
 
 **CalcNova version 2.8.03 is complete.**
 
-This is the final live completion checkpoint for the defined 2.8.03 product baseline.
+This is the final live completion checkpoint for the defined 2.8.03 product baseline at that release point.
 
 Historical source-hardening/continuation detail is preserved under `docs/history/`, including:
 
 - `docs/history/what_changed_through_pre_2.8.03_completion_2026-08-19.md`;
 - `docs/history/final_source_audit_pre_2.8.03_completion_2026-08-19.md`.
 
-The authoritative completion audit is:
+The authoritative completion audit is `docs/FINAL_SOURCE_AUDIT_2026-08-19.md`.
 
-- `docs/FINAL_SOURCE_AUDIT_2026-08-19.md`.
-
-## Final release identity
+## 2.8.03 release identity
 
 - Product/display version: `2.8.03`
 - Normalized .NET/NuGet version: `2.8.3`
 - Normalized Git release tag: `v2.8.3`
-- Assembly version: `2.8.3.0`
-- File version: `2.8.3.0`
+- Assembly/file version: `2.8.3.0`
 - Informational version: `2.8.03`
 - Android/iOS display version: `2.8.03`
 - Android/iOS numeric build code: `20803`
 - Application id: `in.sanskar.calcnova`
 
-Strict Semantic Versioning forbids leading zeroes in numeric version identifiers, so package/tag tooling uses normalized `2.8.3` / `v2.8.3` while CalcNova keeps the requested public product version `2.8.03`.
-
-## Version source of truth
-
-`Directory.Build.props` now centrally defines:
-
-- `ProductDisplayVersion = 2.8.03`;
-- `Version = 2.8.3`;
-- `VersionPrefix = 2.8.3`;
-- `PackageVersion = 2.8.3`;
-- `AssemblyVersion = 2.8.3.0`;
-- `FileVersion = 2.8.3.0`;
-- `InformationalVersion = 2.8.03`.
-
-Android and iOS use the shared display version plus numeric build code `20803`.
-
-## Release workflow finalization
-
-The release workflow now treats source version metadata as authoritative.
-
-Before compiled validation/publication it:
-
-1. validates strict tag syntax;
-2. checks out the exact requested tag;
-3. reads the normalized `<Version>` from `Directory.Build.props`;
-4. requires `RELEASE_TAG = v + SOURCE_VERSION`;
-5. runs tagged source preflight;
-6. proceeds to .NET/platform publication steps only after those source checks.
-
-For CalcNova 2.8.03 the normalized tag is `v2.8.3`.
-
-The Android release path no longer replaces source-owned display/build versions from the tag text or GitHub run number.
-
-## Mobile and packaging metadata
-
-Android:
-
-- `ApplicationDisplayVersion = $(ProductDisplayVersion)`;
-- `ApplicationVersion = 20803`.
-
-iOS:
-
-- `ApplicationDisplayVersion = $(ProductDisplayVersion)`;
-- `ApplicationVersion = 20803`.
-
-Linux AppStream metadata now contains a stable dated release entry:
-
-- version `2.8.03`;
-- date `2026-08-19`;
-- type `stable`;
-- completed cross-platform baseline description.
-
-`tools/validate_packaging_metadata.py` protects central/mobile/Linux/macOS/Windows identity and package metadata contracts, and its regression suite protects the 2.8.03 constants/AppStream release entry.
-
-## In-app About release identity
-
-`AboutViewModel` now exposes:
-
-- `Version = 2.8.03`;
-- `CompletionStatus = Complete`;
-- `ReleaseLabel = Version 2.8.03 • Complete`.
-
-The shared About surface displays that release label.
-
-Added regression source:
-
-- `tests/CalcNova.App.Tests/AboutReleaseIdentityTests.cs`;
-- `tests/CalcNova.App.Tests/AboutReleaseIdentityHeadlessTests.cs`.
-
-## Completed documentation state
-
-Current-facing documentation now describes CalcNova 2.8.03 as complete.
-
-Finalized documents include:
-
-- `README.md` — completed product overview and 2.8.03 identity;
-- `PROJECT_STATE.md` — authoritative complete classification;
-- `CHANGELOG.md` — dated 2.8.03 release record;
-- `docs/README.md` — 2.8.03 documentation index;
-- `docs/FEATURES.md` — completed feature inventory;
-- `docs/ROADMAP.md` — all defined 2.8.03 milestones complete;
-- `docs/VERSIONING.md` — display/SemVer/build-code mapping;
-- `docs/RELEASE.md` — 2.8.03 release process;
-- `docs/RELEASE_READINESS_CHECKLIST.md` — release evidence checklist rather than an implementation-completion checklist;
-- `docs/PLATFORM_SUPPORT.md` — completed platform source composition with external evidence recorded separately;
-- `docs/SOURCE_PREFLIGHT.md` — 2.8.03 source gate and completion contract;
-- `docs/FINAL_SOURCE_AUDIT_2026-08-19.md` — final completion audit;
-- `SECURITY.md` — 2.8.03 current completed/supported baseline;
-- `SUPPORT.md` — 2.8.03 support/maintenance posture;
-- `what_changed.md` — this final live checkpoint.
-
-## Security/support status correction
-
-The root security policy had retained an obsolete pre-release status statement.
-
-It now identifies:
-
-- CalcNova 2.8.03 as the current completed/supported baseline;
-- normalized package/tag mapping;
-- 2.8.03 security maintenance policy.
-
-The Support guide now identifies 2.8.03 as the supported baseline and categorizes feature requests as optional post-release improvements unless they address correctness/security/compatibility defects.
-
-## Completion-status source contract
-
-Added:
-
-- `tools/validate_completion_status.py`;
-- `tools/tests/test_validate_completion_status.py`;
-- `.github/workflows/completion-status-validate.yml`.
-
-The completion validator protects current authoritative files against obsolete provisional-status wording and requires explicit 2.8.03 complete markers.
-
-Protected documents include:
-
-- root README/project state/changelog/live checkpoint/security/support;
-- docs README/features/roadmap/final audit/versioning;
-- release process/evidence checklist/platform support/source preflight.
-
-It also protects the in-app About release identity and its regression source.
-
-The validator rejects current-status phrases including:
-
-- `under active development`;
-- `active pre-release development`;
-- an `Unreleased` top-level release posture;
-- planned first-milestone wording;
-- `remaining product/runtime work`;
-- `remaining high-priority work`;
-- `remaining work is evidence-dependent`.
-
-Historical files under `docs/history/` remain preserved as historical records and do not define the current project state.
-
-## Completion-focused workflow
-
-`.github/workflows/completion-status-validate.yml` watches:
-
-- central version metadata;
-- authoritative completion/release/platform/security/support documentation;
-- About release identity source/tests;
-- Android/iOS version source;
-- Linux AppStream release metadata;
-- completion/packaging validators and tests.
-
-The focused workflow runs:
-
-```text
-python tools/validate_completion_status.py .
-python tools/validate_packaging_metadata.py .
-python -m unittest tools.tests.test_validate_completion_status
-python -m unittest tools.tests.test_validate_packaging_metadata
-```
-
-It uses read-only repository permissions.
-
-## Integrated Source Preflight
-
-`tools/release_preflight.py` now includes:
-
-- the 2.8.03 completion-status validator;
-- its Python regression suite.
-
-`tools/tests/test_release_preflight.py` requires both entries so completion-status coverage cannot silently disappear.
-
-The release-document validator was also updated from older tag/status wording to the 2.8.03 release/evidence contracts.
-
-## Completed product scope
-
-### Calculator and scientific — COMPLETE
-
-Standard/scientific calculation, precedence, scientific functions/constants, angle modes, percentage, repeated equals, memory, sanitized import/paste/copy, keyboard mappings, and selection/caret-aware editing.
-
-### Exact rational arithmetic — COMPLETE
-
-Bounded canonical `BigInteger` rationals, exact decimal/scientific parsing, arithmetic/comparison, default-value safety, Calculator panel, tests, and source validation.
-
-### Engineering notation — COMPLETE
-
-Bounded engineering format/parse workflows, significant-digit formatting, finite exponent limits, non-zero-underflow rejection, shared 4,096-character input contract, Calculator panel, tests, and validation.
-
-### Programmer and Unicode — COMPLETE
-
-Base 2–36 tools, fixed-width signed/unsigned bitwise operations/shifts, 8/16/32/64/128-bit grids, accessible bit states, copy actions, Unicode scalar conversion/inspection, and local Unicode metadata.
-
-### Converter, currency, and date/time — COMPLETE
-
-Offline unit conversion, precision/search/recents/favorites/persistence/copy, converter preference/default contracts, replaceable currency provider/cache/offline fallback, and date/time/business-day/duration utilities.
-
-### Statistics, equations, and matrices — COMPLETE
-
-Descriptive statistics, paired covariance/correlation/regression/`R²`/prediction, deterministic edge handling, equation workflows, matrix determinant/inverse/rank/system solving, and copy workflows.
-
-### Graphing/numerical analysis — COMPLETE
-
-Bounded sampling, discontinuity handling, viewport interaction, multi-series presentation, non-color differentiation, trace/CSV/SVG, derivative/root/integration analysis, extreme-value safety, and workload budgets.
-
-### History/settings/persistence/export — COMPLETE
-
-Native/Browser storage composition, history operations, bounded exports/previews, settings schema/migration/validation, and preference persistence.
-
-### Accessibility/adaptive/onboarding/localization baseline — COMPLETE
-
-Interaction targets, focus/high-contrast behavior, adaptive profiles, keyboard navigation, dynamic-control accessibility, onboarding behavior, English/Hindi semantic catalogs, and reviewed live localized surfaces.
-
-Additional language packs or translation expansion are optional post-release improvements.
-
-### Platform source composition — COMPLETE
-
-Desktop, Browser/WebAssembly, Android, and iOS source composition plus platform workflow/package contracts.
-
-### Release/integrity/evidence infrastructure — COMPLETE
-
-Integrated source preflight, focused validators/workflows, release-tag/workflow contracts, package metadata validation, artifact checksum/manifest tooling, and structured release-evidence schema/model/runner/verifier.
-
-## Local validation attempt
-
-A fresh clone was attempted from the assistant container to run the final integrated Python preflight against the materialized repository tree.
-
-The container could not resolve `github.com`, so cloning stopped before the repository was materialized and the preflight command did not execute.
-
-That attempt is recorded as an environment networking limitation, not as a CalcNova validation failure.
+Strict Semantic Versioning forbids leading zeroes in numeric version identifiers, so package/tag tooling used normalized `2.8.3` / `v2.8.3` while CalcNova kept the requested public product version `2.8.03`.
 
 ## Evidence policy
 
 Product implementation completion and execution evidence remain intentionally separate.
 
-A command/platform check is recorded as PASS only when it actually runs and the result is observed. When the required SDK/device/credential/tool/store service cannot be used in a particular environment, evidence is recorded as `NOT RUN` or `BLOCKED` instead of inventing success.
+A command/platform check is recorded as PASS only when it actually runs and the result is observed. When a required SDK/device/credential/tool/store service cannot be used in a particular environment, evidence is `NOT RUN` or `BLOCKED` instead of invented success.
 
-That does **not** make CalcNova 2.8.03 unfinished; it describes only whether a specific external verification operation executed in that environment.
-
-## Final classification
+## Historical 2.8.03 final classification
 
 - CalcNova 2.8.03 product scope: **COMPLETE**
 - Core/domain implementation: **COMPLETE**
@@ -1291,9 +532,5 @@ That does **not** make CalcNova 2.8.03 unfinished; it describes only whether a s
 - Source validation infrastructure: **COMPLETE**
 - Packaging/release infrastructure: **COMPLETE**
 - Artifact/release-evidence infrastructure: **COMPLETE**
-- Current supported security baseline: **2.8.03**
-- Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**
 
-## Handoff rule
-
-Do not recreate completed 2.8.03 source work in later continuations. Continue only from a concrete observed defect, security/compatibility maintenance need, documentation correction, translation request, dependency update, test improvement, or explicitly requested optional enhancement.
+The current baseline is defined by the newest section at the top of this file and by `PROJECT_STATE.md`.
