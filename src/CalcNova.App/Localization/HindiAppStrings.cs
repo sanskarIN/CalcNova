@@ -69,6 +69,13 @@ internal static class HindiAppStrings
             [AppStringKey.ActionCopyExport] = "निर्यात कॉपी करें",
             [AppStringKey.ActionOpenRepository] = "CalcNova रिपॉज़िटरी खोलें",
             [AppStringKey.ActionOpenGitHubProfile] = "GitHub प्रोफ़ाइल खोलें",
+            [AppStringKey.ActionGraphPanLeft] = "बाएँ खिसकाएँ",
+            [AppStringKey.ActionGraphPanRight] = "दाएँ खिसकाएँ",
+            [AppStringKey.ActionGraphPanUp] = "ऊपर खिसकाएँ",
+            [AppStringKey.ActionGraphPanDown] = "नीचे खिसकाएँ",
+            [AppStringKey.ActionGraphZoomIn] = "ज़ूम इन",
+            [AppStringKey.ActionGraphZoomOut] = "ज़ूम आउट",
+            [AppStringKey.ActionGraphFit] = "ग्राफ़ फिट करें",
 
             [AppStringKey.LabelExpression] = "अभिव्यक्ति",
             [AppStringKey.LabelResult] = "परिणाम",
