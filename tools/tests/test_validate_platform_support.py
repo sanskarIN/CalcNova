@@ -75,9 +75,11 @@ class PlatformSupportValidatorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             copy_fixture(root, validator)
+            identity = validator.load_release_identity(root)
             project = root / "src/CalcNova.Android/CalcNova.Android.csproj"
             source = project.read_text(encoding="utf-8")
-            source = source.replace("<ApplicationVersion>20905</ApplicationVersion>", "<ApplicationVersion>20900</ApplicationVersion>")
+            current_marker = f"<ApplicationVersion>{identity.mobile_build_code}</ApplicationVersion>"
+            source = source.replace(current_marker, "<ApplicationVersion>1</ApplicationVersion>")
             project.write_text(source, encoding="utf-8")
 
             failures = validator.validate(root)
