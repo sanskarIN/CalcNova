@@ -38,7 +38,8 @@ class KeyboardContractValidatorTests(unittest.TestCase):
 
     def test_calculator_hardware_mapping_remains_bounded(self) -> None:
         validator = load_validator()
-        self.assertEqual(25, len(validator.EXPECTED_KEY_TOKENS))
+        self.assertEqual(29, len(validator.EXPECTED_KEY_TOKENS))
+        self.assertLessEqual(len(validator.EXPECTED_KEY_TOKENS), 32)
 
 
 if __name__ == "__main__":
