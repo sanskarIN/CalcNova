@@ -1,10 +1,10 @@
-# CalcNova 2.9.6 Completed Roadmap
+# CalcNova 2.9.7 Completed Roadmap
 
 ## Status
 
-**All milestones defined for CalcNova 2.9.6 are complete.**
+**All milestones defined for CalcNova 2.9.7 are complete.**
 
-This document is a record of the completed product roadmap. Items added after 2.9.6 are maintenance or optional enhancement ideas and do not represent missing requirements for the completed release.
+This document is a record of the completed product roadmap. Items added after 2.9.7 are maintenance or optional enhancement ideas and do not represent missing requirements for the completed release.
 
 ## Milestone 1 — Core calculation — Complete
 
@@ -90,6 +90,8 @@ This document is a record of the completed product roadmap. Items added after 2.
 - Discontinuity segmentation
 - Interactive viewport
 - Pointer/keyboard pan, zoom, reset, and fit
+- Accessible eight-action graph viewport toolbar
+- 44-DIP toolbar targets and keyboard focusability
 - Nearest-point trace
 - Single/multi-expression CSV
 - Stable multi-series identities
@@ -127,6 +129,7 @@ This document is a record of the completed product roadmap. Items added after 2.
 - Keyboard mode navigation
 - Accessible programmer bit states
 - Dynamic graph-control focus/touch-target contracts
+- Accessible graph viewport action toolbar
 - Reduced-motion/high-contrast preference state
 - Onboarding shortcut/focus behavior
 - Conservative runtime evidence matrix
@@ -139,9 +142,10 @@ This document is a record of the completed product roadmap. Items added after 2.
 - Regional English/Hindi culture selection
 - Persisted culture preference
 - Catalog completeness/duplicate/unknown-key validation
-- Reviewed live localization across shell, calculator, onboarding, settings, history, currency, About, and related surfaces
+- Reviewed live localization across shell, calculator, onboarding, settings, history, currency, About, graph viewport actions, and related surfaces
+- Hindi labels for graph pan, zoom, reset, and fit controls
 
-Additional languages and extra UI-string migration are optional translation improvements rather than incomplete 2.9.6 requirements.
+Additional languages and extra UI-string migration are optional translation improvements rather than incomplete 2.9.7 requirements.
 
 ## Milestone 10 — Cross-platform composition — Complete
 
@@ -156,7 +160,7 @@ Additional languages and extra UI-string migration are optional translation impr
 - Android ARM/ARM64/x86/x64 source runtime identifiers
 - iOS ARM64 device and ARM64/x64 simulator source runtime identifiers
 - Focused cross-platform source validator/workflow
-- Mobile release identity `2.9.6` / build code `20906`
+- Mobile release identity `2.9.7` / build code `20907`
 
 ## Milestone 11 — Validation and release infrastructure — Complete
 
@@ -211,16 +215,29 @@ The 2.8.03 completion remains preserved in the changelog and historical audit do
 - packaging/completion/platform/release-document validation became current-version aware
 - checkpoint preserved in `docs/releases/2.9.5.md`
 
-### 2.9.6 current baseline
+### 2.9.6 checkpoint
 
 - Central source version set to `2.9.6`
 - Release tag contract `v2.9.6`
 - Android/iOS build code `20906`
 - About and release-label regressions updated to 2.9.6
 - Linux AppStream 2.9.6 stable entry added while retaining prior release history
-- release identity regression coverage protects the current baseline and 2.9-series build-code mapping
+- release identity regression coverage protects the 2.9-series build-code mapping
 - security/support/contributor policy advanced to 2.9.6
-- current documentation/status synchronized to 2.9.6
+- checkpoint preserved in `docs/releases/2.9.6.md`
+
+### 2.9.7 current baseline
+
+- Central source version set to `2.9.7`
+- Release tag contract `v2.9.7`
+- Android/iOS build code `20907`
+- About and release-label regressions updated to 2.9.7
+- Linux AppStream 2.9.7 stable entry added while retaining prior release history
+- graph viewport toolbar accessibility restored with localized action controls
+- Hindi graph pan/zoom/fit action localization completed
+- stale navigation, graph, headless, adaptive, artifact, evidence, keyboard, and platform source validators aligned with current implementation contracts
+- remaining GitHub checkout action pins aligned to `actions/checkout@v7`
+- current documentation/status synchronized to 2.9.7
 
 ## Environment Verification
 
@@ -228,9 +245,9 @@ Build, device, browser, signing, notarization, provisioning, accessibility-tool,
 
 An environment-specific `NOT RUN` or `BLOCKED` record is evidence metadata, not an incomplete roadmap item.
 
-## Optional Post-2.9.6 Ideas
+## Optional Post-2.9.7 Ideas
 
-The following may be considered later without changing the completed status of 2.9.6:
+The following may be considered later without changing the completed status of 2.9.7:
 
 - additional language packs;
 - optional UI refinements based on user feedback;
@@ -243,4 +260,4 @@ The following may be considered later without changing the completed status of 2
 - additional automated regression coverage;
 - runtime/device/browser evidence expansion.
 
-No optional idea in this section is required for CalcNova 2.9.6 completion.
+No optional idea in this section is required for CalcNova 2.9.7 completion.
