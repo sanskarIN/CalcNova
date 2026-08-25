@@ -2,6 +2,63 @@
 
 All notable CalcNova changes are recorded here.
 
+## [2.9.7] - 2026-08-25
+
+**Status: Complete**
+
+Public/product version: `2.9.7`  
+Package version: `2.9.7`  
+Normalized release tag: `v2.9.7`  
+Assembly/file version: `2.9.7.0`  
+Mobile build code: `20907`
+
+### Accessibility and localization maintenance
+
+- Restored the shared graph viewport action toolbar with eight focusable pan/zoom/reset/fit buttons.
+- Kept graph toolbar actions at the repository's 44-DIP minimum target baseline.
+- Wired the toolbar to the existing shared `GraphPlotControl` viewport operations instead of duplicating graph state.
+- Added Hindi localization for graph pan-left, pan-right, pan-up, pan-down, zoom-in, zoom-out, and fit actions.
+- Preserved live button localization by registering dynamically created graph controls in the existing shell localization map.
+
+### Source-validation repairs
+
+- Updated navigation validation to follow the centralized `ShellKeyboardShortcut` helper introduced by earlier refactoring.
+- Updated graph-surface validation to track current single/multi-series synchronization wiring.
+- Updated headless UI source validation for the current Avalonia application-builder and `PhysicalKey.NumpadAdd` spelling.
+- Updated adaptive-layout validation to use the current compact `Eq` and `Matrix` tab labels while runtime localization continues to provide full localized names.
+- Updated artifact-integrity validation to recognize the structured `("git", "rev-parse", "HEAD")` invocation.
+- Updated release-evidence validation to follow the current `EvidenceStatus.NOT_RUN` / `EvidenceStatus.BLOCKED` model markers.
+- Updated the keyboard regression fixture to protect the expanded 29-key hardware mapping without weakening the bounded-key contract.
+- Updated the platform build-code drift regression to derive the current mobile build code from central release identity before intentionally corrupting it.
+
+### CI hygiene and security workflow maintenance
+
+- Advanced remaining maintained checkout actions in settings-schema, touch-target, XAML, dependency-review, and focused security-validation workflows to `actions/checkout@v7`.
+- Kept current Python setup actions on `actions/setup-python@v6` where applicable.
+- Updated security workflow validation to require the current checkout major consistently across CodeQL, Dependency Review, and focused security validation.
+- Preserved read-only permissions for validation workflows and the existing least-privilege release publication model.
+
+### Release identity and packaging
+
+- Preserved the completed 2.9.6 source/release checkpoint in `docs/releases/2.9.6.md` before advancing current source.
+- Advanced `Directory.Build.props` to `2.9.7` while retaining the direct/transitive NuGet Audit policy.
+- Set Android/iOS numeric build code to `20907` with source-owned `2.9.7` display-version inheritance.
+- Updated in-app About identity and compiled/headless regressions to `Version 2.9.7 • Complete`.
+- Updated release-identity regression expectations to `2.9.7`, `v2.9.7`, `2.9.7.0`, and `20907` while retaining earlier 2.9-series build-code mappings.
+- Added a stable Linux AppStream 2.9.7 entry dated 2026-08-25 while preserving 2.9.6, 2.9.5, 2.9.0, and 2.8.03 history.
+- Updated the packaging regression fixture to the 2.9.7 central identity.
+
+### Current baseline synchronization
+
+- Advanced the maintained security/support/contributor baseline to 2.9.7 and marked 2.9.6 as superseded in the public security policy.
+- Updated the documentation index, feature inventory, completed roadmap, versioning guide, platform support guide, Source Preflight guide, release process, and release-evidence checklist to 2.9.7.
+- Removed stale provisional-status examples from the authoritative Source Preflight document so completion-status validation evaluates only current wording.
+- Added the explicit Desktop source-composition completion marker required by the current completion-status contract.
+
+### Evidence boundary
+
+This release entry records completed source/release preparation. Hosted CI, compiled .NET validation, downloaded package execution, representative Browser testing, Android/iOS device tests, signing, notarization, TestFlight/App Store, Play Console, SBOM/checksum publication, and provenance execution are PASS only after those operations actually run and are observed.
+
 ## [2.9.6] - 2026-08-24
 
 **Status: Complete**
@@ -346,4 +403,4 @@ A final fresh-clone attempt from the assistant container could not resolve `gith
 
 ## Maintenance policy
 
-CalcNova 2.9.6 is the current completed product baseline. Later repository changes may contain security fixes, compatibility maintenance, documentation corrections, translations, test improvements, dependency updates, evidence improvements, or optional features.
+CalcNova 2.9.7 is the current completed product baseline. Later repository changes may contain security fixes, compatibility maintenance, documentation corrections, translations, test improvements, dependency updates, evidence improvements, or optional features.
