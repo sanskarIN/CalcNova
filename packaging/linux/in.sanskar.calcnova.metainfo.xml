@@ -9,6 +9,11 @@
     <p>CalcNova is a complete open-source local-first calculator with standard, scientific, exact-rational, engineering-notation, programmer, Unicode, conversion, statistics, equations, matrices, graphing, history, settings, keyboard, accessibility, and cross-platform workflows.</p>
   </description>
   <releases>
+    <release version="2.9.7" date="2026-08-25" type="stable">
+      <description>
+        <p>CalcNova 2.9.7 maintenance release with graph accessibility restoration and source-validation hardening.</p>
+      </description>
+    </release>
     <release version="2.9.6" date="2026-08-24" type="stable">
       <description>
         <p>CalcNova 2.9.6 maintenance release with synchronized release identity and validation contracts.</p>
