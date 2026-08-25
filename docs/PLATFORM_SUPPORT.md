@@ -1,8 +1,10 @@
-# CalcNova 2.9.6 Platform Support
+# CalcNova 2.9.7 Platform Support
 
 ## Status
 
-**Cross-platform source composition is complete for CalcNova 2.9.6.**
+**Cross-platform source composition is complete for CalcNova 2.9.7.**
+
+Desktop source composition: **COMPLETE**
 
 CalcNova contains completed application composition heads for Desktop, Browser/WebAssembly, Android, and iOS. External runtime/build/signing/store results are tracked as evidence and are not used to redefine the completed source status.
 
@@ -19,7 +21,7 @@ CalcNova contains completed application composition heads for Desktop, Browser/W
 
 The matrix describes the maintained CalcNova targets. It does not imply support for every operating system, CPU, browser engine, store, or legacy device ever produced.
 
-`PROJECT_STATE.md` is the authoritative 2.9.6 completion record.
+`PROJECT_STATE.md` is the authoritative 2.9.7 completion record.
 
 ## Shared platform architecture
 
@@ -50,12 +52,12 @@ Completed source behavior includes:
 - resizable shared window;
 - compact/medium/expanded adaptive profiles;
 - keyboard calculator and mode-navigation support;
-- graph keyboard interaction;
+- graph keyboard interaction and accessible viewport toolbar;
 - shared clipboard composition;
 - native SQLite history and JSON settings/cache composition;
 - external-link composition;
 - settings/onboarding/About surfaces;
-- 2.9.6 release identity inherited from central build properties.
+- 2.9.7 release identity inherited from central build properties.
 
 The stable release workflow publishes self-contained desktop archives for both x64 and ARM64 on all three maintained desktop operating systems:
 
@@ -86,7 +88,7 @@ Completed source/release infrastructure:
 - Linux runner validation workflow;
 - Linux x64 and ARM64 self-contained release publish paths;
 - `.desktop` metadata;
-- AppStream metadata with stable 2.8.03, 2.9.0, 2.9.5, and 2.9.6 release entries;
+- AppStream metadata with stable 2.8.03, 2.9.0, 2.9.5, 2.9.6, and 2.9.7 release entries;
 - package identity validation.
 
 External evidence may record representative distribution launch behavior, clipboard/persistence, desktop integration, accessibility behavior, native x64/ARM64 execution, and the chosen packaging format.
@@ -133,8 +135,8 @@ Completed Android source/release identity:
 - target framework: `net10.0-android`;
 - application id: `in.sanskar.calcnova`;
 - application title: `CalcNova`;
-- display version: `2.9.6`;
-- numeric build code: `20906`;
+- display version: `2.9.7`;
+- numeric build code: `20907`;
 - explicit runtime identifiers: `android-arm`, `android-arm64`, `android-x86`, `android-x64`;
 - Android workload/Java validation workflow contract;
 - release AAB workflow path;
@@ -155,8 +157,8 @@ Completed iOS source/release identity:
 - target framework: `net10.0-ios`;
 - application id: `in.sanskar.calcnova`;
 - application title: `CalcNova`;
-- display version: `2.9.6`;
-- numeric build code: `20906`;
+- display version: `2.9.7`;
+- numeric build code: `20907`;
 - explicit device runtime identifier: `ios-arm64`;
 - explicit simulator runtime identifiers: `iossimulator-arm64`, `iossimulator-x64`;
 - Info.plist/launch metadata;
@@ -198,15 +200,15 @@ This separation is intentional:
 
 ## Version mapping
 
-The public CalcNova release version is `2.9.6`.
+The public CalcNova release version is `2.9.7`.
 
 Current package/tag/build identity:
 
-- package version: `2.9.6`;
-- release tag: `v2.9.6`;
-- mobile build code: `20906`.
+- package version: `2.9.7`;
+- release tag: `v2.9.7`;
+- mobile build code: `20907`.
 
-Earlier checkpoints used `v2.9.0` / `20900` and `v2.9.5` / `20905`; see [releases/2.9.0.md](releases/2.9.0.md) and [releases/2.9.5.md](releases/2.9.5.md).
+Earlier checkpoints used `v2.9.0` / `20900`, `v2.9.5` / `20905`, and `v2.9.6` / `20906`; see [releases/2.9.0.md](releases/2.9.0.md), [releases/2.9.5.md](releases/2.9.5.md), and [releases/2.9.6.md](releases/2.9.6.md).
 
 See [VERSIONING.md](VERSIONING.md).
 
@@ -221,7 +223,7 @@ python tools/validate_platform_workflows.py .
 python tools/validate_packaging_metadata.py .
 python tools/validate_release_workflow.py .
 python tools/validate_completion_status.py .
-python tools/release_preflight.py --tag v2.9.6
+python tools/release_preflight.py --tag v2.9.7
 ```
 
 The release-workflow validator protects the six x64/ARM64 desktop release targets in addition to release-tag/version/publication safety contracts.
@@ -236,11 +238,11 @@ Record external target evidence using:
 PASS / FAIL / BLOCKED / NOT RUN
 ```
 
-Do not convert an unexecuted target operation into PASS because source or a workflow exists. Conversely, `NOT RUN` in one environment does **not** mean the 2.9.6 platform source composition is unfinished.
+Do not convert an unexecuted target operation into PASS because source or a workflow exists. Conversely, `NOT RUN` in one environment does **not** mean the 2.9.7 platform source composition is unfinished.
 
-## Remaining platform work
+## Operational platform follow-up
 
-No additional platform head is required for the defined CalcNova 2.9.6 product scope. Remaining platform work is operational or optional:
+No additional platform head is required for the defined CalcNova 2.9.7 product scope. Operational or optional follow-up includes:
 
 1. observe hosted CI results for all maintained build workflows after changes;
 2. run physical-device Android and iOS smoke/accessibility tests;
@@ -254,6 +256,7 @@ These items are evidence, distribution, maintenance, or optional expansion work.
 
 ## Final platform classification
 
+- Desktop source composition: **COMPLETE**
 - Windows desktop source composition: **COMPLETE**
 - Linux desktop source composition: **COMPLETE**
 - macOS desktop source composition: **COMPLETE**
@@ -264,6 +267,6 @@ These items are evidence, distribution, maintenance, or optional expansion work.
 - Platform workflow source contracts: **COMPLETE**
 - Cross-platform composition source contract: **COMPLETE**
 - Packaging metadata contracts: **COMPLETE**
-- 2.9.6 platform version identity: **COMPLETE**
+- 2.9.7 platform version identity: **COMPLETE**
 
 Future platform changes are maintenance, compatibility/security updates, packaging refinements, evidence collection, or optional enhancements.
