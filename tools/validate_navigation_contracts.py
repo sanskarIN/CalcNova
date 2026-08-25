@@ -23,14 +23,16 @@ def main() -> int:
     xaml_path = root / "src" / "CalcNova.App" / "Views" / "MainView.axaml"
     view_path = root / "src" / "CalcNova.App" / "Views" / "MainView.axaml.cs"
     view_model_path = root / "src" / "CalcNova.App" / "ViewModels" / "MainViewModel.cs"
+    shortcut_path = root / "src" / "CalcNova.App" / "Infrastructure" / "ShellKeyboardShortcut.cs"
 
-    for path in (xaml_path, view_path, view_model_path):
+    for path in (xaml_path, view_path, view_model_path, shortcut_path):
         if not path.is_file():
             return fail(f"missing source file: {path}")
 
     xaml = xaml_path.read_text(encoding="utf-8")
     view_source = view_path.read_text(encoding="utf-8")
     view_model_source = view_model_path.read_text(encoding="utf-8")
+    shortcut_source = shortcut_path.read_text(encoding="utf-8")
 
     tab_count = len(re.findall(r"<TabItem\b", xaml))
     mode_count_match = re.search(r"public\s+const\s+int\s+ModeCount\s*=\s*(\d+)\s*;", view_model_source)
@@ -50,17 +52,30 @@ def main() -> int:
             return fail(f"MainViewModel is missing navigation marker: {marker}")
 
     for marker in (
-        "Key.PageDown",
-        "Key.PageUp",
-        "KeyModifiers.Control",
+        "ShellKeyboardShortcut.GetNavigationAction",
+        "ApplyShellNavigation(viewModel, navigationAction)",
         "SelectNextMode()",
         "SelectPreviousMode()",
     ):
         if marker not in view_source:
             return fail(f"MainView keyboard navigation is missing marker: {marker}")
 
+    for marker in (
+        "KeyModifiers.Control",
+        "Key.PageDown",
+        "Key.PageUp",
+        "Key.Home",
+        "Key.End",
+        "ShellNavigationAction.NextMode",
+        "ShellNavigationAction.PreviousMode",
+        "ShellNavigationAction.FirstMode",
+        "ShellNavigationAction.LastMode",
+    ):
+        if marker not in shortcut_source:
+            return fail(f"ShellKeyboardShortcut is missing navigation marker: {marker}")
+
     print(
-        f"Validated {tab_count} shared modes and Ctrl+PageUp/PageDown keyboard navigation contracts."
+        f"Validated {tab_count} shared modes and centralized Ctrl+PageUp/PageDown/Home/End navigation contracts."
     )
     return 0
 
