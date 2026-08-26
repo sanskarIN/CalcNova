@@ -123,6 +123,29 @@ Historical 2.9.6, 2.9.5, and 2.9.0 release checkpoints remain preserved rather t
 - `test: align adaptive layout mode fixture with current labels`
 - `docs: advance live change log to CalcNova 2.9.7`
 
+## Evidence policy
+
+CalcNova 2.9.7 product scope: **COMPLETE**
+
+The repository continues to enforce dependency-audit policy through:
+
+```xml
+<NuGetAuditMode>all</NuGetAuditMode>
+```
+
+Release artifact workflows use the protected metadata and asset paths:
+
+```text
+artifact-metadata: write
+release-assets/**/*
+```
+
+Environment execution evidence is conservative. A build, device, signing, store, or hosted-service operation is not called PASS merely because its source contract exists. It is recorded as **PASS**, **FAIL**, **BLOCKED**, or **NOT RUN** only when the relevant evidence is actually observed.
+
+When an external environment is unavailable, the correct state is `NOT RUN` or `BLOCKED`.
+
+Future changes: **MAINTENANCE OR OPTIONAL ENHANCEMENT**
+
 ## CalcNova 2.9.6 release preparation — 2026-08-24
 
 CalcNova has been advanced from the preserved 2.9.5 checkpoint to the completed **2.9.6** source/release baseline.
