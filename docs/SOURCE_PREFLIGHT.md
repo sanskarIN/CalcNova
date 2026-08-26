@@ -1,8 +1,8 @@
-# CalcNova 2.9.6 SDK-Independent Source Preflight
+# CalcNova 2.9.7 SDK-Independent Source Preflight
 
 CalcNova includes a deterministic source-level validation command for environments where the .NET SDK or target-platform workloads are unavailable.
 
-**CalcNova 2.9.6 is the completed product baseline.**
+**CalcNova 2.9.7 is the completed product baseline.**
 
 ## Run it
 
@@ -15,12 +15,12 @@ python tools/release_preflight.py
 For the current release identity, include the exact release tag when validating a tagged source tree:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.6
+python tools/release_preflight.py --tag v2.9.7
 ```
 
-The public/product version, strict SemVer package version, and normalized tag are `2.9.6`, `2.9.6`, and `v2.9.6`. Android/iOS use numeric build code `20906`.
+The public/product version, strict SemVer package version, and normalized tag are `2.9.7`, `2.9.7`, and `v2.9.7`. Android/iOS use numeric build code `20907`.
 
-Earlier 2.9.0 and 2.9.5 checkpoints are preserved in [`releases/2.9.0.md`](releases/2.9.0.md) and [`releases/2.9.5.md`](releases/2.9.5.md).
+Earlier 2.9.0, 2.9.5, and 2.9.6 checkpoints are preserved in [`releases/2.9.0.md`](releases/2.9.0.md), [`releases/2.9.5.md`](releases/2.9.5.md), and [`releases/2.9.6.md`](releases/2.9.6.md).
 
 ## What it runs
 
@@ -36,6 +36,7 @@ The integrated preflight is intentionally broader than any one focused workflow.
 - selection-aware calculator editing and function wrapping;
 - graph keyboard interaction;
 - graph surface integration;
+- accessible graph viewport toolbar integration;
 - deterministic multi-series graph presentation.
 
 ### Numerical and data correctness
@@ -55,6 +56,7 @@ The integrated preflight is intentionally broader than any one focused workflow.
 - focus visibility;
 - accessibility runtime-evidence discipline;
 - dynamically inserted shared-control accessibility and touch-target coverage;
+- graph viewport toolbar focus/touch-target coverage;
 - adaptive layout;
 - shared touch-target baselines;
 - English/Hindi localization catalog/preferences and reviewed live localization surfaces.
@@ -63,7 +65,7 @@ The integrated preflight is intentionally broader than any one focused workflow.
 
 - current release identity loaded from `Directory.Build.props`;
 - current release completion-status contracts;
-- in-app About release label `Version 2.9.6 • Complete`;
+- in-app About release label `Version 2.9.7 • Complete`;
 - converter default-pair and preference-notice contracts;
 - versioned settings schema/shared codec/shared validation;
 - onboarding persistence/visual/focus behavior;
@@ -114,12 +116,12 @@ python tools/validate_completion_status.py .
 
 `tools/release_identity.py` parses `Directory.Build.props` and requires:
 
-- display version `2.9.6` to normalize to package version `2.9.6`;
+- display version `2.9.7` to normalize to package version `2.9.7`;
 - `VersionPrefix` and `PackageVersion` to match `Version`;
-- assembly/file versions to match `2.9.6.0`;
+- assembly/file versions to match `2.9.7.0`;
 - informational version to match the display version;
-- release tag to derive as `v2.9.6`;
-- mobile build code to derive as `20906` from `MAJOR * 10000 + MINOR * 100 + PATCH`.
+- release tag to derive as `v2.9.7`;
+- mobile build code to derive as `20907` from `MAJOR * 10000 + MINOR * 100 + PATCH`.
 
 This removes the maintenance risk where validators could remain pinned to an old release after source workflows or version metadata advanced.
 
@@ -134,14 +136,7 @@ python -m unittest tools.tests.test_validate_completion_status
 
 The validator derives its version/tag/build-code expectations from the central release identity and requires authoritative current-facing documents plus the in-app About surface/tests to identify the current completed baseline consistently.
 
-It rejects obsolete provisional-status wording such as:
-
-- `under active development`;
-- an `Unreleased` top-level release posture;
-- planned first-milestone wording;
-- `remaining product/runtime work`;
-- `remaining high-priority work`;
-- `remaining work is evidence-dependent`.
+It also rejects stale provisional-status patterns, including development-phase labels, provisional top-level release posture, planned-first-milestone wording, and wording that incorrectly presents already-completed implementation scope as pending product work.
 
 Historical source-audit/release-checkpoint documents are preserved as history and are not treated as the authoritative current status.
 
@@ -171,6 +166,7 @@ python -m unittest tools.tests.test_validate_security_workflows
 
 The source validator requires the intended CodeQL, Dependency Review, and focused security-validation contracts, including:
 
+- `actions/checkout@v7` for maintained security workflows;
 - CodeQL Action v4;
 - C# analysis with source-analysis build mode;
 - push/PR/schedule/manual CodeQL triggers;
@@ -283,6 +279,6 @@ A successful source preflight validates deterministic repository contracts. It d
 
 Those checks are external execution/settings evidence. They are recorded only when actually run, observed, or enabled.
 
-An environment-specific `NOT RUN` or `BLOCKED` result does not change the completed implementation status of CalcNova 2.9.6; it only records whether that external verification operation executed in that environment.
+An environment-specific `NOT RUN` or `BLOCKED` result does not change the completed implementation status of CalcNova 2.9.7; it only records whether that external verification operation executed in that environment.
 
 See [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md), [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md), [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md), [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md), [FOCUS_VISIBILITY.md](FOCUS_VISIBILITY.md), and [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).

@@ -44,7 +44,7 @@ def validate(root: Path) -> list[str]:
     for marker in (
         "collect_records",
         "Manifest output cannot also be included as an artifact input.",
-        "git rev-parse",
+        '("git", "rev-parse", "HEAD")',
         "write_manifest",
     ):
         if marker not in generator:

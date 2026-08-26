@@ -31,10 +31,11 @@ def validate(root: Path) -> list[str]:
         "EnsureGraphPlot(viewModel.Graphing)",
         "private void EnsureGraphPlot(GraphingViewModel graphing)",
         "MinHeight = 300",
-        "Segments = graphing.Segments",
         "graphing.PropertyChanged += HandleGraphingPropertyChanged",
         "nameof(GraphingViewModel.Segments)",
+        "nameof(GraphingViewModel.MultiSeries)",
         "_graphPlotControl.Segments = _graphPlotViewModel.Segments",
+        "_graphPlotControl.Series = _graphPlotViewModel.MultiSeries",
         "ToolTip.SetTip(plot",
     ):
         if marker not in main_view:
@@ -74,7 +75,7 @@ def main() -> int:
             print(f"- {failure}", file=sys.stderr)
         return 1
 
-    print("Validated shared interactive graph surface, segment synchronization, and headless coverage.")
+    print("Validated shared interactive graph surface, single/multi-series synchronization, and headless coverage.")
     return 0
 
 

@@ -1,6 +1,6 @@
 # CalcNova Support
 
-**Current supported product baseline: CalcNova 2.9.6.**
+**Current supported product baseline: CalcNova 2.9.7.**
 
 CalcNova is an open-source project. Choose the support channel that matches the issue so requests can be handled efficiently.
 
@@ -29,7 +29,7 @@ https://github.com/sanskarIN/CalcNova/issues/new/choose
 
 Explain the user problem first, then the proposed solution and platform/accessibility implications.
 
-Feature requests are optional post-2.9.6 enhancements unless they address a confirmed correctness, security, or compatibility defect.
+Feature requests are optional post-2.9.7 enhancements unless they address a confirmed correctness, security, or compatibility defect.
 
 ## Security vulnerabilities
 

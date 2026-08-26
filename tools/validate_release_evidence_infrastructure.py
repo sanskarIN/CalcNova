@@ -68,7 +68,7 @@ def validate(root: Path) -> list[str]:
         'FAIL = "FAIL"',
         'NOT_RUN = "NOT RUN"',
         'BLOCKED = "BLOCKED"',
-        "NOT RUN, EvidenceStatus.BLOCKED",
+        "EvidenceStatus.NOT_RUN, EvidenceStatus.BLOCKED",
         '"schemaVersion": 1',
         "ids must be unique",
     ):

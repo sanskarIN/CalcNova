@@ -16,6 +16,7 @@ public partial class MainView
     private Border? _converterPreferenceNotice;
     private TextBlock? _converterPreferenceTitle;
     private TextBlock? _converterPreferenceBody;
+    private WrapPanel? _graphViewportToolbar;
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
@@ -66,6 +67,7 @@ public partial class MainView
             _checkBoxLocalizationTabControl.SelectionChanged -= HandleCheckBoxTabSelectionChanged;
         }
 
+        RemoveGraphViewportToolbar();
         _checkBoxLocalizationViewModel = null;
         _checkBoxLocalizationTabControl = null;
         _localizedCheckBoxes.Clear();
@@ -96,6 +98,7 @@ public partial class MainView
         }
 
         EnsureConverterPreferenceNotice();
+        EnsureGraphViewportToolbar();
 
         foreach (var checkBox in this.GetVisualDescendants().OfType<CheckBox>())
         {
@@ -166,5 +169,80 @@ public partial class MainView
         };
         _converterPreferenceNotice.Classes.Add("converter-preference-notice");
         panel.Children.Insert(Math.Min(1, panel.Children.Count), _converterPreferenceNotice);
+    }
+
+    private void EnsureGraphViewportToolbar()
+    {
+        if (_graphViewportToolbar is not null)
+        {
+            return;
+        }
+
+        var graphing = _checkBoxLocalizationViewModel?.Graphing;
+        if (graphing is null)
+        {
+            return;
+        }
+
+        EnsureGraphPlot(graphing);
+        if (_graphPlotControl is null || _graphPlotControl.Parent is not StackPanel graphPanel)
+        {
+            return;
+        }
+
+        var plot = _graphPlotControl;
+        _graphViewportToolbar = new WrapPanel();
+        _graphViewportToolbar.Classes.Add("graph-viewport-toolbar");
+
+        AddGraphViewportButton(AppStringKey.ActionGraphPanLeft, plot.PanLeft);
+        AddGraphViewportButton(AppStringKey.ActionGraphPanRight, plot.PanRight);
+        AddGraphViewportButton(AppStringKey.ActionGraphPanUp, plot.PanUp);
+        AddGraphViewportButton(AppStringKey.ActionGraphPanDown, plot.PanDown);
+        AddGraphViewportButton(AppStringKey.ActionGraphZoomIn, plot.ZoomIn);
+        AddGraphViewportButton(AppStringKey.ActionGraphZoomOut, plot.ZoomOut);
+        AddGraphViewportButton(AppStringKey.ActionReset, plot.ResetViewport);
+        AddGraphViewportButton(AppStringKey.ActionGraphFit, plot.FitToData);
+
+        var plotIndex = graphPanel.Children.IndexOf(plot);
+        graphPanel.Children.Insert(Math.Max(0, plotIndex), _graphViewportToolbar);
+    }
+
+    private void AddGraphViewportButton(AppStringKey key, Action action)
+    {
+        if (_graphViewportToolbar is null)
+        {
+            return;
+        }
+
+        var button = new Button
+        {
+            Content = _checkBoxLocalizationViewModel?.Localizer[key] ?? key.ToString(),
+            Focusable = true,
+            MinHeight = 44,
+            Margin = new Thickness(0, 0, 6, 6)
+        };
+        button.Click += (_, _) => action();
+        _localizedButtons[button] = key;
+        _graphViewportToolbar.Children.Add(button);
+    }
+
+    private void RemoveGraphViewportToolbar()
+    {
+        if (_graphViewportToolbar is null)
+        {
+            return;
+        }
+
+        foreach (var button in _graphViewportToolbar.Children.OfType<Button>())
+        {
+            _localizedButtons.Remove(button);
+        }
+
+        if (_graphViewportToolbar.Parent is Panel panel)
+        {
+            panel.Children.Remove(_graphViewportToolbar);
+        }
+
+        _graphViewportToolbar = null;
     }
 }
