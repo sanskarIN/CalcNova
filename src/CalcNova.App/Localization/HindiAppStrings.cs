@@ -1,111 +1,27 @@
+// src/CalcNova.App/Localization/HindiAppStrings.cs
+using System.Collections.Generic;
+
 namespace CalcNova.App.Localization;
 
-internal static class HindiAppStrings
+public static class HindiAppStrings
 {
-    public static IReadOnlyDictionary<AppStringKey, string> Values { get; } =
-        new Dictionary<AppStringKey, string>
-        {
-            [AppStringKey.AppName] = "CalcNova",
-            [AppStringKey.Tagline] = "तेज़। सटीक। निजी। हर जगह।",
-            [AppStringKey.LocalFirst] = "लोकल-फर्स्ट",
-
-            [AppStringKey.ModeCalculator] = "कैलकुलेटर",
-            [AppStringKey.ModeProgrammer] = "प्रोग्रामर",
-            [AppStringKey.ModeCodePoint] = "यूनिकोड कोड पॉइंट",
-            [AppStringKey.ModeConverter] = "कन्वर्टर",
-            [AppStringKey.ModeStatistics] = "सांख्यिकी",
-            [AppStringKey.ModeEquations] = "समीकरण",
-            [AppStringKey.ModeMatrices] = "मैट्रिक्स",
-            [AppStringKey.ModeGraphing] = "ग्राफ",
-            [AppStringKey.ModeDateTime] = "दिनांक और अवधि",
-            [AppStringKey.ModeCurrency] = "मुद्रा",
-            [AppStringKey.ModeHistory] = "इतिहास",
-            [AppStringKey.ModeSettings] = "सेटिंग्स",
-            [AppStringKey.ModeAbout] = "परिचय",
-
-            [AppStringKey.CalculatorTitle] = "मानक + वैज्ञानिक",
-            [AppStringKey.CalculatorSubtitle] = "सुरक्षित स्थानीय अभिव्यक्ति गणना",
-            [AppStringKey.PromptEnterExpression] = "अभिव्यक्ति दर्ज करें",
-
-            [AppStringKey.OnboardingWelcome] = "CalcNova में आपका स्वागत है",
-            [AppStringKey.OnboardingCalculateTitle] = "अपने तरीके से गणना करें",
-            [AppStringKey.OnboardingCalculateBody] = "एक साझा कार्यक्षेत्र से मानक और वैज्ञानिक गणना, प्रोग्रामर, कन्वर्टर, सांख्यिकी, समीकरण, मैट्रिक्स, ग्राफ, दिनांक और अवधि, मुद्रा और इतिहास का उपयोग करें।",
-            [AppStringKey.OnboardingInputTitle] = "कीबोर्ड और टच के अनुकूल",
-            [AppStringKey.OnboardingInputBody] = "कीबोर्ड पर Ctrl+PageUp और Ctrl+PageDown मोड बदलते हैं; Ctrl+Home और Ctrl+End पहले और अंतिम मोड पर ले जाते हैं। जब आप टेक्स्ट फ़ील्ड संपादित नहीं कर रहे हों तब कैलकुलेटर नंबर-पैड इनपुट भी समर्थित है।",
-            [AppStringKey.OnboardingPrivacyTitle] = "डिफ़ॉल्ट रूप से लोकल-फर्स्ट",
-            [AppStringKey.OnboardingPrivacyBody] = "गणना इतिहास और प्राथमिकताएँ स्थानीय ऐप स्टोरेज में रहती हैं। भौतिक इकाई रूपांतरण ऑफ़लाइन है। मुद्रा दरें वैकल्पिक नेटवर्क सुविधा हैं और उपलब्ध होने पर कैश डेटा का उपयोग कर सकती हैं।",
-            [AppStringKey.OnboardingNoAccount] = "CalcNova की मुख्य सुविधाओं के लिए खाते की आवश्यकता नहीं है। आप इस परिचय को तुरंत छोड़ सकते हैं।",
-
-            [AppStringKey.ConverterPreferencesTitle] = "सहेजी गई कन्वर्टर प्राथमिकताएँ",
-            [AppStringKey.ConverterPreferencesBody] = "परिशुद्धता, हाल की जोड़ियाँ और पसंदीदा जोड़ियाँ केवल स्थानीय ऐप सेटिंग्स में संग्रहीत होती हैं। निश्चित इकाई रूपांतरण ऑफ़लाइन रहता है।",
-            [AppStringKey.CurrencyTitle] = "मुद्रा कन्वर्टर",
-            [AppStringKey.CurrencyPrivacyBody] = "यह वैकल्पिक नेटवर्क-सहायित मॉड्यूल है। CalcNova API कुंजियाँ एम्बेड नहीं करता; कैश की गई दरें ऑफ़लाइन भी उपयोग की जा सकती हैं।",
-            [AppStringKey.HistoryTitle] = "गणना इतिहास",
-            [AppStringKey.HistoryExportTitle] = "दिखाई दे रहा इतिहास निर्यात करें",
-            [AppStringKey.HistoryExportBody] = "केवल वर्तमान में लोड या खोज से मेल खाने वाली प्रविष्टियाँ निर्यात होती हैं और आपके स्पष्ट रूप से कॉपी करने तक डेटा स्थानीय रहता है।",
-            [AppStringKey.SettingsLanguageReviewNote] = "केवल समीक्षा की गई भाषाएँ सूचीबद्ध हैं। अंग्रेज़ी वर्तमान स्रोत भाषा है।",
-            [AppStringKey.AboutOpenSourceLicense] = "ओपन-सोर्स कैलकुलेटर • Apache-2.0",
-            [AppStringKey.AboutSupportOptional] = "सहयोग वैकल्पिक है और CalcNova की मुख्य सुविधाओं के उपयोग के लिए कभी आवश्यक नहीं है।",
-            [AppStringKey.FooterLocalDefault] = "गणनाएँ डिफ़ॉल्ट रूप से स्थानीय रहती हैं • github.com/sanskarIN/CalcNova",
-
-            [AppStringKey.ActionEvaluate] = "गणना करें",
-            [AppStringKey.ActionPasteExpression] = "अभिव्यक्ति पेस्ट करें",
-            [AppStringKey.ActionCopyResult] = "परिणाम कॉपी करें",
-            [AppStringKey.ActionConvert] = "बदलें",
-            [AppStringKey.ActionSwap] = "अदला-बदली",
-            [AppStringKey.ActionAnalyze] = "विश्लेषण करें",
-            [AppStringKey.ActionSolve] = "हल करें",
-            [AppStringKey.ActionCopy] = "कॉपी करें",
-            [AppStringKey.ActionRefresh] = "रीफ्रेश करें",
-            [AppStringKey.ActionSave] = "सहेजें",
-            [AppStringKey.ActionReset] = "रीसेट करें",
-            [AppStringKey.ActionSkip] = "छोड़ें",
-            [AppStringKey.ActionStartCalculating] = "गणना शुरू करें",
-            [AppStringKey.ActionRefreshRates] = "दरें रीफ्रेश करें",
-            [AppStringKey.ActionFavorite] = "पसंदीदा",
-            [AppStringKey.ActionDelete] = "हटाएँ",
-            [AppStringKey.ActionClearAll] = "सभी साफ़ करें",
-            [AppStringKey.ActionGenerateExportPreview] = "निर्यात पूर्वावलोकन बनाएँ",
-            [AppStringKey.ActionCopyExport] = "निर्यात कॉपी करें",
-            [AppStringKey.ActionOpenRepository] = "CalcNova रिपॉज़िटरी खोलें",
-            [AppStringKey.ActionOpenGitHubProfile] = "GitHub प्रोफ़ाइल खोलें",
-            [AppStringKey.ActionGraphPanLeft] = "बाएँ खिसकाएँ",
-            [AppStringKey.ActionGraphPanRight] = "दाएँ खिसकाएँ",
-            [AppStringKey.ActionGraphPanUp] = "ऊपर खिसकाएँ",
-            [AppStringKey.ActionGraphPanDown] = "नीचे खिसकाएँ",
-            [AppStringKey.ActionGraphZoomIn] = "ज़ूम इन",
-            [AppStringKey.ActionGraphZoomOut] = "ज़ूम आउट",
-            [AppStringKey.ActionGraphFit] = "ग्राफ़ फिट करें",
-
-            [AppStringKey.LabelExpression] = "अभिव्यक्ति",
-            [AppStringKey.LabelResult] = "परिणाम",
-            [AppStringKey.LabelAngleUnit] = "कोण इकाई",
-            [AppStringKey.LabelWordSize] = "वर्ड साइज़",
-            [AppStringKey.LabelSignificantDigits] = "सार्थक अंक",
-            [AppStringKey.LabelRecentPairs] = "हाल की जोड़ियाँ",
-            [AppStringKey.LabelFavoritePairs] = "पसंदीदा जोड़ियाँ",
-            [AppStringKey.LabelTheme] = "थीम",
-            [AppStringKey.LabelHistoryLimit] = "इतिहास सीमा",
-            [AppStringKey.LabelLanguage] = "भाषा",
-            [AppStringKey.LabelDecimalPrecisionRange] = "दशमलव परिशुद्धता (1–29)",
-            [AppStringKey.LabelHistoryLimitRange] = "इतिहास सीमा (1–5000)",
-            [AppStringKey.LabelBusiness] = "व्यावसायिक संपर्क",
-            [AppStringKey.LabelSupport] = "सहायता",
-
-            [AppStringKey.PromptAmount] = "राशि",
-            [AppStringKey.PromptFromIsoCode] = "प्रारंभिक ISO कोड, जैसे USD",
-            [AppStringKey.PromptToIsoCode] = "लक्षित ISO कोड, जैसे INR",
-            [AppStringKey.PromptSearch] = "खोजें",
-
-            [AppStringKey.SettingEnableHistory] = "इतिहास सक्षम करें",
-            [AppStringKey.SettingGroupingSeparators] = "अंक समूह विभाजक",
-            [AppStringKey.SettingHaptics] = "समर्थित मोबाइल उपकरणों पर हैप्टिक्स",
-            [AppStringKey.SettingReducedMotion] = "कम गति प्रभाव",
-            [AppStringKey.SettingHighContrast] = "उच्च कंट्रास्ट प्राथमिकता",
-
-            [AppStringKey.StatusCopied] = "कॉपी हो गया।",
-            [AppStringKey.StatusReady] = "तैयार।",
-            [AppStringKey.ErrorInvalidInput] = "इनपुट जाँचें और फिर प्रयास करें।",
-            [AppStringKey.ErrorClipboardUnavailable] = "इस प्लेटफ़ॉर्म पर क्लिपबोर्ड उपलब्ध नहीं है।"
-        };
+    public static readonly IReadOnlyDictionary<AppStringKey, string> Strings = new Dictionary<AppStringKey, string>
+    {
+        [AppStringKey.AppName] = "कैलकनोवा",
+        [AppStringKey.StandardMode] = "मानक",
+        [AppStringKey.ScientificMode] = "वैज्ञानिक",
+        [AppStringKey.ProgrammerMode] = "प्रोग्रामर",
+        [AppStringKey.GraphingMode] = "ग्राफ़िंग",
+        [AppStringKey.ConverterMode] = "परिवर्तक",
+        [AppStringKey.HistoryTitle] = "गणना इतिहास",
+        [AppStringKey.ClearHistory] = "इतिहास साफ़ करें",
+        [AppStringKey.SettingsTitle] = "सेटिंग्स",
+        [AppStringKey.Theme] = "थीम",
+        [AppStringKey.Language] = "भाषा",
+        [AppStringKey.ErrorDivisionByZero] = "शून्य से विभाजन संभव नहीं",
+        [AppStringKey.ErrorInvalidInput] = "अमान्य इनपुट",
+        [AppStringKey.ErrorOverflow] = "ओवरफ़्लो त्रुटि",
+        [AppStringKey.GraphAsymptoteNotice] = "असतत मान पाया गया",
+        [AppStringKey.RadixOverflowWarning] = "मान 64-बिट सीमा से अधिक है"
+    };
 }
