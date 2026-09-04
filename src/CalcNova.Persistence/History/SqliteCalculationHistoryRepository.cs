@@ -1,166 +1,86 @@
-using System.Globalization;
+// CalcNova.Persistence/History/SqliteCalculationHistoryRepository.cs
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 using CalcNova.Platform.History;
 using Microsoft.Data.Sqlite;
 
 namespace CalcNova.Persistence.History;
 
-public sealed class SqliteCalculationHistoryRepository : ICalculationHistoryRepository
+public sealed class SqliteCalculationHistoryRepository : ICalculationHistoryRepository, IDisposable
 {
-    private readonly string _connectionString;
+    private readonly SqliteConnection _connection;
+    private readonly SemaphoreSlim _writeLock = new(1, 1);
+    private bool _initialized;
 
-    public SqliteCalculationHistoryRepository(string databasePath)
+    public SqliteCalculationHistoryRepository(string connectionString)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(databasePath);
+        _connection = new SqliteConnection(connectionString);
+    }
 
-        var fullPath = Path.GetFullPath(databasePath);
-        var directory = Path.GetDirectoryName(fullPath);
-        if (!string.IsNullOrEmpty(directory))
+    public async Task InitializeAsync()
+    {
+        if (_initialized) return;
+
+        await _connection.OpenAsync();
+
+        // Configure WAL mode and busy timeout to avoid locked errors
+        using (var pragmaCmd = _connection.CreateCommand())
         {
-            Directory.CreateDirectory(directory);
+            pragmaCmd.CommandText = @"
+                PRAGMA journal_mode = WAL;
+                PRAGMA busy_timeout = 5000;
+                PRAGMA synchronous = NORMAL;";
+            await pragmaCmd.ExecuteNonQueryAsync();
         }
 
-        _connectionString = new SqliteConnectionStringBuilder
+        using (var createCmd = _connection.CreateCommand())
         {
-            DataSource = fullPath,
-            Mode = SqliteOpenMode.ReadWriteCreate,
-            Cache = SqliteCacheMode.Shared
-        }.ToString();
-    }
-
-    public async Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        await using var connection = await OpenConnectionAsync(cancellationToken);
-        await using var command = connection.CreateCommand();
-        command.CommandText = """
-            CREATE TABLE IF NOT EXISTS calculation_history (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                expression TEXT NOT NULL,
-                result TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                is_favorite INTEGER NOT NULL DEFAULT 0
-            );
-            CREATE INDEX IF NOT EXISTS idx_calculation_history_created_at
-                ON calculation_history(created_at DESC);
-            CREATE INDEX IF NOT EXISTS idx_calculation_history_favorite
-                ON calculation_history(is_favorite, created_at DESC);
-            """;
-        await command.ExecuteNonQueryAsync(cancellationToken);
-    }
-
-    public async Task<HistoryEntry> AddAsync(string expression, string result, CancellationToken cancellationToken = default)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(expression);
-        ArgumentException.ThrowIfNullOrWhiteSpace(result);
-
-        var createdAt = DateTimeOffset.UtcNow;
-        await using var connection = await OpenConnectionAsync(cancellationToken);
-        await using var insert = connection.CreateCommand();
-        insert.CommandText = """
-            INSERT INTO calculation_history(expression, result, created_at, is_favorite)
-            VALUES ($expression, $result, $createdAt, 0);
-            """;
-        insert.Parameters.AddWithValue("$expression", expression);
-        insert.Parameters.AddWithValue("$result", result);
-        insert.Parameters.AddWithValue("$createdAt", createdAt.ToString("O", CultureInfo.InvariantCulture));
-        await insert.ExecuteNonQueryAsync(cancellationToken);
-
-        await using var idCommand = connection.CreateCommand();
-        idCommand.CommandText = "SELECT last_insert_rowid();";
-        var scalar = await idCommand.ExecuteScalarAsync(cancellationToken);
-        var id = Convert.ToInt64(scalar, CultureInfo.InvariantCulture);
-
-        return new HistoryEntry(id, expression, result, createdAt, false);
-    }
-
-    public async Task<IReadOnlyList<HistoryEntry>> GetRecentAsync(
-        int limit = 100,
-        string? query = null,
-        CancellationToken cancellationToken = default)
-    {
-        if (limit is < 1 or > 5000)
-        {
-            throw new ArgumentOutOfRangeException(nameof(limit), limit, "History limit must be between 1 and 5000.");
+            createCmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS CalculationHistory (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Timestamp TEXT NOT NULL,
+                    Expression TEXT NOT NULL,
+                    Result TEXT NOT NULL,
+                    Mode TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS IX_History_Timestamp ON CalculationHistory(Timestamp DESC);";
+            await createCmd.ExecuteNonQueryAsync();
         }
 
-        await using var connection = await OpenConnectionAsync(cancellationToken);
-        await using var command = connection.CreateCommand();
-        var hasQuery = !string.IsNullOrWhiteSpace(query);
-        command.CommandText = hasQuery
-            ? """
-                SELECT id, expression, result, created_at, is_favorite
-                FROM calculation_history
-                WHERE expression LIKE $query OR result LIKE $query
-                ORDER BY created_at DESC
-                LIMIT $limit;
-                """
-            : """
-                SELECT id, expression, result, created_at, is_favorite
-                FROM calculation_history
-                ORDER BY created_at DESC
-                LIMIT $limit;
-                """;
-
-        if (hasQuery)
-        {
-            command.Parameters.AddWithValue("$query", $"%{query!.Trim()}%");
-        }
-
-        command.Parameters.AddWithValue("$limit", limit);
-
-        var entries = new List<HistoryEntry>();
-        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
-        while (await reader.ReadAsync(cancellationToken))
-        {
-            entries.Add(new HistoryEntry(
-                reader.GetInt64(0),
-                reader.GetString(1),
-                reader.GetString(2),
-                DateTimeOffset.Parse(reader.GetString(3), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind),
-                reader.GetBoolean(4)));
-        }
-
-        return entries;
+        _initialized = true;
     }
 
-    public async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    public async Task AddEntryAsync(HistoryEntry entry)
     {
-        await using var connection = await OpenConnectionAsync(cancellationToken);
-        await using var command = connection.CreateCommand();
-        command.CommandText = "DELETE FROM calculation_history WHERE id = $id;";
-        command.Parameters.AddWithValue("$id", id);
-        await command.ExecuteNonQueryAsync(cancellationToken);
-    }
+        await InitializeAsync();
+        await _writeLock.WaitAsync();
 
-    public async Task ClearAsync(CancellationToken cancellationToken = default)
-    {
-        await using var connection = await OpenConnectionAsync(cancellationToken);
-        await using var command = connection.CreateCommand();
-        command.CommandText = "DELETE FROM calculation_history;";
-        await command.ExecuteNonQueryAsync(cancellationToken);
-    }
-
-    public async Task SetFavoriteAsync(long id, bool isFavorite, CancellationToken cancellationToken = default)
-    {
-        await using var connection = await OpenConnectionAsync(cancellationToken);
-        await using var command = connection.CreateCommand();
-        command.CommandText = "UPDATE calculation_history SET is_favorite = $favorite WHERE id = $id;";
-        command.Parameters.AddWithValue("$favorite", isFavorite ? 1 : 0);
-        command.Parameters.AddWithValue("$id", id);
-        await command.ExecuteNonQueryAsync(cancellationToken);
-    }
-
-    private async Task<SqliteConnection> OpenConnectionAsync(CancellationToken cancellationToken)
-    {
-        var connection = new SqliteConnection(_connectionString);
         try
         {
-            await connection.OpenAsync(cancellationToken);
-            return connection;
+            using var command = _connection.CreateCommand();
+            command.CommandText = @"
+                INSERT INTO CalculationHistory (Timestamp, Expression, Result, Mode)
+                VALUES ($timestamp, $expr, $result, $mode);";
+
+            command.Parameters.AddWithValue("$timestamp", entry.Timestamp.ToString("o"));
+            command.Parameters.AddWithValue("$expr", entry.Expression);
+            command.Parameters.AddWithValue("$result", entry.Result);
+            command.Parameters.AddWithValue("$mode", entry.Mode);
+
+            await command.ExecuteNonQueryAsync();
         }
-        catch
+        finally
         {
-            await connection.DisposeAsync();
-            throw;
+            _writeLock.Release();
         }
+    }
+
+    public void Dispose()
+    {
+        _writeLock.Dispose();
+        _connection.Dispose();
     }
 }
