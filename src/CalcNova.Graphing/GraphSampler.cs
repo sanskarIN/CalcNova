@@ -1,120 +1,76 @@
-using CalcNova.Core.Evaluation;
-using CalcNova.Core.Numerics;
+// CalcNova.Graphing/GraphSampler.cs
+using System;
+using System.Collections.Generic;
 
 namespace CalcNova.Graphing;
 
-public sealed class GraphSampler
+public static class GraphSampler
 {
-    public const int MaximumSamples = 10_000;
-
-    private readonly ExpressionEvaluator _evaluator;
-
-    public GraphSampler(ExpressionEvaluator? evaluator = null)
+    /// <summary>
+    /// Samples an expression across the viewport and partitions continuous curves
+    /// to avoid drawing artifacts across asymptotes and undefined points.
+    /// </summary>
+    public static MultiGraphSamplingResult SampleExpression(
+        Func<double, double> evaluator,
+        GraphViewport viewport,
+        GraphSamplingOptions options)
     {
-        _evaluator = evaluator ?? new ExpressionEvaluator();
-    }
-
-    public GraphSamplingResult Sample(string expression, GraphSamplingOptions? options = null)
-    {
-        options ??= new GraphSamplingOptions();
-        ValidateOptions(options);
-
-        var variables = new Dictionary<string, NumberValue>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["x"] = NumberValue.Zero
-        };
-        var evaluationOptions = new EvaluationOptions
-        {
-            AngleUnit = options.AngleUnit,
-            Variables = variables
-        };
-
-        CompiledExpression compiled;
-        try
-        {
-            compiled = _evaluator.Compile(expression, evaluationOptions);
-        }
-        catch (Exception exception) when (exception is CalcNova.Core.Errors.CalculationException or OverflowException)
-        {
-            return GraphSamplingResult.Failed(exception.Message);
-        }
-
         var segments = new List<GraphSegment>();
-        var current = new List<GraphPoint>();
-        var invalidSamples = 0;
-        double? previousY = null;
-        var step = (options.MaximumX - options.MinimumX) / (options.SampleCount - 1);
+        var currentSegmentPoints = new List<GraphPoint>();
 
-        for (var index = 0; index < options.SampleCount; index++)
+        double step = (viewport.XMax - viewport.XMin) / options.Resolution;
+        double viewportHeight = Math.Abs(viewport.YMax - viewport.YMin);
+        
+        // Threshold: A jump exceeding 3x the visible viewport height
+        // combined with a sign change indicates a vertical asymptote.
+        double asymptoticJumpThreshold = viewportHeight * 3.0;
+
+        for (double x = viewport.XMin; x <= viewport.XMax; x += step)
         {
-            var x = index == options.SampleCount - 1
-                ? options.MaximumX
-                : options.MinimumX + (step * index);
-            variables["x"] = NumberValue.FromDouble(x);
-
-            var evaluation = _evaluator.Evaluate(compiled, evaluationOptions);
-            if (!evaluation.Success)
+            double y;
+            try
             {
-                invalidSamples++;
-                CloseCurrentSegment(segments, current);
-                previousY = null;
+                y = evaluator(x);
+            }
+            catch
+            {
+                y = double.NaN;
+            }
+
+            // 1. Check for non-finite evaluations (NaN, Infinity)
+            if (double.IsNaN(y) || double.IsInfinity(y))
+            {
+                FlushSegment(segments, currentSegmentPoints);
                 continue;
             }
 
-            var y = evaluation.Value.ToDouble();
-            if (!double.IsFinite(y) || Math.Abs(y) > options.MaximumAbsoluteY)
+            // 2. Check for asymptotic discontinuity between adjacent points
+            if (currentSegmentPoints.Count > 0)
             {
-                invalidSamples++;
-                CloseCurrentSegment(segments, current);
-                previousY = null;
-                continue;
+                var prev = currentSegmentPoints[^1];
+                bool oppositeSigns = (prev.Y > 0 && y < 0) || (prev.Y < 0 && y > 0);
+                double deltaY = Math.Abs(y - prev.Y);
+
+                if (oppositeSigns && deltaY > asymptoticJumpThreshold)
+                {
+                    FlushSegment(segments, currentSegmentPoints);
+                }
             }
 
-            if (previousY is not null && Math.Abs(y - previousY.Value) > options.DiscontinuityJumpThreshold)
-            {
-                CloseCurrentSegment(segments, current);
-            }
-
-            current.Add(new GraphPoint(x, y == 0d ? 0d : y));
-            previousY = y;
+            currentSegmentPoints.Add(new GraphPoint(x, y));
         }
 
-        CloseCurrentSegment(segments, current);
-        return GraphSamplingResult.Completed(segments, invalidSamples);
+        FlushSegment(segments, currentSegmentPoints);
+
+        return new MultiGraphSamplingResult(segments);
     }
 
-    private static void CloseCurrentSegment(ICollection<GraphSegment> segments, List<GraphPoint> current)
+    private static void FlushSegment(List<GraphSegment> target, List<GraphPoint> current)
     {
         if (current.Count > 0)
         {
-            segments.Add(new GraphSegment(current.ToArray()));
+            target.Add(new GraphSegment(new List<GraphPoint>(current)));
             current.Clear();
-        }
-    }
-
-    private static void ValidateOptions(GraphSamplingOptions options)
-    {
-        if (!double.IsFinite(options.MinimumX) || !double.IsFinite(options.MaximumX) || options.MinimumX >= options.MaximumX)
-        {
-            throw new ArgumentException("Graph X bounds must be finite and MinimumX must be less than MaximumX.", nameof(options));
-        }
-
-        if (options.SampleCount is < 2 or > MaximumSamples)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(options),
-                options.SampleCount,
-                $"Graph sample count must be between 2 and {MaximumSamples}.");
-        }
-
-        if (!double.IsFinite(options.MaximumAbsoluteY) || options.MaximumAbsoluteY <= 0d)
-        {
-            throw new ArgumentOutOfRangeException(nameof(options), "MaximumAbsoluteY must be finite and positive.");
-        }
-
-        if (!double.IsFinite(options.DiscontinuityJumpThreshold) || options.DiscontinuityJumpThreshold <= 0d)
-        {
-            throw new ArgumentOutOfRangeException(nameof(options), "DiscontinuityJumpThreshold must be finite and positive.");
         }
     }
 }
