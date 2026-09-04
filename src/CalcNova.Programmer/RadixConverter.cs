@@ -1,102 +1,71 @@
-using System.Numerics;
+// CalcNova.Programmer/RadixConverter.cs
+using System;
 
 namespace CalcNova.Programmer;
 
 public static class RadixConverter
 {
-    private const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private const string DigitMap = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    public static BigInteger Parse(string text, int radix)
+    /// <summary>
+    /// Safely parses an input string into a 64-bit unsigned integer using the specified radix.
+    /// Returns false on overflow, invalid radix, or invalid digits.
+    /// </summary>
+    public static bool TryParse(string? text, int radix, out ulong value)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(text);
-        ValidateRadix(radix);
+        value = 0;
+        if (string.IsNullOrWhiteSpace(text) || radix < 2 || radix > 36)
+            return false;
 
-        var normalized = text.Trim().Replace("_", string.Empty, StringComparison.Ordinal);
-        if (normalized.Length == 0)
+        string clean = text.Trim().Replace(" ", "").Replace("_", "");
+        if (clean.Length == 0)
+            return false;
+
+        ulong accumulator = 0;
+
+        foreach (char c in clean)
         {
-            throw new FormatException("A radix value must contain at least one digit.");
+            int digitValue;
+            if (c >= '0' && c <= '9') digitValue = c - '0';
+            else if (c >= 'a' && c <= 'z') digitValue = c - 'a' + 10;
+            else if (c >= 'A' && c <= 'Z') digitValue = c - 'A' + 10;
+            else return false;
+
+            if (digitValue >= radix)
+                return false;
+
+            // Overflow guard: verify that accumulator * radix + digitValue <= ulong.MaxValue
+            if (accumulator > (ulong.MaxValue - (ulong)digitValue) / (ulong)radix)
+                return false;
+
+            accumulator = accumulator * (ulong)radix + (ulong)digitValue;
         }
 
-        var span = normalized.AsSpan();
-        var sign = BigInteger.One;
-        if (span[0] is '+' or '-')
-        {
-            if (span[0] == '-')
-            {
-                sign = BigInteger.MinusOne;
-            }
-
-            span = span[1..];
-        }
-
-        if (span.IsEmpty)
-        {
-            throw new FormatException("A radix value must contain at least one digit.");
-        }
-
-        var value = BigInteger.Zero;
-        foreach (var character in span)
-        {
-            var digit = DigitValue(character);
-            if (digit < 0 || digit >= radix)
-            {
-                throw new FormatException($"Digit '{character}' is not valid in base {radix}.");
-            }
-
-            value = (value * radix) + digit;
-        }
-
-        return value * sign;
+        value = accumulator;
+        return true;
     }
 
-    public static string Format(BigInteger value, int radix)
+    /// <summary>
+    /// Formats an unsigned 64-bit integer into a string representation for any radix (2 to 36).
+    /// </summary>
+    public static string Format(ulong value, int radix)
     {
-        ValidateRadix(radix);
-        if (value.IsZero)
-        {
+        if (radix < 2 || radix > 36)
+            throw new ArgumentOutOfRangeException(nameof(radix), "Radix must be between 2 and 36.");
+
+        if (value == 0)
             return "0";
-        }
 
-        var negative = value.Sign < 0;
-        var remaining = BigInteger.Abs(value);
-        var characters = new List<char>();
+        Span<char> buffer = stackalloc char[65];
+        int pos = buffer.Length;
 
-        while (remaining > 0)
+        while (value > 0)
         {
-            remaining = BigInteger.DivRem(remaining, radix, out var remainder);
-            characters.Add(Digits[(int)remainder]);
+            ulong remainder = value % (ulong)radix;
+            value /= (ulong)radix;
+            buffer[--pos] = DigitMap[(int)remainder];
         }
 
-        if (negative)
-        {
-            characters.Add('-');
-        }
-
-        characters.Reverse();
-        return new string([.. characters]);
-    }
-
-    private static int DigitValue(char character)
-    {
-        var upper = char.ToUpperInvariant(character);
-        if (upper is >= '0' and <= '9')
-        {
-            return upper - '0';
-        }
-
-        if (upper is >= 'A' and <= 'Z')
-        {
-            return upper - 'A' + 10;
-        }
-
-        return -1;
-    }
-
-    private static void ValidateRadix(int radix)
-    {
-        if (radix is < 2 or > 36)
-        {
-            throw new ArgumentOutOfRangeException(nameof(radix), radix, "Radix must be between 2 and 36.");
-        }
+        return new string(buffer[pos..]);
     }
 }
