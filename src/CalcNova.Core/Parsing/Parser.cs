@@ -10,7 +10,7 @@ public sealed class Parser
     public Parser(IReadOnlyList<Token> tokens)
     {
         _tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
-        if (_tokens.Count == 0)
+        if (_tokens.Count == 0 || _tokens[^1].Kind != TokenKind.End)
         {
             throw new ArgumentException("Token collection must include an end token.", nameof(tokens));
         }
