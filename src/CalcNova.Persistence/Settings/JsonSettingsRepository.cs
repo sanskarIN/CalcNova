@@ -34,7 +34,19 @@ public sealed class JsonSettingsRepository : ISettingsRepository
             bufferSize: 4096,
             FileOptions.Asynchronous | FileOptions.SequentialScan);
 
-        var settings = await JsonSerializer.DeserializeAsync<AppSettings>(stream, SerializerOptions, cancellationToken);
+        AppSettings? settings;
+        try
+        {
+            settings = await JsonSerializer.DeserializeAsync<AppSettings>(stream, SerializerOptions, cancellationToken);
+        }
+        catch (JsonException)
+        {
+            // A settings file that is not valid JSON carries no recoverable
+            // preferences, so fall back to defaults rather than failing the load.
+            // BrowserSettingsRepository handles a corrupt entry the same way.
+            return new AppSettings();
+        }
+
         return Validate(settings ?? new AppSettings());
     }
 
