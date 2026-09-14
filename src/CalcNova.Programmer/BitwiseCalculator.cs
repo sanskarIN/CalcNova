@@ -19,7 +19,13 @@ public static class BitwiseCalculator
     public static BigInteger ShiftLeft(BigInteger value, int shift, int wordSize)
     {
         ValidateShift(shift);
-        return ToUnsigned(value << shift, wordSize);
+        ValidateWordSize(wordSize);
+
+        // Shifting by wordSize already moves every bit past the mask window, so any
+        // larger shift yields the same masked result. Clamping keeps a very large
+        // shift count from materialising a huge intermediate BigInteger before the
+        // mask discards it.
+        return ToUnsigned(value << Math.Min(shift, wordSize), wordSize);
     }
 
     public static BigInteger LogicalShiftRight(BigInteger value, int shift, int wordSize)
