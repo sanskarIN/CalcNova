@@ -58,13 +58,13 @@ public partial class MainView : UserControl
         shell.Children.Add(overlay);
     }
 
-    protected override void OnSizeChanged(SizeChangedEventArgs eventArgs)
+    protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
-        base.OnSizeChanged(eventArgs);
+        base.OnSizeChanged(e);
 
-        if (eventArgs.WidthChanged)
+        if (e.WidthChanged)
         {
-            ApplyAdaptiveLayout(eventArgs.NewSize.Width);
+            ApplyAdaptiveLayout(e.NewSize.Width);
         }
     }
 

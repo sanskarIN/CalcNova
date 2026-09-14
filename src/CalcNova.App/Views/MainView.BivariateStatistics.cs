@@ -11,9 +11,9 @@ public partial class MainView
     private BivariateStatisticsPanel? _bivariateStatisticsPanelExtension;
     private TextBlock? _aboutReleaseIdentityExtension;
 
-    protected override void OnDataContextChanged(EventArgs eventArgs)
+    protected override void OnDataContextChanged(EventArgs e)
     {
-        base.OnDataContextChanged(eventArgs);
+        base.OnDataContextChanged(e);
 
         LayoutUpdated -= HandleBivariateStatisticsLayoutUpdated;
         LayoutUpdated += HandleBivariateStatisticsLayoutUpdated;

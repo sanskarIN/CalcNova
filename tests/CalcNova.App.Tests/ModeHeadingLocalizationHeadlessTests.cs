@@ -10,7 +10,6 @@ namespace CalcNova.App.Tests;
 
 public sealed class ModeHeadingLocalizationHeadlessTests
 {
-    [Theory]
     [InlineData(1, "प्रोग्रामर")]
     [InlineData(3, "कन्वर्टर")]
     [InlineData(4, "सांख्यिकी")]

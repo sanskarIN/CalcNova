@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using CalcNova.Programmer;
 using Xunit;
@@ -16,7 +17,7 @@ public sealed class ProgrammerCalculatorTests
     {
         var value = RadixConverter.Parse(input, radix);
 
-        Assert.Equal(BigInteger.Parse(expected), value);
+        Assert.Equal(BigInteger.Parse(expected, CultureInfo.InvariantCulture), value);
     }
 
     [Theory]
@@ -27,7 +28,7 @@ public sealed class ProgrammerCalculatorTests
     [InlineData(36)]
     public void RadixConversion_RoundTripsLargeInteger(int radix)
     {
-        var value = BigInteger.Parse("123456789012345678901234567890");
+        var value = BigInteger.Parse("123456789012345678901234567890", CultureInfo.InvariantCulture);
 
         var encoded = RadixConverter.Format(value, radix);
         var decoded = RadixConverter.Parse(encoded, radix);

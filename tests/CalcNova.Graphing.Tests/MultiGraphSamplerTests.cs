@@ -1,3 +1,4 @@
+using System.Globalization;
 using CalcNova.Graphing;
 using Xunit;
 
@@ -55,7 +56,7 @@ public sealed class MultiGraphSamplerTests
         var result = new MultiGraphSampler().Sample(expressions, new GraphSamplingOptions());
 
         Assert.False(result.Success);
-        Assert.Contains(MultiGraphSampler.MaximumExpressions.ToString(), result.ErrorMessage, StringComparison.Ordinal);
+        Assert.Contains(MultiGraphSampler.MaximumExpressions.ToString(CultureInfo.InvariantCulture), result.ErrorMessage, StringComparison.Ordinal);
     }
 
     [Fact]

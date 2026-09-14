@@ -157,10 +157,10 @@ public sealed class GraphPlotControl : Control
         }
     }
 
-    protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        base.OnPointerPressed(eventArgs);
-        var point = eventArgs.GetCurrentPoint(this);
+        base.OnPointerPressed(e);
+        var point = e.GetCurrentPoint(this);
         if (!point.Properties.IsLeftButtonPressed)
         {
             return;
@@ -168,69 +168,69 @@ public sealed class GraphPlotControl : Control
 
         Focus();
         _isPanning = true;
-        _lastPointerPosition = eventArgs.GetPosition(this);
-        eventArgs.Pointer.Capture(this);
-        eventArgs.Handled = true;
+        _lastPointerPosition = e.GetPosition(this);
+        e.Pointer.Capture(this);
+        e.Handled = true;
     }
 
-    protected override void OnPointerMoved(PointerEventArgs eventArgs)
+    protected override void OnPointerMoved(PointerEventArgs e)
     {
-        base.OnPointerMoved(eventArgs);
-        var current = eventArgs.GetPosition(this);
+        base.OnPointerMoved(e);
+        var current = e.GetPosition(this);
 
         if (_isPanning)
         {
             PanByPixels(current.X - _lastPointerPosition.X, current.Y - _lastPointerPosition.Y);
             _lastPointerPosition = current;
-            eventArgs.Handled = true;
+            e.Handled = true;
         }
 
         CoordinateText = FormatCoordinate(ScreenToData(current));
     }
 
-    protected override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        base.OnPointerReleased(eventArgs);
+        base.OnPointerReleased(e);
         if (_isPanning)
         {
             _isPanning = false;
-            eventArgs.Pointer.Capture(null);
-            eventArgs.Handled = true;
+            e.Pointer.Capture(null);
+            e.Handled = true;
         }
     }
 
-    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs eventArgs)
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
-        base.OnPointerCaptureLost(eventArgs);
+        base.OnPointerCaptureLost(e);
         _isPanning = false;
     }
 
-    protected override void OnPointerWheelChanged(PointerWheelEventArgs eventArgs)
+    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        base.OnPointerWheelChanged(eventArgs);
-        if (eventArgs.Delta.Y == 0d)
+        base.OnPointerWheelChanged(e);
+        if (e.Delta.Y == 0d)
         {
             return;
         }
 
-        var anchor = ScreenToData(eventArgs.GetPosition(this));
-        var factor = eventArgs.Delta.Y > 0d ? 0.82d : 1.22d;
+        var anchor = ScreenToData(e.GetPosition(this));
+        var factor = e.Delta.Y > 0d ? 0.82d : 1.22d;
         ZoomAround(anchor, factor);
-        eventArgs.Handled = true;
+        e.Handled = true;
     }
 
-    protected override void OnKeyDown(KeyEventArgs eventArgs)
+    protected override void OnKeyDown(KeyEventArgs e)
     {
-        base.OnKeyDown(eventArgs);
+        base.OnKeyDown(e);
 
-        var action = GraphKeyboardInput.GetAction(eventArgs.Key, eventArgs.KeyModifiers);
+        var action = GraphKeyboardInput.GetAction(e.Key, e.KeyModifiers);
         if (action == GraphKeyboardAction.None)
         {
             return;
         }
 
         ApplyKeyboardAction(action);
-        eventArgs.Handled = true;
+        e.Handled = true;
     }
 
     private void ApplyKeyboardAction(GraphKeyboardAction action)
