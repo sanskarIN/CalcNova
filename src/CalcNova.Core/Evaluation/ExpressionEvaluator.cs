@@ -187,7 +187,7 @@ public sealed class ExpressionEvaluator
         throw new CalculationException(CalculationErrorCode.InvalidArgument, $"Unknown constant or variable '{name}'.");
     }
 
-    private static NumberValue UnaryExact(string name, IReadOnlyList<NumberValue> arguments, Func<NumberValue, NumberValue> operation)
+    private static NumberValue UnaryExact(string name, NumberValue[] arguments, Func<NumberValue, NumberValue> operation)
     {
         RequireCount(name, arguments, 1);
         return operation(arguments[0]);
@@ -195,7 +195,7 @@ public sealed class ExpressionEvaluator
 
     private static NumberValue UnaryDouble(
         string name,
-        IReadOnlyList<NumberValue> arguments,
+        NumberValue[] arguments,
         Func<double, bool> domain,
         Func<double, double> operation)
     {
@@ -215,19 +215,19 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromDouble(result);
     }
 
-    private static NumberValue Power(IReadOnlyList<NumberValue> arguments, NumberValue exponent, EvaluationOptions options, string name)
+    private static NumberValue Power(NumberValue[] arguments, NumberValue exponent, EvaluationOptions options, string name)
     {
         RequireCount(name, arguments, 1);
         return arguments[0].Power(exponent, options.MaximumIntegerExponent);
     }
 
-    private static NumberValue PowerFunction(IReadOnlyList<NumberValue> arguments, EvaluationOptions options, string name)
+    private static NumberValue PowerFunction(NumberValue[] arguments, EvaluationOptions options, string name)
     {
         RequireCount(name, arguments, 2);
         return arguments[0].Power(arguments[1], options.MaximumIntegerExponent);
     }
 
-    private static NumberValue Root(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue Root(NumberValue[] arguments, string name)
     {
         RequireCount(name, arguments, 2);
         if (!arguments[1].TryGetInteger(out var degree) || degree.IsZero || degree < int.MinValue || degree > int.MaxValue)
@@ -247,15 +247,15 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromDouble(result);
     }
 
-    private static NumberValue Reciprocal(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue Reciprocal(NumberValue[] arguments, string name)
     {
         RequireCount(name, arguments, 1);
         return NumberValue.One.Divide(arguments[0]);
     }
 
-    private static NumberValue Log(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue Log(NumberValue[] arguments, string name)
     {
-        if (arguments.Count == 1)
+        if (arguments.Length == 1)
         {
             return UnaryDouble(name, arguments, value => value > 0d, Math.Log10);
         }
@@ -271,14 +271,14 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromDouble(Math.Log(value, @base));
     }
 
-    private static NumberValue Trig(IReadOnlyList<NumberValue> arguments, AngleUnit unit, Func<double, double> operation, string name)
+    private static NumberValue Trig(NumberValue[] arguments, AngleUnit unit, Func<double, double> operation, string name)
     {
         RequireCount(name, arguments, 1);
         return NumberValue.FromDouble(operation(ToRadians(arguments[0].ToDouble(), unit)));
     }
 
     private static NumberValue InverseTrig(
-        IReadOnlyList<NumberValue> arguments,
+        NumberValue[] arguments,
         AngleUnit unit,
         Func<double, bool> domain,
         Func<double, double> operation,
@@ -294,16 +294,16 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromDouble(FromRadians(operation(value), unit));
     }
 
-    private static NumberValue WholeNumberTransform(IReadOnlyList<NumberValue> arguments, Func<double, double> operation, string name)
+    private static NumberValue WholeNumberTransform(NumberValue[] arguments, Func<double, double> operation, string name)
     {
         RequireCount(name, arguments, 1);
         var result = operation(arguments[0].ToDouble());
         return NumberValue.FromInteger(new BigInteger(result));
     }
 
-    private static NumberValue Round(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue Round(NumberValue[] arguments, string name)
     {
-        if (arguments.Count == 1)
+        if (arguments.Length == 1)
         {
             return NumberValue.FromDouble(Math.Round(arguments[0].ToDouble(), MidpointRounding.ToEven));
         }
@@ -317,17 +317,17 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromDouble(Math.Round(arguments[0].ToDouble(), (int)digits, MidpointRounding.ToEven));
     }
 
-    private static NumberValue Sign(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue Sign(NumberValue[] arguments, string name)
     {
         RequireCount(name, arguments, 1);
         return NumberValue.FromInteger(arguments[0].CompareTo(NumberValue.Zero));
     }
 
-    private static NumberValue Minimum(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue Minimum(NumberValue[] arguments, string name)
     {
         RequireAtLeast(name, arguments, 1);
         var result = arguments[0];
-        for (var index = 1; index < arguments.Count; index++)
+        for (var index = 1; index < arguments.Length; index++)
         {
             if (arguments[index].CompareTo(result) < 0)
             {
@@ -338,11 +338,11 @@ public sealed class ExpressionEvaluator
         return result;
     }
 
-    private static NumberValue Maximum(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue Maximum(NumberValue[] arguments, string name)
     {
         RequireAtLeast(name, arguments, 1);
         var result = arguments[0];
-        for (var index = 1; index < arguments.Count; index++)
+        for (var index = 1; index < arguments.Length; index++)
         {
             if (arguments[index].CompareTo(result) > 0)
             {
@@ -353,7 +353,7 @@ public sealed class ExpressionEvaluator
         return result;
     }
 
-    private static NumberValue Factorial(IReadOnlyList<NumberValue> arguments, EvaluationOptions options, string name)
+    private static NumberValue Factorial(NumberValue[] arguments, EvaluationOptions options, string name)
     {
         RequireCount(name, arguments, 1);
         var value = RequireNonNegativeInteger(arguments[0], name);
@@ -371,7 +371,7 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromInteger(result);
     }
 
-    private static NumberValue GreatestCommonDivisor(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue GreatestCommonDivisor(NumberValue[] arguments, string name)
     {
         RequireCount(name, arguments, 2);
         var left = RequireInteger(arguments[0], name);
@@ -379,7 +379,7 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromInteger(BigInteger.GreatestCommonDivisor(BigInteger.Abs(left), BigInteger.Abs(right)));
     }
 
-    private static NumberValue LeastCommonMultiple(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue LeastCommonMultiple(NumberValue[] arguments, string name)
     {
         RequireCount(name, arguments, 2);
         var left = RequireInteger(arguments[0], name);
@@ -393,7 +393,7 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromInteger(BigInteger.Abs((left / gcd) * right));
     }
 
-    private static NumberValue Combinations(IReadOnlyList<NumberValue> arguments, EvaluationOptions options, string name)
+    private static NumberValue Combinations(NumberValue[] arguments, EvaluationOptions options, string name)
     {
         RequireCount(name, arguments, 2);
         var n = RequireNonNegativeInteger(arguments[0], name);
@@ -418,7 +418,7 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromInteger(result);
     }
 
-    private static NumberValue Permutations(IReadOnlyList<NumberValue> arguments, EvaluationOptions options, string name)
+    private static NumberValue Permutations(NumberValue[] arguments, EvaluationOptions options, string name)
     {
         RequireCount(name, arguments, 2);
         var n = RequireNonNegativeInteger(arguments[0], name);
@@ -442,13 +442,13 @@ public sealed class ExpressionEvaluator
         return NumberValue.FromInteger(result);
     }
 
-    private static NumberValue Modulo(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue Modulo(NumberValue[] arguments, string name)
     {
         RequireCount(name, arguments, 2);
         return arguments[0].Modulo(arguments[1]);
     }
 
-    private static NumberValue Percentage(IReadOnlyList<NumberValue> arguments, string name)
+    private static NumberValue Percentage(NumberValue[] arguments, string name)
     {
         RequireCount(name, arguments, 1);
         return arguments[0].Divide(NumberValue.FromInteger(100));
@@ -475,17 +475,17 @@ public sealed class ExpressionEvaluator
         return integer;
     }
 
-    private static void RequireCount(string name, IReadOnlyCollection<NumberValue> arguments, int expected)
+    private static void RequireCount(string name, NumberValue[] arguments, int expected)
     {
-        if (arguments.Count != expected)
+        if (arguments.Length != expected)
         {
-            throw new CalculationException(CalculationErrorCode.InvalidArgument, $"Function '{name}' expects {expected} argument(s), but received {arguments.Count}.");
+            throw new CalculationException(CalculationErrorCode.InvalidArgument, $"Function '{name}' expects {expected} argument(s), but received {arguments.Length}.");
         }
     }
 
-    private static void RequireAtLeast(string name, IReadOnlyCollection<NumberValue> arguments, int minimum)
+    private static void RequireAtLeast(string name, NumberValue[] arguments, int minimum)
     {
-        if (arguments.Count < minimum)
+        if (arguments.Length < minimum)
         {
             throw new CalculationException(CalculationErrorCode.InvalidArgument, $"Function '{name}' expects at least {minimum} argument(s).");
         }
