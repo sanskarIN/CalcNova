@@ -290,6 +290,18 @@ public readonly struct NumberValue : IEquatable<NumberValue>, IComparable<Number
 
     public override int GetHashCode() => NormalizeNegativeZero(ToDouble()).GetHashCode();
 
+    public static bool operator ==(NumberValue left, NumberValue right) => left.Equals(right);
+
+    public static bool operator !=(NumberValue left, NumberValue right) => !left.Equals(right);
+
+    public static bool operator <(NumberValue left, NumberValue right) => left.CompareTo(right) < 0;
+
+    public static bool operator <=(NumberValue left, NumberValue right) => left.CompareTo(right) <= 0;
+
+    public static bool operator >(NumberValue left, NumberValue right) => left.CompareTo(right) > 0;
+
+    public static bool operator >=(NumberValue left, NumberValue right) => left.CompareTo(right) >= 0;
+
     private bool TryToDecimal(out decimal value)
     {
         switch (Kind)

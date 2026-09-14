@@ -15,10 +15,7 @@ public static class ExpressionTextSanitizer
 
     public static string Sanitize(string? text, int maximumLength)
     {
-        if (maximumLength <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maximumLength));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumLength);
 
         if (string.IsNullOrWhiteSpace(text))
         {
