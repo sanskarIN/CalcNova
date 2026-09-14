@@ -16,7 +16,7 @@ public sealed class EngineeringNotationPanel : Border
 
         var input = new TextBox
         {
-            Watermark = "Finite value or engineering notation",
+            PlaceholderText = "Finite value or engineering notation",
             MaxLength = EngineeringNotationFormatter.MaximumInputCharacters,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch
         };

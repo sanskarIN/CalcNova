@@ -56,7 +56,7 @@ public sealed class RationalNumberPanel : Border
     {
         var textBox = new TextBox
         {
-            Watermark = watermark,
+            PlaceholderText = watermark,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch
         };
         textBox.Bind(TextBox.TextProperty, new Binding(propertyName) { Mode = BindingMode.TwoWay });

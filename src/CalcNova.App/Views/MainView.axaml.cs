@@ -25,7 +25,7 @@ public partial class MainView : UserControl
 
     private readonly Dictionary<TextBlock, AppStringKey> _localizedTextBlocks = new();
     private readonly Dictionary<Button, AppStringKey> _localizedButtons = new();
-    private readonly Dictionary<TextBox, AppStringKey> _localizedWatermarks = new();
+    private readonly Dictionary<TextBox, AppStringKey> _localizedPlaceholders = new();
     private MainViewModel? _subscribedViewModel;
     private MainViewModel? _localizationViewModel;
     private TabControl? _localizationTabControl;
@@ -234,7 +234,7 @@ public partial class MainView : UserControl
         _localizationTabControl = null;
         _localizedTextBlocks.Clear();
         _localizedButtons.Clear();
-        _localizedWatermarks.Clear();
+        _localizedPlaceholders.Clear();
     }
 
     private void HandleCultureChanged(CultureInfo culture) => RefreshLocalizationTargets();
@@ -288,11 +288,11 @@ public partial class MainView : UserControl
 
         foreach (var textBox in this.GetVisualDescendants().OfType<TextBox>())
         {
-            if (!_localizedWatermarks.ContainsKey(textBox) &&
-                textBox.Watermark is string literal &&
+            if (!_localizedPlaceholders.ContainsKey(textBox) &&
+                textBox.PlaceholderText is string literal &&
                 ShellLocalization.TryGetLiteralKey(literal, out var key))
             {
-                _localizedWatermarks[textBox] = key;
+                _localizedPlaceholders[textBox] = key;
             }
         }
     }
@@ -315,9 +315,9 @@ public partial class MainView : UserControl
             button.Content = localizer[key];
         }
 
-        foreach (var (textBox, key) in _localizedWatermarks)
+        foreach (var (textBox, key) in _localizedPlaceholders)
         {
-            textBox.Watermark = localizer[key];
+            textBox.PlaceholderText = localizer[key];
         }
 
         var modeHeaders = ShellLocalization.GetModeHeaders(localizer);

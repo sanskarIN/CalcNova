@@ -355,7 +355,7 @@ public sealed class GraphingViewModel : ViewModelBase
         {
             var requestedX = ParseFinite(TraceX, "Trace X");
             var trace = GraphTraceLocator.FindNearest(Segments, requestedX);
-            TraceResult = $"requested x={Format(requestedX)} • sampled x≈{Format(trace.SampledX)} • y≈{Format(trace.Y)} • segment {trace.Segment}";
+            TraceResult = $"requested x={Format(requestedX)} • sampled x≈{Format(trace.X)} • y≈{Format(trace.Y)} • segment {trace.Segment}";
             ErrorMessage = string.Empty;
         }
         catch (Exception exception) when (exception is ArgumentException or FormatException or InvalidOperationException or OverflowException)
