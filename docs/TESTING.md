@@ -18,6 +18,18 @@ A check is only PASS when it actually completes successfully. If a required plat
 
 The Python preflight is SDK-independent source-contract validation. It does not replace the compiled `.NET` commands.
 
+## One-command verification
+
+`tools/scripts/check.sh` (bash) and `tools/scripts/check.ps1` (PowerShell) run the same sequence end to end:
+
+1. `tools/release_preflight.py`, the SDK-independent contract preflight;
+2. the `tools/tests` suite, which exercises the contract validators themselves;
+3. the .NET restore, format, build, and test commands listed above.
+
+Both SDK-independent steps are skipped with a warning when Python is unavailable, and both scripts stop with an explanatory message when the .NET SDK is missing. Run one of these before opening a pull request: the contract steps reproduce gates that CI enforces but that the `dotnet` commands alone never exercise.
+
+The PowerShell script accepts `-SkipFormat` and `-SkipTests` to shorten the .NET portion; the contract steps always run.
+
 ## Current test projects
 
 ### CalcNova.Core.Tests
