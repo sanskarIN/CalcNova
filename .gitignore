@@ -41,6 +41,11 @@ appsettings.*.local.json
 # Avalonia / web generated output
 wwwroot/_framework/
 
+# Python tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
 # Temporary files
 *.tmp
 *.temp

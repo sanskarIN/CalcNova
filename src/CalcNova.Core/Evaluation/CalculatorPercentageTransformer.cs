@@ -1,72 +1,74 @@
-// src/CalcNova.Core/Evaluation/CalculatorPercentageTransformer.cs
-using System;
-using System.Text;
-using System.Text.RegularExpressions;
+using CalcNova.Core.Errors;
+using CalcNova.Core.Numerics;
+using CalcNova.Core.Parsing;
 
 namespace CalcNova.Core.Evaluation;
 
-/// <summary>
-/// Transforms human calculator percentage syntax into mathematically sound expressions
-/// prior to AST tokenization and parsing.
-/// </summary>
-public static class CalculatorPercentageTransformer
+public sealed class CalculatorPercentageTransformer
 {
-    // Regex matching: [Left Operand] [Operator (+, -, *, /)] [Percentage Operand]%
-    // Example matches: "100 + 10%", "250.5 - 5%", "80 * 20%", "40 / 10%"
-    private static readonly Regex BinaryPercentageRegex = new(
-        @"(?<left>(?:\d+(?:\.\d+)?|\([^\(\)]+\)))\s*(?<op>[\+\-\*\/])\s*(?<percent>\d+(?:\.\d+)?)\s*%",
-        RegexOptions.Compiled);
+    private static readonly NumberValue OneHundred = NumberValue.FromInteger(100);
+    private readonly ExpressionEvaluator _evaluator;
 
-    // Regex matching standalone percentages: "50%" -> "(50 / 100)"
-    private static readonly Regex StandalonePercentageRegex = new(
-        @"(?<val>\d+(?:\.\d+)?)\s*%",
-        RegexOptions.Compiled);
-
-    /// <summary>
-    /// Transforms percentage expressions to respect commercial calculator rules.
-    /// Additive/Subtractive: A + B% => A + (A * (B / 100))
-    /// Multiplicative/Divisive: A * B% => A * (B / 100)
-    /// Standalone: B% => (B / 100)
-    /// </summary>
-    public static string Transform(string expression)
+    public CalculatorPercentageTransformer(ExpressionEvaluator? evaluator = null)
     {
-        if (string.IsNullOrWhiteSpace(expression) || !expression.Contains('%'))
-            return expression;
-
-        string current = expression;
-        bool modified;
-
-        // Iterate to resolve nested or chained occurrences: e.g., "100 + 10% + 5%"
-        do
-        {
-            modified = false;
-            string transformed = BinaryPercentageRegex.Replace(current, match =>
-            {
-                modified = true;
-                string left = match.Groups["left"].Value.Trim();
-                string op = match.Groups["op"].Value.Trim();
-                string percent = match.Groups["percent"].Value.Trim();
-
-                return op switch
-                {
-                    "+" => $"({left} + ({left} * ({percent} / 100.0)))",
-                    "-" => $"({left} - ({left} * ({percent} / 100.0)))",
-                    "*" => $"({left} * ({percent} / 100.0))",
-                    "/" => $"({left} / ({percent} / 100.0))",
-                    _ => match.Value
-                };
-            });
-
-            current = transformed;
-        } while (modified);
-
-        // Transform any remaining standalone percentages: "(50%)" => "((50 / 100.0))"
-        current = StandalonePercentageRegex.Replace(current, match =>
-        {
-            string val = match.Groups["val"].Value.Trim();
-            return $"({val} / 100.0)";
-        });
-
-        return current;
+        _evaluator = evaluator ?? new ExpressionEvaluator();
     }
+
+    public PercentageTransformation Transform(string expression, EvaluationOptions? options = null)
+    {
+        options ??= EvaluationOptions.Default;
+        var compiled = _evaluator.Compile(expression, options);
+
+        if (compiled.SyntaxTree is BinaryExpression binary && binary.Operator is (
+            TokenKind.Plus or TokenKind.Minus or TokenKind.Star or TokenKind.Slash))
+        {
+            var left = EvaluateSubExpression(binary.Left, options);
+            var right = EvaluateSubExpression(binary.Right, options);
+            var percentageValue = binary.Operator is TokenKind.Plus or TokenKind.Minus
+                ? left.Multiply(right).Divide(OneHundred)
+                : right.Divide(OneHundred);
+
+            var symbol = binary.Operator switch
+            {
+                TokenKind.Plus => "+",
+                TokenKind.Minus => "-",
+                TokenKind.Star => "*",
+                TokenKind.Slash => "/",
+                _ => throw new CalculationException(CalculationErrorCode.InvalidArgument, "Unsupported percentage context.")
+            };
+
+            return new PercentageTransformation(
+                $"{left.ToDisplayString()} {symbol} {percentageValue.ToDisplayString()}",
+                percentageValue);
+        }
+
+        var value = _evaluator.Evaluate(compiled, options);
+        if (!value.Success)
+        {
+            throw new CalculationException(
+                ResolveErrorCode(value.ErrorCode),
+                value.ErrorMessage ?? "Percentage conversion failed.");
+        }
+
+        var standalonePercentage = value.Value.Divide(OneHundred);
+        return new PercentageTransformation(standalonePercentage.ToDisplayString(), standalonePercentage);
+    }
+
+    private NumberValue EvaluateSubExpression(Expression expression, EvaluationOptions options)
+    {
+        var result = _evaluator.Evaluate(new CompiledExpression("<percentage>", expression), options);
+        if (!result.Success)
+        {
+            throw new CalculationException(
+                ResolveErrorCode(result.ErrorCode),
+                result.ErrorMessage ?? "Percentage conversion failed.");
+        }
+
+        return result.Value;
+    }
+
+    private static CalculationErrorCode ResolveErrorCode(CalculationErrorCode reported) =>
+        reported == CalculationErrorCode.None ? CalculationErrorCode.InvalidArgument : reported;
 }
+
+public sealed record PercentageTransformation(string TransformedExpression, NumberValue PercentageValue);

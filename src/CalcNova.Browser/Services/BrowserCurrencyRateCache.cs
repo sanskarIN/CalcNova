@@ -30,6 +30,15 @@ internal sealed class BrowserCurrencyRateCache : ICurrencyRateCache
             BrowserInterop.RemoveItem(KeyPrefix + code);
             return null;
         }
+        catch (ArgumentException)
+        {
+            // Stored JSON can parse and still carry values CurrencyRateSnapshot
+            // rejects, such as a malformed currency code, a null rate table, or a
+            // non-positive rate. Drop the unusable entry and report a cache miss,
+            // exactly as unparsable JSON is handled.
+            BrowserInterop.RemoveItem(KeyPrefix + code);
+            return null;
+        }
     }
 
     public async Task SaveAsync(CurrencyRateSnapshot snapshot, CancellationToken cancellationToken = default)

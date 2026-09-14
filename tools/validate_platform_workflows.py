@@ -30,7 +30,7 @@ WORKFLOW_CONTRACTS: dict[str, tuple[str, ...]] = {
         "runs-on: ubuntu-latest",
         "actions/checkout@v7",
         "actions/setup-dotnet@v6",
-        "actions/setup-java@v5",
+        "actions/setup-java@v6",
         'java-version: "17"',
         "dotnet workload install android",
         "dotnet restore src/CalcNova.Android/CalcNova.Android.csproj",

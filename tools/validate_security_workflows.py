@@ -105,7 +105,7 @@ def validate(root: Path) -> list[str]:
                 '      - "tools/tests/test_validate_dependency_security.py"',
                 "permissions:\n  contents: read",
                 "actions/checkout@v7",
-                "actions/setup-python@v6",
+                "actions/setup-python@v7",
                 "python tools/validate_security_workflows.py .",
                 "python tools/validate_dependency_security.py .",
                 "python -m unittest tools.tests.test_validate_security_workflows",

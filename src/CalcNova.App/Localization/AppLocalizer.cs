@@ -1,74 +1,85 @@
-// src/CalcNova.App/Localization/AppLocalizer.cs
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Globalization;
 
 namespace CalcNova.App.Localization;
 
 public sealed class AppLocalizer : IAppLocalizer
 {
-    private static readonly Lazy<AppLocalizer> _instance = new(() => new AppLocalizer());
-    public static AppLocalizer Instance => _instance.Value;
+    private static readonly CultureInfo EnglishCulture = CultureInfo.GetCultureInfo("en");
+    private static readonly CultureInfo HindiCulture = CultureInfo.GetCultureInfo("hi");
+    private static readonly IReadOnlyList<CultureInfo> Cultures = [EnglishCulture, HindiCulture];
 
-    private readonly ConcurrentDictionary<string, IReadOnlyDictionary<AppStringKey, string>> _catalogs = new();
-    private string _currentCulture = "en-US";
+    private CultureInfo _culture = EnglishCulture;
 
-    public event Action? LanguageChanged;
-
-    public AppLocalizer()
+    static AppLocalizer()
     {
-        // Register default catalogs
-        _catalogs["en-US"] = EnglishAppStrings.Strings;
-        _catalogs["hi-IN"] = HindiAppStrings.Strings;
+        ValidateCatalog("English", EnglishAppStrings.Values);
+        ValidateCatalog("Hindi", HindiAppStrings.Values);
     }
 
-    public string CurrentCulture
+    public AppLocalizer(string? initialCultureName = null)
     {
-        get => _currentCulture;
-        set
+        if (!string.IsNullOrWhiteSpace(initialCultureName))
         {
-            string normalized = NormalizeCulture(value);
-            if (_currentCulture != normalized)
-            {
-                _currentCulture = normalized;
-                LanguageChanged?.Invoke();
-            }
+            TrySetCulture(initialCultureName);
         }
     }
 
-    public string GetString(AppStringKey key)
-    {
-        // 1. Attempt lookup in current culture
-        if (_catalogs.TryGetValue(_currentCulture, out var activeCatalog) &&
-            activeCatalog.TryGetValue(key, out var localized) &&
-            !string.IsNullOrWhiteSpace(localized))
-        {
-            return localized;
-        }
+    public event Action<CultureInfo>? CultureChanged;
 
-        // 2. Fallback to English (en-US)
-        if (_catalogs.TryGetValue("en-US", out var fallbackCatalog) &&
-            fallbackCatalog.TryGetValue(key, out var fallback) &&
-            !string.IsNullOrWhiteSpace(fallback))
-        {
-            return fallback;
-        }
+    public CultureInfo Culture => _culture;
 
-        // 3. Last-resort fallback: return enum key name without crashing
-        return $"[{key}]";
-    }
+    public IReadOnlyList<CultureInfo> SupportedCultures => Cultures;
 
-    public string this[AppStringKey key] => GetString(key);
+    public string this[AppStringKey key] =>
+        string.Equals(_culture.TwoLetterISOLanguageName, HindiCulture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase)
+            ? HindiAppStrings.Values[key]
+            : EnglishAppStrings.Values[key];
 
-    private static string NormalizeCulture(string cultureName)
+    public bool TrySetCulture(string? cultureName)
     {
         if (string.IsNullOrWhiteSpace(cultureName))
-            return "en-US";
+        {
+            return false;
+        }
 
-        if (cultureName.StartsWith("hi", StringComparison.OrdinalIgnoreCase))
-            return "hi-IN";
+        CultureInfo requestedCulture;
+        try
+        {
+            requestedCulture = CultureInfo.GetCultureInfo(cultureName.Trim());
+        }
+        catch (CultureNotFoundException)
+        {
+            return false;
+        }
 
-        return "en-US";
+        if (!Cultures.Any(culture => string.Equals(
+                requestedCulture.TwoLetterISOLanguageName,
+                culture.TwoLetterISOLanguageName,
+                StringComparison.OrdinalIgnoreCase)))
+        {
+            return false;
+        }
+
+        if (string.Equals(_culture.Name, requestedCulture.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        _culture = requestedCulture;
+        CultureChanged?.Invoke(_culture);
+        return true;
+    }
+
+    private static void ValidateCatalog(string name, IReadOnlyDictionary<AppStringKey, string> values)
+    {
+        var missingKeys = Enum.GetValues<AppStringKey>()
+            .Where(key => !values.TryGetValue(key, out var value) || string.IsNullOrWhiteSpace(value))
+            .ToArray();
+
+        if (missingKeys.Length > 0)
+        {
+            throw new InvalidOperationException(
+                $"{name} localization catalog is missing: {string.Join(", ", missingKeys)}");
+        }
     }
 }

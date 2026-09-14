@@ -22,7 +22,7 @@ REQUIRED_MARKERS = (
     "runs-on: ubuntu-latest",
     "timeout-minutes: 8",
     "uses: actions/checkout@v6",
-    "uses: actions/setup-python@v6",
+    "uses: actions/setup-python@v7",
     'python-version: "3.13"',
     "run: python tools/release_preflight.py",
 )

@@ -45,6 +45,14 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache
         {
             return null;
         }
+        catch (ArgumentException)
+        {
+            // A structurally valid file can still hold values the snapshot rejects,
+            // such as a malformed currency code, a null rate table, or a non-positive
+            // rate. Treat an unusable cache entry as a cache miss, exactly as
+            // unparsable JSON is treated, so the caller can refresh from the provider.
+            return null;
+        }
         finally
         {
             _gate.Release();

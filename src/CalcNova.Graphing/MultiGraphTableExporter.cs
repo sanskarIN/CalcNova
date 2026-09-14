@@ -24,13 +24,17 @@ public static class MultiGraphTableExporter
         {
             while (sources.Count > 0 && rows.Count < maximumRows)
             {
-                for (var index = sources.Count - 1; index >= 0 && rows.Count < maximumRows; index--)
+                var index = 0;
+                while (index < sources.Count && rows.Count < maximumRows)
                 {
                     var source = sources[index];
                     if (!source.Points.MoveNext())
                     {
                         source.Points.Dispose();
                         sources.RemoveAt(index);
+
+                        // The following series shifts down into this slot, so hold
+                        // the index rather than advancing past it.
                         continue;
                     }
 
@@ -41,6 +45,7 @@ public static class MultiGraphTableExporter
                         point.Segment,
                         point.X,
                         point.Y));
+                    index++;
                 }
             }
         }
