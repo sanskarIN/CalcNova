@@ -25,7 +25,7 @@ public sealed class StatisticsCalculator
         var minimum = data[0];
         var maximum = data[^1];
         var populationVariance = Variance(data, mean, sample: false);
-        var sampleVariance = data.Length > 1 ? Variance(data, mean, sample: true) : null;
+        double? sampleVariance = data.Length > 1 ? Variance(data, mean, sample: true) : null;
         var modes = CalculateModes(data);
 
         return new StatisticsSummary(
