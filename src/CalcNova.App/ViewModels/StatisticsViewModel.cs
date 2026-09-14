@@ -111,20 +111,20 @@ public sealed class StatisticsViewModel : ViewModelBase
                 : string.Join(", ", result.Modes.Select(Format));
 
             var builder = new StringBuilder();
-            builder.AppendLine($"Count: {result.Count}");
-            builder.AppendLine($"Sum: {Format(result.Sum)}");
-            builder.AppendLine($"Mean: {Format(result.Mean)}");
-            builder.AppendLine($"Median: {Format(result.Median)}");
-            builder.AppendLine($"Mode: {modes}");
-            builder.AppendLine($"Minimum: {Format(result.Minimum)}");
-            builder.AppendLine($"Maximum: {Format(result.Maximum)}");
-            builder.AppendLine($"Range: {Format(result.Range)}");
-            builder.AppendLine($"Population variance: {Format(result.PopulationVariance)}");
-            builder.AppendLine($"Population σ: {Format(result.PopulationStandardDeviation)}");
-            builder.AppendLine($"Sample variance: {(result.SampleVariance is null ? "N/A" : Format(result.SampleVariance.Value))}");
-            builder.AppendLine($"Sample s: {(result.SampleStandardDeviation is null ? "N/A" : Format(result.SampleStandardDeviation.Value))}");
-            builder.AppendLine($"Q1: {Format(result.FirstQuartile)}");
-            builder.Append($"Q3: {Format(result.ThirdQuartile)}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Count: {result.Count}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Sum: {Format(result.Sum)}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Mean: {Format(result.Mean)}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Median: {Format(result.Median)}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Mode: {modes}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Minimum: {Format(result.Minimum)}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Maximum: {Format(result.Maximum)}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Range: {Format(result.Range)}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Population variance: {Format(result.PopulationVariance)}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Population σ: {Format(result.PopulationStandardDeviation)}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Sample variance: {(result.SampleVariance is null ? "N/A" : Format(result.SampleVariance.Value))}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Sample s: {(result.SampleStandardDeviation is null ? "N/A" : Format(result.SampleStandardDeviation.Value))}");
+            builder.AppendLine(CultureInfo.InvariantCulture, $"Q1: {Format(result.FirstQuartile)}");
+            builder.Append(CultureInfo.InvariantCulture, $"Q3: {Format(result.ThirdQuartile)}");
 
             Summary = builder.ToString();
             CopyStatus = string.Empty;
@@ -202,15 +202,15 @@ public sealed class StatisticsViewModel : ViewModelBase
     private static string BuildBivariateSummary(BivariateStatisticsSummary result)
     {
         var builder = new StringBuilder();
-        builder.AppendLine($"Pairs: {result.Count}");
-        builder.AppendLine($"Mean X: {Format(result.MeanX)}");
-        builder.AppendLine($"Mean Y: {Format(result.MeanY)}");
-        builder.AppendLine($"Population covariance: {Format(result.PopulationCovariance)}");
-        builder.AppendLine($"Sample covariance: {FormatNullable(result.SampleCovariance)}");
-        builder.AppendLine($"Pearson r: {FormatNullable(result.PearsonCorrelation)}");
-        builder.AppendLine($"Regression slope: {FormatNullable(result.RegressionSlope)}");
-        builder.AppendLine($"Regression intercept: {FormatNullable(result.RegressionIntercept)}");
-        builder.Append($"R²: {FormatNullable(result.RSquared)}");
+        builder.AppendLine(CultureInfo.InvariantCulture, $"Pairs: {result.Count}");
+        builder.AppendLine(CultureInfo.InvariantCulture, $"Mean X: {Format(result.MeanX)}");
+        builder.AppendLine(CultureInfo.InvariantCulture, $"Mean Y: {Format(result.MeanY)}");
+        builder.AppendLine(CultureInfo.InvariantCulture, $"Population covariance: {Format(result.PopulationCovariance)}");
+        builder.AppendLine(CultureInfo.InvariantCulture, $"Sample covariance: {FormatNullable(result.SampleCovariance)}");
+        builder.AppendLine(CultureInfo.InvariantCulture, $"Pearson r: {FormatNullable(result.PearsonCorrelation)}");
+        builder.AppendLine(CultureInfo.InvariantCulture, $"Regression slope: {FormatNullable(result.RegressionSlope)}");
+        builder.AppendLine(CultureInfo.InvariantCulture, $"Regression intercept: {FormatNullable(result.RegressionIntercept)}");
+        builder.Append(CultureInfo.InvariantCulture, $"R²: {FormatNullable(result.RSquared)}");
         return builder.ToString();
     }
 

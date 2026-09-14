@@ -8,10 +8,7 @@ public static class GraphSeriesLinePatternCatalog
 
     public static GraphSeriesLinePattern ForSeriesIndex(int seriesIndex)
     {
-        if (seriesIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(seriesIndex));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(seriesIndex);
 
         return Patterns[seriesIndex % Patterns.Length];
     }
@@ -31,10 +28,7 @@ public static class GraphSeriesLinePatternCatalog
 
     public static bool ShouldDrawEdge(GraphSeriesLinePattern pattern, int edgeIndex)
     {
-        if (edgeIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(edgeIndex));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(edgeIndex);
 
         return pattern switch
         {

@@ -10,10 +10,7 @@ public sealed class BitCellViewModel : ViewModelBase
 
     public BitCellViewModel(int index, bool isSet, Action<int> toggle)
     {
-        if (index < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
 
         Index = index;
         _isSet = isSet;

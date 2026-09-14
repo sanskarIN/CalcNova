@@ -6,7 +6,7 @@ using CalcNova.Platform.Settings;
 
 namespace CalcNova.App.ViewModels;
 
-public sealed class SettingsViewModel : ViewModelBase
+public sealed class SettingsViewModel : ViewModelBase, IDisposable
 {
     private readonly ISettingsRepository? _repository;
     private readonly IAppLocalizer _localizer;
@@ -344,6 +344,8 @@ public sealed class SettingsViewModel : ViewModelBase
         OnPropertyChanged(nameof(CompletedOnboardingVersion));
         OnPropertyChanged(nameof(ShouldShowOnboarding));
     }
+
+    public void Dispose() => _saveGate.Dispose();
 
     private void ApplyCulture(string? cultureName)
     {

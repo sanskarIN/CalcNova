@@ -2,7 +2,7 @@ namespace CalcNova.Converter;
 
 public static class ConversionDefaults
 {
-    private static readonly IReadOnlyDictionary<UnitCategory, ConversionPair> Pairs =
+    private static readonly Dictionary<UnitCategory, ConversionPair> Pairs =
         new Dictionary<UnitCategory, ConversionPair>
         {
             [UnitCategory.Length] = new("m", "km"),

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using System.Windows.Input;
 using CalcNova.App.Infrastructure;
@@ -267,13 +268,13 @@ public sealed class ProgrammerViewModel : ViewModelBase
         {
             if (ShiftCount > WordSize)
             {
-                throw new ArgumentOutOfRangeException(nameof(ShiftCount), ShiftCount, "Shift count cannot exceed the selected word size.");
+                throw new InvalidOperationException("Shift count cannot exceed the selected word size.");
             }
 
             var value = RadixConverter.Parse(Input, InputBase);
             ApplyResult(operation(value, ShiftCount, WordSize), $"{label} {ShiftCount}");
         }
-        catch (Exception exception) when (exception is FormatException or ArgumentException or OverflowException)
+        catch (Exception exception) when (exception is FormatException or ArgumentException or InvalidOperationException or OverflowException)
         {
             ErrorMessage = exception.Message;
         }
@@ -299,7 +300,7 @@ public sealed class ProgrammerViewModel : ViewModelBase
         Decimal = RadixConverter.Format(Signed ? signed : unsigned, 10);
         Hexadecimal = RadixConverter.Format(unsigned, 16);
         BitPattern = BitwiseCalculator.ToBitString(unsigned, WordSize);
-        InterpretedValue = (Signed ? signed : unsigned).ToString();
+        InterpretedValue = (Signed ? signed : unsigned).ToString(CultureInfo.InvariantCulture);
         UpdateBits(unsigned);
     }
 
