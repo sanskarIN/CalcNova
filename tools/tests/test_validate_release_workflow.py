@@ -63,7 +63,7 @@ class ReleaseWorkflowValidatorTests(unittest.TestCase):
             source,
         )
         self.assertIn("CalcNova-android.sbom.cdx.json", source)
-        self.assertGreaterEqual(source.count("actions/setup-python@v6"), 4)
+        self.assertGreaterEqual(source.count("actions/setup-python@v7"), 4)
 
     def test_release_provenance_uses_current_attest_action_and_scoped_permissions(self) -> None:
         source = RELEASE_WORKFLOW.read_text(encoding="utf-8")
