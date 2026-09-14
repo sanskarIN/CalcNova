@@ -88,6 +88,8 @@ The repository keeps direct/transitive NuGet auditing enabled:
 <NuGetAuditLevel>moderate</NuGetAuditLevel>
 ```
 
+In settings terms that is `NuGetAudit=true`, `NuGetAuditMode=all`, and `NuGetAuditLevel=moderate`, matching `SECURITY.md`, `docs/SECURITY.md`, and `docs/SECURITY_AUTOMATION.md`.
+
 Warnings-as-errors keep moderate-or-higher NuGet audit warnings actionable when advisory data is available. CodeQL, Dependency Review, Dependabot, focused security-workflow validation, and dependency-policy validation remain enabled.
 
 ### Deterministic SBOM and provenance
