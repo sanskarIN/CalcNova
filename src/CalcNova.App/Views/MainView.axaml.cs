@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -42,6 +43,29 @@ public partial class MainView : UserControl
     {
         InitializeComponent();
         AttachOnboardingOverlay();
+
+        // Mode switching is a shell-wide shortcut, so it has to be seen before the
+        // focused control gets a chance to consume it. TabControl marks Ctrl+PageUp and
+        // Ctrl+PageDown handled while the event is still below this view, so a
+        // bubbling handler here is never reached.
+        AddHandler(KeyDownEvent, HandleShellNavigationKeyDown, RoutingStrategies.Tunnel);
+    }
+
+    private void HandleShellNavigationKeyDown(object? sender, KeyEventArgs eventArgs)
+    {
+        if (DataContext is not MainViewModel viewModel || viewModel.Settings.ShouldShowOnboarding)
+        {
+            return;
+        }
+
+        var navigationAction = ShellKeyboardShortcut.GetNavigationAction(eventArgs.Key, eventArgs.KeyModifiers);
+        if (navigationAction == ShellNavigationAction.None)
+        {
+            return;
+        }
+
+        ApplyShellNavigation(viewModel, navigationAction);
+        eventArgs.Handled = true;
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -145,14 +169,6 @@ public partial class MainView : UserControl
 
         if (viewModel.Settings.ShouldShowOnboarding)
         {
-            return;
-        }
-
-        var navigationAction = ShellKeyboardShortcut.GetNavigationAction(eventArgs.Key, eventArgs.KeyModifiers);
-        if (navigationAction != ShellNavigationAction.None)
-        {
-            ApplyShellNavigation(viewModel, navigationAction);
-            eventArgs.Handled = true;
             return;
         }
 
