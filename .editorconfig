@@ -70,3 +70,10 @@ dotnet_diagnostic.CA1707.severity = none
 # sites without changing what any test does. This mirrors the repository's existing
 # decision to switch CA2007 off rather than sprinkle ConfigureAwait.
 dotnet_diagnostic.xUnit1051.severity = none
+
+# CA1711 rejects any type name ending in "Delegate". UIKit requires exactly this one:
+# the class is registered with Objective-C as "AppDelegate" and handed to
+# UIApplication.Main as the application's delegate, so renaming it would stop the app
+# launching. The rule is scoped off for the iOS head alone rather than repository-wide.
+[src/CalcNova.iOS/**.cs]
+dotnet_diagnostic.CA1711.severity = none
