@@ -310,6 +310,16 @@ public partial class MainView : UserControl
     {
         foreach (var textBlock in this.GetVisualDescendants().OfType<TextBlock>())
         {
+            // Tab headers are localized from ShellLocalization.GetModeHeaders further
+            // down, so they must not also be captured by English literal. The Converter
+            // tab reads "Convert", which collides with the Convert action label and
+            // would relabel the tab with that action's translation instead of the mode
+            // name.
+            if (textBlock.FindAncestorOfType<TabItem>() is not null)
+            {
+                continue;
+            }
+
             if (!_localizedTextBlocks.ContainsKey(textBlock) &&
                 ShellLocalization.TryGetLiteralKey(textBlock.Text, out var key))
             {
