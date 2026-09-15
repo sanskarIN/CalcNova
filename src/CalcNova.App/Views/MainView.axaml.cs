@@ -97,6 +97,8 @@ public partial class MainView : UserControl
         AttachCalculatorExpressionEditor(viewModel.Calculator);
         EnsureCodePointMetadataPanel(viewModel.CodePoint);
         EnsureGraphPlot(viewModel.Graphing);
+        LayoutUpdated -= HandleShellLayoutUpdated;
+        LayoutUpdated += HandleShellLayoutUpdated;
 
         await viewModel.InitializeAsync();
         CaptureLocalizedControls();
@@ -112,6 +114,8 @@ public partial class MainView : UserControl
 
     private void OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs eventArgs)
     {
+        LayoutUpdated -= HandleShellLayoutUpdated;
+
         if (AppComposition.Dependencies.ClipboardService is AvaloniaClipboardService clipboardService)
         {
             clipboardService.Attach(null);
@@ -235,6 +239,38 @@ public partial class MainView : UserControl
         _localizedTextBlocks.Clear();
         _localizedButtons.Clear();
         _localizedPlaceholders.Clear();
+    }
+
+    /// <summary>
+    /// AttachedToVisualTree fires before this control's template is applied, so the
+    /// TabControl and the per-mode panels are not reachable through
+    /// GetVisualDescendants yet. Finish the wiring on the first layout pass that
+    /// exposes them, and keep re-checking because TabControl realizes each mode's
+    /// content only when that tab is first selected.
+    /// </summary>
+    private void HandleShellLayoutUpdated(object? sender, EventArgs eventArgs)
+    {
+        if (_localizationViewModel is not null && _localizationTabControl is null)
+        {
+            _localizationTabControl = this.GetVisualDescendants().OfType<TabControl>().FirstOrDefault();
+            if (_localizationTabControl is not null)
+            {
+                _localizationTabControl.SelectionChanged += HandleLocalizationSelectionChanged;
+                CaptureLocalizedControls();
+                ApplyLocalization();
+            }
+        }
+
+        // Order matters: the viewport toolbar is built around the plot, so the plot has
+        // to exist before the check-box pass runs.
+        if (_subscribedViewModel is not null)
+        {
+            EnsureCodePointMetadataPanel(_subscribedViewModel.CodePoint);
+            EnsureGraphPlot(_subscribedViewModel.Graphing);
+        }
+
+        CompleteCheckBoxLocalizationWiring();
+        RefreshLocalizedCheckBoxes();
     }
 
     private void HandleCultureChanged(CultureInfo culture) => RefreshLocalizationTargets();
