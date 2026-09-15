@@ -98,7 +98,11 @@ public sealed class BrowserSettingsRepository : ISettingsRepository
 
         try
         {
-            _ = CultureInfo.GetCultureInfo(cultureName);
+            // predefinedOnly matters: with ICU, the lenient overload accepts almost any
+            // well-formed tag and invents a culture, so "not-a-real-culture" would be
+            // stored and later resolve to a culture named "not". Only Windows NLS
+            // rejected it, which made this validation silently platform-dependent.
+            _ = CultureInfo.GetCultureInfo(cultureName, predefinedOnly: true);
         }
         catch (CultureNotFoundException exception)
         {
