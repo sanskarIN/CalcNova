@@ -65,7 +65,7 @@ This checkpoint records source-side work completed after the earlier project-sta
 ### Repository quality hardening
 
 - integrated source preflight expanded during the continuation with converter defaults/notice, graph surface/series presentation, numerical safety, and concurrent Unicode/export/budget gates;
-- dedicated validator rejecting TODO/FIXME/`NotImplementedException`/placeholder implementation markers in source/test trees;
+- dedicated validator rejecting `TODO`/`FIXME`/`NotImplementedException`/placeholder implementation markers in source/test trees;
 - focused incomplete-code workflow and regression test;
 - standalone technical documentation added for converter defaults/privacy, graph series presentation, graph viewport controls, numerical safety, calculator keyboard input, and live localization.
 

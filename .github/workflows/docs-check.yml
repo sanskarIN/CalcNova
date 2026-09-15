@@ -46,7 +46,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RInE '(^|[^A-Za-z])(TBD|FIXME|HACK|XXX)([^A-Za-z]|$)' README.md docs --include='*.md'; then
+          # A marker written as inline code is being named, not left behind - the
+          # documentation has to be able to describe the placeholder policy, and the
+          # historical records describe the validator that enforces it. Strip code spans
+          # first, then scan what remains.
+          status=0
+          while IFS= read -r file; do
+            if matches=$(sed 's/`[^`]*`//g' "$file" | grep -nE '(^|[^A-Za-z])(TBD|FIXME|HACK|XXX)([^A-Za-z]|$)'); then
+              printf '%s\n' "$matches" | sed "s|^|$file:|"
+              status=1
+            fi
+          done < <(find README.md docs -type f -name '*.md' | sort)
+          if [[ "$status" -ne 0 ]]; then
             echo "Documentation contains unresolved placeholder markers."
-            exit 1
           fi
+          exit "$status"
