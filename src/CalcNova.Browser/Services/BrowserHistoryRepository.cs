@@ -1,12 +1,12 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using CalcNova.Platform.History;
 
 namespace CalcNova.Browser.Services;
 
-public sealed class BrowserHistoryRepository : ICalculationHistoryRepository
+public sealed class BrowserHistoryRepository : ICalculationHistoryRepository, IDisposable
 {
     private const string StorageKey = "calcnova.history.v1";
-    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
     private readonly SemaphoreSlim _gate = new(1, 1);
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default) =>
@@ -125,6 +125,8 @@ public sealed class BrowserHistoryRepository : ICalculationHistoryRepository
         }
     }
 
+    public void Dispose() => _gate.Dispose();
+
     private static List<HistoryEntry> LoadEntries()
     {
         var json = BrowserInterop.GetItem(StorageKey);
@@ -135,7 +137,7 @@ public sealed class BrowserHistoryRepository : ICalculationHistoryRepository
 
         try
         {
-            return JsonSerializer.Deserialize<List<HistoryEntry>>(json, SerializerOptions) ?? [];
+            return JsonSerializer.Deserialize(json, BrowserHistoryJsonContext.Default.ListHistoryEntry) ?? [];
         }
         catch (JsonException)
         {
@@ -145,7 +147,13 @@ public sealed class BrowserHistoryRepository : ICalculationHistoryRepository
 
     private static void SaveEntries(IReadOnlyList<HistoryEntry> entries)
     {
-        var json = JsonSerializer.Serialize(entries, SerializerOptions);
+        var json = JsonSerializer.Serialize(entries, BrowserHistoryJsonContext.Default.ListHistoryEntry);
         BrowserInterop.SetItem(StorageKey, json);
     }
 }
+
+// Source-generated metadata keeps this serialization trim-safe under the browser
+// head's trimming publish.
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
+[JsonSerializable(typeof(List<HistoryEntry>))]
+internal sealed partial class BrowserHistoryJsonContext : JsonSerializerContext;
