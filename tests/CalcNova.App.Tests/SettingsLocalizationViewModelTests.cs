@@ -12,7 +12,7 @@ public sealed class SettingsLocalizationViewModelTests
     {
         var viewModel = new SettingsViewModel(null, new AppLocalizer());
 
-        Assert.Equal(["en"], viewModel.SupportedCultureNames);
+        Assert.Equal(["en", "hi"], viewModel.SupportedCultureNames);
         Assert.Equal("en", viewModel.CultureName);
     }
 

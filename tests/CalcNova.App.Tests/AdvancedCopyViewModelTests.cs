@@ -52,8 +52,8 @@ public sealed class AdvancedCopyViewModelTests
             !string.IsNullOrWhiteSpace(statistics.CopyStatus) &&
             !string.IsNullOrWhiteSpace(matrices.CopyStatus));
 
-        Assert.Contains("not available", statistics.CopyStatus, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("not available", matrices.CopyStatus, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("unavailable", statistics.CopyStatus, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("unavailable", matrices.CopyStatus, StringComparison.OrdinalIgnoreCase);
     }
 
     private static async Task WaitUntilAsync(Func<bool> predicate)
