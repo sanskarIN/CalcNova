@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using CalcNova.Platform.Settings;
 
 namespace CalcNova.Browser.Services;
@@ -8,6 +7,7 @@ namespace CalcNova.Browser.Services;
 public sealed class BrowserSettingsRepository : ISettingsRepository, IDisposable
 {
     private const string StorageKey = "calcnova.settings.v1";
+    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
     private readonly SemaphoreSlim _gate = new(1, 1);
 
     public async Task<AppSettings> LoadAsync(CancellationToken cancellationToken = default)
@@ -24,7 +24,7 @@ public sealed class BrowserSettingsRepository : ISettingsRepository, IDisposable
 
             try
             {
-                return Validate(JsonSerializer.Deserialize(json, BrowserSettingsJsonContext.Default.AppSettings) ?? new AppSettings());
+                return Validate(AppSettingsJson.Deserialize(json, SerializerOptions) ?? new AppSettings());
             }
             catch (JsonException)
             {
@@ -46,7 +46,7 @@ public sealed class BrowserSettingsRepository : ISettingsRepository, IDisposable
         try
         {
             await BrowserInterop.EnsureInitializedAsync(cancellationToken);
-            BrowserInterop.SetItem(StorageKey, JsonSerializer.Serialize(settings, BrowserSettingsJsonContext.Default.AppSettings));
+            BrowserInterop.SetItem(StorageKey, AppSettingsJson.Serialize(settings, SerializerOptions));
         }
         finally
         {
@@ -136,9 +136,3 @@ public sealed class BrowserSettingsRepository : ISettingsRepository, IDisposable
         }
     }
 }
-
-// Source-generated metadata keeps this serialization trim-safe under the browser
-// head's trimming publish.
-[JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
-[JsonSerializable(typeof(AppSettings))]
-internal sealed partial class BrowserSettingsJsonContext : JsonSerializerContext;

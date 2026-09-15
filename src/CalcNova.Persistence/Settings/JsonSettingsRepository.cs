@@ -37,7 +37,7 @@ public sealed class JsonSettingsRepository : ISettingsRepository
         AppSettings? settings;
         try
         {
-            settings = await JsonSerializer.DeserializeAsync<AppSettings>(stream, SerializerOptions, cancellationToken);
+            settings = await AppSettingsJson.DeserializeAsync(stream, SerializerOptions, cancellationToken);
         }
         catch (JsonException)
         {
@@ -72,7 +72,7 @@ public sealed class JsonSettingsRepository : ISettingsRepository
                 bufferSize: 4096,
                 FileOptions.Asynchronous | FileOptions.WriteThrough))
             {
-                await JsonSerializer.SerializeAsync(stream, settings, SerializerOptions, cancellationToken);
+                await AppSettingsJson.SerializeAsync(stream, settings, SerializerOptions, cancellationToken);
                 await stream.FlushAsync(cancellationToken);
             }
 
