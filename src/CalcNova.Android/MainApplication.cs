@@ -16,7 +16,7 @@ namespace CalcNova.Android;
 /// </summary>
 /// <remarks>
 /// Composition belongs here rather than in the launcher activity: the Avalonia application
-/// is created during <see cref="Application.OnCreate"/>, which Android runs before any
+/// is created during the Android application's own OnCreate, which runs before any
 /// activity exists, so anything configured from an activity would arrive too late for
 /// startup to see it. Properties such as the label and theme stay in AndroidManifest.xml
 /// and are merged into the element this attribute generates.
