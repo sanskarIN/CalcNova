@@ -89,7 +89,7 @@ public sealed class SqliteCalculationHistoryRepository : ICalculationHistoryRepo
             ? """
                 SELECT id, expression, result, created_at, is_favorite
                 FROM calculation_history
-                WHERE expression LIKE $query OR result LIKE $query
+                WHERE expression LIKE $query ESCAPE '\' OR result LIKE $query ESCAPE '\'
                 ORDER BY created_at DESC
                 LIMIT $limit;
                 """
@@ -102,7 +102,7 @@ public sealed class SqliteCalculationHistoryRepository : ICalculationHistoryRepo
 
         if (hasQuery)
         {
-            command.Parameters.AddWithValue("$query", $"%{query!.Trim()}%");
+            command.Parameters.AddWithValue("$query", $"%{EscapeLikePattern(query!.Trim())}%");
         }
 
         command.Parameters.AddWithValue("$limit", limit);
@@ -148,6 +148,23 @@ public sealed class SqliteCalculationHistoryRepository : ICalculationHistoryRepo
         command.Parameters.AddWithValue("$id", id);
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
+
+    /// <summary>
+    /// Escapes the LIKE metacharacters in a user-supplied search term.
+    /// </summary>
+    /// <remarks>
+    /// The term is a parameter, so it can never alter the statement, but SQLite still reads
+    /// <c>%</c> and <c>_</c> inside it as wildcards. Searching history for "50%" therefore
+    /// matched every entry beginning with "50", and a lone "_" matched everything - and
+    /// percent signs are ordinary content in a calculator's history. The browser head
+    /// searches with a plain substring match, so escaping here also makes the two heads
+    /// agree. The escape character itself is doubled first, or escaping the wildcards would
+    /// re-introduce them.
+    /// </remarks>
+    private static string EscapeLikePattern(string value) => value
+        .Replace("\\", "\\\\", StringComparison.Ordinal)
+        .Replace("%", "\\%", StringComparison.Ordinal)
+        .Replace("_", "\\_", StringComparison.Ordinal);
 
     private async Task<SqliteConnection> OpenConnectionAsync(CancellationToken cancellationToken)
     {
