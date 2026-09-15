@@ -8,6 +8,14 @@
     <ApplicationVersion>20907</ApplicationVersion>
     <ApplicationDisplayVersion>$(ProductDisplayVersion)</ApplicationDisplayVersion>
     <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
+
+    <!-- IL2104 is the per-package roll-up ILLink emits when a NuGet dependency produces trim
+         warnings inside itself: here Avalonia.DesignerSupport, which only exists for the XAML
+         previewer, and Microsoft.Data.Sqlite, which Microsoft documents as not fully
+         trim-compatible. Neither is ours to annotate, and warnings-as-errors turns the roll-up
+         into a build failure. Project code keeps reporting its own trim diagnostics
+         individually (IL2026 and friends), so nothing actionable is hidden by this. -->
+    <NoWarn>$(NoWarn);IL2104</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.iOS" />
