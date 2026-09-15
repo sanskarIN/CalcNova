@@ -1,4 +1,5 @@
 using CalcNova.Persistence.History;
+using Microsoft.Data.Sqlite;
 using Xunit;
 
 namespace CalcNova.Persistence.Tests;
@@ -16,6 +17,12 @@ public sealed class SqliteCalculationHistoryRepositoryTests : IAsyncLifetime
 
     public ValueTask DisposeAsync()
     {
+        // The repository opens and disposes a connection per call, but Microsoft.Data.Sqlite
+        // pools them, so the underlying handle stays open and keeps the file locked. On
+        // Windows that makes File.Delete throw, failing every test in this class during
+        // teardown. Returning the pooled connections releases the file first.
+        SqliteConnection.ClearAllPools();
+
         if (File.Exists(_databasePath))
         {
             File.Delete(_databasePath);
