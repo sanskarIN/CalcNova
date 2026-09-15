@@ -63,6 +63,60 @@ public sealed class SqliteCalculationHistoryRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Search_TreatsPercentAsLiteralTextRatherThanAWildcard()
+    {
+        // Percent signs are ordinary content in a calculator's history, so "50%" has to
+        // mean the two characters "50%" and not "anything starting with 50".
+        await _repository.AddAsync("50% of 200", "100");
+        await _repository.AddAsync("50 + 7", "57");
+        await _repository.AddAsync("500 * 2", "1000");
+
+        var matches = await _repository.GetRecentAsync(query: "50%");
+
+        Assert.Equal("50% of 200", Assert.Single(matches).Expression);
+    }
+
+    [Fact]
+    public async Task Search_TreatsUnderscoreAsLiteralTextRatherThanASingleCharacterWildcard()
+    {
+        await _repository.AddAsync("max_value", "255");
+        await _repository.AddAsync("abc", "1");
+
+        var matches = await _repository.GetRecentAsync(query: "_");
+
+        Assert.Equal("max_value", Assert.Single(matches).Expression);
+    }
+
+    [Fact]
+    public async Task Search_TreatsTheEscapeCharacterItselfAsLiteralText()
+    {
+        await _repository.AddAsync(@"path\to", "1");
+        await _repository.AddAsync("plain", "2");
+
+        var matches = await _repository.GetRecentAsync(query: @"\");
+
+        Assert.Equal(@"path\to", Assert.Single(matches).Expression);
+    }
+
+    [Fact]
+    public async Task Search_StillMatchesOrdinarySubstringsAfterEscaping()
+    {
+        await _repository.AddAsync("sqrt(16)", "4");
+        await _repository.AddAsync("cbrt(27)", "3");
+
+        var matches = await _repository.GetRecentAsync(query: "rt(");
+
+        Assert.Equal(2, matches.Count);
+    }
+
+    [Fact]
+    public async Task GetRecentAsync_RejectsLimitsOutsideTheSupportedRange()
+    {
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _repository.GetRecentAsync(limit: 0));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _repository.GetRecentAsync(limit: 5001));
+    }
+
+    [Fact]
     public async Task DeleteAndClear_RemoveRows()
     {
         var first = await _repository.AddAsync("1 + 1", "2");
