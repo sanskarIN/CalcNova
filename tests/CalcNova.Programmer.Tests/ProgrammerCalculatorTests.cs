@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Numerics;
-using CalcNova.Programmer;
 using Xunit;
 
 namespace CalcNova.Programmer.Tests;

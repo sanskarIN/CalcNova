@@ -1,5 +1,4 @@
 using Avalonia;
-using CalcNova.App;
 using CalcNova.App.Services;
 using CalcNova.Desktop.Services;
 using CalcNova.Persistence.Currency;

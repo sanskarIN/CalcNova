@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Headless;
-using CalcNova.App;
 
 [assembly: AvaloniaTestApplication(typeof(CalcNova.App.Tests.TestAppBuilder))]
 

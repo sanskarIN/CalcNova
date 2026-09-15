@@ -1,4 +1,3 @@
-using CalcNova.Programmer;
 using Xunit;
 
 namespace CalcNova.Programmer.Tests;

@@ -1,4 +1,3 @@
-using CalcNova.Currency;
 using Xunit;
 
 namespace CalcNova.Currency.Tests;

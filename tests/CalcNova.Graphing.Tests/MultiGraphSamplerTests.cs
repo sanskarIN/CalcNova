@@ -1,5 +1,4 @@
 using System.Globalization;
-using CalcNova.Graphing;
 using Xunit;
 
 namespace CalcNova.Graphing.Tests;
