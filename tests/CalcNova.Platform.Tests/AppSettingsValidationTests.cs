@@ -43,6 +43,83 @@ public sealed class AppSettingsValidationTests
     }
 
     [Fact]
+    public void Deserialize_OmittedProperties_KeepTheirDeclaredDefaults()
+    {
+        // A settings file written before a preference existed omits it entirely, so every
+        // property the document does not mention has to come back as its declared default
+        // rather than default(T). System.Text.Json's source generator surfaces init-only
+        // properties as constructor parameters and would pass 0 or false for each missing
+        // one, silently resetting preferences on upgrade; this pins the behaviour the
+        // reflection path gives and fails if settings JSON is ever moved onto a generated
+        // contract.
+        using var document = JsonDocument.Parse(
+            """
+            {
+              "schemaVersion": 1,
+              "cultureName": "hi-IN"
+            }
+            """);
+
+        var settings = AppSettingsJson.Deserialize(document.RootElement, SerializerOptions);
+        var declaredDefaults = new AppSettings();
+
+        Assert.Equal("hi-IN", settings.CultureName);
+        Assert.Equal(declaredDefaults.DecimalPrecision, settings.DecimalPrecision);
+        Assert.Equal(declaredDefaults.HistoryLimit, settings.HistoryLimit);
+        Assert.Equal(declaredDefaults.ConverterSignificantDigits, settings.ConverterSignificantDigits);
+        Assert.Equal(declaredDefaults.UseGroupingSeparators, settings.UseGroupingSeparators);
+        Assert.Equal(declaredDefaults.HapticsEnabled, settings.HapticsEnabled);
+        Assert.Equal(declaredDefaults.HistoryEnabled, settings.HistoryEnabled);
+        Assert.Equal(declaredDefaults.Theme, settings.Theme);
+        Assert.Equal(declaredDefaults.AngleUnit, settings.AngleUnit);
+        Assert.NotNull(settings.ConverterRecentPairs);
+        Assert.NotNull(settings.ConverterFavoritePairs);
+    }
+
+    [Fact]
+    public void Serialize_RoundTripsEveryPreference()
+    {
+        var original = new AppSettings
+        {
+            CultureName = "hi-IN",
+            DecimalPrecision = 9,
+            HistoryLimit = 42,
+            UseGroupingSeparators = false,
+            HapticsEnabled = false,
+            HistoryEnabled = false,
+            ReducedMotion = true,
+            HighContrast = true,
+            ConverterSignificantDigits = 12,
+            ConverterRecentPairs = ["v1:km>m"],
+            ConverterFavoritePairs = ["v1:kg>g"],
+            CompletedOnboardingVersion = 3
+        };
+
+        var restored = AppSettingsJson.Deserialize(AppSettingsJson.Serialize(original, SerializerOptions), SerializerOptions);
+
+        Assert.NotNull(restored);
+
+        // Compared property by property rather than with record equality: the two array
+        // properties are compiler-compared by reference, so a round-tripped instance is
+        // never equal to its original however faithful the values are.
+        Assert.Equal(original.SchemaVersion, restored.SchemaVersion);
+        Assert.Equal(original.Theme, restored.Theme);
+        Assert.Equal(original.AngleUnit, restored.AngleUnit);
+        Assert.Equal(original.CultureName, restored.CultureName);
+        Assert.Equal(original.DecimalPrecision, restored.DecimalPrecision);
+        Assert.Equal(original.UseGroupingSeparators, restored.UseGroupingSeparators);
+        Assert.Equal(original.HapticsEnabled, restored.HapticsEnabled);
+        Assert.Equal(original.HistoryEnabled, restored.HistoryEnabled);
+        Assert.Equal(original.HistoryLimit, restored.HistoryLimit);
+        Assert.Equal(original.ReducedMotion, restored.ReducedMotion);
+        Assert.Equal(original.HighContrast, restored.HighContrast);
+        Assert.Equal(original.ConverterSignificantDigits, restored.ConverterSignificantDigits);
+        Assert.Equal(original.ConverterRecentPairs, restored.ConverterRecentPairs);
+        Assert.Equal(original.ConverterFavoritePairs, restored.ConverterFavoritePairs);
+        Assert.Equal(original.CompletedOnboardingVersion, restored.CompletedOnboardingVersion);
+    }
+
+    [Fact]
     public void NormalizeAndValidate_LegacySettings_MigratesAndPreservesPreferences()
     {
         var legacy = new AppSettings
