@@ -1,16 +1,12 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CalcNova.Platform.History;
 
 public sealed class HistoryExportService
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
-    {
-        WriteIndented = true
-    };
-
     public string Export(IReadOnlyList<HistoryEntry> entries, HistoryExportFormat format)
     {
         ArgumentNullException.ThrowIfNull(entries);
@@ -23,7 +19,7 @@ public sealed class HistoryExportService
         {
             HistoryExportFormat.PlainText => ExportPlainText(entries),
             HistoryExportFormat.Csv => ExportCsv(entries),
-            HistoryExportFormat.Json => JsonSerializer.Serialize(entries, JsonOptions),
+            HistoryExportFormat.Json => JsonSerializer.Serialize(entries, HistoryExportJsonContext.Default.IReadOnlyListHistoryEntry),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported history export format.")
         };
     }
@@ -100,3 +96,10 @@ public sealed class HistoryExportService
         return $"\"{normalized.Replace("\"", "\"\"", StringComparison.Ordinal)}\"";
     }
 }
+
+// Source-generated metadata keeps history export trim-safe: the browser head publishes with
+// trimming enabled, and the reflection-based Serialize overloads cannot tell the trimmer
+// which HistoryEntry members have to survive.
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web, WriteIndented = true)]
+[JsonSerializable(typeof(IReadOnlyList<HistoryEntry>))]
+internal sealed partial class HistoryExportJsonContext : JsonSerializerContext;
