@@ -1,16 +1,14 @@
 using Android.App;
 using Android.Content.PM;
-using Avalonia;
 using Avalonia.Android;
-using CalcNova.App;
-using CalcNova.App.Services;
-using CalcNova.Android.Services;
-using CalcNova.Persistence.Currency;
-using CalcNova.Persistence.History;
-using CalcNova.Persistence.Settings;
 
 namespace CalcNova.Android;
 
+/// <summary>
+/// The launcher activity. Avalonia 12 hosts the application on
+/// <see cref="MainApplication"/>, so this type only declares how Android should start and
+/// reconfigure the window that the shared shell is rendered into.
+/// </summary>
 [Activity(
     Label = "CalcNova",
     Theme = "@style/CalcNovaTheme",
@@ -23,22 +21,6 @@ namespace CalcNova.Android;
                            ConfigChanges.SmallestScreenSize |
                            ConfigChanges.UiMode |
                            ConfigChanges.Density)]
-public sealed class MainActivity : AvaloniaMainActivity<SingleViewApp>
+public sealed class MainActivity : AvaloniaMainActivity
 {
-    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
-    {
-        var appDataDirectory = FilesDir?.AbsolutePath
-            ?? throw new InvalidOperationException("Android local application storage is unavailable.");
-
-        AppComposition.Configure(new AppDependencies(
-            new SqliteCalculationHistoryRepository(Path.Combine(appDataDirectory, "history.db")),
-            new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json")))
-        {
-            ExternalLinkService = new AndroidExternalLinkService(this),
-            ClipboardService = new AvaloniaClipboardService(),
-            CurrencyRateCache = new JsonCurrencyRateCache(Path.Combine(appDataDirectory, "currency"))
-        });
-
-        return base.CustomizeAppBuilder(builder).WithInterFont();
-    }
 }

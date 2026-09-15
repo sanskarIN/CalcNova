@@ -55,6 +55,14 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
         '<ProjectReference Include="../CalcNova.Persistence/CalcNova.Persistence.csproj" />',
     ),
     "src/CalcNova.Android/MainActivity.cs": (
+        # Avalonia 12 hosts the application on Android's Application object, so the
+        # launcher activity derives from the non-generic AvaloniaMainActivity and
+        # composition lives in MainApplication.cs below.
+        "public sealed class MainActivity : AvaloniaMainActivity",
+        "MainLauncher = true",
+    ),
+    "src/CalcNova.Android/MainApplication.cs": (
+        "AvaloniaAndroidApplication<SingleViewApp>",
         "FilesDir?.AbsolutePath",
         "SqliteCalculationHistoryRepository",
         "JsonSettingsRepository",
