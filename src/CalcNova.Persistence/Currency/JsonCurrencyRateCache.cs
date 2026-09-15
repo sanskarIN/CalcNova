@@ -1,14 +1,19 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using CalcNova.Currency;
 
 namespace CalcNova.Persistence.Currency;
 
 public sealed class JsonCurrencyRateCache : ICurrencyRateCache, IDisposable
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
-    {
-        WriteIndented = true
-    };
+    // Source-generated metadata keeps the cache trim-safe: the iOS head links in Release, and
+    // the reflection overloads cannot tell the trimmer which members of the stored snapshot
+    // survive. Built from options so the file stays indented.
+    private static readonly StoredCurrencySnapshotJsonContext SerializerContext = new(
+        new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        {
+            WriteIndented = true
+        });
 
     private readonly string _directory;
     private readonly SemaphoreSlim _gate = new(1, 1);
@@ -33,7 +38,7 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache, IDisposable
             }
 
             await using var stream = File.OpenRead(path);
-            var model = await JsonSerializer.DeserializeAsync<StoredSnapshot>(stream, JsonOptions, cancellationToken);
+            var model = await JsonSerializer.DeserializeAsync(stream, SerializerContext.StoredCurrencySnapshot, cancellationToken);
             if (model is null)
             {
                 return null;
@@ -65,7 +70,7 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache, IDisposable
         Directory.CreateDirectory(_directory);
         var path = GetPath(snapshot.BaseCurrency);
         var tempPath = path + ".tmp";
-        var model = new StoredSnapshot(
+        var model = new StoredCurrencySnapshot(
             snapshot.BaseCurrency,
             snapshot.Rates.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase),
             snapshot.RetrievedAt,
@@ -76,7 +81,7 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache, IDisposable
         {
             await using (var stream = File.Create(tempPath))
             {
-                await JsonSerializer.SerializeAsync(stream, model, JsonOptions, cancellationToken);
+                await JsonSerializer.SerializeAsync(stream, model, SerializerContext.StoredCurrencySnapshot, cancellationToken);
             }
 
             File.Move(tempPath, path, overwrite: true);
@@ -108,10 +113,14 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache, IDisposable
         {
         }
     }
-
-    private sealed record StoredSnapshot(
-        string BaseCurrency,
-        Dictionary<string, decimal> Rates,
-        DateTimeOffset RetrievedAt,
-        string Source);
 }
+
+internal sealed record StoredCurrencySnapshot(
+    string BaseCurrency,
+    Dictionary<string, decimal> Rates,
+    DateTimeOffset RetrievedAt,
+    string Source);
+
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
+[JsonSerializable(typeof(StoredCurrencySnapshot))]
+internal sealed partial class StoredCurrencySnapshotJsonContext : JsonSerializerContext;
