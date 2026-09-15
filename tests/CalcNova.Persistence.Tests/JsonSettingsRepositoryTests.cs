@@ -45,6 +45,70 @@ public sealed class JsonSettingsRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Load_CorruptJson_FallsBackToDefaultsInsteadOfFailingStartup()
+    {
+        // A settings file that is not valid JSON carries no recoverable preferences. It must
+        // not take the application down with it, because the file is read during startup.
+        await File.WriteAllTextAsync(_filePath, "{ this is not json");
+        var repository = new JsonSettingsRepository(_filePath);
+
+        var settings = await repository.LoadAsync();
+
+        Assert.Equal(AppSettingsSchema.CurrentVersion, settings.SchemaVersion);
+        Assert.Equal(ThemePreference.System, settings.Theme);
+        Assert.Equal("en", settings.CultureName);
+    }
+
+    [Fact]
+    public async Task Load_EmptyFile_FallsBackToDefaults()
+    {
+        await File.WriteAllTextAsync(_filePath, string.Empty);
+        var repository = new JsonSettingsRepository(_filePath);
+
+        var settings = await repository.LoadAsync();
+
+        Assert.Equal(AppSettingsSchema.CurrentVersion, settings.SchemaVersion);
+    }
+
+    [Fact]
+    public async Task Load_JsonNullLiteral_FallsBackToDefaults()
+    {
+        await File.WriteAllTextAsync(_filePath, "null");
+        var repository = new JsonSettingsRepository(_filePath);
+
+        var settings = await repository.LoadAsync();
+
+        Assert.Equal(AppSettingsSchema.CurrentVersion, settings.SchemaVersion);
+    }
+
+    [Fact]
+    public async Task Save_LeavesNoTemporaryFileBehind()
+    {
+        // The write goes to a sibling ".tmp" and is then moved into place. A leftover
+        // temporary file would accumulate in the user's settings directory on every save.
+        var repository = new JsonSettingsRepository(_filePath);
+
+        await repository.SaveAsync(new AppSettings { CultureName = "en" });
+
+        Assert.True(File.Exists(_filePath));
+        Assert.False(File.Exists(_filePath + ".tmp"));
+    }
+
+    [Fact]
+    public async Task Save_RejectedSettings_LeaveTheExistingFileIntact()
+    {
+        var repository = new JsonSettingsRepository(_filePath);
+        await repository.SaveAsync(new AppSettings { CultureName = "en", DecimalPrecision = 9 });
+
+        await Assert.ThrowsAsync<InvalidDataException>(
+            () => repository.SaveAsync(new AppSettings { CultureName = "en", DecimalPrecision = 0 }));
+
+        var reloaded = await repository.LoadAsync();
+        Assert.Equal(9, reloaded.DecimalPrecision);
+        Assert.False(File.Exists(_filePath + ".tmp"));
+    }
+
+    [Fact]
     public async Task SaveAndLoad_RoundTripsSettings()
     {
         var repository = new JsonSettingsRepository(_filePath);
