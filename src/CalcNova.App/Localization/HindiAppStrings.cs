@@ -75,7 +75,7 @@ internal static class HindiAppStrings
             [AppStringKey.ActionGraphPanDown] = "नीचे खिसकाएँ",
             [AppStringKey.ActionGraphZoomIn] = "ज़ूम इन",
             [AppStringKey.ActionGraphZoomOut] = "ज़ूम आउट",
-            [AppStringKey.ActionGraphFit] = "ग्राफ़ फिट करें",
+            [AppStringKey.ActionGraphFit] = "ग्राफ़ फ़िट करें",
 
             [AppStringKey.LabelExpression] = "अभिव्यक्ति",
             [AppStringKey.LabelResult] = "परिणाम",
