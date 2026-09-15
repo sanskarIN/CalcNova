@@ -42,6 +42,14 @@ dotnet_code_quality.CA1822.api_surface = private, internal
 # from XAML and published on NumberValue, so renaming them would break callers.
 dotnet_diagnostic.CA1720.severity = none
 
+# CA1725 wants every override to reuse the base parameter name, which for Avalonia
+# input overrides is the single letter e. This codebase names event arguments
+# eventArgs everywhere, including in the non-override handlers CA1725 never sees, and
+# tools/validate_graph_keyboard.py pins that spelling as a contract marker for the
+# GraphPlotControl keyboard path. Renaming only the overrides would split the
+# convention in half and break that contract, so keep the house spelling.
+dotnet_diagnostic.CA1725.severity = none
+
 [*.{axaml,xml,props,targets,csproj,slnx}]
 indent_style = space
 indent_size = 2
