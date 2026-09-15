@@ -56,6 +56,62 @@ public sealed class JsonCurrencyRateCacheTests : IDisposable
         Assert.Null(result);
     }
 
+    [Fact]
+    public async Task LoadAsync_StructurallyValidButUnusableEntry_IsTreatedAsACacheMiss()
+    {
+        // The file parses as JSON and has the right shape, but a non-positive rate is one
+        // the snapshot refuses to construct. That has to read as a miss so the caller
+        // refreshes, not as an exception escaping the cache.
+        Directory.CreateDirectory(_directory);
+        await File.WriteAllTextAsync(
+            Path.Combine(_directory, "USD.json"),
+            """
+            {
+              "baseCurrency": "USD",
+              "rates": { "EUR": -1 },
+              "retrievedAt": "2026-08-18T12:00:00+00:00",
+              "source": "Test rates"
+            }
+            """);
+        var cache = new JsonCurrencyRateCache(_directory);
+
+        Assert.Null(await cache.LoadAsync("USD"));
+    }
+
+    [Fact]
+    public async Task LoadAsync_EntryWithAMalformedCurrencyCode_IsTreatedAsACacheMiss()
+    {
+        Directory.CreateDirectory(_directory);
+        await File.WriteAllTextAsync(
+            Path.Combine(_directory, "USD.json"),
+            """
+            {
+              "baseCurrency": "USD",
+              "rates": { "EUROS": 0.9 },
+              "retrievedAt": "2026-08-18T12:00:00+00:00",
+              "source": "Test rates"
+            }
+            """);
+        var cache = new JsonCurrencyRateCache(_directory);
+
+        Assert.Null(await cache.LoadAsync("USD"));
+    }
+
+    [Fact]
+    public async Task SaveAsync_LeavesNoTemporaryFileBehind()
+    {
+        var cache = new JsonCurrencyRateCache(_directory);
+
+        await cache.SaveAsync(new CurrencyRateSnapshot(
+            "USD",
+            new Dictionary<string, decimal> { ["EUR"] = 0.91m },
+            DateTimeOffset.UnixEpoch,
+            "Test rates"));
+
+        Assert.True(File.Exists(Path.Combine(_directory, "USD.json")));
+        Assert.Empty(Directory.GetFiles(_directory, "*.tmp"));
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_directory))
