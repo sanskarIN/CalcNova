@@ -265,6 +265,7 @@ public partial class MainView : UserControl
         // to exist before the check-box pass runs.
         if (_subscribedViewModel is not null)
         {
+            AttachCalculatorExpressionEditor(_subscribedViewModel.Calculator);
             EnsureCodePointMetadataPanel(_subscribedViewModel.CodePoint);
             EnsureGraphPlot(_subscribedViewModel.Graphing);
         }
@@ -528,6 +529,12 @@ public partial class MainView : UserControl
 
     private void AttachCalculatorExpressionEditor(CalculatorViewModel calculator)
     {
+        if (_calculatorExpressionTextBox is not null &&
+            ReferenceEquals(_calculatorEditorViewModel, calculator))
+        {
+            return;
+        }
+
         DetachCalculatorExpressionEditor();
 
         var textBox = this.GetVisualDescendants()
