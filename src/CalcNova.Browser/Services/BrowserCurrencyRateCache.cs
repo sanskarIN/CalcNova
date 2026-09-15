@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using CalcNova.Currency;
 
 namespace CalcNova.Browser.Services;
@@ -6,7 +7,6 @@ namespace CalcNova.Browser.Services;
 internal sealed class BrowserCurrencyRateCache : ICurrencyRateCache
 {
     private const string KeyPrefix = "calcnova.currency.";
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     public async Task<CurrencyRateSnapshot?> LoadAsync(string baseCurrency, CancellationToken cancellationToken = default)
     {
@@ -20,7 +20,7 @@ internal sealed class BrowserCurrencyRateCache : ICurrencyRateCache
 
         try
         {
-            var model = JsonSerializer.Deserialize<StoredSnapshot>(json, JsonOptions);
+            var model = JsonSerializer.Deserialize(json, BrowserCurrencyJsonContext.Default.BrowserStoredCurrencySnapshot);
             return model is null
                 ? null
                 : new CurrencyRateSnapshot(model.BaseCurrency, model.Rates, model.RetrievedAt, model.Source);
@@ -45,17 +45,24 @@ internal sealed class BrowserCurrencyRateCache : ICurrencyRateCache
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         await BrowserInterop.EnsureInitializedAsync(cancellationToken);
-        var model = new StoredSnapshot(
+        var model = new BrowserStoredCurrencySnapshot(
             snapshot.BaseCurrency,
             snapshot.Rates.ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.OrdinalIgnoreCase),
             snapshot.RetrievedAt,
             snapshot.Source);
-        BrowserInterop.SetItem(KeyPrefix + snapshot.BaseCurrency, JsonSerializer.Serialize(model, JsonOptions));
+        BrowserInterop.SetItem(KeyPrefix + snapshot.BaseCurrency, JsonSerializer.Serialize(model, BrowserCurrencyJsonContext.Default.BrowserStoredCurrencySnapshot));
     }
-
-    private sealed record StoredSnapshot(
-        string BaseCurrency,
-        Dictionary<string, decimal> Rates,
-        DateTimeOffset RetrievedAt,
-        string Source);
 }
+
+internal sealed record BrowserStoredCurrencySnapshot(
+    string BaseCurrency,
+    Dictionary<string, decimal> Rates,
+    DateTimeOffset RetrievedAt,
+    string Source);
+
+// Source-generated metadata keeps this serialization trim-safe: the browser head is
+// published with trimming, and the reflection-based overloads cannot tell the trimmer
+// which members survive.
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
+[JsonSerializable(typeof(BrowserStoredCurrencySnapshot))]
+internal sealed partial class BrowserCurrencyJsonContext : JsonSerializerContext;

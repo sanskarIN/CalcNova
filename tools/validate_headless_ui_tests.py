@@ -115,7 +115,7 @@ def validate(root: Path) -> list[str]:
 
     for marker in (
         "window.KeyPressQwerty(PhysicalKey.ArrowRight, RawInputModifiers.None)",
-        "window.KeyPressQwerty(PhysicalKey.NumpadAdd, RawInputModifiers.None)",
+        "window.KeyPressQwerty(PhysicalKey.NumPadAdd, RawInputModifiers.None)",
         "window.KeyPressQwerty(PhysicalKey.Home, RawInputModifiers.None)",
         "window.KeyPressQwerty(PhysicalKey.F, RawInputModifiers.None)",
         "plot.Viewport",

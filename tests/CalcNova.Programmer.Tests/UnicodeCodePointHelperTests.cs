@@ -1,10 +1,11 @@
-using CalcNova.Programmer;
 using Xunit;
 
 namespace CalcNova.Programmer.Tests;
 
 public sealed class UnicodeCodePointHelperTests
 {
+    private static readonly string[] ExpectedSurrogatePairCodePoints = ["U+0041", "U+1F600"];
+
     [Theory]
     [InlineData("U+0041", 0x41)]
     [InlineData("0x03C0", 0x03C0)]
@@ -34,7 +35,7 @@ public sealed class UnicodeCodePointHelperTests
     {
         var codePoints = UnicodeCodePointHelper.GetCodePoints("A😀");
 
-        Assert.Equal(new[] { "U+0041", "U+1F600" }, codePoints);
+        Assert.Equal(ExpectedSurrogatePairCodePoints, codePoints);
     }
 
     [Fact]

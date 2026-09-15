@@ -26,6 +26,7 @@
     <Project Path="tests/CalcNova.DateTime.Tests/CalcNova.DateTime.Tests.csproj" />
     <Project Path="tests/CalcNova.Currency.Tests/CalcNova.Currency.Tests.csproj" />
     <Project Path="tests/CalcNova.Persistence.Tests/CalcNova.Persistence.Tests.csproj" />
+    <Project Path="tests/CalcNova.Platform.Tests/CalcNova.Platform.Tests.csproj" />
     <Project Path="tests/CalcNova.App.Tests/CalcNova.App.Tests.csproj" />
   </Folder>
 </Solution>

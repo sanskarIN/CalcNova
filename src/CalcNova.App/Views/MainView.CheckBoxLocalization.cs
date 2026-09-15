@@ -73,6 +73,28 @@ public partial class MainView
         _localizedCheckBoxes.Clear();
     }
 
+    /// <summary>
+    /// The TabControl is not reachable when this view is first attached, because the
+    /// template has not been applied yet. The shell's layout hook calls this so the
+    /// tab subscription and the dynamically built toolbar and notice still appear.
+    /// </summary>
+    internal void CompleteCheckBoxLocalizationWiring()
+    {
+        if (_checkBoxLocalizationViewModel is null || _checkBoxLocalizationTabControl is not null)
+        {
+            return;
+        }
+
+        _checkBoxLocalizationTabControl = this.GetVisualDescendants().OfType<TabControl>().FirstOrDefault();
+        if (_checkBoxLocalizationTabControl is null)
+        {
+            return;
+        }
+
+        _checkBoxLocalizationTabControl.SelectionChanged += HandleCheckBoxTabSelectionChanged;
+        RefreshLocalizedCheckBoxes();
+    }
+
     private void HandleCheckBoxCultureChanged(CultureInfo culture) => RefreshLocalizedCheckBoxes();
 
     private void HandleCheckBoxTabSelectionChanged(object? sender, SelectionChangedEventArgs e) =>

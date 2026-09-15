@@ -1,13 +1,13 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using CalcNova.Platform.Settings;
 
 namespace CalcNova.Browser.Services;
 
-public sealed class BrowserSettingsRepository : ISettingsRepository
+public sealed class BrowserSettingsRepository : ISettingsRepository, IDisposable
 {
     private const string StorageKey = "calcnova.settings.v1";
-    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
     private readonly SemaphoreSlim _gate = new(1, 1);
 
     public async Task<AppSettings> LoadAsync(CancellationToken cancellationToken = default)
@@ -24,7 +24,7 @@ public sealed class BrowserSettingsRepository : ISettingsRepository
 
             try
             {
-                return Validate(JsonSerializer.Deserialize<AppSettings>(json, SerializerOptions) ?? new AppSettings());
+                return Validate(JsonSerializer.Deserialize(json, BrowserSettingsJsonContext.Default.AppSettings) ?? new AppSettings());
             }
             catch (JsonException)
             {
@@ -46,13 +46,15 @@ public sealed class BrowserSettingsRepository : ISettingsRepository
         try
         {
             await BrowserInterop.EnsureInitializedAsync(cancellationToken);
-            BrowserInterop.SetItem(StorageKey, JsonSerializer.Serialize(settings, SerializerOptions));
+            BrowserInterop.SetItem(StorageKey, JsonSerializer.Serialize(settings, BrowserSettingsJsonContext.Default.AppSettings));
         }
         finally
         {
             _gate.Release();
         }
     }
+
+    public void Dispose() => _gate.Dispose();
 
     private static AppSettings Validate(AppSettings settings)
     {
@@ -98,7 +100,11 @@ public sealed class BrowserSettingsRepository : ISettingsRepository
 
         try
         {
-            _ = CultureInfo.GetCultureInfo(cultureName);
+            // predefinedOnly matters: with ICU, the lenient overload accepts almost any
+            // well-formed tag and invents a culture, so "not-a-real-culture" would be
+            // stored and later resolve to a culture named "not". Only Windows NLS
+            // rejected it, which made this validation silently platform-dependent.
+            _ = CultureInfo.GetCultureInfo(cultureName, predefinedOnly: true);
         }
         catch (CultureNotFoundException exception)
         {
@@ -130,3 +136,9 @@ public sealed class BrowserSettingsRepository : ISettingsRepository
         }
     }
 }
+
+// Source-generated metadata keeps this serialization trim-safe under the browser
+// head's trimming publish.
+[JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
+[JsonSerializable(typeof(AppSettings))]
+internal sealed partial class BrowserSettingsJsonContext : JsonSerializerContext;

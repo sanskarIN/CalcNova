@@ -65,7 +65,10 @@ def validate(root: Path) -> list[str]:
         failures.append("Missing global.json SDK policy.")
     else:
         source = global_json.read_text(encoding="utf-8")
-        for marker in ('"version": "10.0.400"', '"rollForward": "latestFeature"', '"allowPrerelease": false'):
+        # 10.0.100 is the .NET 10 GA feature band. Pinning a band that has not shipped
+        # makes every `dotnet` command in the repository fail SDK resolution, CI included;
+        # rollForward "latestFeature" still accepts any higher band once one exists.
+        for marker in ('"version": "10.0.100"', '"rollForward": "latestFeature"', '"allowPrerelease": false'):
             if marker not in source:
                 failures.append(f"global.json is missing SDK policy marker: {marker}")
 

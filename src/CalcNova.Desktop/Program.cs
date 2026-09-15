@@ -1,5 +1,4 @@
 using Avalonia;
-using CalcNova.App;
 using CalcNova.App.Services;
 using CalcNova.Desktop.Services;
 using CalcNova.Persistence.Currency;
@@ -18,7 +17,7 @@ internal static class Program
     }
 
     public static AppBuilder BuildAvaloniaApp() =>
-        AppBuilder.Configure<App>()
+        AppBuilder.Configure<CalcNova.App.App>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();

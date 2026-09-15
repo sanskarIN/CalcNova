@@ -6,7 +6,7 @@ using CalcNova.Platform.Settings;
 
 namespace CalcNova.App.ViewModels;
 
-public sealed class SettingsViewModel : ViewModelBase
+public sealed class SettingsViewModel : ViewModelBase, IDisposable
 {
     private readonly ISettingsRepository? _repository;
     private readonly IAppLocalizer _localizer;
@@ -39,6 +39,7 @@ public sealed class SettingsViewModel : ViewModelBase
         ResetCommand = new AsyncRelayCommand(_ => ResetAsync());
         CompleteOnboardingCommand = new AsyncRelayCommand(_ => CompleteOnboardingAsync());
         SkipOnboardingCommand = new AsyncRelayCommand(_ => SkipOnboardingAsync());
+        RestartOnboardingCommand = new AsyncRelayCommand(_ => RestartOnboardingAsync());
     }
 
     public event Action<AppSettings>? SettingsChanged;
@@ -135,6 +136,8 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public ICommand SkipOnboardingCommand { get; }
 
+    public ICommand RestartOnboardingCommand { get; }
+
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -214,17 +217,35 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public Task CompleteOnboardingAsync(CancellationToken cancellationToken = default)
     {
-        return PersistOnboardingCompletionAsync("Onboarding completed.", cancellationToken);
+        return PersistOnboardingVersionAsync(
+            OnboardingPolicy.MarkCurrentVersionCompleted(),
+            "Onboarding completed.",
+            cancellationToken);
     }
 
     public Task SkipOnboardingAsync(CancellationToken cancellationToken = default)
     {
-        return PersistOnboardingCompletionAsync("Onboarding skipped.", cancellationToken);
+        return PersistOnboardingVersionAsync(
+            OnboardingPolicy.MarkCurrentVersionCompleted(),
+            "Onboarding skipped.",
+            cancellationToken);
     }
 
-    private async Task PersistOnboardingCompletionAsync(string successMessage, CancellationToken cancellationToken)
+    /// <summary>
+    /// Clears the recorded onboarding version so the introduction is shown again,
+    /// leaving every other preference untouched.
+    /// </summary>
+    public Task RestartOnboardingAsync(CancellationToken cancellationToken = default)
     {
-        _completedOnboardingVersion = OnboardingPolicy.MarkCurrentVersionCompleted();
+        return PersistOnboardingVersionAsync(0, "Introduction will be shown again.", cancellationToken);
+    }
+
+    private async Task PersistOnboardingVersionAsync(
+        int completedOnboardingVersion,
+        string successMessage,
+        CancellationToken cancellationToken)
+    {
+        _completedOnboardingVersion = OnboardingPolicy.NormalizeCompletedVersion(completedOnboardingVersion);
         OnPropertyChanged(nameof(CompletedOnboardingVersion));
         OnPropertyChanged(nameof(ShouldShowOnboarding));
 
@@ -344,6 +365,8 @@ public sealed class SettingsViewModel : ViewModelBase
         OnPropertyChanged(nameof(CompletedOnboardingVersion));
         OnPropertyChanged(nameof(ShouldShowOnboarding));
     }
+
+    public void Dispose() => _saveGate.Dispose();
 
     private void ApplyCulture(string? cultureName)
     {

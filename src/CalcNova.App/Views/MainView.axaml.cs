@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -25,7 +26,7 @@ public partial class MainView : UserControl
 
     private readonly Dictionary<TextBlock, AppStringKey> _localizedTextBlocks = new();
     private readonly Dictionary<Button, AppStringKey> _localizedButtons = new();
-    private readonly Dictionary<TextBox, AppStringKey> _localizedWatermarks = new();
+    private readonly Dictionary<TextBox, AppStringKey> _localizedPlaceholders = new();
     private MainViewModel? _subscribedViewModel;
     private MainViewModel? _localizationViewModel;
     private TabControl? _localizationTabControl;
@@ -42,6 +43,29 @@ public partial class MainView : UserControl
     {
         InitializeComponent();
         AttachOnboardingOverlay();
+
+        // Mode switching is a shell-wide shortcut, so it has to be seen before the
+        // focused control gets a chance to consume it. TabControl marks Ctrl+PageUp and
+        // Ctrl+PageDown handled while the event is still below this view, so a
+        // bubbling handler here is never reached.
+        AddHandler(KeyDownEvent, HandleShellNavigationKeyDown, RoutingStrategies.Tunnel);
+    }
+
+    private void HandleShellNavigationKeyDown(object? sender, KeyEventArgs eventArgs)
+    {
+        if (DataContext is not MainViewModel viewModel || viewModel.Settings.ShouldShowOnboarding)
+        {
+            return;
+        }
+
+        var navigationAction = ShellKeyboardShortcut.GetNavigationAction(eventArgs.Key, eventArgs.KeyModifiers);
+        if (navigationAction == ShellNavigationAction.None)
+        {
+            return;
+        }
+
+        ApplyShellNavigation(viewModel, navigationAction);
+        eventArgs.Handled = true;
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
@@ -97,6 +121,8 @@ public partial class MainView : UserControl
         AttachCalculatorExpressionEditor(viewModel.Calculator);
         EnsureCodePointMetadataPanel(viewModel.CodePoint);
         EnsureGraphPlot(viewModel.Graphing);
+        LayoutUpdated -= HandleShellLayoutUpdated;
+        LayoutUpdated += HandleShellLayoutUpdated;
 
         await viewModel.InitializeAsync();
         CaptureLocalizedControls();
@@ -112,6 +138,8 @@ public partial class MainView : UserControl
 
     private void OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs eventArgs)
     {
+        LayoutUpdated -= HandleShellLayoutUpdated;
+
         if (AppComposition.Dependencies.ClipboardService is AvaloniaClipboardService clipboardService)
         {
             clipboardService.Attach(null);
@@ -141,14 +169,6 @@ public partial class MainView : UserControl
 
         if (viewModel.Settings.ShouldShowOnboarding)
         {
-            return;
-        }
-
-        var navigationAction = ShellKeyboardShortcut.GetNavigationAction(eventArgs.Key, eventArgs.KeyModifiers);
-        if (navigationAction != ShellNavigationAction.None)
-        {
-            ApplyShellNavigation(viewModel, navigationAction);
-            eventArgs.Handled = true;
             return;
         }
 
@@ -234,7 +254,45 @@ public partial class MainView : UserControl
         _localizationTabControl = null;
         _localizedTextBlocks.Clear();
         _localizedButtons.Clear();
-        _localizedWatermarks.Clear();
+        _localizedPlaceholders.Clear();
+    }
+
+    /// <summary>
+    /// AttachedToVisualTree fires before this control's template is applied, so the
+    /// TabControl and the per-mode panels are not reachable through
+    /// GetVisualDescendants yet. Finish the wiring on the first layout pass that
+    /// exposes them, and keep re-checking because TabControl realizes each mode's
+    /// content only when that tab is first selected.
+    /// </summary>
+    private void HandleShellLayoutUpdated(object? sender, EventArgs eventArgs)
+    {
+        if (_localizationViewModel is not null && _localizationTabControl is null)
+        {
+            _localizationTabControl = this.GetVisualDescendants().OfType<TabControl>().FirstOrDefault();
+            if (_localizationTabControl is not null)
+            {
+                _localizationTabControl.SelectionChanged += HandleLocalizationSelectionChanged;
+                CaptureLocalizedControls();
+                ApplyLocalization();
+            }
+        }
+
+        // Order matters: the viewport toolbar is built around the plot, so the plot has
+        // to exist before the check-box pass runs.
+        if (_subscribedViewModel is not null)
+        {
+            AttachCalculatorExpressionEditor(_subscribedViewModel.Calculator);
+            EnsureCodePointMetadataPanel(_subscribedViewModel.CodePoint);
+            EnsureGraphPlot(_subscribedViewModel.Graphing);
+        }
+
+        CompleteCheckBoxLocalizationWiring();
+        RefreshLocalizedCheckBoxes();
+
+        // A tab's content is realized during the layout pass that follows
+        // SelectionChanged, so the capture driven by that event runs while the new
+        // mode's controls do not exist yet. Re-capturing here picks them up.
+        RefreshLocalizationTargets();
     }
 
     private void HandleCultureChanged(CultureInfo culture) => RefreshLocalizationTargets();
@@ -269,6 +327,16 @@ public partial class MainView : UserControl
     {
         foreach (var textBlock in this.GetVisualDescendants().OfType<TextBlock>())
         {
+            // Tab headers are localized from ShellLocalization.GetModeHeaders further
+            // down, so they must not also be captured by English literal. The Converter
+            // tab reads "Convert", which collides with the Convert action label and
+            // would relabel the tab with that action's translation instead of the mode
+            // name.
+            if (textBlock.FindAncestorOfType<TabItem>() is not null)
+            {
+                continue;
+            }
+
             if (!_localizedTextBlocks.ContainsKey(textBlock) &&
                 ShellLocalization.TryGetLiteralKey(textBlock.Text, out var key))
             {
@@ -288,11 +356,11 @@ public partial class MainView : UserControl
 
         foreach (var textBox in this.GetVisualDescendants().OfType<TextBox>())
         {
-            if (!_localizedWatermarks.ContainsKey(textBox) &&
-                textBox.Watermark is string literal &&
+            if (!_localizedPlaceholders.ContainsKey(textBox) &&
+                textBox.PlaceholderText is string literal &&
                 ShellLocalization.TryGetLiteralKey(literal, out var key))
             {
-                _localizedWatermarks[textBox] = key;
+                _localizedPlaceholders[textBox] = key;
             }
         }
     }
@@ -315,9 +383,9 @@ public partial class MainView : UserControl
             button.Content = localizer[key];
         }
 
-        foreach (var (textBox, key) in _localizedWatermarks)
+        foreach (var (textBox, key) in _localizedPlaceholders)
         {
-            textBox.Watermark = localizer[key];
+            textBox.PlaceholderText = localizer[key];
         }
 
         var modeHeaders = ShellLocalization.GetModeHeaders(localizer);
@@ -477,6 +545,12 @@ public partial class MainView : UserControl
 
     private void AttachCalculatorExpressionEditor(CalculatorViewModel calculator)
     {
+        if (_calculatorExpressionTextBox is not null &&
+            ReferenceEquals(_calculatorEditorViewModel, calculator))
+        {
+            return;
+        }
+
         DetachCalculatorExpressionEditor();
 
         var textBox = this.GetVisualDescendants()

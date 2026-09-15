@@ -4,10 +4,7 @@ public sealed class BitGroupViewModel
 {
     public BitGroupViewModel(int byteIndex, IReadOnlyList<BitCellViewModel> bits)
     {
-        if (byteIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(byteIndex));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(byteIndex);
 
         ArgumentNullException.ThrowIfNull(bits);
         if (bits.Count is < 1 or > 8)

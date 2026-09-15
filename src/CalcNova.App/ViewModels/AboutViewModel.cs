@@ -69,7 +69,7 @@ public sealed class AboutViewModel : ViewModelBase
 
     public ICommand EmailSupportCommand { get; }
 
-    private ICommand CreateCommand(Uri uri) => new AsyncRelayCommand(_ => OpenAsync(uri));
+    private AsyncRelayCommand CreateCommand(Uri uri) => new(_ => OpenAsync(uri));
 
     private async Task OpenAsync(Uri uri)
     {

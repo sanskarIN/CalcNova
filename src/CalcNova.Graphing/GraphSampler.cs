@@ -42,6 +42,7 @@ public sealed class GraphSampler
         var segments = new List<GraphSegment>();
         var current = new List<GraphPoint>();
         var invalidSamples = 0;
+        string? firstSampleError = null;
         double? previousY = null;
         var step = (options.MaximumX - options.MinimumX) / (options.SampleCount - 1);
 
@@ -56,6 +57,7 @@ public sealed class GraphSampler
             if (!evaluation.Success)
             {
                 invalidSamples++;
+                firstSampleError ??= evaluation.ErrorMessage;
                 CloseCurrentSegment(segments, current);
                 previousY = null;
                 continue;
@@ -65,6 +67,7 @@ public sealed class GraphSampler
             if (!double.IsFinite(y) || Math.Abs(y) > options.MaximumAbsoluteY)
             {
                 invalidSamples++;
+                firstSampleError ??= "The expression has no finite value inside the sampled range.";
                 CloseCurrentSegment(segments, current);
                 previousY = null;
                 continue;
@@ -80,10 +83,21 @@ public sealed class GraphSampler
         }
 
         CloseCurrentSegment(segments, current);
+
+        // Compiling only checks syntax, so an unknown function or an expression that is
+        // undefined across the whole range parses and then fails at every sample. Without
+        // this the caller is handed a successful result holding no points and plots a
+        // blank graph with nothing to explain it.
+        if (segments.Count == 0)
+        {
+            return GraphSamplingResult.Failed(
+                firstSampleError ?? "The expression produced no plottable points in the sampled range.");
+        }
+
         return GraphSamplingResult.Completed(segments, invalidSamples);
     }
 
-    private static void CloseCurrentSegment(ICollection<GraphSegment> segments, List<GraphPoint> current)
+    private static void CloseCurrentSegment(List<GraphSegment> segments, List<GraphPoint> current)
     {
         if (current.Count > 0)
         {

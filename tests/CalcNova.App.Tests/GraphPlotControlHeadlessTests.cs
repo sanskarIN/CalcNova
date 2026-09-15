@@ -26,7 +26,7 @@ public sealed class GraphPlotControlHeadlessTests
             Assert.Equal(-8d, plot.Viewport.MinimumX, precision: 10);
             Assert.Equal(12d, plot.Viewport.MaximumX, precision: 10);
 
-            window.KeyPressQwerty(PhysicalKey.NumpadAdd, RawInputModifiers.None);
+            window.KeyPressQwerty(PhysicalKey.NumPadAdd, RawInputModifiers.None);
             Assert.Equal(16.4d, plot.Viewport.Width, precision: 10);
             Assert.Equal(16.4d, plot.Viewport.Height, precision: 10);
         }
@@ -47,7 +47,7 @@ public sealed class GraphPlotControlHeadlessTests
         {
             Assert.True(plot.Focus());
             window.KeyPressQwerty(PhysicalKey.ArrowLeft, RawInputModifiers.None);
-            window.KeyPressQwerty(PhysicalKey.NumpadSubtract, RawInputModifiers.None);
+            window.KeyPressQwerty(PhysicalKey.NumPadSubtract, RawInputModifiers.None);
             Assert.NotEqual(new GraphViewport(-10d, 10d, -10d, 10d), plot.Viewport);
 
             window.KeyPressQwerty(PhysicalKey.Home, RawInputModifiers.None);

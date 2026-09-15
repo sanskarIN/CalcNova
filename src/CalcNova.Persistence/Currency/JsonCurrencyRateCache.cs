@@ -3,7 +3,7 @@ using CalcNova.Currency;
 
 namespace CalcNova.Persistence.Currency;
 
-public sealed class JsonCurrencyRateCache : ICurrencyRateCache
+public sealed class JsonCurrencyRateCache : ICurrencyRateCache, IDisposable
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
@@ -87,6 +87,8 @@ public sealed class JsonCurrencyRateCache : ICurrencyRateCache
             _gate.Release();
         }
     }
+
+    public void Dispose() => _gate.Dispose();
 
     private string GetPath(string baseCurrency) => Path.Combine(_directory, $"{baseCurrency}.json");
 

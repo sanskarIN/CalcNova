@@ -8,10 +8,7 @@ public sealed class ConversionPairHistory
 
     public ConversionPairHistory(int maximumRecentPairs = 12)
     {
-        if (maximumRecentPairs <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maximumRecentPairs));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumRecentPairs);
 
         _maximumRecentPairs = maximumRecentPairs;
     }

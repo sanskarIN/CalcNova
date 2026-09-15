@@ -273,7 +273,7 @@ public readonly struct RationalNumber : IEquatable<RationalNumber>, IComparable<
         }
 
         var remaining = text[(marker + 1)..];
-        if (remaining.IndexOf('e') >= 0 || remaining.IndexOf('E') >= 0)
+        if (remaining.Contains('e') || remaining.Contains('E'))
         {
             throw new FormatException("Rational decimal text may contain only one exponent marker.");
         }

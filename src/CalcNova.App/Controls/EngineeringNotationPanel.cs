@@ -1,6 +1,6 @@
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data;
 using CalcNova.App.ViewModels;
 using CalcNova.Core.Numerics;
 
@@ -16,14 +16,16 @@ public sealed class EngineeringNotationPanel : Border
 
         var input = new TextBox
         {
-            Watermark = "Finite value or engineering notation",
+            PlaceholderText = "Finite value or engineering notation",
             MaxLength = EngineeringNotationFormatter.MaximumInputCharacters,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch
         };
-        input.Bind(TextBox.TextProperty, new Binding(nameof(EngineeringNotationViewModel.InputText))
-        {
-            Mode = BindingMode.TwoWay
-        });
+        input.Bind(
+            TextBox.TextProperty,
+            TrimSafeBinding.TwoWay<EngineeringNotationViewModel, string>(
+                nameof(EngineeringNotationViewModel.InputText),
+                static viewModel => viewModel.InputText,
+                static (viewModel, value) => viewModel.InputText = value));
 
         var precision = new NumericUpDown
         {
@@ -34,10 +36,12 @@ public sealed class EngineeringNotationPanel : Border
             Width = 100,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left
         };
-        precision.Bind(NumericUpDown.ValueProperty, new Binding(nameof(EngineeringNotationViewModel.SignificantDigits))
-        {
-            Mode = BindingMode.TwoWay
-        });
+        precision.Bind(
+            NumericUpDown.ValueProperty,
+            TrimSafeBinding.TwoWay<EngineeringNotationViewModel, int>(
+                nameof(EngineeringNotationViewModel.SignificantDigits),
+                static viewModel => viewModel.SignificantDigits,
+                static (viewModel, value) => viewModel.SignificantDigits = value));
 
         Child = new StackPanel
         {
@@ -70,37 +74,42 @@ public sealed class EngineeringNotationPanel : Border
                         precision
                     }
                 },
-                CreateCommandButton("Format", nameof(EngineeringNotationViewModel.FormatCommand)),
-                CreateCommandButton("Parse", nameof(EngineeringNotationViewModel.ParseCommand)),
-                CreateBoundTextBlock("Engineering: ", nameof(EngineeringNotationViewModel.FormattedText)),
-                CreateBoundTextBlock("Value: ", nameof(EngineeringNotationViewModel.ParsedValue)),
-                CreateBoundTextBlock(string.Empty, nameof(EngineeringNotationViewModel.ErrorMessage))
+                CreateCommandButton("Format", nameof(EngineeringNotationViewModel.FormatCommand), static viewModel => viewModel.FormatCommand),
+                CreateCommandButton("Parse", nameof(EngineeringNotationViewModel.ParseCommand), static viewModel => viewModel.ParseCommand),
+                CreateBoundTextBlock("Engineering: ", nameof(EngineeringNotationViewModel.FormattedText), static viewModel => viewModel.FormattedText),
+                CreateBoundTextBlock("Value: ", nameof(EngineeringNotationViewModel.ParsedValue), static viewModel => viewModel.ParsedValue),
+                CreateBoundTextBlock(string.Empty, nameof(EngineeringNotationViewModel.ErrorMessage), static viewModel => viewModel.ErrorMessage)
             }
         };
     }
 
-    private static Button CreateCommandButton(string label, string commandPropertyName)
+    private static Button CreateCommandButton(
+        string label,
+        string commandPropertyName,
+        Func<EngineeringNotationViewModel, ICommand> getter)
     {
         var button = new Button
         {
             Content = label,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left
         };
-        button.Bind(Button.CommandProperty, new Binding(commandPropertyName));
+        button.Bind(Button.CommandProperty, TrimSafeBinding.OneWay(commandPropertyName, getter));
         return button;
     }
 
-    private static TextBlock CreateBoundTextBlock(string prefix, string propertyName)
+    private static TextBlock CreateBoundTextBlock(
+        string prefix,
+        string propertyName,
+        Func<EngineeringNotationViewModel, string> getter)
     {
         var textBlock = new TextBlock
         {
             TextWrapping = Avalonia.Media.TextWrapping.Wrap,
             Opacity = 0.82
         };
-        textBlock.Bind(TextBlock.TextProperty, new Binding(propertyName)
-        {
-            StringFormat = string.IsNullOrEmpty(prefix) ? null : prefix + "{0}"
-        });
+        textBlock.Bind(
+            TextBlock.TextProperty,
+            TrimSafeBinding.OneWay(propertyName, getter, string.IsNullOrEmpty(prefix) ? null : prefix + "{0}"));
         return textBlock;
     }
 }

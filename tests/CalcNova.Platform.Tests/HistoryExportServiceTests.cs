@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using CalcNova.Platform.History;
 using Xunit;
@@ -71,7 +72,12 @@ public sealed class HistoryExportServiceTests
     public void Export_RejectsMoreThanConfiguredMaximumEntries()
     {
         var entries = Enumerable.Range(1, 5001)
-            .Select(index => new HistoryEntry(index, index.ToString(), index.ToString(), DateTimeOffset.UnixEpoch, false))
+            .Select(index => new HistoryEntry(
+                index,
+                index.ToString(CultureInfo.InvariantCulture),
+                index.ToString(CultureInfo.InvariantCulture),
+                DateTimeOffset.UnixEpoch,
+                false))
             .ToArray();
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>

@@ -1,4 +1,3 @@
-using CalcNova.Graphing;
 using Xunit;
 
 namespace CalcNova.Graphing.Tests;

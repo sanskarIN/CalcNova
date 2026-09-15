@@ -33,7 +33,17 @@ public static class EngineeringNotationFormatter
         if (Math.Abs(roundedMantissa) >= 1000d && exponent <= MaximumEngineeringExponent - 3)
         {
             roundedMantissa /= 1000d;
+            mantissa /= 1000d;
             exponent += 3;
+        }
+
+        // Rounding to nearest can lift a mantissa that sits just under double.MaxValue
+        // above it, so the text we are about to emit would no longer parse. Truncating
+        // toward zero at the same precision stays inside the representable range and is
+        // still accurate to the requested number of significant digits.
+        if (!double.IsFinite(ScaleByPowerOfTen(roundedMantissa, exponent)))
+        {
+            roundedMantissa = TruncateToSignificantDigits(mantissa, significantDigits);
         }
 
         var mantissaText = roundedMantissa.ToString($"G{significantDigits}", CultureInfo.InvariantCulture);
@@ -109,6 +119,24 @@ public static class EngineeringNotationFormatter
         }
 
         return value;
+    }
+
+    private static double TruncateToSignificantDigits(double value, int significantDigits)
+    {
+        if (value == 0d || !double.IsFinite(value))
+        {
+            return value;
+        }
+
+        var magnitude = (int)Math.Floor(Math.Log10(Math.Abs(value)));
+        var scale = Math.Pow(10d, significantDigits - 1 - magnitude);
+        if (!double.IsFinite(scale) || scale == 0d)
+        {
+            return value;
+        }
+
+        var truncated = Math.Truncate(value * scale) / scale;
+        return double.IsFinite(truncated) ? truncated : value;
     }
 
     private static int GetEngineeringExponent(double absoluteValue)

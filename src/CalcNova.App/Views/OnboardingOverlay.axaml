@@ -1,6 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:CalcNova.App.ViewModels"
              x:Class="CalcNova.App.Views.OnboardingOverlay"
+             x:DataType="vm:MainViewModel"
              IsVisible="{Binding Settings.ShouldShowOnboarding}">
   <Border Background="#CC000000" Padding="16">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled"

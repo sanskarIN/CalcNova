@@ -82,7 +82,9 @@ public sealed class EngineeringNotationPanelHeadlessTests
         try
         {
             Dispatcher.UIThread.RunJobs();
-            var input = Assert.Single(panel.GetVisualDescendants().OfType<TextBox>());
+            var input = Assert.Single(
+                panel.GetVisualDescendants().OfType<TextBox>(),
+                box => box.PlaceholderText == "Finite value or engineering notation");
 
             Assert.Equal(EngineeringNotationFormatter.MaximumInputCharacters, input.MaxLength);
         }

@@ -13,10 +13,7 @@ public static class CalculatorSelectionEditor
     {
         expression ??= string.Empty;
         ArgumentException.ThrowIfNullOrEmpty(token);
-        if (maximumLength < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maximumLength));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(maximumLength);
 
         var start = Math.Clamp(selectionStart, 0, expression.Length);
         var end = Math.Clamp(selectionEnd, 0, expression.Length);

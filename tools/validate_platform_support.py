@@ -29,7 +29,10 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
         "JsonCurrencyRateCache",
     ),
     "src/CalcNova.Browser/CalcNova.Browser.csproj": (
-        '<Project Sdk="Microsoft.NET.Sdk.Browser">',
+        # Microsoft.NET.Sdk.Browser does not exist and never shipped; the WebAssembly
+        # head is built by Microsoft.NET.Sdk.WebAssembly, so restore failed outright
+        # while this contract insisted on the other spelling.
+        '<Project Sdk="Microsoft.NET.Sdk.WebAssembly">',
         "<TargetFramework>net10.0-browser</TargetFramework>",
         '<PackageReference Include="Avalonia.Browser" />',
         '<ProjectReference Include="../CalcNova.App/CalcNova.App.csproj" />',
@@ -52,6 +55,14 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
         '<ProjectReference Include="../CalcNova.Persistence/CalcNova.Persistence.csproj" />',
     ),
     "src/CalcNova.Android/MainActivity.cs": (
+        # Avalonia 12 hosts the application on Android's Application object, so the
+        # launcher activity derives from the non-generic AvaloniaMainActivity and
+        # composition lives in MainApplication.cs below.
+        "public sealed class MainActivity : AvaloniaMainActivity",
+        "MainLauncher = true",
+    ),
+    "src/CalcNova.Android/MainApplication.cs": (
+        "AvaloniaAndroidApplication<SingleViewApp>",
         "FilesDir?.AbsolutePath",
         "SqliteCalculationHistoryRepository",
         "JsonSettingsRepository",

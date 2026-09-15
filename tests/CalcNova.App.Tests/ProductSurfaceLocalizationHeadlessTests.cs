@@ -20,7 +20,7 @@ public sealed class ProductSurfaceLocalizationHeadlessTests
             Dispatcher.UIThread.RunJobs();
 
             Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(), item => item.Text == "मुद्रा कन्वर्टर");
-            Assert.Contains(view.GetVisualDescendants().OfType<TextBox>(), item => Equals(item.Watermark, "राशि"));
+            Assert.Contains(view.GetVisualDescendants().OfType<TextBox>(), item => Equals(item.PlaceholderText, "राशि"));
             Assert.Contains(view.GetVisualDescendants().OfType<Button>(), item => Equals(item.Content, "दरें रीफ्रेश करें"));
         }
         finally
@@ -40,7 +40,7 @@ public sealed class ProductSurfaceLocalizationHeadlessTests
 
             Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(), item => item.Text == "गणना इतिहास");
             Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(), item => item.Text == "दिखाई दे रहा इतिहास निर्यात करें");
-            Assert.Contains(view.GetVisualDescendants().OfType<TextBox>(), item => Equals(item.Watermark, "खोजें"));
+            Assert.Contains(view.GetVisualDescendants().OfType<TextBox>(), item => Equals(item.PlaceholderText, "खोजें"));
             Assert.Contains(view.GetVisualDescendants().OfType<Button>(), item => Equals(item.Content, "सभी साफ़ करें"));
             Assert.Contains(view.GetVisualDescendants().OfType<Button>(), item => Equals(item.Content, "निर्यात पूर्वावलोकन बनाएँ"));
         }

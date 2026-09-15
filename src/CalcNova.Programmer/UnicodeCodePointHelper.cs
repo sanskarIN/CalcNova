@@ -97,10 +97,7 @@ public static class UnicodeCodePointHelper
 
     private static void ValidateInspectionLimit(int maximumRunes)
     {
-        if (maximumRunes <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maximumRunes));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumRunes);
     }
 
     private static void EnsureWithinInspectionLimit(int currentCount, int maximumRunes, string parameterName)

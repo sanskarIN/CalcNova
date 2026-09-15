@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 using CalcNova.App.Controls;
@@ -10,6 +9,8 @@ public partial class MainView
 {
     private BivariateStatisticsPanel? _bivariateStatisticsPanelExtension;
     private TextBlock? _aboutReleaseIdentityExtension;
+    private EngineeringNotationPanel? _engineeringNotationPanelExtension;
+    private RationalNumberPanel? _rationalNumberPanelExtension;
 
     protected override void OnDataContextChanged(EventArgs eventArgs)
     {
@@ -19,14 +20,82 @@ public partial class MainView
         LayoutUpdated += HandleBivariateStatisticsLayoutUpdated;
         DetachBivariateStatisticsPanel();
         DetachAboutReleaseIdentity();
+        DetachCalculatorFeaturePanels();
         EnsureBivariateStatisticsPanel();
         EnsureAboutReleaseIdentity();
+        EnsureCalculatorFeaturePanels();
     }
 
     private void HandleBivariateStatisticsLayoutUpdated(object? sender, EventArgs eventArgs)
     {
         EnsureBivariateStatisticsPanel();
         EnsureAboutReleaseIdentity();
+        EnsureCalculatorFeaturePanels();
+    }
+
+    /// <summary>
+    /// Adds the supplemental Calculator-mode panels described by
+    /// docs/ENGINEERING_NOTATION.md and docs/EXACT_RATIONALS.md. Each panel owns its own
+    /// view model, so the shell only has to place it once the Calculator tab is realized.
+    /// </summary>
+    private void EnsureCalculatorFeaturePanels()
+    {
+        if (DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        var calculatorPanel = this.GetVisualDescendants()
+            .OfType<StackPanel>()
+            .FirstOrDefault(panel => ReferenceEquals(panel.DataContext, viewModel.Calculator));
+        if (calculatorPanel is null)
+        {
+            return;
+        }
+
+        if (_engineeringNotationPanelExtension?.Parent is null)
+        {
+            _engineeringNotationPanelExtension =
+                calculatorPanel.Children.OfType<EngineeringNotationPanel>().FirstOrDefault();
+            if (_engineeringNotationPanelExtension is null)
+            {
+                _engineeringNotationPanelExtension = new EngineeringNotationPanel
+                {
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch
+                };
+                calculatorPanel.Children.Add(_engineeringNotationPanelExtension);
+            }
+        }
+
+        if (_rationalNumberPanelExtension?.Parent is null)
+        {
+            _rationalNumberPanelExtension =
+                calculatorPanel.Children.OfType<RationalNumberPanel>().FirstOrDefault();
+            if (_rationalNumberPanelExtension is null)
+            {
+                _rationalNumberPanelExtension = new RationalNumberPanel
+                {
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch
+                };
+                calculatorPanel.Children.Add(_rationalNumberPanelExtension);
+            }
+        }
+    }
+
+    private void DetachCalculatorFeaturePanels()
+    {
+        if (_engineeringNotationPanelExtension?.Parent is Panel engineeringParent)
+        {
+            engineeringParent.Children.Remove(_engineeringNotationPanelExtension);
+        }
+
+        if (_rationalNumberPanelExtension?.Parent is Panel rationalParent)
+        {
+            rationalParent.Children.Remove(_rationalNumberPanelExtension);
+        }
+
+        _engineeringNotationPanelExtension = null;
+        _rationalNumberPanelExtension = null;
     }
 
     private void EnsureBivariateStatisticsPanel()

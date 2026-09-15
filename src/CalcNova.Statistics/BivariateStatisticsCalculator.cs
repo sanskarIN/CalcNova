@@ -66,7 +66,7 @@ public sealed class BivariateStatisticsCalculator
         }
 
         var populationCovariance = coMoment / count;
-        var sampleCovariance = count > 1 ? coMoment / (count - 1) : null;
+        double? sampleCovariance = count > 1 ? coMoment / (count - 1) : null;
 
         double? correlation = null;
         if (sumSquaredX > 0d && sumSquaredY > 0d)
@@ -87,7 +87,7 @@ public sealed class BivariateStatisticsCalculator
             }
         }
 
-        var rSquared = correlation is null ? null : correlation.Value * correlation.Value;
+        double? rSquared = correlation is null ? null : correlation.Value * correlation.Value;
         return new BivariateStatisticsSummary(
             count,
             meanX,

@@ -23,9 +23,50 @@ dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
 dotnet_diagnostic.IDE0005.severity = warning
 dotnet_diagnostic.CA2007.severity = none
 
+# CA1822 is valuable on non-public members, where a static helper is simply the
+# accurate declaration. On the public surface it would force ExpressionEvaluator,
+# EquationSolver, StatisticsCalculator and BivariateStatisticsCalculator to expose
+# static methods, but those types are constructed and injected on purpose
+# (ExpressionEvaluator is passed to CalculationSession, GraphSampler,
+# CalculatorPercentageTransformer, ScientificCalculator and GraphNumericalAnalyzer),
+# and a static member cannot be called through an instance. Keep the rule where it
+# helps and stop it from dictating the public shape of those services.
+dotnet_code_quality.CA1822.api_surface = private, internal
+
+# CA1720 treats Integer, Decimal, Single and Signed as type names. In a calculator
+# they are the domain vocabulary: NumberKind.Integer and NumberKind.Decimal name the
+# numeric domains NumberValue stores, ProgrammerViewModel.Decimal is the base-10
+# representation shown beside Binary, Octal and Hexadecimal, Signed selects
+# two's-complement interpretation, and GraphPlotMode.Single is one plotted series
+# rather than many. No alternative spelling reads better, and these names are bound
+# from XAML and published on NumberValue, so renaming them would break callers.
+dotnet_diagnostic.CA1720.severity = none
+
+# CA1725 wants every override to reuse the base parameter name, which for Avalonia
+# input overrides is the single letter e. This codebase names event arguments
+# eventArgs everywhere, including in the non-override handlers CA1725 never sees, and
+# tools/validate_graph_keyboard.py pins that spelling as a contract marker for the
+# GraphPlotControl keyboard path. Renaming only the overrides would split the
+# convention in half and break that contract, so keep the house spelling.
+dotnet_diagnostic.CA1725.severity = none
+
 [*.{axaml,xml,props,targets,csproj,slnx}]
 indent_style = space
 indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
+
+# Test methods use the Member_Scenario_Expectation convention throughout, which is
+# what makes a failing test name self-describing. CA1707 targets library naming and
+# has no bearing on assemblies that are never referenced as an API.
+[tests/**/*.cs]
+dotnet_diagnostic.CA1707.severity = none
+
+# xUnit1051 asks every call that accepts a CancellationToken to be handed
+# TestContext.Current.CancellationToken so a hung test cancels promptly. These are
+# fast in-process unit tests over local files and in-memory fakes, with no blocking
+# waits to interrupt, so threading the token through would add noise at 144 call
+# sites without changing what any test does. This mirrors the repository's existing
+# decision to switch CA2007 off rather than sprinkle ConfigureAwait.
+dotnet_diagnostic.xUnit1051.severity = none

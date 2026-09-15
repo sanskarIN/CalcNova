@@ -209,7 +209,7 @@ public sealed class MainViewHeadlessTests
             var expressionBox = view.GetVisualDescendants()
                 .OfType<TextBox>()
                 .First(textBox => ReferenceEquals(textBox.DataContext, viewModel.Calculator));
-            Assert.Equal("अभिव्यक्ति दर्ज करें", expressionBox.Watermark);
+            Assert.Equal("अभिव्यक्ति दर्ज करें", expressionBox.PlaceholderText);
         }
         finally
         {
