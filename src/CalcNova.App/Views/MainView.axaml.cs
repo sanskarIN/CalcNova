@@ -271,6 +271,11 @@ public partial class MainView : UserControl
 
         CompleteCheckBoxLocalizationWiring();
         RefreshLocalizedCheckBoxes();
+
+        // A tab's content is realized during the layout pass that follows
+        // SelectionChanged, so the capture driven by that event runs while the new
+        // mode's controls do not exist yet. Re-capturing here picks them up.
+        RefreshLocalizationTargets();
     }
 
     private void HandleCultureChanged(CultureInfo culture) => RefreshLocalizationTargets();
