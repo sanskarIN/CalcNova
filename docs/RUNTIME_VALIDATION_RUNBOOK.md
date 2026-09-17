@@ -1,4 +1,4 @@
-# CalcNova 2.8.03 Runtime Validation Runbook
+# CalcNova 1.0.0 Runtime Validation Runbook
 
 Use this runbook only from a trusted checkout of the exact commit/tag being evaluated. Record the environment and the observed result for every command. Do not convert an unavailable or unobserved check into PASS.
 
@@ -20,9 +20,9 @@ A workflow definition, source validator, test file, or package template is not r
 Record:
 
 ```text
-Product version: 2.8.03
-Normalized package version: 2.8.3
-Normalized release tag: v2.8.3
+Product version: 1.0.0
+Normalized package version: 1.0.0
+Normalized release tag: v1.0.0
 Commit SHA:
 Branch/tag:
 Repository URL:
@@ -30,7 +30,7 @@ Validation date:
 Validator/operator:
 ```
 
-For release validation, use the exact normalized release tag `v2.8.3` and verify that it resolves to the expected commit before testing artifacts.
+For release validation, use the exact normalized release tag `v1.0.0` and verify that it resolves to the expected commit before testing artifacts.
 
 ## 2. SDK-independent source preflight
 
@@ -40,10 +40,10 @@ From the repository root:
 python tools/release_preflight.py
 ```
 
-For the CalcNova 2.8.03 release tag:
+For the CalcNova 1.0.0 release tag:
 
 ```bash
-python tools/release_preflight.py --tag v2.8.3
+python tools/release_preflight.py --tag v1.0.0
 ```
 
 Record the Python version and full command result.
@@ -166,8 +166,8 @@ On a supported Android emulator/device, verify:
 
 - Android workload/toolchain restore/build succeeds;
 - application id is `in.sanskar.calcnova`;
-- display version is `2.8.03`;
-- numeric build code is `20803`;
+- display version is `1.0.0`;
+- numeric build code is `10000`;
 - application launches;
 - portrait and landscape layouts;
 - representative phone/tablet widths;
@@ -179,7 +179,7 @@ On a supported Android emulator/device, verify:
 - TalkBack traversal and labels;
 - touch target usability;
 - high contrast/reduced motion behavior;
-- signed AAB only when external signing secrets are configured;
+- release-key-signed packages only when external signing secrets are configured;
 - store pre-launch/report checks when preparing publication.
 
 A normal build and a production-signed AAB are separate evidence rows.
@@ -252,7 +252,7 @@ Repeat the relevant checks for native and Browser storage rather than assuming o
 
 For every artifact intended for publication:
 
-- prove it came from `v2.8.3` or the exact maintenance tag being evaluated;
+- prove it came from `v1.0.0` or the exact maintenance tag being evaluated;
 - record build runner/toolchain;
 - verify expected architecture/runtime identifier;
 - verify checksum;
@@ -261,13 +261,13 @@ For every artifact intended for publication:
 - verify no debug-only configuration or signing secret is embedded;
 - verify required notices/licenses are present.
 
-For the 2.8.03 automated release workflow, expected artifact families are:
+For the 1.0.0 automated release workflow, expected artifact families are:
 
 - Windows `win-x64` desktop ZIP;
 - Linux `linux-x64` desktop ZIP;
 - macOS `osx-x64` desktop ZIP;
 - Browser/WebAssembly bundle;
-- signed Android AAB when signing secrets are configured;
+- Android app bundle and universal APK, release-key signed when signing secrets are configured;
 - generated SHA-256 checksum material.
 
 iOS exact-tag simulator validation is a separate validation path and is not represented as a signed App Store artifact.
@@ -288,8 +288,8 @@ Before release promotion, verify:
 Use a record similar to:
 
 ```text
-Product: CalcNova 2.8.03 — COMPLETE
-Normalized tag: v2.8.3
+Product: CalcNova 1.0.0 — COMPLETE
+Normalized tag: v1.0.0
 Source preflight: PASS / FAIL / BLOCKED / NOT RUN
 Restore: PASS / FAIL / BLOCKED / NOT RUN
 Format/analyzers: PASS / FAIL / BLOCKED / NOT RUN
@@ -308,4 +308,4 @@ Packaging/signing: PASS / FAIL / BLOCKED / NOT RUN
 Security/privacy/docs review: PASS / FAIL / BLOCKED / NOT RUN
 ```
 
-A stable release should only be promoted after every release-required evidence row has an acceptable observed result and any known limitation is documented. This evidence discipline is separate from the completed 2.8.03 source/product classification.
+A stable release should only be promoted after every release-required evidence row has an acceptable observed result and any known limitation is documented. This evidence discipline is separate from the completed 1.0.0 source/product classification.

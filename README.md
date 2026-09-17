@@ -20,11 +20,12 @@ CalcNova is a completed, open-source, privacy-first, cross-platform calculator b
 
 The public/product version is **1.0.0**, the .NET/NuGet package version is **1.0.0**, and the corresponding normalized release tag is **`v1.0.0`**. Android and iOS use numeric build code **`10000`**. See [`docs/VERSIONING.md`](docs/VERSIONING.md) for the complete mapping.
 
-CalcNova 1.0.0 is the first release. The 2.x numbers used during development were never published — the repository has no tag or artifact for any of them — so the version was reset to state the real position. Those development checkpoints are preserved in [`docs/releases/2.9.0.md`](docs/releases/2.9.0.md), [`docs/releases/2.9.5.md`](docs/releases/2.9.5.md), [`docs/releases/2.9.6.md`](docs/releases/2.9.6.md), and [`docs/releases/2.9.7.md`](docs/releases/2.9.7.md).
+CalcNova 1.0.0 is the first release. See [`docs/releases/1.0.0.md`](docs/releases/1.0.0.md) for the release checkpoint.
 
-### 2.9-series release and platform maintenance
+### Release consistency and platform maintenance
 
-The 2.9 series adds release-consistency and cross-platform maintenance without removing the completed calculator feature set:
+Alongside the calculator feature set, 1.0.0 ships the release-consistency and cross-platform
+infrastructure that keeps it honest:
 
 - centralized SDK-independent release identity parsing in `tools/release_identity.py`;
 - fail-closed consistency checks for display, SemVer, package, assembly/file, informational, release-tag, and mobile-build identities;

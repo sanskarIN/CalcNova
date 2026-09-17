@@ -2,7 +2,7 @@
 
 CalcNova graph analysis reuses the same project-owned expression engine used for normal calculations. The variable `x` is supplied through evaluation variables; graph analysis does not invoke arbitrary code.
 
-The 2.8.03 baseline contains bounded derivative, root-finding, integration, sampling, trace, multi-series, and export workflows. Numerical results are approximate by design and are presented as such.
+The 1.0.0 baseline contains bounded derivative, root-finding, integration, sampling, trace, multi-series, and export workflows. Numerical results are approximate by design and are presented as such.
 
 ## Scope
 
@@ -106,7 +106,7 @@ See [GRAPH_NUMERICAL_SAFETY.md](GRAPH_NUMERICAL_SAFETY.md).
 - multi-series presentation and legend integration;
 - viewport pan/zoom/reset/fit interaction.
 
-These are completed 2.8.03 source capabilities rather than remaining product work.
+These are completed 1.0.0 source capabilities rather than remaining product work.
 
 ## Multi-series behavior
 
@@ -164,7 +164,7 @@ Coverage should protect representative and boundary cases such as:
 - sampling/export bounds;
 - multi-series identity/presentation.
 
-Additional maintenance tests may expand coverage for trigonometric/domain-specific cases when useful, but they are not missing 2.8.03 implementation requirements.
+Additional maintenance tests may expand coverage for trigonometric/domain-specific cases when useful, but they are not missing 1.0.0 implementation requirements.
 
 ## Validation
 
@@ -184,7 +184,7 @@ PASS / FAIL / BLOCKED / NOT RUN
 
 See [RUNTIME_VALIDATION_RUNBOOK.md](RUNTIME_VALIDATION_RUNBOOK.md).
 
-## 2.8.03 classification
+## 1.0.0 classification
 
 - bounded derivative approximation: **COMPLETE**;
 - bounded bisection root finding: **COMPLETE**;
@@ -195,4 +195,4 @@ See [RUNTIME_VALIDATION_RUNBOOK.md](RUNTIME_VALIDATION_RUNBOOK.md).
 - CSV/SVG export workflows: **COMPLETE**;
 - numerical workload safeguards: **COMPLETE**.
 
-Future numerical additions are optional enhancements or maintenance, not unfinished 2.8.03 scope.
+Future numerical additions are optional enhancements or maintenance, not unfinished 1.0.0 scope.

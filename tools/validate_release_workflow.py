@@ -50,6 +50,9 @@ def validate(root: Path) -> list[str]:
         'CalcNova-browser.sbom.cdx.json',
         'python tools/generate_sbom.py --assets src/CalcNova.Android/obj/project.assets.json --name CalcNova-android --output CalcNova-android.sbom.cdx.json',
         'CalcNova-android.sbom.cdx.json',
+        '-p:AndroidPackageFormats="aab;apk"',
+        'cp "$AAB" "CalcNova-android${SUFFIX}.aab"',
+        'cp "$APK" "CalcNova-android${SUFFIX}.apk"',
         "permissions:\n  contents: read",
         "actions/attest@v4",
         "subject-path: release-assets/**/*",
@@ -109,11 +112,29 @@ def validate(root: Path) -> list[str]:
     ):
         failures.append("Browser release publication must generate its CycloneDX SBOM before artifact upload.")
 
-    android_publish = source.find("      - name: Publish signed Android App Bundle")
+    android_publish = source.find("      - name: Publish Android packages")
     android_sbom = source.find("      - name: Generate Android CycloneDX SBOM", android_publish)
     android_upload = source.find("      - name: Upload Android artifact", android_publish)
     if not (android_publish >= 0 and android_sbom > android_publish and android_upload > android_sbom):
-        failures.append("Signed Android release publication must generate its CycloneDX SBOM before artifact upload.")
+        failures.append("Android release publication must generate its CycloneDX SBOM before artifact upload.")
+
+    # Gating these steps on the signing secrets once let a release publish with no Android asset
+    # at all, and report success. Android now builds on every release, so a broken Android head
+    # fails the release instead of quietly disappearing from it.
+    android_job = source.find("  android:")
+    android_job_end = source.find("  publish-release:", android_job)
+    if android_job < 0 or android_job_end < 0:
+        failures.append("Release workflow must define an android job before the publication job.")
+    else:
+        android_job_source = source[android_job:android_job_end]
+        for step in ("Publish Android packages", "Generate Android CycloneDX SBOM", "Upload Android artifact"):
+            step_start = android_job_source.find(f"      - name: {step}")
+            next_step = android_job_source.find("      - name: ", step_start + 1)
+            step_source = android_job_source[step_start:next_step if next_step > 0 else None]
+            if "steps.signing.outputs.configured == 'true'" in step_source:
+                failures.append(
+                    f"Android release step must not be gated on signing secrets, or a release can publish without it: {step}"
+                )
 
     publish_position = source.find("  publish-release:")
     publication_permissions = (

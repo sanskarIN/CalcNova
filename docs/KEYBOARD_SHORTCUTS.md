@@ -1,8 +1,8 @@
-# CalcNova 2.8.03 Keyboard Shortcuts
+# CalcNova 1.0.0 Keyboard Shortcuts
 
 CalcNova supports keyboard-first workflows on keyboard-capable targets while deliberately avoiding broad shortcut interception that would conflict with text editing, browsers, operating systems, or assistive technology.
 
-This document lists implemented shared mappings and separates optional future shortcut ideas from the completed 2.8.03 baseline.
+This document lists implemented shared mappings and separates optional future shortcut ideas from the completed 1.0.0 baseline.
 
 ## Shared shell navigation
 
@@ -154,7 +154,7 @@ Browser builds must not unnecessarily hijack important browser/system shortcuts.
 
 CalcNova's modifier policies intentionally limit interception. Any future shortcut that conflicts with browser navigation, tabs, developer tools, accessibility software, or OS conventions should be redesigned or made appropriately configurable rather than captured globally.
 
-## Optional post-2.8.03 shortcut ideas
+## Optional post-1.0.0 shortcut ideas
 
 Possible future power-user additions include:
 
@@ -164,7 +164,7 @@ Possible future power-user additions include:
 - configurable user shortcuts with conflict detection;
 - additional locale-aware physical-key mappings after target validation.
 
-These are optional enhancements, not missing 2.8.03 requirements.
+These are optional enhancements, not missing 1.0.0 requirements.
 
 ## Validation
 
@@ -189,7 +189,7 @@ Target keyboard/layout/browser behavior is recorded independently using:
 PASS / FAIL / BLOCKED / NOT RUN
 ```
 
-## 2.8.03 classification
+## 1.0.0 classification
 
 - Calculator Enter/Escape/Backspace: **COMPLETE**;
 - top-row/numpad digit input: **COMPLETE**;
@@ -199,4 +199,4 @@ PASS / FAIL / BLOCKED / NOT RUN
 - shared mode navigation: **COMPLETE**;
 - graph keyboard pan/zoom/reset/fit: **COMPLETE**;
 - onboarding shortcut suppression: **COMPLETE**;
-- configurable/direct-mode extra shortcuts: **OPTIONAL POST-2.8.03**.
+- configurable/direct-mode extra shortcuts: **OPTIONAL POST-1.0.0**.

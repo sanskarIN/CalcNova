@@ -1,6 +1,6 @@
 # CalcNova Main-Branch Protection
 
-CalcNova's source and CI gates are designed to protect the completed 2.8.03 baseline, but those checks only become merge enforcement when GitHub branch protection or a repository ruleset requires them.
+CalcNova's source and CI gates are designed to protect the completed 1.0.0 baseline, but those checks only become merge enforcement when GitHub branch protection or a repository ruleset requires them.
 
 ## Observed repository state — 2026-08-23
 
@@ -174,7 +174,7 @@ Current observed GitHub repository-setting state on 2026-08-23:
 main branch protection/ruleset enforcement: FAIL / NOT ENABLED
 ```
 
-This repository-setting gap does not change CalcNova 2.8.03's completed product/source classification, but it is a meaningful governance/security maintenance item because direct pushes can bypass required-review/check enforcement until the setting is enabled.
+This repository-setting gap does not change CalcNova 1.0.0's completed product/source classification, but it is a meaningful governance/security maintenance item because direct pushes can bypass required-review/check enforcement until the setting is enabled.
 
 ## Related files
 

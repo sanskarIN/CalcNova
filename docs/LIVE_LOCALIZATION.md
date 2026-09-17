@@ -1,8 +1,8 @@
-# CalcNova 2.8.03 Live Localization
+# CalcNova 1.0.0 Live Localization
 
-CalcNova has a semantic localization catalog and a live Avalonia refresh path for the reviewed English/Hindi 2.8.03 surfaces.
+CalcNova has a semantic localization catalog and a live Avalonia refresh path for the reviewed English/Hindi 1.0.0 surfaces.
 
-The completed baseline does not mean every technical token, user value, formula, unit ID, ISO code, URL, or remaining incidental detail string should be translated. It means the current reviewed semantic key set and protected major surfaces are implemented and validated as the 2.8.03 localization scope.
+The completed baseline does not mean every technical token, user value, formula, unit ID, ISO code, URL, or remaining incidental detail string should be translated. It means the current reviewed semantic key set and protected major surfaces are implemented and validated as the 1.0.0 localization scope.
 
 ## Reviewed languages
 
@@ -113,7 +113,7 @@ PASS / FAIL / BLOCKED / NOT RUN
 
 for observed runtime evidence.
 
-## Optional post-2.8.03 localization improvements
+## Optional post-1.0.0 localization improvements
 
 Further localization work can still be valuable, for example:
 
@@ -123,7 +123,7 @@ Further localization work can still be valuable, for example:
 - richer locale-aware numeric input where parser ambiguity can be handled safely;
 - RTL language support after dedicated design/testing.
 
-These are optional extensions. They should not be represented as unresolved requirements for the completed 2.8.03 English/Hindi localization baseline.
+These are optional extensions. They should not be represented as unresolved requirements for the completed 1.0.0 English/Hindi localization baseline.
 
 ## Related documentation
 
@@ -133,11 +133,11 @@ These are optional extensions. They should not be represented as unresolved requ
 - [Settings storage contract](SETTINGS_STORAGE_CONTRACT.md)
 - [UI automation](UI_AUTOMATION.md)
 
-## 2.8.03 classification
+## 1.0.0 classification
 
 - reviewed English catalog: **COMPLETE**;
 - reviewed Hindi catalog: **COMPLETE**;
 - culture preference persistence: **COMPLETE**;
 - reviewed live shared-surface refresh: **COMPLETE**;
 - source/catalog/headless contract coverage: **COMPLETE**;
-- additional languages/detail migration: **OPTIONAL POST-2.8.03**.
+- additional languages/detail migration: **OPTIONAL POST-1.0.0**.

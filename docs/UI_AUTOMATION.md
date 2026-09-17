@@ -1,4 +1,4 @@
-# CalcNova 2.8.03 UI Automation
+# CalcNova 1.0.0 UI Automation
 
 CalcNova includes focused Avalonia headless integration coverage for shared-application behavior that is difficult to validate with pure domain/view-model tests alone.
 
@@ -155,7 +155,7 @@ High-cost or target-specific behavior should remain in platform runtime/manual/t
 - [Validation evidence](VALIDATION_EVIDENCE.md)
 - [Source preflight](SOURCE_PREFLIGHT.md)
 
-## 2.8.03 classification
+## 1.0.0 classification
 
 - Avalonia headless test infrastructure: **COMPLETE**;
 - shared-shell representative scenarios: **COMPLETE**;

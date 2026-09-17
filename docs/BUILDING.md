@@ -1,6 +1,6 @@
 # Building CalcNova
 
-This guide documents the current CalcNova 2.8.03 build, run, publish, and platform-workload paths.
+This guide documents the current CalcNova 1.0.0 build, run, publish, and platform-workload paths.
 
 CalcNova contains maintained composition heads for:
 
@@ -59,10 +59,10 @@ The SDK-independent repository gate can be run first:
 python tools/release_preflight.py
 ```
 
-For a tagged 2.8.03 release checkout:
+For a tagged 1.0.0 release checkout:
 
 ```bash
-python tools/release_preflight.py --tag v2.8.3
+python tools/release_preflight.py --tag v1.0.0
 ```
 
 ## Restore, format, build, and test the core solution
@@ -278,8 +278,8 @@ Current identity and platform metadata:
 
 - application id: `in.sanskar.calcnova`;
 - application title: `CalcNova`;
-- display version: `2.8.03`;
-- numeric build code: `20803`;
+- display version: `1.0.0`;
+- numeric build code: `10000`;
 - minimum Android API: 23;
 - JDK used by CI: Temurin 17.
 
@@ -300,14 +300,45 @@ dotnet build src/CalcNova.Android/CalcNova.Android.csproj \
 
 A normal build can be used for compilation validation without production signing.
 
-### Signed Android App Bundle
+### Android distribution packages
 
-The release workflow publishes an AAB only when the required signing secrets are configured. Its publish contract is equivalent to:
+A Release configuration build produces both distribution shapes from one packaging pass:
+
+```text
+bin/Release/net10.0-android/in.sanskar.calcnova-Signed.aab   # Google Play upload
+bin/Release/net10.0-android/in.sanskar.calcnova-Signed.apk   # direct install, adb install
+```
+
+The `.aab` is what Google Play accepts and cannot be installed by hand. The `.apk` is the universal
+APK bundletool derives from that same bundle, and is what a downloaded release install needs. Both
+come from `AndroidPackageFormats=aab;apk`, which the project sets for Release.
+
+### Signing an Android release
+
+Without signing configuration the Android SDK signs with a throwaway debug key it generates locally.
+That is fine for validating that packaging works, and unusable for distribution: Google Play rejects
+debug keys, and the key differs between machines and CI runs, so installs cannot be upgraded in
+place.
+
+A real release needs a keystore you own and keep. Create one once:
+
+```bash
+keytool -genkeypair -v \
+  -keystore calcnova-release.keystore \
+  -alias calcnova \
+  -keyalg RSA -keysize 4096 -validity 10000
+```
+
+Keep that file and its passwords safe and out of Git. Losing the key means no future build can
+upgrade an installed copy of the app, and Google Play will not accept a replacement key without
+going through its key-reset process.
+
+The signed publish contract is equivalent to:
 
 ```bash
 dotnet publish src/CalcNova.Android/CalcNova.Android.csproj \
   --configuration Release \
-  -p:AndroidPackageFormats=aab \
+  -p:AndroidPackageFormats="aab;apk" \
   -p:AndroidKeyStore=true \
   -p:AndroidSigningKeyStore="<secure-keystore-path>" \
   -p:AndroidSigningKeyAlias="<alias>" \
@@ -317,14 +348,14 @@ dotnet publish src/CalcNova.Android/CalcNova.Android.csproj \
 
 Never put real signing values in shell history, committed scripts, documentation examples, or repository files. Prefer secure local secret storage or CI secrets.
 
-The GitHub release workflow uses these secret names:
+The GitHub release workflow reads them from these repository secrets:
 
-- `CALCNOVA_ANDROID_KEYSTORE_BASE64`;
+- `CALCNOVA_ANDROID_KEYSTORE_BASE64` — `base64 -w0 calcnova-release.keystore`;
 - `CALCNOVA_ANDROID_KEY_ALIAS`;
 - `CALCNOVA_ANDROID_KEY_PASSWORD`;
 - `CALCNOVA_ANDROID_STORE_PASSWORD`.
 
-The workflow decodes a temporary keystore, publishes the AAB, uploads the artifact, and removes the temporary keystore.
+The workflow decodes a temporary keystore, publishes both packages, uploads them with their SBOM, and removes the temporary keystore. When the secrets are absent it still builds and publishes, under `-debug-signed` names, so a broken Android head fails the release rather than disappearing from it.
 
 Android runtime evidence should distinguish compilation from emulator/device launch, orientation behavior, persistence, clipboard, TalkBack/large-text checks, signed package generation, and Play Store processing.
 
@@ -340,8 +371,8 @@ Current identity and platform metadata:
 
 - application id: `in.sanskar.calcnova`;
 - application title: `CalcNova`;
-- display version: `2.8.03`;
-- numeric build code: `20803`;
+- display version: `1.0.0`;
+- numeric build code: `10000`;
 - minimum iOS platform version: 15.0.
 
 The iOS toolchain requires a supported macOS/Xcode environment.

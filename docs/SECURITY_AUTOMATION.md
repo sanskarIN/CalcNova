@@ -1,6 +1,6 @@
 # CalcNova Security Automation
 
-This guide documents the repository-owned security automation used to maintain the completed CalcNova 2.8.03 baseline.
+This guide documents the repository-owned security automation used to maintain the completed CalcNova 1.0.0 baseline.
 
 Security automation is a maintenance control. It does not change the public product version and it does not replace manual security review, runtime validation, platform signing review, or responsible vulnerability reporting.
 

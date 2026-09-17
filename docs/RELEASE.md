@@ -13,7 +13,7 @@ CalcNova 1.0.0 uses:
 
 See [VERSIONING.md](VERSIONING.md).
 
-The development checkpoints that preceded the first release are preserved in [releases/2.9.0.md](releases/2.9.0.md), [releases/2.9.5.md](releases/2.9.5.md), [releases/2.9.6.md](releases/2.9.6.md), and [releases/2.9.7.md](releases/2.9.7.md). None of them was published; the current source is 1.0.0.
+The current source is 1.0.0, CalcNova's first release; its checkpoint is [releases/1.0.0.md](releases/1.0.0.md).
 
 ## Release evidence principle
 
@@ -45,16 +45,14 @@ python tools/validate_completion_status.py .
 
 `tools/release_identity.py` parses `Directory.Build.props`, validates display/package/assembly/file/informational fields, derives the release tag, and derives mobile build code as `MAJOR * 10000 + MINOR * 100 + PATCH`.
 
-For the 2.9 series:
+For the current release:
 
 ```text
-2.9.0 -> v2.9.0 -> 20900
-2.9.5 -> v2.9.5 -> 20905
-2.9.6 -> v2.9.6 -> 20906
 1.0.0 -> v1.0.0 -> 10000
 ```
 
-This prevents release validators from remaining silently pinned to an earlier product version.
+Deriving these from the source tree prevents release validators from remaining silently pinned to a
+version the project has moved past.
 
 ## .NET quality gate
 
@@ -220,7 +218,7 @@ It derives the current version/tag/build expectations from `Directory.Build.prop
 - live `what_changed.md` checkpoint;
 - in-app About `Version 1.0.0 • Complete` label and regressions.
 
-Historical 2.8.03/2.9.0/2.9.5/2.9.6 records remain historical and do not define the current status.
+1.0.0 is the current and only release.
 
 ## Settings migration gate
 
@@ -327,7 +325,18 @@ Signing credentials remain outside Git.
 
 Use platform-appropriate secure local configuration or GitHub Actions secrets. Never print private-key content or signing passwords into logs.
 
-The Android release workflow produces a signed AAB only when all required signing secrets are configured, and temporary keystore material is removed after use.
+The Android release job always builds and publishes packages so a broken Android head fails the
+release instead of quietly vanishing from it. The signing secrets decide which key signs them:
+
+- all four secrets configured — `CalcNova-android.aab` and `CalcNova-android.apk`, signed with the
+  project release key, suitable for Google Play and for direct installation;
+- any secret missing — `CalcNova-android-debug-signed.aab` and `CalcNova-android-debug-signed.apk`,
+  signed with the throwaway key the Android SDK generates for that run. They install, but Google
+  Play rejects them and the key differs between runs, so they cannot be upgraded in place. The job
+  raises a workflow warning and the `-debug-signed` name keeps them distinguishable in the release
+  asset list.
+
+Temporary keystore material is removed after use in both cases.
 
 The iOS exact-tag simulator validation path is intentionally unsigned and does not claim App Store signing/provisioning.
 
@@ -344,7 +353,7 @@ Current automated artifact families include:
 - macOS Intel x64 self-contained desktop archive + SBOM;
 - macOS Apple Silicon ARM64 self-contained desktop archive + SBOM;
 - Browser bundle + SBOM;
-- Android AAB + SBOM when signing secrets are configured;
+- Android app bundle, universal APK, and SBOM;
 - checksum material.
 
 An iOS archive remains credential/provisioning dependent and is not represented by the unsigned simulator-validation workflow.
@@ -361,7 +370,7 @@ The workflow passes the inclusive subject glob:
 release-assets/**/*
 ```
 
-to `actions/attest@v4`, so every file in the prepared release-asset tree is covered, including package archives, generated SBOMs, optional Android output, and `SHA256SUMS.txt`.
+to `actions/attest@v4`, so every file in the prepared release-asset tree is covered, including package archives, generated SBOMs, Android output, and `SHA256SUMS.txt`.
 
 Provenance attestation binds artifacts to GitHub workflow/repository/commit identity; it does not claim that the artifact is vulnerability-free.
 
@@ -393,7 +402,6 @@ Release notes should identify:
 
 - product version `1.0.0`;
 - tag `v1.0.0`;
-- 2.9.0, 2.9.5, and 2.9.6 checkpoints where relevant;
 - major capabilities;
 - important fixes;
 - graph accessibility/localization maintenance;

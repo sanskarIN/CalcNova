@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -74,6 +75,45 @@ class ReleaseWorkflowValidatorTests(unittest.TestCase):
         self.assertEqual(1, source.count("attestations: write"))
         self.assertEqual(1, source.count("artifact-metadata: write"))
         self.assertIn("subject-path: release-assets/**/*", source)
+
+    def test_android_release_is_never_gated_on_signing_secrets(self) -> None:
+        source = RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        android = source[source.find("  android:") : source.find("  publish-release:")]
+        self.assertNotEqual("", android)
+        for step in ("Publish Android packages", "Generate Android CycloneDX SBOM", "Upload Android artifact"):
+            with self.subTest(step=step):
+                start = android.find(f"      - name: {step}")
+                self.assertGreaterEqual(start, 0)
+                end = android.find("      - name: ", start + 1)
+                self.assertNotIn(
+                    "steps.signing.outputs.configured == 'true'",
+                    android[start : end if end > 0 else None],
+                )
+
+    def test_validator_rejects_a_signing_gated_android_upload(self) -> None:
+        validator = load_validator()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            workflow = root / ".github" / "workflows"
+            workflow.mkdir(parents=True)
+            gated = RELEASE_WORKFLOW.read_text(encoding="utf-8").replace(
+                "      - name: Upload Android artifact\n        uses: actions/upload-artifact@v7",
+                "      - name: Upload Android artifact\n"
+                "        if: steps.signing.outputs.configured == 'true'\n"
+                "        uses: actions/upload-artifact@v7",
+            )
+            (workflow / "release.yml").write_text(gated, encoding="utf-8")
+            failures = validator.validate(root)
+        self.assertTrue(
+            any("must not be gated on signing secrets" in failure for failure in failures),
+            failures,
+        )
+
+    def test_release_publishes_both_android_distribution_shapes(self) -> None:
+        source = RELEASE_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn('-p:AndroidPackageFormats="aab;apk"', source)
+        self.assertIn('cp "$AAB" "CalcNova-android${SUFFIX}.aab"', source)
+        self.assertIn('cp "$APK" "CalcNova-android${SUFFIX}.apk"', source)
 
     def test_release_checksums_use_published_flat_filenames(self) -> None:
         source = RELEASE_WORKFLOW.read_text(encoding="utf-8")

@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Normalized semantic version tag, for example v2.8.3 (product display version 2.8.03)"
+        description: "Normalized semantic version tag, for example v1.0.0"
         required: true
         type: string
 
@@ -169,41 +169,63 @@ jobs:
         id: signing
         shell: bash
         run: |
+          # Android is built either way. Skipping the job when no keystore is configured used to
+          # let a release publish with no Android asset and no failure, so a broken Android head
+          # could reach a tag unnoticed. The only thing the secrets change is which key signs the
+          # packages, and therefore what they are named.
           if [[ -n "$KEYSTORE_BASE64" && -n "$KEY_ALIAS" && -n "$KEY_PASSWORD" && -n "$STORE_PASSWORD" ]]; then
             echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "suffix=" >> "$GITHUB_OUTPUT"
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "Android release artifact skipped because signing secrets are not configured."
+            echo "suffix=-debug-signed" >> "$GITHUB_OUTPUT"
+            echo "::warning::Release signing secrets are not configured. Android packages will be signed with the build key the Android SDK generates for this run, published under -debug-signed names, and cannot be uploaded to Google Play. See docs/RELEASE.md for the keystore setup."
           fi
       - name: Decode temporary keystore
         if: steps.signing.outputs.configured == 'true'
         shell: bash
         run: echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/calcnova-release.keystore"
-      - name: Publish signed Android App Bundle
-        if: steps.signing.outputs.configured == 'true'
+      - name: Publish Android packages
         shell: bash
+        env:
+          SIGNING_CONFIGURED: ${{ steps.signing.outputs.configured }}
+          SUFFIX: ${{ steps.signing.outputs.suffix }}
         run: |
-          dotnet publish src/CalcNova.Android/CalcNova.Android.csproj \
-            --configuration Release \
-            -p:AndroidPackageFormats=aab \
-            -p:AndroidKeyStore=true \
-            -p:AndroidSigningKeyStore="$RUNNER_TEMP/calcnova-release.keystore" \
-            -p:AndroidSigningKeyAlias="$KEY_ALIAS" \
-            -p:AndroidSigningKeyPass="$KEY_PASSWORD" \
-            -p:AndroidSigningStorePass="$STORE_PASSWORD"
+          set -euo pipefail
+          publish=(
+            dotnet publish src/CalcNova.Android/CalcNova.Android.csproj
+            --configuration Release
+            -p:AndroidPackageFormats="aab;apk"
+          )
+          if [[ "$SIGNING_CONFIGURED" == "true" ]]; then
+            publish+=(
+              -p:AndroidKeyStore=true
+              -p:AndroidSigningKeyStore="$RUNNER_TEMP/calcnova-release.keystore"
+              -p:AndroidSigningKeyAlias="$KEY_ALIAS"
+              -p:AndroidSigningKeyPass="$KEY_PASSWORD"
+              -p:AndroidSigningStorePass="$STORE_PASSWORD"
+            )
+          fi
+          "${publish[@]}"
+
           AAB="$(find src/CalcNova.Android/bin/Release -type f -name '*.aab' | head -n 1)"
           test -n "$AAB"
-          cp "$AAB" CalcNova-android.aab
+          cp "$AAB" "CalcNova-android${SUFFIX}.aab"
+
+          # bundletool derives this from the same bundle. Publishing it is what makes the release
+          # installable without Google Play, because an .aab cannot be installed by hand.
+          APK="$(find src/CalcNova.Android/bin/Release -type f -name '*-Signed.apk' | head -n 1)"
+          test -n "$APK"
+          cp "$APK" "CalcNova-android${SUFFIX}.apk"
       - name: Generate Android CycloneDX SBOM
-        if: steps.signing.outputs.configured == 'true'
         run: python tools/generate_sbom.py --assets src/CalcNova.Android/obj/project.assets.json --name CalcNova-android --output CalcNova-android.sbom.cdx.json
       - name: Upload Android artifact
-        if: steps.signing.outputs.configured == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: android
           path: |
-            CalcNova-android.aab
+            CalcNova-android*.aab
+            CalcNova-android*.apk
             CalcNova-android.sbom.cdx.json
           if-no-files-found: error
       - name: Remove temporary keystore
@@ -213,7 +235,6 @@ jobs:
 
   publish-release:
     needs: [desktop, browser, android]
-    if: always() && needs.desktop.result == 'success' && needs.browser.result == 'success' && (needs.android.result == 'success' || needs.android.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: write

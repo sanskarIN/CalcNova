@@ -85,7 +85,7 @@ Only finite floating values are accepted as normal results. Non-finite outcomes 
 
 ## Exact rational utility
 
-CalcNova 2.8.03 also includes a separate exact-rational utility based on bounded canonical `BigInteger` numerator/denominator arithmetic.
+CalcNova 1.0.0 also includes a separate exact-rational utility based on bounded canonical `BigInteger` numerator/denominator arithmetic.
 
 It supports exact integer, fraction, finite-decimal, and decimal-scientific parsing plus arithmetic/comparison/normalization without converting finite decimal input through `double` first.
 
@@ -241,9 +241,9 @@ Changes to parser or numeric semantics should include coverage for:
 
 Changes to exact-rational, engineering-notation, graph numerical, or other specialized numeric behavior must also run their focused regression/validator coverage.
 
-## Optional post-2.8.03 numeric ideas
+## Optional post-1.0.0 numeric ideas
 
-Possible future enhancements—not missing 2.8.03 requirements—include:
+Possible future enhancements—not missing 1.0.0 requirements—include:
 
 - complex-number workflows;
 - broader fraction/exact-result integration in ordinary expression presentation;

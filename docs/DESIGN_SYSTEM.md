@@ -1,8 +1,8 @@
-# CalcNova 2.8.03 Design System
+# CalcNova 1.0.0 Design System
 
 CalcNova's shared UI is designed to feel calm, precise, modern, efficient, and consistent across Desktop, Browser/WebAssembly, Android, and iOS.
 
-This document describes the implemented 2.8.03 design baseline and the rules future maintenance/enhancement work must preserve.
+This document describes the implemented 1.0.0 design baseline and the rules future maintenance/enhancement work must preserve.
 
 ## Principles
 
@@ -265,7 +265,7 @@ Errors should:
 
 ## Localization design
 
-English and Hindi catalogs are part of the 2.8.03 baseline.
+English and Hindi catalogs are part of the 1.0.0 baseline.
 
 Layouts must tolerate:
 
@@ -300,7 +300,7 @@ For a UI maintenance/enhancement change, review as applicable:
 
 Automated source/headless checks should be updated when a new deterministic design contract is introduced. Target-platform visual/accessibility behavior remains runtime evidence.
 
-## 2.8.03 classification
+## 1.0.0 classification
 
 - shared adaptive shell: **COMPLETE**;
 - interaction-target/focus baseline: **COMPLETE**;
@@ -310,4 +310,4 @@ Automated source/headless checks should be updated when a new deterministic desi
 - onboarding design baseline: **COMPLETE**;
 - repository-owned brand asset generation: **COMPLETE**.
 
-Future design changes are maintenance or optional refinement rather than missing 2.8.03 product requirements.
+Future design changes are maintenance or optional refinement rather than missing 1.0.0 product requirements.

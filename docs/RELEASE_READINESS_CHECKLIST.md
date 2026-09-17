@@ -23,9 +23,6 @@ PASS / FAIL / BLOCKED / NOT RUN
 - [ ] Release tag equals `v` plus source `<Version>`.
 - [ ] Packaging, completion-status, platform-support, and release-document validators derive current expectations from central release identity.
 - [ ] In-app About shows `Version 1.0.0 • Complete`.
-- [ ] Historical 2.9.0 checkpoint remains recorded as `v2.9.0` / `20900`.
-- [ ] Historical 2.9.5 checkpoint remains recorded as `v2.9.5` / `20905`.
-- [ ] Historical 2.9.6 checkpoint remains recorded as `v2.9.6` / `20906`.
 
 ## Source preflight
 
@@ -288,14 +285,14 @@ Additional language packs are optional post-1.0.0 improvements.
 - [ ] Every artifact comes from release tag `v1.0.0`.
 - [ ] Stable release artifacts are not debug builds.
 - [ ] Each published Desktop/Browser package has its expected deterministic CycloneDX 1.7 SBOM.
-- [ ] Android AAB/SBOM is present only when signed Android publication is enabled.
+- [ ] The Android app bundle, universal APK, and SBOM are all present.
 - [ ] Release asset basenames are unique and do not collide with `SHA256SUMS.txt`.
 - [ ] SHA-256/checksum material is generated using published basenames.
 - [ ] Checksum material covers published package/SBOM assets.
 - [ ] `actions/attest@v4` provenance is generated for `release-assets/**/*`.
 - [ ] Artifact manifest/provenance tooling is used where required.
 - [ ] Reruns preserve release notes/history and replace only intended assets.
-- [ ] Android artifact is omitted rather than falsely published as signed when signing secrets are absent.
+- [ ] Android packages carry release-key names only when signing secrets are configured, and `-debug-signed` names otherwise.
 
 ## Evidence record
 

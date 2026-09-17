@@ -1,6 +1,6 @@
-# CalcNova 2.8.03 Onboarding
+# CalcNova 1.0.0 Onboarding
 
-CalcNova onboarding is optional, local-first, skippable, versioned, and part of the completed 2.8.03 shared application baseline.
+CalcNova onboarding is optional, local-first, skippable, versioned, and part of the completed 1.0.0 shared application baseline.
 
 It introduces important capabilities without requiring an account, collecting onboarding telemetry, or repeatedly interrupting returning users.
 
@@ -194,9 +194,9 @@ For a release/runtime evidence pass, check as applicable:
 - predictable focus restoration after dismissal;
 - no onboarding surface blocks calculation after dismissal.
 
-Unchecked runtime evidence does not mean the 2.8.03 source implementation is missing; it records only what has or has not been observed in that environment.
+Unchecked runtime evidence does not mean the 1.0.0 source implementation is missing; it records only what has or has not been observed in that environment.
 
-## 2.8.03 classification
+## 1.0.0 classification
 
 - versioned local onboarding state: **COMPLETE**;
 - shared onboarding visual surface: **COMPLETE**;
@@ -206,4 +206,4 @@ Unchecked runtime evidence does not mean the 2.8.03 source implementation is mis
 - English/Hindi reviewed live localization: **COMPLETE**;
 - target-platform runtime/accessibility evidence: recorded independently.
 
-Future onboarding changes are maintenance or optional content improvements rather than missing 2.8.03 requirements.
+Future onboarding changes are maintenance or optional content improvements rather than missing 1.0.0 requirements.

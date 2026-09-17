@@ -105,10 +105,10 @@ A CI-hygiene source contract can be complete while a newly pushed workflow run r
 
 This is post-completion maintenance. It does not change:
 
-- product version `2.8.03`;
-- normalized package version `2.8.3`;
-- normalized release tag `v2.8.3`;
-- mobile build code `20803`.
+- product version `1.0.0`;
+- normalized package version `1.0.0`;
+- normalized release tag `v1.0.0`;
+- mobile build code `10000`.
 
 ## Related documentation
 

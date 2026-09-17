@@ -1,8 +1,8 @@
-# CalcNova 2.8.03 Localization
+# CalcNova 1.0.0 Localization
 
-CalcNova's localization architecture keeps mathematical meaning culture-independent while providing reviewed live localization for the completed 2.8.03 semantic baseline.
+CalcNova's localization architecture keeps mathematical meaning culture-independent while providing reviewed live localization for the completed 1.0.0 semantic baseline.
 
-The current reviewed languages are English and Hindi. Additional languages and further migration of non-semantic/technical UI text are optional post-2.8.03 improvements rather than incomplete release requirements.
+The current reviewed languages are English and Hindi. Additional languages and further migration of non-semantic/technical UI text are optional post-1.0.0 improvements rather than incomplete release requirements.
 
 ## Completed localization baseline
 
@@ -37,7 +37,7 @@ The Hindi catalog contains the same current semantic key set as English. Adding 
 
 ## Reviewed live-localized surfaces
 
-The 2.8.03 baseline includes reviewed live localization across major shared product surfaces, including:
+The 1.0.0 baseline includes reviewed live localization across major shared product surfaces, including:
 
 - application shell/header and primary mode names;
 - Calculator reviewed title/prompt/action surfaces;
@@ -143,7 +143,7 @@ Screen-reader pronunciation/quality must be validated on target assistive techno
 
 ## Right-to-left languages
 
-RTL languages are not part of the reviewed 2.8.03 language baseline.
+RTL languages are not part of the reviewed 1.0.0 language baseline.
 
 A future RTL language pack requires intentional design/testing for:
 
@@ -197,7 +197,7 @@ Runtime language/layout/screen-reader evidence should be recorded using:
 PASS / FAIL / BLOCKED / NOT RUN
 ```
 
-## Optional post-2.8.03 localization work
+## Optional post-1.0.0 localization work
 
 Possible optional improvements include:
 
@@ -207,9 +207,9 @@ Possible optional improvements include:
 - additional localized date/time presentation;
 - RTL support after dedicated design/testing.
 
-These are optional enhancements, not missing requirements for the completed English/Hindi 2.8.03 semantic baseline.
+These are optional enhancements, not missing requirements for the completed English/Hindi 1.0.0 semantic baseline.
 
-## 2.8.03 classification
+## 1.0.0 classification
 
 - semantic localization architecture: **COMPLETE**;
 - English current semantic catalog: **COMPLETE**;
@@ -218,4 +218,4 @@ These are optional enhancements, not missing requirements for the completed Engl
 - culture preference persistence: **COMPLETE**;
 - reviewed live localized major surfaces: **COMPLETE**;
 - catalog/source validation: **COMPLETE**;
-- additional languages/further text migration: **OPTIONAL POST-2.8.03**.
+- additional languages/further text migration: **OPTIONAL POST-1.0.0**.

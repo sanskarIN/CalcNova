@@ -1,6 +1,6 @@
 # CalcNova Programmer Mode
 
-CalcNova programmer tooling is a completed 2.8.03 feature built on `System.Numerics.BigInteger` with explicit word-size boundaries for operations that model fixed-width machine integers.
+CalcNova programmer tooling is a completed 1.0.0 feature built on `System.Numerics.BigInteger` with explicit word-size boundaries for operations that model fixed-width machine integers.
 
 ## Radix conversion
 
@@ -141,9 +141,9 @@ Compiled tests run through the normal .NET test gate described in [TESTING.md](T
 
 Source/test presence is not a substitute for observed platform accessibility/runtime evidence. Record target-specific results using `PASS / FAIL / BLOCKED / NOT RUN`.
 
-## 2.8.03 classification
+## 1.0.0 classification
 
-For CalcNova 2.8.03:
+For CalcNova 1.0.0:
 
 - base 2–36 conversion: **COMPLETE**;
 - 8/16/32/64/128-bit UI presets: **COMPLETE**;
@@ -156,4 +156,4 @@ For CalcNova 2.8.03:
 - radix/fixed-width copy actions: **COMPLETE**;
 - Unicode scalar utilities: **COMPLETE**.
 
-Future changes are maintenance or optional enhancements rather than missing 2.8.03 requirements.
+Future changes are maintenance or optional enhancements rather than missing 1.0.0 requirements.
