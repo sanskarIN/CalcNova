@@ -11,9 +11,12 @@
     <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
 
     <!-- Google Play distributes app bundles, so a Release build produces one directly rather
-         than an APK a maintainer would have to convert. Debug keeps APKs, which are what
-         `dotnet build -t:Install` and a plain `adb install` expect. -->
+         than an APK a maintainer would have to convert. A bundle cannot be installed by hand,
+         though, so Release also asks bundletool for the universal APK derived from that same
+         bundle; direct downloads and `adb install` need that shape. Debug keeps a plain APK,
+         which is what `dotnet build -t:Install` expects. -->
     <AndroidPackageFormat Condition="'$(Configuration)' == 'Release'">aab</AndroidPackageFormat>
+    <AndroidPackageFormats Condition="'$(Configuration)' == 'Release'">aab;apk</AndroidPackageFormats>
     <AndroidPackageFormat Condition="'$(Configuration)' != 'Release'">apk</AndroidPackageFormat>
   </PropertyGroup>
   <ItemGroup>
