@@ -6,6 +6,7 @@ using CalcNova.Core.Memory;
 using CalcNova.Core.Numerics;
 using CalcNova.Core.Parsing;
 using CalcNova.Platform.Clipboard;
+using CalcNova.Platform.Haptics;
 
 namespace CalcNova.App.ViewModels;
 
@@ -18,6 +19,8 @@ public sealed class CalculatorViewModel : ViewModelBase
     private readonly Func<string, string, Task>? _recordCalculationAsync;
     private readonly Func<bool> _historyEnabledProvider;
     private readonly IClipboardService? _clipboardService;
+    private readonly IHapticFeedbackService _hapticFeedbackService;
+    private readonly Func<bool> _hapticsEnabledProvider;
     private string? _lastEvaluatedExpression;
     private string _expression = string.Empty;
     private string _result = "0";
@@ -30,7 +33,9 @@ public sealed class CalculatorViewModel : ViewModelBase
         ExpressionEvaluator? evaluator = null,
         Func<string, string, Task>? recordCalculationAsync = null,
         Func<bool>? historyEnabledProvider = null,
-        IClipboardService? clipboardService = null)
+        IClipboardService? clipboardService = null,
+        IHapticFeedbackService? hapticFeedbackService = null,
+        Func<bool>? hapticsEnabledProvider = null)
     {
         _evaluator = evaluator ?? new ExpressionEvaluator();
         _session = new CalculationSession(_evaluator);
@@ -38,6 +43,8 @@ public sealed class CalculatorViewModel : ViewModelBase
         _recordCalculationAsync = recordCalculationAsync;
         _historyEnabledProvider = historyEnabledProvider ?? (() => true);
         _clipboardService = clipboardService;
+        _hapticFeedbackService = hapticFeedbackService ?? NullHapticFeedbackService.Instance;
+        _hapticsEnabledProvider = hapticsEnabledProvider ?? (() => true);
 
         AppendCommand = new RelayCommand(Append);
         EvaluateCommand = new AsyncRelayCommand(_ => EvaluateAsync());
@@ -168,12 +175,14 @@ public sealed class CalculatorViewModel : ViewModelBase
             Result = "Error";
             StatusMessage = evaluation.ErrorMessage ?? "Calculation failed.";
             ResetRepeatState();
+            Feedback(HapticFeedbackKind.Warning);
             return;
         }
 
         Result = evaluation.Value.ToDisplayString();
         StatusMessage = string.Empty;
         _lastEvaluatedExpression = expression;
+        Feedback(HapticFeedbackKind.Success);
 
         if (_recordCalculationAsync is not null && _historyEnabledProvider() && !string.IsNullOrWhiteSpace(expression))
         {
@@ -183,6 +192,19 @@ public sealed class CalculatorViewModel : ViewModelBase
     }
 
     public void ApplyAngleUnit(AngleUnit angleUnit) => AngleUnit = angleUnit;
+
+    /// <summary>
+    /// Asks the device for one short confirmation, if the user wants haptics and the device has
+    /// them. Called after the action it confirms has already taken effect, so feedback can never
+    /// change what the calculator did.
+    /// </summary>
+    private void Feedback(HapticFeedbackKind kind)
+    {
+        if (_hapticsEnabledProvider())
+        {
+            _hapticFeedbackService.Perform(kind);
+        }
+    }
 
     public void UpdateSelection(int selectionStart, int selectionEnd)
     {
@@ -269,6 +291,7 @@ public sealed class CalculatorViewModel : ViewModelBase
         StatusMessage = string.Empty;
         ResetRepeatState();
         RequestSelection(0);
+        Feedback(HapticFeedbackKind.Selection);
     }
 
     public void Backspace()
@@ -284,6 +307,7 @@ public sealed class CalculatorViewModel : ViewModelBase
             Expression = Expression.Remove(start, end - start);
             StatusMessage = string.Empty;
             RequestSelection(start);
+            Feedback(HapticFeedbackKind.Selection);
             return;
         }
 
@@ -295,6 +319,7 @@ public sealed class CalculatorViewModel : ViewModelBase
         Expression = Expression.Remove(start - 1, 1);
         StatusMessage = string.Empty;
         RequestSelection(start - 1);
+        Feedback(HapticFeedbackKind.Selection);
     }
 
     private void Append(object? parameter)
@@ -316,10 +341,12 @@ public sealed class CalculatorViewModel : ViewModelBase
             Expression = edit.Expression;
             StatusMessage = string.Empty;
             RequestSelection(edit.CaretIndex);
+            Feedback(HapticFeedbackKind.Selection);
         }
         catch (InvalidOperationException exception)
         {
             StatusMessage = exception.Message;
+            Feedback(HapticFeedbackKind.Warning);
         }
     }
 

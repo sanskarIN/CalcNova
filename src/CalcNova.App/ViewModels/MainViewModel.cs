@@ -24,7 +24,9 @@ public sealed class MainViewModel : ViewModelBase
         Calculator = new CalculatorViewModel(
             recordCalculationAsync: (expression, result) => History.RecordAsync(expression, result),
             historyEnabledProvider: () => Settings.HistoryEnabled,
-            clipboardService: dependencies.ClipboardService);
+            clipboardService: dependencies.ClipboardService,
+            hapticFeedbackService: dependencies.HapticFeedbackService,
+            hapticsEnabledProvider: () => Settings.HapticsEnabled);
         Programmer = new ProgrammerViewModel(dependencies.ClipboardService);
         CodePoint = new CodePointViewModel(dependencies.ClipboardService);
         Converter = new ConverterViewModel(dependencies.ClipboardService);
