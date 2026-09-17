@@ -35,6 +35,10 @@ WORKFLOW_CONTRACTS: dict[str, tuple[str, ...]] = {
         "dotnet workload install android",
         "dotnet restore src/CalcNova.Android/CalcNova.Android.csproj",
         "dotnet build src/CalcNova.Android/CalcNova.Android.csproj --configuration Release --no-restore",
+        # Packaging is the step that exercises the manifest, resources and signing
+        # configuration; compiling alone never touches them.
+        "dotnet publish src/CalcNova.Android/CalcNova.Android.csproj --configuration Release --no-restore --output artifacts/android",
+        "actions/upload-artifact@v7",
     ),
     ".github/workflows/build-ios.yml": (
         "runs-on: macos-latest",

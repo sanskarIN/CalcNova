@@ -8,30 +8,15 @@
   <description>
     <p>CalcNova is a complete open-source local-first calculator with standard, scientific, exact-rational, engineering-notation, programmer, Unicode, conversion, statistics, equations, matrices, graphing, history, settings, keyboard, accessibility, and cross-platform workflows.</p>
   </description>
+  <!-- CalcNova 1.0.0 is the project's first release. The 2.8 and 2.9 numbers that preceded it
+       were pre-release development checkpoints: no tag and no published artifact ever existed
+       for any of them. Listing them here as stable releases would have told software centres
+       that a version newer than 1.0.0 was available, because every version comparator ranks
+       2.9.7 above 1.0.0. The development record is kept in CHANGELOG.md and docs/history/. -->
   <releases>
-    <release version="2.9.7" date="2026-08-25" type="stable">
+    <release version="1.0.0" date="2026-09-17" type="stable">
       <description>
-        <p>CalcNova 2.9.7 maintenance release with graph accessibility restoration and source-validation hardening.</p>
-      </description>
-    </release>
-    <release version="2.9.6" date="2026-08-24" type="stable">
-      <description>
-        <p>CalcNova 2.9.6 maintenance release with synchronized release identity and validation contracts.</p>
-      </description>
-    </release>
-    <release version="2.9.5" date="2026-08-24" type="stable">
-      <description>
-        <p>CalcNova 2.9.5 completed 2.9-series cross-platform and release-consistency baseline.</p>
-      </description>
-    </release>
-    <release version="2.9.0" date="2026-08-24" type="stable">
-      <description>
-        <p>CalcNova 2.9.0 release-identity and cross-platform maintenance baseline.</p>
-      </description>
-    </release>
-    <release version="2.8.03" date="2026-08-19" type="stable">
-      <description>
-        <p>CalcNova 2.8.03 completed cross-platform product baseline.</p>
+        <p>CalcNova 1.0.0 is the first release: a complete local-first calculator covering standard, scientific, exact-rational, engineering-notation, programmer, Unicode, conversion, statistics, equations, matrices, graphing, currency, history and settings workflows across Desktop, Browser, Android and iOS.</p>
       </description>
     </release>
   </releases>

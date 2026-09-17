@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- The languages CalcNova ships strings for. Declaring them lets Android 13 and later offer
+     CalcNova in the system per-app language picker, so a user can run the app in Hindi without
+     changing the language of the whole device. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+  <locale android:name="en" />
+  <locale android:name="hi" />
+</locale-config>

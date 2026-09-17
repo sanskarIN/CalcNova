@@ -1,8 +1,8 @@
-# CalcNova 2.9.7 SDK-Independent Source Preflight
+# CalcNova 1.0.0 SDK-Independent Source Preflight
 
 CalcNova includes a deterministic source-level validation command for environments where the .NET SDK or target-platform workloads are unavailable.
 
-**CalcNova 2.9.7 is the completed product baseline.**
+**CalcNova 1.0.0 is the completed product baseline.**
 
 ## Run it
 
@@ -15,10 +15,10 @@ python tools/release_preflight.py
 For the current release identity, include the exact release tag when validating a tagged source tree:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.7
+python tools/release_preflight.py --tag v1.0.0
 ```
 
-The public/product version, strict SemVer package version, and normalized tag are `2.9.7`, `2.9.7`, and `v2.9.7`. Android/iOS use numeric build code `20907`.
+The public/product version, strict SemVer package version, and normalized tag are `1.0.0`, `1.0.0`, and `v1.0.0`. Android/iOS use numeric build code `10000`.
 
 Earlier 2.9.0, 2.9.5, and 2.9.6 checkpoints are preserved in [`releases/2.9.0.md`](releases/2.9.0.md), [`releases/2.9.5.md`](releases/2.9.5.md), and [`releases/2.9.6.md`](releases/2.9.6.md).
 
@@ -65,7 +65,7 @@ The integrated preflight is intentionally broader than any one focused workflow.
 
 - current release identity loaded from `Directory.Build.props`;
 - current release completion-status contracts;
-- in-app About release label `Version 2.9.7 • Complete`;
+- in-app About release label `Version 1.0.0 • Complete`;
 - converter default-pair and preference-notice contracts;
 - versioned settings schema/shared codec/shared validation;
 - onboarding persistence/visual/focus behavior;
@@ -116,12 +116,12 @@ python tools/validate_completion_status.py .
 
 `tools/release_identity.py` parses `Directory.Build.props` and requires:
 
-- display version `2.9.7` to normalize to package version `2.9.7`;
+- display version `1.0.0` to normalize to package version `1.0.0`;
 - `VersionPrefix` and `PackageVersion` to match `Version`;
-- assembly/file versions to match `2.9.7.0`;
+- assembly/file versions to match `1.0.0.0`;
 - informational version to match the display version;
-- release tag to derive as `v2.9.7`;
-- mobile build code to derive as `20907` from `MAJOR * 10000 + MINOR * 100 + PATCH`.
+- release tag to derive as `v1.0.0`;
+- mobile build code to derive as `10000` from `MAJOR * 10000 + MINOR * 100 + PATCH`.
 
 This removes the maintenance risk where validators could remain pinned to an old release after source workflows or version metadata advanced.
 
@@ -279,6 +279,6 @@ A successful source preflight validates deterministic repository contracts. It d
 
 Those checks are external execution/settings evidence. They are recorded only when actually run, observed, or enabled.
 
-An environment-specific `NOT RUN` or `BLOCKED` result does not change the completed implementation status of CalcNova 2.9.7; it only records whether that external verification operation executed in that environment.
+An environment-specific `NOT RUN` or `BLOCKED` result does not change the completed implementation status of CalcNova 1.0.0; it only records whether that external verification operation executed in that environment.
 
 See [RELEASE.md](RELEASE.md), [TESTING.md](TESTING.md), [PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md), [SECURITY_AUTOMATION.md](SECURITY_AUTOMATION.md), [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md), [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md), [FOCUS_VISIBILITY.md](FOCUS_VISIBILITY.md), and [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).

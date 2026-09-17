@@ -46,3 +46,28 @@ jobs:
 
       - name: Build Android release configuration
         run: dotnet build src/CalcNova.Android/CalcNova.Android.csproj --configuration Release --no-restore
+
+      - name: Package Android app bundle
+        run: dotnet publish src/CalcNova.Android/CalcNova.Android.csproj --configuration Release --no-restore --output artifacts/android
+
+      - name: Confirm an app bundle was produced
+        shell: bash
+        run: |
+          set -euo pipefail
+          # A compile proves the code is valid; only packaging proves the manifest, resources and
+          # signing configuration hold together, which is what distribution actually needs.
+          bundle=$(find artifacts/android -name '*.aab' -print -quit)
+          if [[ -z "$bundle" ]]; then
+            echo "No Android app bundle was produced."
+            find artifacts/android -maxdepth 2 -type f -print
+            exit 1
+          fi
+          echo "Produced $bundle ($(du -h "$bundle" | cut -f1))"
+
+      - name: Upload Android app bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: calcnova-android-aab
+          path: artifacts/android/*.aab
+          if-no-files-found: error
+          retention-days: 14

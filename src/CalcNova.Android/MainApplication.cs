@@ -39,6 +39,7 @@ public sealed class MainApplication : AvaloniaAndroidApplication<SingleViewApp>
             new JsonSettingsRepository(Path.Combine(appDataDirectory, "settings.json")))
         {
             ExternalLinkService = new AndroidExternalLinkService(this),
+            HapticFeedbackService = new AndroidHapticFeedbackService(this),
             ClipboardService = new AvaloniaClipboardService(),
             CurrencyRateCache = new JsonCurrencyRateCache(Path.Combine(appDataDirectory, "currency"))
         });

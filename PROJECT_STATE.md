@@ -2,11 +2,11 @@
 
 ## Current Version
 
-**2.9.7**
+**1.0.0**
 
-Normalized .NET/NuGet version: `2.9.7`  
-Normalized release tag: `v2.9.7`  
-Mobile numeric build code: `20907`
+Normalized .NET/NuGet version: `1.0.0`  
+Normalized release tag: `v1.0.0`  
+Mobile numeric build code: `10000`
 
 See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
@@ -16,11 +16,11 @@ See [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
 ## Completion Status
 
-**COMPLETE — CalcNova version 2.9.7**
+**COMPLETE — CalcNova version 1.0.0**
 
-The defined 2.9.7 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization, accessibility/adaptive UI, Desktop/Browser/Android/iOS composition, source validation, dependency-security policy, artifact integrity, structured release evidence, packaging metadata, release workflows, security automation, release provenance, deterministic release SBOM generation, cross-platform source validation, centralized release identity, and graph accessibility maintenance are present as completed source capabilities.
+The defined 1.0.0 product scope is implemented in the repository. Core calculation, scientific functions, exact rational arithmetic, engineering notation, programmer and Unicode tools, converter/date-time/currency utilities, descriptive and bivariate statistics, equations, matrices, graphing/numerical analysis, history, persistence, settings, onboarding, localization, accessibility/adaptive UI, Desktop/Browser/Android/iOS composition, source validation, dependency-security policy, artifact integrity, structured release evidence, packaging metadata, release workflows, security automation, release provenance, deterministic release SBOM generation, cross-platform source validation, centralized release identity, and graph accessibility maintenance are present as completed source capabilities.
 
-Future repository changes are classified as maintenance, compatibility updates, security fixes, documentation changes, translation additions, dependency updates, tests, or optional enhancements. They are not required to define the 2.9.7 project as complete.
+Future repository changes are classified as maintenance, compatibility updates, security fixes, documentation changes, translation additions, dependency updates, tests, or optional enhancements. They are not required to define the 1.0.0 project as complete.
 
 ## Current Maintenance Enhancements — 2026-08-26
 
@@ -45,15 +45,15 @@ Future repository changes are classified as maintenance, compatibility updates, 
 `Directory.Build.props` is the source of truth for current release identity. `tools/release_identity.py` parses and validates it without requiring the .NET SDK.
 
 ```text
-ProductDisplayVersion = 2.9.7
-Version = 2.9.7
-VersionPrefix = 2.9.7
-PackageVersion = 2.9.7
-AssemblyVersion = 2.9.7.0
-FileVersion = 2.9.7.0
-InformationalVersion = 2.9.7
-ReleaseTag = v2.9.7
-MobileBuildCode = 20907
+ProductDisplayVersion = 1.0.0
+Version = 1.0.0
+VersionPrefix = 1.0.0
+PackageVersion = 1.0.0
+AssemblyVersion = 1.0.0.0
+FileVersion = 1.0.0.0
+InformationalVersion = 1.0.0
+ReleaseTag = v1.0.0
+MobileBuildCode = 10000
 ```
 
 Protected mobile mappings include:
@@ -62,7 +62,7 @@ Protected mobile mappings include:
 2.9.0 -> 20900
 2.9.5 -> 20905
 2.9.6 -> 20906
-2.9.7 -> 20907
+1.0.0 -> 10000
 ```
 
 ### Cross-platform source hardening
@@ -112,11 +112,11 @@ The Android publication job keeps the source-owned product display version and n
 ## Product Identity
 
 - Product name: CalcNova
-- Public version: `2.9.7`
-- Package version: `2.9.7`
-- Release tag: `v2.9.7`
-- Assembly/file version: `2.9.7.0`
-- Mobile build code: `20907`
+- Public version: `1.0.0`
+- Package version: `1.0.0`
+- Release tag: `v1.0.0`
+- Assembly/file version: `1.0.0.0`
+- Mobile build code: `10000`
 - Application id: `in.sanskar.calcnova`
 - License: Apache-2.0
 - Repository: `https://github.com/sanskarIN/CalcNova`
@@ -220,7 +220,7 @@ SDK-independent validation covers repository/security contracts, XAML, navigatio
 The integrated gate is:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.7
+python tools/release_preflight.py --tag v1.0.0
 ```
 
 Focused checks include:
@@ -248,14 +248,14 @@ Unavailable external operations are recorded as `NOT RUN` or `BLOCKED`, never in
 
 ## Historical Release Checkpoints
 
-- [`docs/releases/2.9.7.md`](docs/releases/2.9.7.md) — current 2.9.7 checkpoint
+- [`docs/releases/1.0.0.md`](docs/releases/1.0.0.md) — current 1.0.0 checkpoint
 - [`docs/releases/2.9.6.md`](docs/releases/2.9.6.md) — preserved 2.9.6 checkpoint
 - [`docs/releases/2.9.5.md`](docs/releases/2.9.5.md) — preserved 2.9.5 checkpoint
 - [`docs/releases/2.9.0.md`](docs/releases/2.9.0.md) — preserved 2.9.0 checkpoint
 
 ## Final Classification
 
-- Product scope for 2.9.7: **COMPLETE**
+- Product scope for 1.0.0: **COMPLETE**
 - Core features: **COMPLETE**
 - Shared application features: **COMPLETE**
 - Platform source composition: **COMPLETE**

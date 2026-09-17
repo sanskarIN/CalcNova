@@ -1,13 +1,13 @@
-# CalcNova 2.9.7 Documentation
+# CalcNova 1.0.0 Documentation
 
-**Project status: Complete for version 2.9.7.**
+**Project status: Complete for version 1.0.0.**
 
-This directory contains the authoritative product, engineering, quality, platform, packaging, validation, security-maintenance, and release documentation for the completed CalcNova 2.9.7 baseline.
+This directory contains the authoritative product, engineering, quality, platform, packaging, validation, security-maintenance, and release documentation for the completed CalcNova 1.0.0 baseline.
 
-Normalized release tag: `v2.9.7`  
-Android/iOS numeric build code: `20907`
+Normalized release tag: `v1.0.0`  
+Android/iOS numeric build code: `10000`
 
-Earlier 2.9-series preparations are preserved in [releases/2.9.0.md](releases/2.9.0.md), [releases/2.9.5.md](releases/2.9.5.md), and [releases/2.9.6.md](releases/2.9.6.md). Current-facing guides use 2.9.7; dated older records remain historical.
+1.0.0 is CalcNova's first release; the 2.x numbers that preceded it were development checkpoints that were never published. Those checkpoints are preserved in [releases/2.9.0.md](releases/2.9.0.md), [releases/2.9.5.md](releases/2.9.5.md), [releases/2.9.6.md](releases/2.9.6.md), and [releases/2.9.7.md](releases/2.9.7.md). Current-facing guides use 1.0.0; dated older records remain historical.
 
 Use this page as the documentation map. Current guides are grouped by responsibility; dated continuation/audit/release-checkpoint records are grouped separately so history is not confused with current product status.
 
@@ -15,12 +15,14 @@ Use this page as the documentation map. Current guides are grouped by responsibi
 
 - [Project state](../PROJECT_STATE.md) — authoritative completion/status record.
 - [Main README](../README.md) — product overview and major capabilities.
-- [Versioning](VERSIONING.md) — current `2.9.7` / `v2.9.7` / `20907` mapping and centralized release-identity contract.
-- [Completed feature inventory](FEATURES.md) — implemented 2.9.7 product scope.
+- [Versioning](VERSIONING.md) — current `1.0.0` / `v1.0.0` / `10000` mapping and centralized release-identity contract.
+- [Completed feature inventory](FEATURES.md) — implemented 1.0.0 product scope.
 - [Completed roadmap](ROADMAP.md) — completed milestone record and optional post-release ideas.
 - [2.9.0 release checkpoint](releases/2.9.0.md) — preserved requested intermediate release preparation.
 - [2.9.5 release checkpoint](releases/2.9.5.md) — preserved earlier completed 2.9-series baseline.
-- [2.9.6 release checkpoint](releases/2.9.6.md) — preserved maintenance baseline before 2.9.7.
+- [2.9.6 release checkpoint](releases/2.9.6.md) — preserved development checkpoint.
+- [2.9.7 release checkpoint](releases/2.9.7.md) — final development checkpoint before the 1.0.0 renumbering.
+- [1.0.0 release checkpoint](releases/1.0.0.md) — the current release.
 - [Platform support](PLATFORM_SUPPORT.md) — Windows/Linux/macOS, Browser/WebAssembly/PWA, Android, and iOS composition status.
 - [Building](BUILDING.md) — current build/run/publish commands and platform prerequisites.
 - [Testing](TESTING.md) — test layers and responsibilities.
@@ -112,11 +114,11 @@ The maintained source matrix covers:
 Current identity:
 
 ```text
-Product/display: 2.9.7
-Package: 2.9.7
-Tag: v2.9.7
-Assembly/file: 2.9.7.0
-Mobile build code: 20907
+Product/display: 1.0.0
+Package: 1.0.0
+Tag: v1.0.0
+Assembly/file: 1.0.0.0
+Mobile build code: 10000
 ```
 
 Focused checks:
@@ -127,7 +129,7 @@ python tools/validate_packaging_metadata.py .
 python tools/validate_completion_status.py .
 ```
 
-The 2.9.0, 2.9.5, and 2.9.6 checkpoints remain preserved before the repository intentionally advanced to 2.9.7.
+The 2.9.0, 2.9.5, 2.9.6 and 2.9.7 checkpoints remain preserved as development records; none of them was ever released, and the repository then renumbered to 1.0.0 for its first release.
 
 ## Security maintenance and supply-chain checks
 
@@ -172,7 +174,7 @@ These checks are also integrated into the main source preflight. The online NuGe
 The integrated SDK-independent current-release gate is:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.7
+python tools/release_preflight.py --tag v1.0.0
 ```
 
 The compiled .NET gate is documented in [BUILDING.md](BUILDING.md) and [TESTING.md](TESTING.md).
@@ -226,12 +228,12 @@ When a historical statement differs from a current authoritative guide, use the 
 
 ## Version summary
 
-- Product/display version: `2.9.7`
-- Package version: `2.9.7`
-- Normalized release tag: `v2.9.7`
-- Assembly/file version: `2.9.7.0`
-- Android/iOS display version: `2.9.7`
-- Android/iOS numeric build code: `20907`
+- Product/display version: `1.0.0`
+- Package version: `1.0.0`
+- Normalized release tag: `v1.0.0`
+- Assembly/file version: `1.0.0.0`
+- Android/iOS display version: `1.0.0`
+- Android/iOS numeric build code: `10000`
 - Application id: `in.sanskar.calcnova`
 
 ## Documentation source-of-truth rules
@@ -252,7 +254,7 @@ When code or a workflow changes, update the corresponding documentation in the s
 
 ## Evidence note
 
-A runtime/platform/network/service check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 2.9.7 implementation is unfinished.
+A runtime/platform/network/service check is recorded as PASS only when it actually runs and its result is observed. `NOT RUN` or `BLOCKED` describes verification evidence in a particular environment; it does not mean the completed 1.0.0 implementation is unfinished.
 
 That distinction applies to CodeQL, Dependency Review, online NuGet vulnerability queries, provenance generation, signing, packaging, device/browser execution, and store processing.
 

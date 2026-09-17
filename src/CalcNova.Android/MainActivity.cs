@@ -10,7 +10,7 @@ namespace CalcNova.Android;
 /// reconfigure the window that the shared shell is rendered into.
 /// </summary>
 [Activity(
-    Label = "CalcNova",
+    Label = "@string/app_name",
     Theme = "@style/CalcNovaTheme",
     MainLauncher = true,
     Icon = "@mipmap/ic_launcher",

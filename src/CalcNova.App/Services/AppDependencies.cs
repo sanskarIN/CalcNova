@@ -2,6 +2,7 @@ using CalcNova.App.Localization;
 using CalcNova.Currency;
 using CalcNova.Platform.Clipboard;
 using CalcNova.Platform.External;
+using CalcNova.Platform.Haptics;
 using CalcNova.Platform.History;
 using CalcNova.Platform.Settings;
 
@@ -18,6 +19,12 @@ public sealed record AppDependencies(
     public ICurrencyRateCache? CurrencyRateCache { get; init; }
 
     public ICurrencyRateProvider? CurrencyRateProvider { get; init; }
+
+    /// <summary>
+    /// The device's haptic engine. Heads without one leave this null and
+    /// <see cref="NullHapticFeedbackService"/> is used, so callers never branch on availability.
+    /// </summary>
+    public IHapticFeedbackService? HapticFeedbackService { get; init; }
 
     public IAppLocalizer? Localizer { get; init; }
 

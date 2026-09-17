@@ -47,6 +47,8 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
     ),
     "src/CalcNova.Android/CalcNova.Android.csproj": (
         "<TargetFramework>net10.0-android</TargetFramework>",
+        # Release builds produce the app bundle Google Play distributes.
+        "<AndroidPackageFormat Condition=\"'$(Configuration)' == 'Release'\">aab</AndroidPackageFormat>",
         "<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>",
         "<ApplicationId>in.sanskar.calcnova</ApplicationId>",
         "<ApplicationDisplayVersion>$(ProductDisplayVersion)</ApplicationDisplayVersion>",
@@ -67,8 +69,34 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
         "SqliteCalculationHistoryRepository",
         "JsonSettingsRepository",
         "AndroidExternalLinkService",
+        "AndroidHapticFeedbackService",
         "AvaloniaClipboardService",
         "JsonCurrencyRateCache",
+    ),
+    "src/CalcNova.Android/Properties/AndroidManifest.xml": (
+        # Haptics are a declared product feature, so the permission that makes them possible and
+        # the feature declaration that keeps CalcNova installable without a vibrator are both
+        # part of the Android contract.
+        'android:name="android.permission.VIBRATE"',
+        'android:name="android.hardware.vibrate" android:required="false"',
+        # CalcNova ships English and Hindi; localeConfig is what surfaces that in the Android 13+
+        # per-app language picker.
+        'android:localeConfig="@xml/locales_config"',
+        # Backup rules for both the pre-12 and 12+ APIs, so history and settings restore onto a
+        # new device and the reconstructible rate cache does not.
+        'android:fullBackupContent="@xml/backup_rules"',
+        'android:dataExtractionRules="@xml/data_extraction_rules"',
+        'android:enableOnBackInvokedCallback="true"',
+        'android:usesCleartextTraffic="false"',
+    ),
+    "src/CalcNova.Android/Services/AndroidHapticFeedbackService.cs": (
+        "IHapticFeedbackService",
+        # The vibrator API moved at API 26 and again at API 31; each path has to stay present
+        # because CalcNova supports back to API 23.
+        "OperatingSystem.IsAndroidVersionAtLeast(31)",
+        "OperatingSystem.IsAndroidVersionAtLeast(26)",
+        "VibratorManager",
+        "VibrationEffect.CreateOneShot",
     ),
     "src/CalcNova.iOS/CalcNova.iOS.csproj": (
         "<TargetFramework>net10.0-ios</TargetFramework>",
@@ -84,8 +112,16 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
         "SqliteCalculationHistoryRepository",
         "JsonSettingsRepository",
         "IosExternalLinkService",
+        "IosHapticFeedbackService",
         "AvaloniaClipboardService",
         "JsonCurrencyRateCache",
+    ),
+    "src/CalcNova.iOS/Services/IosHapticFeedbackService.cs": (
+        "IHapticFeedbackService",
+        # The selection generator, not the impact one: UIImpactFeedbackGenerator's style
+        # constructor was obsoleted in iOS 17.5 in favour of an overload needing a UIView.
+        "UISelectionFeedbackGenerator",
+        "UINotificationFeedbackGenerator",
     ),
     "src/CalcNova.Platform/CalcNova.Platform.csproj": (
         "<TargetFramework>net10.0</TargetFramework>",
@@ -97,6 +133,14 @@ REQUIRED_FILES: tuple[str, ...] = (
     "Directory.Build.props",
     "src/CalcNova.Platform/Clipboard/IClipboardService.cs",
     "src/CalcNova.Platform/External/IExternalLinkService.cs",
+    "src/CalcNova.Platform/Haptics/IHapticFeedbackService.cs",
+    "src/CalcNova.Platform/Haptics/NullHapticFeedbackService.cs",
+    "src/CalcNova.Android/Resources/values/strings.xml",
+    "src/CalcNova.Android/Resources/values-night/styles.xml",
+    "src/CalcNova.Android/Resources/values-night-v31/styles.xml",
+    "src/CalcNova.Android/Resources/xml/locales_config.xml",
+    "src/CalcNova.Android/Resources/xml/backup_rules.xml",
+    "src/CalcNova.Android/Resources/xml/data_extraction_rules.xml",
     "src/CalcNova.Platform/History/ICalculationHistoryRepository.cs",
     "src/CalcNova.Platform/Settings/ISettingsRepository.cs",
     "src/CalcNova.Browser/wwwroot/index.html",

@@ -4,20 +4,19 @@ CalcNova welcomes responsible reports that help keep users and contributors safe
 
 ## Supported versions
 
-**CalcNova 2.9.7 is the current completed and supported product baseline.**
+**CalcNova 1.0.0 is the current completed and supported product baseline.**
 
 Security fixes are applied to the actively maintained `main` branch and, when needed, to supported release or maintenance branches/tags.
 
 | Version | Supported |
 | --- | --- |
-| `2.9.7` | Yes |
-| `2.9.6` | Superseded by 2.9.7 |
-| `2.9.5` | Superseded by the later 2.9 series |
-| `2.9.0` | Superseded by the later 2.9 series |
-| `2.8.03` | Superseded by the 2.9 series |
+| `1.0.0` | Yes |
+| `2.8.03` – `2.9.7` | Never released; development checkpoints only |
 | Earlier snapshots | No stable-support guarantee |
 
-The normalized SemVer/package equivalent of 2.9.7 is `2.9.7`, and the normalized release tag is `v2.9.7`.
+CalcNova 1.0.0 is the project's first release. The 2.x numbers that appear in the changelog and in `docs/releases/` were pre-release development checkpoints: no tag and no artifact was ever published for any of them, so there is nothing running in the field to receive a backport.
+
+The normalized SemVer/package equivalent of 1.0.0 is `1.0.0`, and the normalized release tag is `v1.0.0`.
 
 ## Reporting a vulnerability
 
@@ -91,7 +90,7 @@ python -m unittest tools.tests.test_validate_security_workflows
 python -m unittest tools.tests.test_validate_dependency_security
 ```
 
-Those checks are also integrated into `python tools/release_preflight.py --tag v2.9.7`.
+Those checks are also integrated into `python tools/release_preflight.py --tag v1.0.0`.
 
 The focused security workflow watches `Directory.Build.props`, so a change that disables transitive audit, weakens the severity threshold, suppresses protected NU190x warnings through the guarded properties, or removes warnings-as-errors becomes a source-contract failure.
 
@@ -101,4 +100,4 @@ See `docs/SECURITY_AUTOMATION.md` for triggers, permissions, action versions, Nu
 
 ## Completion and security maintenance
 
-The completed status of CalcNova 2.9.7 does not end security maintenance. Confirmed vulnerabilities, compatibility problems, dependency advisories, and security-tooling changes can be fixed through maintenance updates without reclassifying the 2.9.7 product baseline as unfinished.
+The completed status of CalcNova 1.0.0 does not end security maintenance. Confirmed vulnerabilities, compatibility problems, dependency advisories, and security-tooling changes can be fixed through maintenance updates without reclassifying the 1.0.0 product baseline as unfinished.

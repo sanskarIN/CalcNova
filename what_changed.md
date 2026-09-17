@@ -1,22 +1,22 @@
 # What Changed
 
-## CalcNova 2.9.7 maintenance release preparation — 2026-08-26
+## CalcNova 1.0.0 first release — 2026-09-17
 
-CalcNova has been advanced from the preserved 2.9.6 checkpoint to the current **2.9.7** maintenance baseline.
+CalcNova is released as **1.0.0**. The 2.x numbers that preceded it were development checkpoints and were never published; the repository has no tag or artifact for any of them, so the version now states the project's real position rather than implying a release history it does not have.
 
 ### Current release identity
 
-- Product/display version: `2.9.7`
-- .NET/NuGet package version: `2.9.7`
-- Release tag contract: `v2.9.7`
-- Assembly/file version: `2.9.7.0`
-- Android/iOS numeric build code: `20907`
+- Product/display version: `1.0.0`
+- .NET/NuGet package version: `1.0.0`
+- Release tag contract: `v1.0.0`
+- Assembly/file version: `1.0.0.0`
+- Android/iOS numeric build code: `10000`
 - Application id: `in.sanskar.calcnova`
-- In-app About label: `Version 2.9.7 • Complete`
+- In-app About label: `Version 1.0.0 • Complete`
 
-### 2.9.7 maintenance scope
+### 1.0.0 maintenance scope
 
-The 2.9.7 work preserves the completed calculator feature set and hardens the areas most likely to drift during release maintenance:
+The 1.0.0 work preserves the completed calculator feature set and hardens the areas most likely to drift during release maintenance:
 
 - graph viewport accessibility is now represented by one stable eight-action toolbar contract: pan left/right/up/down, zoom in/out, reset, and fit-to-data;
 - graph toolbar commands, labels, tooltips, target sizes, and focus behavior are validated from source;
@@ -28,22 +28,22 @@ The 2.9.7 work preserves the completed calculator feature set and hardens the ar
 - iOS source composition explicitly inventories ARM64 device and ARM64/x64 simulator identifiers;
 - platform workflow contracts remain aligned with the current GitHub Actions checkout/setup baseline;
 - deterministic CycloneDX 1.7 SBOM generation, checksum/provenance controls, dependency-security validation, and CodeQL/Dependency Review/Dependabot coverage remain protected;
-- the public README, project state, and live change log now identify 2.9.7 consistently.
+- the public README, project state, and live change log now identify 1.0.0 consistently.
 
-### 2.9.7 release-identity contract
+### 1.0.0 release-identity contract
 
 The release identity remains centralized in `Directory.Build.props`:
 
 ```text
-ProductDisplayVersion = 2.9.7
-Version = 2.9.7
-VersionPrefix = 2.9.7
-PackageVersion = 2.9.7
-AssemblyVersion = 2.9.7.0
-FileVersion = 2.9.7.0
-InformationalVersion = 2.9.7
-MobileBuildCode = 20907
-ReleaseTag = v2.9.7
+ProductDisplayVersion = 1.0.0
+Version = 1.0.0
+VersionPrefix = 1.0.0
+PackageVersion = 1.0.0
+AssemblyVersion = 1.0.0.0
+FileVersion = 1.0.0.0
+InformationalVersion = 1.0.0
+MobileBuildCode = 10000
+ReleaseTag = v1.0.0
 ```
 
 The release-identity regression suite protects the numeric build mapping:
@@ -52,10 +52,10 @@ The release-identity regression suite protects the numeric build mapping:
 2.9.0 -> 20900
 2.9.5 -> 20905
 2.9.6 -> 20906
-2.9.7 -> 20907
+1.0.0 -> 10000
 ```
 
-### 2.9.7 graph accessibility contract
+### 1.0.0 graph accessibility contract
 
 The graph surface now has a stable, inspectable viewport action vocabulary:
 
@@ -72,7 +72,7 @@ Fit to data
 
 Each action is keyboard-focusable and uses the shared 44-DIP minimum interaction-target baseline. The source contract also protects English/Hindi semantic labels and focus restoration after toolbar interaction.
 
-### 2.9.7 cross-platform source contract
+### 1.0.0 cross-platform source contract
 
 The maintained source/release matrix remains:
 
@@ -83,16 +83,16 @@ The maintained source/release matrix remains:
 - Android: `android-arm`, `android-arm64`, `android-x86`, `android-x64`;
 - iOS: `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`.
 
-No maintained platform head was removed during the 2.9.7 maintenance work.
+No maintained platform head was removed during the 1.0.0 maintenance work.
 
-### 2.9.7 validation updates
+### 1.0.0 validation updates
 
 The source-preflight regression set now includes the adaptive-layout validator test with the current shell mode labels. Release validators remain SDK-independent and fail closed when the source contract is inconsistent.
 
 The preferred current source gate is:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.7
+python tools/release_preflight.py --tag v1.0.0
 ```
 
 Focused checks include:
@@ -105,27 +105,27 @@ python tools/validate_completion_status.py .
 python tools/validate_platform_support.py .
 ```
 
-### 2.9.7 documentation synchronization
+### 1.0.0 documentation synchronization
 
-The following current-state documents were advanced to 2.9.7 on the maintenance branch:
+The following current-state documents were advanced to 1.0.0 on the maintenance branch:
 
 - `README.md`
 - `PROJECT_STATE.md`
 - `what_changed.md`
-- `docs/releases/2.9.7.md` (existing release checkpoint)
+- `docs/releases/1.0.0.md` (existing release checkpoint)
 
 Historical 2.9.6, 2.9.5, and 2.9.0 release checkpoints remain preserved rather than rewritten.
 
-### 2.9.7 maintenance commits
+### 1.0.0 maintenance commits
 
-- `docs: advance README to CalcNova 2.9.7`
-- `docs: advance project state to CalcNova 2.9.7`
+- `docs: advance README to CalcNova 1.0.0`
+- `docs: advance project state to CalcNova 1.0.0`
 - `test: align adaptive layout mode fixture with current labels`
-- `docs: advance live change log to CalcNova 2.9.7`
+- `docs: advance live change log to CalcNova 1.0.0`
 
 ## Evidence policy
 
-CalcNova 2.9.7 product scope: **COMPLETE**
+CalcNova 1.0.0 product scope: **COMPLETE**
 
 The repository continues to enforce dependency-audit policy through:
 
@@ -157,7 +157,8 @@ Before the 2.9.6 bump, the completed 2.9.5 source/release state was preserved in
 The release sequence remains auditable as:
 
 ```text
-2.8.03 -> 2.9.0 -> 2.9.5 -> 2.9.6 -> 2.9.7
+2.8.03 -> 2.9.0 -> 2.9.5 -> 2.9.6 -> 2.9.7  (development checkpoints, never released)
+1.0.0                                          (first release)
 ```
 
 ### Central version and mobile identities

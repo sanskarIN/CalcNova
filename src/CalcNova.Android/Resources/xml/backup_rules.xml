@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Android 11 and earlier (android:fullBackupContent). CalcNova stores calculation history,
+     preferences and a currency-rate cache in its files directory. History and preferences are
+     the user's own work and are worth restoring onto a new device; the rate cache is
+     reconstructible from the network and would only restore stale figures, so it is excluded. -->
+<full-backup-content>
+  <include domain="file" path="." />
+  <exclude domain="file" path="currency" />
+</full-backup-content>

@@ -1,8 +1,8 @@
-# CalcNova 2.9.7 Release Evidence Checklist
+# CalcNova 1.0.0 Release Evidence Checklist
 
 ## Purpose
 
-CalcNova 2.9.7 is the completed product baseline. This checklist records **execution evidence** for a release/tag/environment; unchecked items do not change the completed implementation status.
+CalcNova 1.0.0 is the completed product baseline. This checklist records **execution evidence** for a release/tag/environment; unchecked items do not change the completed implementation status.
 
 Use only observed statuses:
 
@@ -12,24 +12,24 @@ PASS / FAIL / BLOCKED / NOT RUN
 
 ## Release identity
 
-- [ ] Product/display version is `2.9.7`.
-- [ ] Package version is `2.9.7`.
-- [ ] Release tag is `v2.9.7`.
-- [ ] Assembly/file version is `2.9.7.0`.
-- [ ] Android/iOS display version is `2.9.7`.
-- [ ] Android/iOS numeric build code is `20907`.
+- [ ] Product/display version is `1.0.0`.
+- [ ] Package version is `1.0.0`.
+- [ ] Release tag is `v1.0.0`.
+- [ ] Assembly/file version is `1.0.0.0`.
+- [ ] Android/iOS display version is `1.0.0`.
+- [ ] Android/iOS numeric build code is `10000`.
 - [ ] `Directory.Build.props` is the shared version source of truth.
 - [ ] `python -m unittest tools.tests.test_release_identity` passes.
 - [ ] Release tag equals `v` plus source `<Version>`.
 - [ ] Packaging, completion-status, platform-support, and release-document validators derive current expectations from central release identity.
-- [ ] In-app About shows `Version 2.9.7 • Complete`.
+- [ ] In-app About shows `Version 1.0.0 • Complete`.
 - [ ] Historical 2.9.0 checkpoint remains recorded as `v2.9.0` / `20900`.
 - [ ] Historical 2.9.5 checkpoint remains recorded as `v2.9.5` / `20905`.
 - [ ] Historical 2.9.6 checkpoint remains recorded as `v2.9.6` / `20906`.
 
 ## Source preflight
 
-- [ ] `python tools/release_preflight.py --tag v2.9.7` passes from the exact release-tag checkout.
+- [ ] `python tools/release_preflight.py --tag v1.0.0` passes from the exact release-tag checkout.
 - [ ] Repository required-file/security guards pass.
 - [ ] Release-identity regression contracts pass.
 - [ ] Avalonia `.axaml` XML validation passes.
@@ -46,7 +46,7 @@ PASS / FAIL / BLOCKED / NOT RUN
 - [ ] English/Hindi localization contracts pass.
 - [ ] Settings/onboarding/converter contracts pass.
 - [ ] Packaging metadata contracts pass.
-- [ ] Current 2.9.7 completion-status contract passes.
+- [ ] Current 1.0.0 completion-status contract passes.
 - [ ] Platform workflow contracts pass.
 - [ ] Cross-platform source composition contracts pass.
 - [ ] Source Preflight workflow self-validation passes.
@@ -170,7 +170,7 @@ PASS / FAIL / BLOCKED / NOT RUN
 - [ ] Hindi graph viewport action labels are checked.
 - [ ] Reviewed localized surfaces are checked at representative sizes.
 
-Additional language packs are optional post-2.9.7 improvements.
+Additional language packs are optional post-1.0.0 improvements.
 
 ## Accessibility and responsive-layout evidence
 
@@ -242,8 +242,8 @@ Additional language packs are optional post-2.9.7 improvements.
 
 - [ ] Android workload restore/publish succeeds.
 - [ ] Application id is `in.sanskar.calcnova`.
-- [ ] Display version is `2.9.7`.
-- [ ] Numeric build code is `20907`.
+- [ ] Display version is `1.0.0`.
+- [ ] Numeric build code is `10000`.
 - [ ] Source runtime identifiers include `android-arm`, `android-arm64`, `android-x86`, `android-x64`.
 - [ ] Signed AAB is produced only with configured external secrets.
 - [ ] Temporary signing material is removed.
@@ -258,8 +258,8 @@ Additional language packs are optional post-2.9.7 improvements.
 
 - [ ] iOS workload/build succeeds on macOS/Xcode.
 - [ ] Application id is `in.sanskar.calcnova`.
-- [ ] Display version is `2.9.7`.
-- [ ] Numeric build code is `20907`.
+- [ ] Display version is `1.0.0`.
+- [ ] Numeric build code is `10000`.
 - [ ] Source runtime identifiers include `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`.
 - [ ] Launch metadata is correct.
 - [ ] Unsigned exact-tag simulator workflow is checked where applicable.
@@ -285,7 +285,7 @@ Additional language packs are optional post-2.9.7 improvements.
 
 ## Release artifacts, SBOMs, checksums, and provenance
 
-- [ ] Every artifact comes from release tag `v2.9.7`.
+- [ ] Every artifact comes from release tag `v1.0.0`.
 - [ ] Stable release artifacts are not debug builds.
 - [ ] Each published Desktop/Browser package has its expected deterministic CycloneDX 1.7 SBOM.
 - [ ] Android AAB/SBOM is present only when signed Android publication is enabled.
@@ -300,10 +300,10 @@ Additional language packs are optional post-2.9.7 improvements.
 ## Evidence record
 
 ```text
-Product: CalcNova 2.9.7 — COMPLETE
-Normalized tag: v2.9.7
-Release tag: v2.9.7
-Mobile build code: 20907
+Product: CalcNova 1.0.0 — COMPLETE
+Normalized tag: v1.0.0
+Release tag: v1.0.0
+Mobile build code: 10000
 Source preflight: PASS / FAIL / BLOCKED / NOT RUN
 .NET restore/format/build/test: PASS / FAIL / BLOCKED / NOT RUN
 Windows x64: PASS / FAIL / BLOCKED / NOT RUN
@@ -321,4 +321,4 @@ Signing/store evidence: PASS / FAIL / BLOCKED / NOT RUN
 SBOM/checksum/provenance publication: PASS / FAIL / BLOCKED / NOT RUN
 ```
 
-Never convert `NOT RUN` or `BLOCKED` into PASS because source files/workflows merely exist. That evidence discipline coexists with the completed 2.9.7 product status.
+Never convert `NOT RUN` or `BLOCKED` into PASS because source files/workflows merely exist. That evidence discipline coexists with the completed 1.0.0 product status.

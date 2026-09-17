@@ -1,10 +1,10 @@
-# CalcNova 2.9.7 Completed Roadmap
+# CalcNova 1.0.0 Completed Roadmap
 
 ## Status
 
-**All milestones defined for CalcNova 2.9.7 are complete.**
+**All milestones defined for CalcNova 1.0.0 are complete.**
 
-This document is a record of the completed product roadmap. Items added after 2.9.7 are maintenance or optional enhancement ideas and do not represent missing requirements for the completed release.
+This document is a record of the completed product roadmap. Items added after 1.0.0 are maintenance or optional enhancement ideas and do not represent missing requirements for the completed release.
 
 ## Milestone 1 — Core calculation — Complete
 
@@ -145,7 +145,7 @@ This document is a record of the completed product roadmap. Items added after 2.
 - Reviewed live localization across shell, calculator, onboarding, settings, history, currency, About, graph viewport actions, and related surfaces
 - Hindi labels for graph pan, zoom, reset, and fit controls
 
-Additional languages and extra UI-string migration are optional translation improvements rather than incomplete 2.9.7 requirements.
+Additional languages and extra UI-string migration are optional translation improvements rather than incomplete 1.0.0 requirements.
 
 ## Milestone 10 — Cross-platform composition — Complete
 
@@ -160,7 +160,7 @@ Additional languages and extra UI-string migration are optional translation impr
 - Android ARM/ARM64/x86/x64 source runtime identifiers
 - iOS ARM64 device and ARM64/x64 simulator source runtime identifiers
 - Focused cross-platform source validator/workflow
-- Mobile release identity `2.9.7` / build code `20907`
+- Mobile release identity `1.0.0` / build code `10000`
 
 ## Milestone 11 — Validation and release infrastructure — Complete
 
@@ -226,18 +226,18 @@ The 2.8.03 completion remains preserved in the changelog and historical audit do
 - security/support/contributor policy advanced to 2.9.6
 - checkpoint preserved in `docs/releases/2.9.6.md`
 
-### 2.9.7 current baseline
+### 1.0.0 current baseline
 
-- Central source version set to `2.9.7`
-- Release tag contract `v2.9.7`
-- Android/iOS build code `20907`
-- About and release-label regressions updated to 2.9.7
-- Linux AppStream 2.9.7 stable entry added while retaining prior release history
+- Central source version set to `1.0.0`
+- Release tag contract `v1.0.0`
+- Android/iOS build code `10000`
+- About and release-label regressions updated to 1.0.0
+- Linux AppStream reduced to a single 1.0.0 stable entry, the only version ever published
 - graph viewport toolbar accessibility restored with localized action controls
 - Hindi graph pan/zoom/fit action localization completed
 - stale navigation, graph, headless, adaptive, artifact, evidence, keyboard, and platform source validators aligned with current implementation contracts
 - remaining GitHub checkout action pins aligned to `actions/checkout@v7`
-- current documentation/status synchronized to 2.9.7
+- current documentation/status synchronized to 1.0.0
 
 ## Environment Verification
 
@@ -245,9 +245,9 @@ Build, device, browser, signing, notarization, provisioning, accessibility-tool,
 
 An environment-specific `NOT RUN` or `BLOCKED` record is evidence metadata, not an incomplete roadmap item.
 
-## Optional Post-2.9.7 Ideas
+## Optional Post-1.0.0 Ideas
 
-The following may be considered later without changing the completed status of 2.9.7:
+The following may be considered later without changing the completed status of 1.0.0:
 
 - additional language packs;
 - optional UI refinements based on user feedback;
@@ -260,4 +260,4 @@ The following may be considered later without changing the completed status of 2
 - additional automated regression coverage;
 - runtime/device/browser evidence expansion.
 
-No optional idea in this section is required for CalcNova 2.9.7 completion.
+No optional idea in this section is required for CalcNova 1.0.0 completion.
