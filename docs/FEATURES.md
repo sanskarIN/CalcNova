@@ -1,12 +1,12 @@
-# CalcNova 2.9.7 Features
+# CalcNova 1.0.0 Features
 
 ## Status
 
-**Complete for version 2.9.7.**
+**Complete for version 1.0.0.**
 
-This document is the completed feature inventory for CalcNova 2.9.7. Environment-specific verification results are evidence records, not unfinished feature requirements.
+This document is the completed feature inventory for CalcNova 1.0.0. Environment-specific verification results are evidence records, not unfinished feature requirements.
 
-The 2.9 series preserves the completed calculator feature set while adding stronger release-identity and cross-platform source validation. Earlier 2.9.0, 2.9.5, and 2.9.6 checkpoints are preserved in [`releases/2.9.0.md`](releases/2.9.0.md), [`releases/2.9.5.md`](releases/2.9.5.md), and [`releases/2.9.6.md`](releases/2.9.6.md); current source is 2.9.7.
+The feature set was completed across a series of development checkpoints that were never published; they are preserved in [`releases/2.9.0.md`](releases/2.9.0.md), [`releases/2.9.5.md`](releases/2.9.5.md), [`releases/2.9.6.md`](releases/2.9.6.md), and [`releases/2.9.7.md`](releases/2.9.7.md). Current source is 1.0.0, the first release.
 
 ## Standard calculator
 
@@ -295,7 +295,7 @@ See [`SETTINGS_MIGRATION.md`](SETTINGS_MIGRATION.md).
 - Runtime accessibility evidence vocabulary: PASS / FAIL / BLOCKED / NOT RUN
 - Source validators for accessibility markup, focus, dynamic controls, adaptive layout, touch targets, and evidence discipline
 
-Runtime evidence remains recorded only when actually observed; this does not change the completed 2.9.7 implementation status.
+Runtime evidence remains recorded only when actually observed; this does not change the completed 1.0.0 implementation status.
 
 ## Localization
 
@@ -309,7 +309,7 @@ Runtime evidence remains recorded only when actually observed; this does not cha
 - Settings checkbox localization in the live capture/apply path
 - Hindi graph pan/zoom/fit action labels for the accessible viewport toolbar
 
-Additional languages or translation expansion are optional post-2.9.7 contributions.
+Additional languages or translation expansion are optional post-1.0.0 contributions.
 
 ## Platforms
 
@@ -338,8 +338,8 @@ Maintained architecture/runtime source matrix:
 - Android: `android-arm`, `android-arm64`, `android-x86`, `android-x64`
 - iOS: `ios-arm64`, `iossimulator-arm64`, `iossimulator-x64`
 
-Android/iOS display version: `2.9.7`  
-Android/iOS numeric build code: `20907`
+Android/iOS display version: `1.0.0`  
+Android/iOS numeric build code: `10000`
 
 See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md).
 
@@ -352,13 +352,13 @@ See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md).
 - 2.9.0 checkpoint: `v2.9.0`, build code `20900`
 - 2.9.5 checkpoint: `v2.9.5`, build code `20905`
 - 2.9.6 checkpoint: `v2.9.6`, build code `20906`
-- Current 2.9.7 baseline: `v2.9.7`, build code `20907`
+- Current 1.0.0 baseline: `v1.0.0`, build code `10000`
 - Packaging validator derives current version/build expectations instead of hardcoding release constants
 - Completion-status validator derives current documentation/About expectations from central metadata
 - Cross-platform source validator derives mobile build identity from central metadata
 - Release-document validator derives current release/documentation markers from central metadata
 - Release-identity regression coverage is integrated into Source Preflight
-- Linux AppStream preserves stable entries for 2.8.03, 2.9.0, 2.9.5, 2.9.6, and 2.9.7
+- Linux AppStream declares one stable entry, for 1.0.0, the project's first release
 
 See [`VERSIONING.md`](VERSIONING.md), [`releases/2.9.0.md`](releases/2.9.0.md), [`releases/2.9.5.md`](releases/2.9.5.md), and [`releases/2.9.6.md`](releases/2.9.6.md).
 
@@ -400,17 +400,17 @@ See [`SOURCE_PREFLIGHT.md`](SOURCE_PREFLIGHT.md), [`VALIDATION_EVIDENCE.md`](VAL
 
 ## Version identity
 
-- Product/display version: `2.9.7`
-- Package version: `2.9.7`
-- Release tag: `v2.9.7`
-- Assembly/file version: `2.9.7.0`
-- Mobile build code: `20907`
+- Product/display version: `1.0.0`
+- Package version: `1.0.0`
+- Release tag: `v1.0.0`
+- Assembly/file version: `1.0.0.0`
+- Mobile build code: `10000`
 
 See [`VERSIONING.md`](VERSIONING.md).
 
 ## Completion classification
 
-- 2.9.7 feature scope: **COMPLETE**
+- 1.0.0 feature scope: **COMPLETE**
 - Shared application integration: **COMPLETE**
 - Platform source composition: **COMPLETE**
 - Cross-platform source validation: **COMPLETE**
@@ -418,4 +418,4 @@ See [`VERSIONING.md`](VERSIONING.md).
 - Documentation baseline: **COMPLETE**
 - Source validation/release infrastructure: **COMPLETE**
 
-Later changes are maintenance, compatibility/security updates, translations, tests, evidence collection, or optional enhancements rather than missing 2.9.7 features.
+Later changes are maintenance, compatibility/security updates, translations, tests, evidence collection, or optional enhancements rather than missing 1.0.0 features.

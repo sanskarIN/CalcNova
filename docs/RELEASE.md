@@ -1,32 +1,32 @@
-# CalcNova 2.9.7 Release Process
+# CalcNova 1.0.0 Release Process
 
 ## Release identity
 
-CalcNova 2.9.7 uses:
+CalcNova 1.0.0 uses:
 
-- product/display version: `2.9.7`;
-- .NET/NuGet version: `2.9.7`;
-- release tag: `v2.9.7`;
-- assembly/file version: `2.9.7.0`;
-- Android/iOS display version: `2.9.7`;
-- Android/iOS numeric build code: `20907`.
+- product/display version: `1.0.0`;
+- .NET/NuGet version: `1.0.0`;
+- release tag: `v1.0.0`;
+- assembly/file version: `1.0.0.0`;
+- Android/iOS display version: `1.0.0`;
+- Android/iOS numeric build code: `10000`.
 
 See [VERSIONING.md](VERSIONING.md).
 
-Earlier 2.9.0, 2.9.5, and 2.9.6 checkpoints are preserved in [releases/2.9.0.md](releases/2.9.0.md), [releases/2.9.5.md](releases/2.9.5.md), and [releases/2.9.6.md](releases/2.9.6.md). The current source then advanced to 2.9.7.
+The development checkpoints that preceded the first release are preserved in [releases/2.9.0.md](releases/2.9.0.md), [releases/2.9.5.md](releases/2.9.5.md), [releases/2.9.6.md](releases/2.9.6.md), and [releases/2.9.7.md](releases/2.9.7.md). None of them was published; the current source is 1.0.0.
 
 ## Release evidence principle
 
-CalcNova 2.9.7 is the completed product baseline. Release execution evidence is recorded independently.
+CalcNova 1.0.0 is the completed product baseline. Release execution evidence is recorded independently.
 
 A command, build, test, browser/device check, signing operation, accessibility audit, security-service run, attestation, or store validation is marked PASS only after it actually executes and the result is observed. `NOT RUN` and `BLOCKED` are evidence states for unavailable environments/tools/credentials/services; they do not describe the product as unfinished.
 
 ## Source release gate
 
-From the exact 2.9.7 release-tag checkout, run:
+From the exact 1.0.0 release-tag checkout, run:
 
 ```bash
-python tools/release_preflight.py --tag v2.9.7
+python tools/release_preflight.py --tag v1.0.0
 ```
 
 The preflight validates repository/security structure, centralized release identity, XAML/UI/navigation/keyboard contracts, calculator editing, graph/numerical contracts, Unicode metadata, exact rationals, engineering notation, bounded exports, bivariate statistics, accessibility/adaptive/localization contracts, settings/onboarding, package metadata, current completion status, platform workflows, cross-platform source composition, security automation, release workflows, artifact integrity, structured release evidence, SBOM generation, and regression suites for SDK-independent validators/tooling.
@@ -51,7 +51,7 @@ For the 2.9 series:
 2.9.0 -> v2.9.0 -> 20900
 2.9.5 -> v2.9.5 -> 20905
 2.9.6 -> v2.9.6 -> 20906
-2.9.7 -> v2.9.7 -> 20907
+1.0.0 -> v1.0.0 -> 10000
 ```
 
 This prevents release validators from remaining silently pinned to an earlier product version.
@@ -91,7 +91,7 @@ A release maintainer should review relevant CodeQL, dependency-review, Dependabo
 - a pushed `v*` tag;
 - manual `workflow_dispatch` referencing an existing SemVer tag.
 
-For CalcNova 2.9.7, use `v2.9.7`.
+For CalcNova 1.0.0, use `v1.0.0`.
 
 The validation job follows this order:
 
@@ -167,7 +167,7 @@ The Android release job intentionally does not replace:
 - `ApplicationDisplayVersion` from tag text;
 - `ApplicationVersion` from `github.run_number`.
 
-Android and iOS use the source-defined `2.9.7` display version and `20907` build code.
+Android and iOS use the source-defined `1.0.0` display version and `10000` build code.
 
 This prevents a rerun or tag-format difference from changing package identity.
 
@@ -177,10 +177,10 @@ Current source identities are:
 
 - common application identifier: `in.sanskar.calcnova` where supported;
 - application display name: `CalcNova`;
-- product display version: `2.9.7`;
-- package version: `2.9.7`;
-- release tag: `v2.9.7`;
-- mobile application/build version: `20907`;
+- product display version: `1.0.0`;
+- package version: `1.0.0`;
+- release tag: `v1.0.0`;
+- mobile application/build version: `10000`;
 - desktop assembly: `CalcNova.Desktop`;
 - browser assembly: `CalcNova.Browser`.
 
@@ -218,7 +218,7 @@ It derives the current version/tag/build expectations from `Directory.Build.prop
 - release and release-readiness docs;
 - platform/source-preflight docs;
 - live `what_changed.md` checkpoint;
-- in-app About `Version 2.9.7 • Complete` label and regressions.
+- in-app About `Version 1.0.0 • Complete` label and regressions.
 
 Historical 2.8.03/2.9.0/2.9.5/2.9.6 records remain historical and do not define the current status.
 
@@ -238,7 +238,7 @@ An older build must not silently overwrite settings created by an unsupported ne
 
 ## Accessibility evidence gate
 
-Source accessibility contracts are complete for 2.9.7. Runtime/device evidence is recorded separately in [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
+Source accessibility contracts are complete for 1.0.0. Runtime/device evidence is recorded separately in [ACCESSIBILITY_TEST_MATRIX.md](ACCESSIBILITY_TEST_MATRIX.md).
 
 Do not mark a runtime scenario PASS merely because focus styles, automation names, keyboard mappings, or validators exist in source.
 
@@ -254,11 +254,11 @@ with enough target/tool context to reproduce the result where useful.
 
 For the release commit/tag, confirm:
 
-- `README.md` identifies version 2.9.7 as complete;
-- `PROJECT_STATE.md` identifies version 2.9.7 as complete;
-- `CHANGELOG.md` contains the dated 2.9.7 release entry and preserves earlier checkpoints;
-- `docs/VERSIONING.md` maps 2.9.7 to package `2.9.7`, tag `v2.9.7`, and build code `20907`;
-- `what_changed.md` contains the current 2.9.7 checkpoint;
+- `README.md` identifies version 1.0.0 as complete;
+- `PROJECT_STATE.md` identifies version 1.0.0 as complete;
+- `CHANGELOG.md` contains the dated 1.0.0 release entry and preserves earlier checkpoints;
+- `docs/VERSIONING.md` maps 1.0.0 to package `1.0.0`, tag `v1.0.0`, and build code `10000`;
+- `what_changed.md` contains the current 1.0.0 checkpoint;
 - package/version identifiers are consistent;
 - source preflight is run or its evidence state is recorded;
 - no release-critical placeholder implementation exists;
@@ -391,8 +391,8 @@ The workflow:
 
 Release notes should identify:
 
-- product version `2.9.7`;
-- tag `v2.9.7`;
+- product version `1.0.0`;
+- tag `v1.0.0`;
 - 2.9.0, 2.9.5, and 2.9.6 checkpoints where relevant;
 - major capabilities;
 - important fixes;
@@ -408,7 +408,7 @@ Do not claim universal compatibility, zero defects, or successful provenance gen
 
 ## Maintenance / hotfix process
 
-For a post-2.9.7 defect:
+For a post-1.0.0 defect:
 
 1. reproduce and scope impact;
 2. add regression coverage where practical;
