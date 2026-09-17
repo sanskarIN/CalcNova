@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+  <!-- CalcNova is the product name and is not translated; it is a string resource so the
+       launcher label has a single definition rather than being repeated as a literal in the
+       manifest and in the activity attribute. -->
+  <string name="app_name">CalcNova</string>
+</resources>

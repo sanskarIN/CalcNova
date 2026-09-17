@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+  <!-- The launcher icon keeps its own background in both themes; only the splash follows the
+       device theme, so a dark-mode launch does not flash a white screen before the app paints. -->
+  <color name="calcnova_icon_background">#182033</color>
+  <color name="calcnova_splash_background">#101623</color>
+</resources>

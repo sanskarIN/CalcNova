@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Android 12 and later (android:dataExtractionRules). Same intent as backup_rules.xml, stated
+     separately for cloud backup and for device-to-device transfer as the newer API requires. -->
+<data-extraction-rules>
+  <cloud-backup>
+    <include domain="file" path="." />
+    <exclude domain="file" path="currency" />
+  </cloud-backup>
+  <device-transfer>
+    <include domain="file" path="." />
+    <exclude domain="file" path="currency" />
+  </device-transfer>
+</data-extraction-rules>
