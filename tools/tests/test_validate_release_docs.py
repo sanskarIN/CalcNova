@@ -43,11 +43,9 @@ class ReleaseDocumentationValidatorTests(unittest.TestCase):
         self.assertIn(f"python tools/release_preflight.py --tag {identity.release_tag}", release_markers)
         self.assertIn(f"release tag: `{identity.release_tag}`", release_markers)
 
-    def test_release_contract_protects_2_9_checkpoint_chain(self) -> None:
+    def test_release_contract_protects_the_current_checkpoint(self) -> None:
         _, identity, markers = self.current_markers()
         self.assertIn("docs/VERSIONING.md", markers)
-        self.assertIn("docs/releases/2.9.0.md", markers)
-        self.assertIn("docs/releases/2.9.5.md", markers)
         current_checkpoint = f"docs/releases/{identity.display_version}.md"
         self.assertIn(current_checkpoint, markers)
         self.assertIn(

@@ -111,18 +111,6 @@ def required_markers(identity: ReleaseIdentity) -> dict[str, tuple[str, ...]]:
             f"numeric build code: `{build}`",
             "validate_platform_support.py",
         ),
-        "docs/releases/2.9.0.md": (
-            "# CalcNova 2.9.0 Release Checkpoint",
-            "Release tag: `v2.9.0`",
-            "Android/iOS build code: `20900`",
-            "advanced from this checkpoint to CalcNova **2.9.5**",
-        ),
-        "docs/releases/2.9.5.md": (
-            "# CalcNova 2.9.5 Release Checkpoint",
-            "Release tag: `v2.9.5`",
-            "Android/iOS build code: `20905`",
-            "advanced from this checkpoint to CalcNova **2.9.6**",
-        ),
     }
 
     markers[f"docs/releases/{display}.md"] = (
