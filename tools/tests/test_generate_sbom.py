@@ -32,16 +32,16 @@ def sample_assets() -> dict:
                     "type": "package",
                     "dependencies": {"Package.B": "2.0.0"},
                 },
-                "CalcNova.Core/2.8.3": {"type": "project"},
+                "CalcNova.Core/3.4.5": {"type": "project"},
             }
         },
         "libraries": {
             "Package.B/2.0.0": {"type": "package"},
             "Package.A/1.2.3": {"type": "package", "sha512": sha512},
-            "CalcNova.Core/2.8.3": {"type": "project"},
+            "CalcNova.Core/3.4.5": {"type": "project"},
         },
         "project": {
-            "version": "2.8.3",
+            "version": "3.4.5",
             "restore": {"projectName": "CalcNova.Desktop"},
             "frameworks": {
                 "net10.0": {
@@ -63,7 +63,7 @@ class GenerateSbomTests(unittest.TestCase):
         self.assertEqual("1.7", first["specVersion"])
         self.assertEqual("https://cyclonedx.org/schema/bom-1.7.schema.json", first["$schema"])
         self.assertEqual("CalcNova.Desktop", first["metadata"]["component"]["name"])
-        self.assertEqual("2.8.3", first["metadata"]["component"]["version"])
+        self.assertEqual("3.4.5", first["metadata"]["component"]["version"])
         self.assertEqual(["Package.A", "Package.B"], [item["name"] for item in first["components"]])
         self.assertTrue(first["serialNumber"].startswith("urn:uuid:"))
 
@@ -89,10 +89,10 @@ class GenerateSbomTests(unittest.TestCase):
         sbom = generator.build_sbom(
             sample_assets(),
             component_name="CalcNova-win-x64",
-            component_version="2.8.3",
+            component_version="3.4.5",
         )
         self.assertEqual("CalcNova-win-x64", sbom["metadata"]["component"]["name"])
-        self.assertEqual("2.8.3", sbom["metadata"]["component"]["version"])
+        self.assertEqual("3.4.5", sbom["metadata"]["component"]["version"])
 
     def test_unsupported_assets_format_is_rejected(self) -> None:
         generator = load_generator()

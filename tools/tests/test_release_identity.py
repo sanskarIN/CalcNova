@@ -31,16 +31,16 @@ class ReleaseIdentityTests(unittest.TestCase):
         self.assertEqual("v1.0.0", identity.release_tag)
         self.assertEqual("1.0.0.0", identity.assembly_version)
 
-    def test_mobile_build_code_supports_2_9_series(self) -> None:
+    def test_mobile_build_code_covers_multi_digit_components(self) -> None:
         module = load_module()
-        self.assertEqual("20900", module.mobile_build_code_for("2.9.0"))
-        self.assertEqual("20905", module.mobile_build_code_for("2.9.5"))
-        self.assertEqual("20906", module.mobile_build_code_for("2.9.6"))
+        self.assertEqual("30400", module.mobile_build_code_for("3.4.0"))
+        self.assertEqual("30405", module.mobile_build_code_for("3.4.5"))
+        self.assertEqual("71209", module.mobile_build_code_for("7.12.9"))
         self.assertEqual("10000", module.mobile_build_code_for("1.0.0"))
 
     def test_display_version_normalization_removes_numeric_leading_zeroes(self) -> None:
         module = load_module()
-        self.assertEqual("2.8.3", module.normalize_display_version("2.8.03"))
+        self.assertEqual("3.4.5", module.normalize_display_version("3.4.05"))
         self.assertEqual("1.0.0", module.normalize_display_version("1.0.0"))
 
     def test_mismatched_central_versions_fail_closed(self) -> None:
@@ -50,11 +50,11 @@ class ReleaseIdentityTests(unittest.TestCase):
             (root / "Directory.Build.props").write_text(
                 """<Project><PropertyGroup>
 <ProductDisplayVersion>1.0.0</ProductDisplayVersion>
-<Version>2.9.6</Version>
-<VersionPrefix>2.9.6</VersionPrefix>
-<PackageVersion>2.9.6</PackageVersion>
-<AssemblyVersion>2.9.6.0</AssemblyVersion>
-<FileVersion>2.9.6.0</FileVersion>
+<Version>3.4.5</Version>
+<VersionPrefix>3.4.5</VersionPrefix>
+<PackageVersion>3.4.5</PackageVersion>
+<AssemblyVersion>3.4.5.0</AssemblyVersion>
+<FileVersion>3.4.5.0</FileVersion>
 <InformationalVersion>1.0.0</InformationalVersion>
 </PropertyGroup></Project>""",
                 encoding="utf-8",
