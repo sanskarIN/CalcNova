@@ -9,6 +9,16 @@
     <ApplicationDisplayVersion>$(ProductDisplayVersion)</ApplicationDisplayVersion>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
+
+    <!-- Google Play distributes app bundles, so a Release build produces one directly rather
+         than an APK a maintainer would have to convert. Debug keeps APKs, which are what
+         `dotnet build -t:Install` and a plain `adb install` expect. -->
+    <AndroidPackageFormat Condition="'$(Configuration)' == 'Release'">aab</AndroidPackageFormat>
+    <AndroidPackageFormat Condition="'$(Configuration)' != 'Release'">apk</AndroidPackageFormat>
+
+    <!-- Startup tracing data ships with the package so the runtime can AOT the paths a cold
+         start actually takes, which is what the first screen of a calculator is dominated by. -->
+    <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.Android" />
