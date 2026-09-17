@@ -10,8 +10,8 @@ public sealed class AboutReleaseIdentityTests
     {
         var viewModel = new AboutViewModel(null);
 
-        Assert.Equal("2.9.7", viewModel.Version);
+        Assert.Equal("1.0.0", viewModel.Version);
         Assert.Equal("Complete", viewModel.CompletionStatus);
-        Assert.Equal("Version 2.9.7 • Complete", viewModel.ReleaseLabel);
+        Assert.Equal("Version 1.0.0 • Complete", viewModel.ReleaseLabel);
     }
 }

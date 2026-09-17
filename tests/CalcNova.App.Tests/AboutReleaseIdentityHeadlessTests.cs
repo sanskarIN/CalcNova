@@ -29,7 +29,7 @@ public sealed class AboutReleaseIdentityHeadlessTests
 
             Assert.Contains(
                 view.GetVisualDescendants().OfType<TextBlock>(),
-                block => string.Equals(block.Text, "Version 2.9.7 • Complete", StringComparison.Ordinal));
+                block => string.Equals(block.Text, "Version 1.0.0 • Complete", StringComparison.Ordinal));
         }
         finally
         {
