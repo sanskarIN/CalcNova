@@ -350,12 +350,30 @@ Never put real signing values in shell history, committed scripts, documentation
 
 The GitHub release workflow reads them from these repository secrets:
 
-- `CALCNOVA_ANDROID_KEYSTORE_BASE64` — `base64 -w0 calcnova-release.keystore`;
+- `CALCNOVA_ANDROID_KEYSTORE_BASE64` — the keystore file as one line of base64;
 - `CALCNOVA_ANDROID_KEY_ALIAS`;
 - `CALCNOVA_ANDROID_KEY_PASSWORD`;
 - `CALCNOVA_ANDROID_STORE_PASSWORD`.
 
-The workflow decodes a temporary keystore, publishes both packages, uploads them with their SBOM, and removes the temporary keystore. When the secrets are absent it still builds and publishes, under `-debug-signed` names, so a broken Android head fails the release rather than disappearing from it.
+Encoding the keystore to a single line differs by platform, because `base64` is not the same program
+everywhere:
+
+```bash
+base64 -w0 calcnova-release.keystore            # GNU coreutils (Linux)
+base64 -i calcnova-release.keystore | tr -d '\n' # BSD base64 (macOS), which has no -w
+```
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("calcnova-release.keystore"))  # Windows PowerShell
+```
+
+Line wrapping in the secret is fine — the workflow strips whitespace before decoding, so a value
+pasted from an editor that added line breaks or carriage returns still works.
+
+The workflow decodes the keystore to a temporary file and immediately lists the configured alias with
+`keytool`, so a wrong password, a wrong alias or a truncated secret fails within seconds and says
+which one, rather than surfacing much later as a signing error. It then publishes both packages,
+uploads them with their SBOM, and removes the temporary keystore. When the secrets are absent it still builds and publishes, under `-debug-signed` names, so a broken Android head fails the release rather than disappearing from it.
 
 Android runtime evidence should distinguish compilation from emulator/device launch, orientation behavior, persistence, clipboard, TalkBack/large-text checks, signed package generation, and Play Store processing.
 

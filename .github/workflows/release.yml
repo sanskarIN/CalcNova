@@ -181,10 +181,35 @@ jobs:
             echo "suffix=-debug-signed" >> "$GITHUB_OUTPUT"
             echo "::warning::Release signing secrets are not configured. Android packages will be signed with the build key the Android SDK generates for this run, published under -debug-signed names, and cannot be uploaded to Google Play. See docs/RELEASE.md for the keystore setup."
           fi
-      - name: Decode temporary keystore
+      - name: Decode and verify temporary keystore
         if: steps.signing.outputs.configured == 'true'
         shell: bash
-        run: echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/calcnova-release.keystore"
+        run: |
+          set -euo pipefail
+          # Strip whitespace before decoding. base64 --decode tolerates the line wrapping that
+          # `base64` produces by default, but a carriage return - which is what a secret pasted
+          # from a Windows editor carries - makes it fail with a bare "invalid input".
+          printf '%s' "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode \
+            > "$RUNNER_TEMP/calcnova-release.keystore"
+          test -s "$RUNNER_TEMP/calcnova-release.keystore"
+
+          # Check the keystore, alias and password agree before the Android build, so a bad secret
+          # fails here in seconds instead of after a full workload install and package pass.
+          # keytool reports its errors on stdout, not stderr, so capture both streams and show
+          # them only on failure: the success path is a certificate listing nobody needs to read.
+          # keytool names what went wrong ("keystore password was incorrect", "Alias <x> does not
+          # exist") without echoing the password back.
+          if ! keytool -list \
+                 -keystore "$RUNNER_TEMP/calcnova-release.keystore" \
+                 -storepass "$STORE_PASSWORD" \
+                 -alias "$KEY_ALIAS" > "$RUNNER_TEMP/keytool-output.txt" 2>&1; then
+            echo "The release keystore could not be opened with the configured alias and password."
+            echo "Check CALCNOVA_ANDROID_KEYSTORE_BASE64, CALCNOVA_ANDROID_KEY_ALIAS and CALCNOVA_ANDROID_STORE_PASSWORD."
+            sed 's/^/keytool: /' "$RUNNER_TEMP/keytool-output.txt"
+            rm -f "$RUNNER_TEMP/keytool-output.txt"
+            exit 1
+          fi
+          rm -f "$RUNNER_TEMP/keytool-output.txt"
       - name: Publish Android packages
         shell: bash
         env:
