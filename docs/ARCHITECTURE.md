@@ -2,7 +2,7 @@
 
 ## Status
 
-This document describes the completed CalcNova 2.8.03 source architecture.
+This document describes the completed CalcNova 1.0.0 source architecture.
 
 CalcNova uses a feature-first modular .NET solution with MVVM at the shared Avalonia presentation boundary. Mathematical/domain code is separated from UI/platform composition so the same behavior can be reused across Desktop, Browser/WebAssembly, Android, and iOS.
 
@@ -256,7 +256,7 @@ Current architecture includes:
 - fail-closed handling of unsupported future schemas;
 - shared decoding/validation rules where native and Browser storage need equivalent behavior.
 
-Cloud synchronization is not part of the default 2.8.03 architecture.
+Cloud synchronization is not part of the default 1.0.0 architecture.
 
 See [SETTINGS_STORAGE_CONTRACT.md](SETTINGS_STORAGE_CONTRACT.md) and [SETTINGS_MIGRATION.md](SETTINGS_MIGRATION.md).
 

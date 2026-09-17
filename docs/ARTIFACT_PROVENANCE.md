@@ -2,7 +2,7 @@
 
 CalcNova's stable release workflow generates deterministic CycloneDX software bills of materials (SBOMs), SHA-256 checksum material, and cryptographic provenance attestations for packaged release artifacts.
 
-This is post-2.8.03 supply-chain hardening. It does not change the CalcNova product version and it does not claim that an artifact or dependency is vulnerability-free.
+This is post-1.0.0 supply-chain hardening. It does not change the CalcNova product version and it does not claim that an artifact or dependency is vulnerability-free.
 
 ## What is attested
 

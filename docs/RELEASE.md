@@ -13,7 +13,7 @@ CalcNova 1.0.0 uses:
 
 See [VERSIONING.md](VERSIONING.md).
 
-The development checkpoints that preceded the first release are preserved in [releases/2.9.0.md](releases/2.9.0.md), [releases/2.9.5.md](releases/2.9.5.md), [releases/2.9.6.md](releases/2.9.6.md), and [releases/2.9.7.md](releases/2.9.7.md). None of them was published; the current source is 1.0.0.
+The current source is 1.0.0, CalcNova's first release; its checkpoint is [releases/1.0.0.md](releases/1.0.0.md).
 
 ## Release evidence principle
 
@@ -48,9 +48,6 @@ python tools/validate_completion_status.py .
 For the 2.9 series:
 
 ```text
-2.9.0 -> v2.9.0 -> 20900
-2.9.5 -> v2.9.5 -> 20905
-2.9.6 -> v2.9.6 -> 20906
 1.0.0 -> v1.0.0 -> 10000
 ```
 
@@ -220,7 +217,7 @@ It derives the current version/tag/build expectations from `Directory.Build.prop
 - live `what_changed.md` checkpoint;
 - in-app About `Version 1.0.0 • Complete` label and regressions.
 
-Historical 2.8.03/2.9.0/2.9.5/2.9.6 records remain historical and do not define the current status.
+1.0.0 is the current and only release.
 
 ## Settings migration gate
 
@@ -393,7 +390,6 @@ Release notes should identify:
 
 - product version `1.0.0`;
 - tag `v1.0.0`;
-- 2.9.0, 2.9.5, and 2.9.6 checkpoints where relevant;
 - major capabilities;
 - important fixes;
 - graph accessibility/localization maintenance;

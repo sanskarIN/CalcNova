@@ -182,51 +182,12 @@ Additional languages and extra UI-string migration are optional translation impr
 - Unified SDK-independent source preflight
 - Focused GitHub Actions workflows
 
-## Milestone 12 — Version 2.8.03 finalization — Complete historical baseline
+## Milestone 12 — Release identity — Complete
 
-- Public version `2.8.03`
-- Strict SemVer/package equivalent `2.8.3`
-- Normalized release tag `v2.8.3`
-- Assembly/file version `2.8.3.0`
-- Mobile build code `20803`
-- Completed 2.8.03 product baseline
+- `tools/release_identity.py` centralizes SDK-independent release-identity parsing and mobile build-code derivation
+- packaging, completion, platform and release-document validation derive their expected version from `Directory.Build.props`
 
-The 2.8.03 completion remains preserved in the changelog and historical audit documents.
-
-## Milestone 13 — 2.9-series release consistency — Complete
-
-### 2.9.0 checkpoint
-
-- Central source version set to `2.9.0`
-- Release tag contract `v2.9.0`
-- Android/iOS build code `20900`
-- About and release-label regressions updated to 2.9.0
-- Linux AppStream 2.9.0 stable entry added
-- Historical checkpoint preserved in `docs/releases/2.9.0.md`
-
-### 2.9.5 checkpoint
-
-- Central source version set to `2.9.5`
-- Release tag contract `v2.9.5`
-- Android/iOS build code `20905`
-- About and release-label regressions updated to 2.9.5
-- Linux AppStream 2.9.5 stable entry added while retaining 2.9.0 and 2.8.03
-- `tools/release_identity.py` centralized SDK-independent release identity parsing and mobile build-code derivation
-- packaging/completion/platform/release-document validation became current-version aware
-- checkpoint preserved in `docs/releases/2.9.5.md`
-
-### 2.9.6 checkpoint
-
-- Central source version set to `2.9.6`
-- Release tag contract `v2.9.6`
-- Android/iOS build code `20906`
-- About and release-label regressions updated to 2.9.6
-- Linux AppStream 2.9.6 stable entry added while retaining prior release history
-- release identity regression coverage protects the 2.9-series build-code mapping
-- security/support/contributor policy advanced to 2.9.6
-- checkpoint preserved in `docs/releases/2.9.6.md`
-
-### 1.0.0 current baseline
+## Milestone 13 — 1.0.0 release — Complete
 
 - Central source version set to `1.0.0`
 - Release tag contract `v1.0.0`

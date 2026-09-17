@@ -6,7 +6,7 @@
 
 This document is the completed feature inventory for CalcNova 1.0.0. Environment-specific verification results are evidence records, not unfinished feature requirements.
 
-The feature set was completed across a series of development checkpoints that were never published; they are preserved in [`releases/2.9.0.md`](releases/2.9.0.md), [`releases/2.9.5.md`](releases/2.9.5.md), [`releases/2.9.6.md`](releases/2.9.6.md), and [`releases/2.9.7.md`](releases/2.9.7.md). Current source is 1.0.0, the first release.
+Current source is 1.0.0, CalcNova's first release.
 
 ## Standard calculator
 
@@ -349,9 +349,6 @@ See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md).
 - `tools/release_identity.py` validates display/package/assembly/file/informational identity
 - Release tag derives as `v<Version>`
 - Mobile build code derives as `MAJOR * 10000 + MINOR * 100 + PATCH`
-- 2.9.0 checkpoint: `v2.9.0`, build code `20900`
-- 2.9.5 checkpoint: `v2.9.5`, build code `20905`
-- 2.9.6 checkpoint: `v2.9.6`, build code `20906`
 - Current 1.0.0 baseline: `v1.0.0`, build code `10000`
 - Packaging validator derives current version/build expectations instead of hardcoding release constants
 - Completion-status validator derives current documentation/About expectations from central metadata
@@ -360,7 +357,7 @@ See [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md).
 - Release-identity regression coverage is integrated into Source Preflight
 - Linux AppStream declares one stable entry, for 1.0.0, the project's first release
 
-See [`VERSIONING.md`](VERSIONING.md), [`releases/2.9.0.md`](releases/2.9.0.md), [`releases/2.9.5.md`](releases/2.9.5.md), and [`releases/2.9.6.md`](releases/2.9.6.md).
+See [`VERSIONING.md`](VERSIONING.md) and [`releases/1.0.0.md`](releases/1.0.0.md).
 
 ## Release and validation infrastructure
 

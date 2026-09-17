@@ -1,6 +1,6 @@
-# CalcNova 2.8.03 Privacy
+# CalcNova 1.0.0 Privacy
 
-CalcNova is designed as a local-first calculator. This document describes the completed open-source 2.8.03 baseline and must be updated whenever implementation changes data handling, storage, permissions, networking, telemetry, or third-party services.
+CalcNova is designed as a local-first calculator. This document describes the completed open-source 1.0.0 baseline and must be updated whenever implementation changes data handling, storage, permissions, networking, telemetry, or third-party services.
 
 ## Privacy summary
 
@@ -87,7 +87,7 @@ Do not describe Browser local persistence as cloud synchronization.
 
 ## Currency conversion and network access
 
-Currency infrastructure is the primary optional network-enhanced feature in the 2.8.03 baseline.
+Currency infrastructure is the primary optional network-enhanced feature in the 1.0.0 baseline.
 
 It is designed around:
 
@@ -112,7 +112,7 @@ Currency conversion can use cached/offline behavior when fresh network rates are
 
 ## Analytics and advertising
 
-The open-source 2.8.03 baseline does not intentionally include:
+The open-source 1.0.0 baseline does not intentionally include:
 
 - advertising SDKs;
 - behavioral tracking;
@@ -179,7 +179,7 @@ Platform packaging/release review should verify the actual permission manifest g
 
 ## Cloud synchronization
 
-Cloud synchronization is not part of the default 2.8.03 architecture.
+Cloud synchronization is not part of the default 1.0.0 architecture.
 
 If cloud sync is introduced in a later optional release, it must be opt-in and documented separately, including:
 

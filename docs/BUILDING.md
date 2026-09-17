@@ -1,6 +1,6 @@
 # Building CalcNova
 
-This guide documents the current CalcNova 2.8.03 build, run, publish, and platform-workload paths.
+This guide documents the current CalcNova 1.0.0 build, run, publish, and platform-workload paths.
 
 CalcNova contains maintained composition heads for:
 
@@ -59,10 +59,10 @@ The SDK-independent repository gate can be run first:
 python tools/release_preflight.py
 ```
 
-For a tagged 2.8.03 release checkout:
+For a tagged 1.0.0 release checkout:
 
 ```bash
-python tools/release_preflight.py --tag v2.8.3
+python tools/release_preflight.py --tag v1.0.0
 ```
 
 ## Restore, format, build, and test the core solution
@@ -278,8 +278,8 @@ Current identity and platform metadata:
 
 - application id: `in.sanskar.calcnova`;
 - application title: `CalcNova`;
-- display version: `2.8.03`;
-- numeric build code: `20803`;
+- display version: `1.0.0`;
+- numeric build code: `10000`;
 - minimum Android API: 23;
 - JDK used by CI: Temurin 17.
 
@@ -340,8 +340,8 @@ Current identity and platform metadata:
 
 - application id: `in.sanskar.calcnova`;
 - application title: `CalcNova`;
-- display version: `2.8.03`;
-- numeric build code: `20803`;
+- display version: `1.0.0`;
+- numeric build code: `10000`;
 - minimum iOS platform version: 15.0.
 
 The iOS toolchain requires a supported macOS/Xcode environment.

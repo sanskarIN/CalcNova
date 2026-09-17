@@ -20,7 +20,6 @@ python tools/release_preflight.py --tag v1.0.0
 
 The public/product version, strict SemVer package version, and normalized tag are `1.0.0`, `1.0.0`, and `v1.0.0`. Android/iOS use numeric build code `10000`.
 
-Earlier 2.9.0, 2.9.5, and 2.9.6 checkpoints are preserved in [`releases/2.9.0.md`](releases/2.9.0.md), [`releases/2.9.5.md`](releases/2.9.5.md), and [`releases/2.9.6.md`](releases/2.9.6.md).
 
 ## What it runs
 

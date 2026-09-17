@@ -59,9 +59,6 @@ MobileBuildCode = 10000
 Protected mobile mappings include:
 
 ```text
-2.9.0 -> 20900
-2.9.5 -> 20905
-2.9.6 -> 20906
 1.0.0 -> 10000
 ```
 
@@ -246,12 +243,9 @@ The repository records PASS only when an operation actually executes and its res
 
 Unavailable external operations are recorded as `NOT RUN` or `BLOCKED`, never invented as PASS.
 
-## Historical Release Checkpoints
+## Release Checkpoint
 
-- [`docs/releases/1.0.0.md`](docs/releases/1.0.0.md) — current 1.0.0 checkpoint
-- [`docs/releases/2.9.6.md`](docs/releases/2.9.6.md) — preserved 2.9.6 checkpoint
-- [`docs/releases/2.9.5.md`](docs/releases/2.9.5.md) — preserved 2.9.5 checkpoint
-- [`docs/releases/2.9.0.md`](docs/releases/2.9.0.md) — preserved 2.9.0 checkpoint
+- [`docs/releases/1.0.0.md`](docs/releases/1.0.0.md) — the 1.0.0 release checkpoint
 
 ## Final Classification
 

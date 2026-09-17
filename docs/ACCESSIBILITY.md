@@ -1,12 +1,12 @@
-# CalcNova 2.8.03 Accessibility
+# CalcNova 1.0.0 Accessibility
 
-Accessibility is part of the completed CalcNova 2.8.03 source baseline, not a post-release decoration.
+Accessibility is part of the completed CalcNova 1.0.0 source baseline, not a post-release decoration.
 
 Source implementation completeness and target-platform accessibility evidence are intentionally separate. CalcNova includes shared accessibility contracts and automated source/headless coverage, while screen-reader, text-scaling, contrast, touch, and device behavior must still be recorded as `PASS / FAIL / BLOCKED / NOT RUN` only after the relevant runtime check is actually performed.
 
 ## Completed shared baseline
 
-The 2.8.03 shared source includes:
+The 1.0.0 shared source includes:
 
 - a 44-DIP minimum interaction-target baseline for common controls;
 - a 54-DIP standard calculator-key baseline;
@@ -188,7 +188,7 @@ Future UI changes must preserve equivalent redundant cues.
 
 The shared shell exposes a `reduced-motion` state class derived from preference state.
 
-Current 2.8.03 shared UI does not require decorative animation to communicate essential meaning. Future transitions/animations must respect reduced-motion behavior where appropriate and must not make calculation workflows slower or inaccessible.
+Current 1.0.0 shared UI does not require decorative animation to communicate essential meaning. Future transitions/animations must respect reduced-motion behavior where appropriate and must not make calculation workflows slower or inaccessible.
 
 ## Programmer accessibility
 
@@ -279,7 +279,7 @@ UI changes must preserve the shared accessibility/adaptive contracts. Pull reque
 
 A new UI capability that cannot be operated or understood through the project's supported input/accessibility patterns requires explicit design review before inclusion.
 
-## 2.8.03 classification
+## 1.0.0 classification
 
 - shared accessibility source baseline: **COMPLETE**;
 - adaptive/touch/focus contracts: **COMPLETE**;
@@ -288,4 +288,4 @@ A new UI capability that cannot be operated or understood through the project's 
 - onboarding accessibility source behavior: **COMPLETE**;
 - platform-specific runtime evidence: recorded independently as **PASS / FAIL / BLOCKED / NOT RUN**.
 
-Runtime evidence gaps do not redefine the completed 2.8.03 source scope, and source completeness does not justify inventing runtime PASS results.
+Runtime evidence gaps do not redefine the completed 1.0.0 source scope, and source completeness does not justify inventing runtime PASS results.

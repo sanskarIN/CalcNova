@@ -8,11 +8,8 @@
   <description>
     <p>CalcNova is a complete open-source local-first calculator with standard, scientific, exact-rational, engineering-notation, programmer, Unicode, conversion, statistics, equations, matrices, graphing, history, settings, keyboard, accessibility, and cross-platform workflows.</p>
   </description>
-  <!-- CalcNova 1.0.0 is the project's first release. The 2.8 and 2.9 numbers that preceded it
-       were pre-release development checkpoints: no tag and no published artifact ever existed
-       for any of them. Listing them here as stable releases would have told software centres
-       that a version newer than 1.0.0 was available, because every version comparator ranks
-       2.9.7 above 1.0.0. The development record is kept in CHANGELOG.md and docs/history/. -->
+  <!-- CalcNova 1.0.0 is the project's first and only release, so it is the only entry a
+       software centre should offer. -->
   <releases>
     <release version="1.0.0" date="2026-09-17" type="stable">
       <description>

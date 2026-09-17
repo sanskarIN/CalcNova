@@ -16,15 +16,7 @@ The current 1.0.0 release uses strict Semantic Versioning-compatible numeric com
 | Informational version | `1.0.0` |
 | Android/iOS numeric build code | `10000` |
 
-## Why 1.0.0 follows the 2.x development numbers
-
-CalcNova used 2.x version numbers throughout development and none of them were ever released: the repository has no release tag and no published artifact for any of them. Continuing from 2.9.7 would have asserted a release history that does not exist.
-
-1.0.0 states the real position — this is CalcNova's first release — and it is the number that version comparators in package managers, app stores and software centres will rank correctly from here on.
-
-The development record is preserved, not renumbered. [`CHANGELOG.md`](../CHANGELOG.md) keeps every earlier entry under a pre-release heading, and the checkpoints remain in [`releases/2.9.0.md`](releases/2.9.0.md), [`releases/2.9.5.md`](releases/2.9.5.md), [`releases/2.9.6.md`](releases/2.9.6.md) and [`releases/2.9.7.md`](releases/2.9.7.md).
-
-Linux AppStream metadata is the one place the earlier numbers were removed rather than relabelled: a software centre reading them would have offered users a 2.9.7 newer than the release they actually have.
+1.0.0 is CalcNova's first release, and the only version the project has published.
 
 ## Source of truth
 
@@ -56,13 +48,7 @@ The mobile calculation therefore gives:
 
 ```text
 1.0.0 -> 10000
-2.9.0 -> 20900
-2.9.5 -> 20905
-2.9.6 -> 20906
-2.9.7 -> 20907
 ```
-
-The 2.9 rows are retained because the formula has to keep producing the same codes for the checkpoints that recorded them; only the first row describes a release.
 
 Minor and patch components above 99 are rejected by that mobile build-code contract instead of silently producing an ambiguous code.
 

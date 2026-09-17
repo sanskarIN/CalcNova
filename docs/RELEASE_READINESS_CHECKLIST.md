@@ -23,9 +23,6 @@ PASS / FAIL / BLOCKED / NOT RUN
 - [ ] Release tag equals `v` plus source `<Version>`.
 - [ ] Packaging, completion-status, platform-support, and release-document validators derive current expectations from central release identity.
 - [ ] In-app About shows `Version 1.0.0 • Complete`.
-- [ ] Historical 2.9.0 checkpoint remains recorded as `v2.9.0` / `20900`.
-- [ ] Historical 2.9.5 checkpoint remains recorded as `v2.9.5` / `20905`.
-- [ ] Historical 2.9.6 checkpoint remains recorded as `v2.9.6` / `20906`.
 
 ## Source preflight
 

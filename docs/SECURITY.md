@@ -1,6 +1,6 @@
-# CalcNova 2.8.03 Secure Engineering
+# CalcNova 1.0.0 Secure Engineering
 
-This document describes implementation-level security expectations for the completed CalcNova 2.8.03 baseline. Public vulnerability-reporting instructions live in the root [`SECURITY.md`](../SECURITY.md).
+This document describes implementation-level security expectations for the completed CalcNova 1.0.0 baseline. Public vulnerability-reporting instructions live in the root [`SECURITY.md`](../SECURITY.md).
 
 ## Threat model
 
@@ -127,7 +127,7 @@ A platform must handle unavailable/blocked link launching without attempting uns
 
 ## Currency/network features
 
-CalcNova 2.8.03 includes replaceable currency-rate infrastructure with local caching and offline fallback semantics.
+CalcNova 1.0.0 includes replaceable currency-rate infrastructure with local caching and offline fallback semantics.
 
 Network-enhanced currency behavior must preserve these requirements:
 

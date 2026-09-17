@@ -208,7 +208,6 @@ Current package/tag/build identity:
 - release tag: `v1.0.0`;
 - mobile build code: `10000`.
 
-Earlier checkpoints used `v2.9.0` / `20900`, `v2.9.5` / `20905`, and `v2.9.6` / `20906`; see [releases/2.9.0.md](releases/2.9.0.md), [releases/2.9.5.md](releases/2.9.5.md), and [releases/2.9.6.md](releases/2.9.6.md).
 
 See [VERSIONING.md](VERSIONING.md).
 

@@ -11,10 +11,9 @@ Security fixes are applied to the actively maintained `main` branch and, when ne
 | Version | Supported |
 | --- | --- |
 | `1.0.0` | Yes |
-| `2.8.03` – `2.9.7` | Never released; development checkpoints only |
 | Earlier snapshots | No stable-support guarantee |
 
-CalcNova 1.0.0 is the project's first release. The 2.x numbers that appear in the changelog and in `docs/releases/` were pre-release development checkpoints: no tag and no artifact was ever published for any of them, so there is nothing running in the field to receive a backport.
+CalcNova 1.0.0 is the project's first release, so it is the only version that can receive a security fix.
 
 The normalized SemVer/package equivalent of 1.0.0 is `1.0.0`, and the normalized release tag is `v1.0.0`.
 

@@ -7,7 +7,7 @@ This directory contains the authoritative product, engineering, quality, platfor
 Normalized release tag: `v1.0.0`  
 Android/iOS numeric build code: `10000`
 
-1.0.0 is CalcNova's first release; the 2.x numbers that preceded it were development checkpoints that were never published. Those checkpoints are preserved in [releases/2.9.0.md](releases/2.9.0.md), [releases/2.9.5.md](releases/2.9.5.md), [releases/2.9.6.md](releases/2.9.6.md), and [releases/2.9.7.md](releases/2.9.7.md). Current-facing guides use 1.0.0; dated older records remain historical.
+1.0.0 is CalcNova's first release. See [releases/1.0.0.md](releases/1.0.0.md) for the release checkpoint.
 
 Use this page as the documentation map. Current guides are grouped by responsibility; dated continuation/audit/release-checkpoint records are grouped separately so history is not confused with current product status.
 
@@ -18,10 +18,6 @@ Use this page as the documentation map. Current guides are grouped by responsibi
 - [Versioning](VERSIONING.md) — current `1.0.0` / `v1.0.0` / `10000` mapping and centralized release-identity contract.
 - [Completed feature inventory](FEATURES.md) — implemented 1.0.0 product scope.
 - [Completed roadmap](ROADMAP.md) — completed milestone record and optional post-release ideas.
-- [2.9.0 release checkpoint](releases/2.9.0.md) — preserved requested intermediate release preparation.
-- [2.9.5 release checkpoint](releases/2.9.5.md) — preserved earlier completed 2.9-series baseline.
-- [2.9.6 release checkpoint](releases/2.9.6.md) — preserved development checkpoint.
-- [2.9.7 release checkpoint](releases/2.9.7.md) — final development checkpoint before the 1.0.0 renumbering.
 - [1.0.0 release checkpoint](releases/1.0.0.md) — the current release.
 - [Platform support](PLATFORM_SUPPORT.md) — Windows/Linux/macOS, Browser/WebAssembly/PWA, Android, and iOS composition status.
 - [Building](BUILDING.md) — current build/run/publish commands and platform prerequisites.
@@ -129,7 +125,7 @@ python tools/validate_packaging_metadata.py .
 python tools/validate_completion_status.py .
 ```
 
-The 2.9.0, 2.9.5, 2.9.6 and 2.9.7 checkpoints remain preserved as development records; none of them was ever released, and the repository then renumbered to 1.0.0 for its first release.
+The 1.0.0 checkpoint records the first release.
 
 ## Security maintenance and supply-chain checks
 
@@ -202,22 +198,11 @@ sha256sum -c SHA256SUMS.txt
 
 See [ARTIFACT_PROVENANCE.md](ARTIFACT_PROVENANCE.md) for checksum, SBOM, and attestation verification details.
 
-## Completion and audit records
+## Release records
 
-These records describe completed source passes/checkpoints and should not override newer authoritative files such as `PROJECT_STATE.md`:
-
-- [2.9.6 release checkpoint — 2026-08-24](releases/2.9.6.md)
-- [2.9.5 release checkpoint — 2026-08-24](releases/2.9.5.md)
-- [2.9.0 release checkpoint — 2026-08-24](releases/2.9.0.md)
-- [Documentation consistency audit — 2026-08-20](DOCUMENTATION_AUDIT_2026-08-20.md)
-- [Final source audit — 2026-08-19](FINAL_SOURCE_AUDIT_2026-08-19.md)
-- [Release source checkpoint — 2026-08-19](RELEASE_SOURCE_CHECKPOINT_2026-08-19.md)
-- [Continuation checkpoint — 2026-08-19](CONTINUATION_CHECKPOINT_2026-08-19.md)
-- [Continuation pass 2 — 2026-08-19](CONTINUATION_2026-08-19_PASS2.md)
+- [1.0.0 release checkpoint](releases/1.0.0.md)
 - [What changed](../what_changed.md)
-- [`docs/history/`](history/) — archived historical records.
-
-When a historical statement differs from a current authoritative guide, use the current guide.
+- [Changelog](../CHANGELOG.md)
 
 ## Community and maintenance
 

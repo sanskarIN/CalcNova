@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Normalized semantic version tag, for example v2.8.3 (product display version 2.8.03)"
+        description: "Normalized semantic version tag, for example v1.0.0"
         required: true
         type: string
 

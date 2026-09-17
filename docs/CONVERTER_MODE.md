@@ -1,6 +1,6 @@
 # CalcNova Converter Mode
 
-CalcNova's fixed-unit converter is a completed offline feature in the 2.8.03 baseline. Unit definitions live in the project, and fixed physical/data conversion does not require an account, network request, external service, or embedded credential.
+CalcNova's fixed-unit converter is a completed offline feature in the 1.0.0 baseline. Unit definitions live in the project, and fixed physical/data conversion does not require an account, network request, external service, or embedded credential.
 
 ## Fixed conversion model
 
@@ -177,9 +177,9 @@ Compiled tests run through the normal .NET test gate described in [TESTING.md](T
 
 Source/test presence is not runtime platform evidence. Desktop, Browser, Android, and iOS persistence/accessibility behavior should be recorded with `PASS / FAIL / BLOCKED / NOT RUN` only after the corresponding operation is observed.
 
-## 2.8.03 classification
+## 1.0.0 classification
 
-For CalcNova 2.8.03:
+For CalcNova 1.0.0:
 
 - fixed-unit categories: **COMPLETE**;
 - unit search and From/To assignment: **COMPLETE**;
@@ -193,4 +193,4 @@ For CalcNova 2.8.03:
 - per-category defaults: **COMPLETE**;
 - local preference persistence: **COMPLETE**.
 
-Future converter changes are maintenance or optional enhancements rather than missing 2.8.03 requirements.
+Future converter changes are maintenance or optional enhancements rather than missing 1.0.0 requirements.
