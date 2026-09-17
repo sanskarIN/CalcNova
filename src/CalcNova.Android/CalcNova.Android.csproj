@@ -15,10 +15,6 @@
          `dotnet build -t:Install` and a plain `adb install` expect. -->
     <AndroidPackageFormat Condition="'$(Configuration)' == 'Release'">aab</AndroidPackageFormat>
     <AndroidPackageFormat Condition="'$(Configuration)' != 'Release'">apk</AndroidPackageFormat>
-
-    <!-- Startup tracing data ships with the package so the runtime can AOT the paths a cold
-         start actually takes, which is what the first screen of a calculator is dominated by. -->
-    <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.Android" />
