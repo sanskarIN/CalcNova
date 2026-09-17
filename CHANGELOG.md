@@ -2,9 +2,46 @@
 
 All notable CalcNova changes are recorded here.
 
+## [1.0.0] - 2026-09-17
+
+**Status: First release**
+
+Public/product version: `1.0.0`  
+Package version: `1.0.0`  
+Normalized release tag: `v1.0.0`  
+Assembly/file version: `1.0.0.0`  
+Mobile build code: `10000`
+
+### Release numbering
+
+- Reset the project version from 2.9.7 to 1.0.0. No 2.x version was ever released: the repository has no release tag and no published artifact for any of them, so continuing the 2.x sequence would have asserted a release history that does not exist.
+- Reduced Linux AppStream metadata to a single stable 1.0.0 entry. The earlier entries described releases that never happened, and every version comparator ranks 2.9.7 above 1.0.0, so a software centre reading them would have offered users a newer version than the one they have.
+- Preserved the development record in place: every entry below this one is retained, and the checkpoints remain in `docs/releases/`.
+
+### Android
+
+- Implemented haptic feedback. The Haptics setting had been persisted, validated, localized and shown as a checkbox since before this release without any head implementing it; calculator input now asks the device for a short confirmation, with distinct patterns for an accepted key, a completed calculation and a rejected one.
+- Added the `VIBRATE` permission and declared the vibrator feature as not required, so CalcNova still installs on devices without one.
+- Added night-mode resources so a dark-themed device no longer flashes a light splash screen before the app paints.
+- Declared a locale configuration for English and Hindi, which surfaces CalcNova in the Android 13+ per-app language picker.
+- Added backup and data-extraction rules for both the pre-12 and 12+ APIs: history and settings restore onto a new device, and the reconstructible currency-rate cache does not.
+- Opted in to the Android 13+ predictive back gesture.
+- Moved the launcher label to a string resource instead of repeating a literal.
+- Release builds now produce the Android app bundle Google Play distributes, and CI packages, verifies and uploads it rather than only compiling.
+
+### iOS
+
+- Implemented haptic feedback over UIKit's impact and notification generators, so the setting's promise of haptics on mobile targets holds on both mobile platforms.
+
+---
+
+## Pre-release development history
+
+Everything below this line records development checkpoints, not releases. None of these versions was tagged or published; they are retained because they document how the product was built.
+
 ## [2.9.7] - 2026-08-25
 
-**Status: Complete**
+**Status: Complete (development checkpoint, never released)**
 
 Public/product version: `2.9.7`  
 Package version: `2.9.7`  
