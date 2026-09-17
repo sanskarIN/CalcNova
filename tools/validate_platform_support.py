@@ -118,7 +118,9 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
     ),
     "src/CalcNova.iOS/Services/IosHapticFeedbackService.cs": (
         "IHapticFeedbackService",
-        "UIImpactFeedbackGenerator",
+        # The selection generator, not the impact one: UIImpactFeedbackGenerator's style
+        # constructor was obsoleted in iOS 17.5 in favour of an overload needing a UIView.
+        "UISelectionFeedbackGenerator",
         "UINotificationFeedbackGenerator",
     ),
     "src/CalcNova.Platform/CalcNova.Platform.csproj": (

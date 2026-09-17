@@ -8,9 +8,15 @@ namespace CalcNova.iOS.Services;
 /// </summary>
 /// <remarks>
 /// The settings checkbox offers haptics on mobile targets, plural, so iOS implements the same
-/// contract as Android rather than leaving half of that promise unmet. UIKit distinguishes
-/// impact from notification feedback, which maps cleanly onto the two kinds CalcNova asks for:
-/// a keypress is an impact, an outcome is a notification.
+/// contract as Android rather than leaving half of that promise unmet. UIKit's generators map
+/// cleanly onto the kinds CalcNova asks for: a keypress is a selection change, an outcome is a
+/// notification.
+///
+/// The selection generator is used rather than an impact generator for two reasons. It is what
+/// Apple designed for a discrete choice, which is exactly what pressing a calculator key is; and
+/// it is the one that is not deprecated - <c>UIImpactFeedbackGenerator</c>'s style constructor
+/// was obsoleted in iOS 17.5 in favour of an overload that needs the <c>UIView</c> the feedback
+/// belongs to, which a service composed before any window exists cannot supply.
 ///
 /// Generators are created per call rather than cached. Apple's guidance is to prepare a
 /// generator shortly before use; a calculator's presses are far enough apart that holding the
@@ -45,10 +51,10 @@ public sealed class IosHapticFeedbackService : IHapticFeedbackService
                 break;
 
             default:
-                using (var generator = new UIImpactFeedbackGenerator(UIImpactFeedbackStyle.Light))
+                using (var generator = new UISelectionFeedbackGenerator())
                 {
                     generator.Prepare();
-                    generator.ImpactOccurred();
+                    generator.SelectionChanged();
                 }
 
                 break;
