@@ -38,7 +38,8 @@ Mobile build code: `10000`
 - Added backup and data-extraction rules for both the pre-12 and 12+ APIs: history and settings restore onto a new device, and the reconstructible currency-rate cache does not.
 - Opted in to the Android 13+ predictive back gesture.
 - Moved the launcher label to a string resource instead of repeating a literal.
-- Release builds now produce the Android app bundle Google Play distributes, and CI packages, verifies and uploads it rather than only compiling.
+- Release builds produce both distribution shapes from one packaging pass: the app bundle Google Play distributes, and the universal APK bundletool derives from it, which is what a downloaded release actually installs. CI packages, verifies and uploads both rather than only compiling.
+- The release workflow always builds and publishes Android. Every step used to be gated on the release signing secrets, so with none configured the release published no Android asset and still reported success. The secrets now decide only which key signs the packages: the project release key, or the throwaway key the Android SDK generates for that run, in which case the assets are named `-debug-signed` and the run raises a warning.
 
 ### iOS
 

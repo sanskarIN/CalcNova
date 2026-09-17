@@ -25,6 +25,8 @@ CalcNova 1.0.0 ships the complete calculator feature set with the following cont
 - the shared release-identity helper remains the source of truth for version-aware validators;
 - release, packaging, completion-status, and platform-support validators derive their expected version from `Directory.Build.props` rather than hardcoding it;
 - Android source composition explicitly inventories ARM, ARM64, x86, and x64 runtime identifiers;
+- Android Release builds package both the Google Play app bundle and the universal APK bundletool derives from it, and the Android build workflow asserts both shapes;
+- the release workflow always builds and publishes Android; the signing secrets choose the key and the asset names rather than deciding whether Android ships at all;
 - iOS source composition explicitly inventories ARM64 device and ARM64/x64 simulator identifiers;
 - platform workflow contracts remain aligned with the current GitHub Actions checkout/setup baseline;
 - deterministic CycloneDX 1.7 SBOM generation, checksum/provenance controls, dependency-security validation, and CodeQL/Dependency Review/Dependabot coverage remain protected;
