@@ -15,7 +15,7 @@ The release publication job attests every file in the prepared `release-assets/`
 - macOS Intel x64 desktop ZIP and CycloneDX SBOM;
 - macOS Apple Silicon ARM64 desktop ZIP and CycloneDX SBOM;
 - Browser/WebAssembly ZIP and CycloneDX SBOM;
-- Android AAB and CycloneDX SBOM when signing secrets are configured;
+- Android app bundle, universal APK, and CycloneDX SBOM;
 - `SHA256SUMS.txt`.
 
 The workflow uses:
@@ -30,7 +30,7 @@ with one inclusive subject glob:
 release-assets/**/*
 ```
 
-Using one inclusive release-tree subject keeps optional artifacts such as the signed Android AAB and its SBOM conditional without requiring a separate path that may not exist in an unsigned release run.
+Using one inclusive release-tree subject covers every published file without a per-family path, including the Android packages whose names change with signing configuration.
 
 ## CycloneDX SBOM contract
 
@@ -64,10 +64,10 @@ CalcNova-linux-arm64.sbom.cdx.json
 CalcNova-osx-x64.sbom.cdx.json
 CalcNova-osx-arm64.sbom.cdx.json
 CalcNova-browser.sbom.cdx.json
-CalcNova-android.sbom.cdx.json   # only when the signed Android artifact is produced
+CalcNova-android.sbom.cdx.json
 ```
 
-Desktop and Browser SBOMs are generated after their platform publish command has produced/restored the relevant assets and before workflow-artifact upload. The Android SBOM follows successful signed AAB publication and therefore remains conditional on signing configuration.
+Desktop, Browser, and Android SBOMs are each generated after their platform publish command has produced/restored the relevant assets and before workflow-artifact upload.
 
 SBOM files are ordinary release assets. As a result:
 
@@ -76,7 +76,7 @@ SBOM files are ordinary release assets. As a result:
 3. they are covered by the same `actions/attest@v4` `release-assets/**/*` provenance subject set;
 4. they are uploaded to the GitHub Release next to the package they describe.
 
-Focused regression coverage lives in `tools/tests/test_generate_sbom.py`. The integrated source preflight executes that suite, while `tools/validate_release_workflow.py` independently requires SBOM generation and upload for Desktop, Browser, and signed Android publication paths.
+Focused regression coverage lives in `tools/tests/test_generate_sbom.py`. The integrated source preflight executes that suite, while `tools/validate_release_workflow.py` independently requires SBOM generation and upload for the Desktop, Browser, and Android publication paths, and rejects an Android step gated on signing secrets.
 
 ## Why provenance matters
 
@@ -237,7 +237,7 @@ Follow current GitHub documentation for the exact offline-verification command f
 - exactly one `id-token: write` grant;
 - exactly one `attestations: write` grant;
 - exactly one `artifact-metadata: write` grant;
-- Desktop, Browser, and signed Android CycloneDX SBOM generation before artifact upload;
+- Desktop, Browser, and Android CycloneDX SBOM generation before artifact upload;
 - `.sbom.cdx.json` release filenames next to the package artifacts;
 - `actions/attest@v4`;
 - the inclusive `release-assets/**/*` subject glob;

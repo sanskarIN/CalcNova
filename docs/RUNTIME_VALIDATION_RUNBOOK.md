@@ -179,7 +179,7 @@ On a supported Android emulator/device, verify:
 - TalkBack traversal and labels;
 - touch target usability;
 - high contrast/reduced motion behavior;
-- signed AAB only when external signing secrets are configured;
+- release-key-signed packages only when external signing secrets are configured;
 - store pre-launch/report checks when preparing publication.
 
 A normal build and a production-signed AAB are separate evidence rows.
@@ -267,7 +267,7 @@ For the 1.0.0 automated release workflow, expected artifact families are:
 - Linux `linux-x64` desktop ZIP;
 - macOS `osx-x64` desktop ZIP;
 - Browser/WebAssembly bundle;
-- signed Android AAB when signing secrets are configured;
+- Android app bundle and universal APK, release-key signed when signing secrets are configured;
 - generated SHA-256 checksum material.
 
 iOS exact-tag simulator validation is a separate validation path and is not represented as a signed App Store artifact.

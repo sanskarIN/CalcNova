@@ -174,7 +174,10 @@ Requirements:
 - do not log secret signing properties;
 - verify the generated package/permission manifest before store publication.
 
-The repository release workflow intentionally skips a signed Android artifact when signing secrets are not configured rather than fabricating a signed result.
+The repository release workflow never presents an unsigned build as a signed one. When the signing
+secrets are absent it publishes the Android packages under `-debug-signed` names, raises a workflow
+warning, and leaves the release-key names free, so an artifact signed by a throwaway build key cannot
+be mistaken for one signed by the project key.
 
 ## iOS boundary
 
@@ -270,7 +273,7 @@ The stable release workflow keeps repository contents read-only by default and g
 
 Stable release publication generates SHA-256 checksum material and GitHub artifact provenance attestations for the prepared `release-assets/**/*` tree.
 
-The release workflow uses `actions/attest@v4` after checksum generation and before GitHub Release asset upload. The inclusive release-tree subject covers desktop/Browser ZIP files, the signed Android AAB when present, and `SHA256SUMS.txt` without requiring a separate path for optional Android output.
+The release workflow uses `actions/attest@v4` after checksum generation and before GitHub Release asset upload. The inclusive release-tree subject covers desktop/Browser ZIP files, the Android app bundle and universal APK, and `SHA256SUMS.txt` without requiring a separate path per artifact family.
 
 Artifact attestations help consumers verify where/how an artifact was built and bind it to workflow/repository/commit identity. They do not prove that an artifact is free from vulnerabilities or defects.
 

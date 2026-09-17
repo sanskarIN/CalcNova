@@ -22,9 +22,10 @@ The public/product version is **1.0.0**, the .NET/NuGet package version is **1.0
 
 CalcNova 1.0.0 is the first release. See [`docs/releases/1.0.0.md`](docs/releases/1.0.0.md) for the release checkpoint.
 
-### 2.9-series release and platform maintenance
+### Release consistency and platform maintenance
 
-The 2.9 series adds release-consistency and cross-platform maintenance without removing the completed calculator feature set:
+Alongside the calculator feature set, 1.0.0 ships the release-consistency and cross-platform
+infrastructure that keeps it honest:
 
 - centralized SDK-independent release identity parsing in `tools/release_identity.py`;
 - fail-closed consistency checks for display, SemVer, package, assembly/file, informational, release-tag, and mobile-build identities;

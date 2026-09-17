@@ -186,9 +186,9 @@ The compiled .NET gate is documented in [BUILDING.md](BUILDING.md) and [TESTING.
 - [Packaging overview](../packaging/README.md)
 - [Changelog](../CHANGELOG.md)
 
-Current automated release artifact families include Desktop (`win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, `osx-arm64`), Browser/WebAssembly, and a signed Android AAB when signing secrets are configured. iOS simulator validation is maintained separately from signed App Store distribution.
+Current automated release artifact families include Desktop (`win-x64`, `win-arm64`, `linux-x64`, `linux-arm64`, `osx-x64`, `osx-arm64`), Browser/WebAssembly, and Android as both an app bundle and a universal APK. iOS simulator validation is maintained separately from signed App Store distribution.
 
-Desktop/Browser and signed Android release assets receive deterministic CycloneDX 1.7 SBOMs where configured. The publication job validates unique/reserved release filenames, generates `SHA256SUMS.txt` with the flat basenames users actually download, then creates provenance attestations for the prepared `release-assets/**/*` tree before uploading intended GitHub Release assets.
+Desktop, Browser, and Android release assets receive deterministic CycloneDX 1.7 SBOMs. The publication job validates unique/reserved release filenames, generates `SHA256SUMS.txt` with the flat basenames users actually download, then creates provenance attestations for the prepared `release-assets/**/*` tree before uploading intended GitHub Release assets.
 
 After downloading release assets into one directory, GNU/coreutils-compatible systems can verify the checksum manifest with:
 

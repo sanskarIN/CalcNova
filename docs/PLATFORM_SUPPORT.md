@@ -139,15 +139,15 @@ Completed Android source/release identity:
 - numeric build code: `10000`;
 - explicit runtime identifiers: `android-arm`, `android-arm64`, `android-x86`, `android-x64`;
 - Android workload/Java validation workflow contract;
-- release AAB workflow path;
-- signing only from external secrets;
+- release workflow path publishing both an app bundle and the universal APK derived from it;
+- release-key signing only from external secrets;
 - temporary keystore cleanup;
 - native app-files storage selection;
 - SQLite history, JSON settings/cache, shared clipboard, and Android external-link composition.
 
 Release publication does not override the source-owned display/build versions.
 
-External evidence may record workload build output, emulator/device launch, portrait/landscape behavior, persistence, clipboard, TalkBack/large text behavior, signed AAB production, and store checks where credentials/services are available.
+External evidence may record workload build output, emulator/device launch, portrait/landscape behavior, persistence, clipboard, TalkBack/large text behavior, release-key-signed package production, and store checks where credentials/services are available.
 
 ## iOS
 

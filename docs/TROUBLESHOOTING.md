@@ -277,9 +277,13 @@ A normal compile/build does not require production signing. A signed release AAB
 
 Never commit keystores, aliases with secrets, or passwords while troubleshooting. See [BUILDING.md](BUILDING.md) for the release secret contract.
 
-## Android signed AAB issues
+## Android packaging and signing issues
 
-If an unsigned/normal Android build passes but signed publication fails, focus on signing rather than changing calculator code.
+If a normal Android build passes but release publication fails, focus on packaging and signing rather than changing calculator code.
+
+A Release build produces both an `.aab` and the universal `.apk` bundletool derives from it. A missing
+`.apk` with a present `.aab` means bundletool did not run, usually because `AndroidPackageFormats` no
+longer contains `apk` or because Java is unavailable on the machine.
 
 Check that all required CI secrets are configured:
 
@@ -290,7 +294,11 @@ Check that all required CI secrets are configured:
 
 Verify the keystore/alias/password combination locally using secure tooling without printing secrets into logs.
 
-The release workflow intentionally skips the signed Android artifact when signing secrets are absent.
+When the secrets are absent the release workflow still builds and publishes Android, using the
+throwaway key the Android SDK generates for that run and `-debug-signed` asset names. Those packages
+install for testing but Google Play rejects them, and their key changes between runs, so they cannot
+upgrade an existing install. Configure the four secrets and re-run the release to replace them with
+release-key-signed packages.
 
 ## iOS workload / Xcode issues
 
