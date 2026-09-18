@@ -74,11 +74,10 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
         "JsonCurrencyRateCache",
     ),
     "src/CalcNova.Android/Properties/AndroidManifest.xml": (
-        # Haptics are a declared product feature, so the permission that makes them possible and
-        # the feature declaration that keeps CalcNova installable without a vibrator are both
-        # part of the Android contract.
+        # Haptics are a declared product feature, so the permission that makes them possible is
+        # part of the Android contract. No vibrator <uses-feature> accompanies it: see
+        # FORBIDDEN_FILE_MARKERS below.
         'android:name="android.permission.VIBRATE"',
-        'android:name="android.hardware.vibrate" android:required="false"',
         # CalcNova ships English and Hindi; localeConfig is what surfaces that in the Android 13+
         # per-app language picker.
         'android:localeConfig="@xml/locales_config"',
@@ -147,6 +146,20 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
     ),
 }
 
+# Substrings that must NOT appear. A contract that only checks for presence cannot stop a
+# plausible-looking line from being reintroduced, and this one looked plausible for a release.
+FORBIDDEN_FILE_MARKERS: dict[str, tuple[tuple[str, str], ...]] = {
+    "src/CalcNova.Android/Properties/AndroidManifest.xml": (
+        (
+            '<uses-feature android:name="android.hardware.vibrate"',
+            "Android has no vibrator feature constant, so this declares a feature that does not "
+            "exist and nothing reads. VIBRATE also implies no feature requirement on Google "
+            "Play, so it never kept CalcNova installable on a device without a vibrator - "
+            "AndroidHapticFeedbackService's HasVibrator check does that.",
+        ),
+    ),
+}
+
 REQUIRED_FILES: tuple[str, ...] = (
     "Directory.Build.props",
     "src/CalcNova.Platform/Clipboard/IClipboardService.cs",
@@ -197,6 +210,18 @@ def validate(root: Path) -> list[str]:
             if version_marker not in source:
                 failures.append(
                     f"{relative_path} is missing current mobile build marker: {version_marker}"
+                )
+
+    for relative_path, forbidden_markers in FORBIDDEN_FILE_MARKERS.items():
+        path = root / relative_path
+        if not path.is_file():
+            continue
+
+        source = path.read_text(encoding="utf-8")
+        for marker, reason in forbidden_markers:
+            if marker in source:
+                failures.append(
+                    f"{relative_path} contains a retired cross-platform marker: {marker} - {reason}"
                 )
 
     for relative_path in REQUIRED_FILES:

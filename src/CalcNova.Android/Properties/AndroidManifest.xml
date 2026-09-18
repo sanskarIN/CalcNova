@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
   <!-- Short confirmation buzzes for calculator input, gated behind the Haptics preference.
-       VIBRATE is a normal permission: it is granted at install and never prompts. -->
-  <uses-permission android:name="android.permission.VIBRATE" />
+       VIBRATE is a normal permission: it is granted at install and never prompts.
 
-  <!-- Declared so CalcNova installs on devices without a vibrator instead of being filtered out
-       of the store listing; the haptic service degrades to doing nothing on those devices. -->
-  <uses-feature android:name="android.hardware.vibrate" android:required="false" />
+       No matching <uses-feature> is declared, and none should be added. Android has no
+       vibrator feature constant - "android.hardware.vibrate" is absent from the platform's
+       own features list - and VIBRATE is not one of the permissions Google Play maps to an
+       implied feature requirement, so nothing filters CalcNova out over it. A device without
+       a vibrator is handled where it actually matters: AndroidHapticFeedbackService checks
+       Vibrator.HasVibrator and does nothing when there is none. -->
+  <uses-permission android:name="android.permission.VIBRATE" />
 
   <application
       android:label="@string/app_name"
