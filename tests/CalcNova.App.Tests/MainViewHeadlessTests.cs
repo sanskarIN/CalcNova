@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -267,6 +268,48 @@ public sealed class MainViewHeadlessTests
 
             Assert.False(viewModel.Settings.ShouldShowOnboarding);
             Assert.False(overlay.IsVisible);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task CompactShell_KeepsModeContentInsideTheWindow()
+    {
+        var viewModel = await CreateReadyViewModelAsync();
+        var view = new MainView { DataContext = viewModel };
+
+        // Below AdaptiveLayoutProfile.CompactMaximumWidth, which is where a phone lands.
+        var window = new Window { Width = 420, Height = 860, Content = view };
+
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            // A mode's content pane that scrolls horizontally is measured with unlimited width,
+            // and then nothing inside it sizes itself to the window: WrapPanels stop wrapping and
+            // star-sized keypad columns stretch past the edge, so the shell has to be panned to
+            // reach a key. Only the strip that holds the mode tabs may scroll sideways.
+            var contentPanes = view.GetVisualDescendants()
+                .OfType<ScrollViewer>()
+                .Where(scrollViewer => !scrollViewer.GetVisualDescendants().OfType<TabItem>().Any())
+                .ToArray();
+
+            Assert.NotEmpty(contentPanes);
+            Assert.All(
+                contentPanes,
+                pane => Assert.Equal(ScrollBarVisibility.Disabled, pane.HorizontalScrollBarVisibility));
+
+            // The contract above is what stops a pane overflowing; this is the overflow itself.
+            Assert.All(
+                contentPanes,
+                pane => Assert.True(
+                    pane.Extent.Width <= pane.Viewport.Width + 0.5,
+                    $"A mode content pane measured {pane.Extent.Width} wide "
+                        + $"inside a {pane.Viewport.Width} wide viewport."));
         }
         finally
         {
