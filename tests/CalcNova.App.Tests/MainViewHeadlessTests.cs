@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -267,6 +268,55 @@ public sealed class MainViewHeadlessTests
 
             Assert.False(viewModel.Settings.ShouldShowOnboarding);
             Assert.False(overlay.IsVisible);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task CompactShell_KeepsModeContentInsideTheWindow()
+    {
+        var viewModel = await CreateReadyViewModelAsync();
+        var view = new MainView { DataContext = viewModel };
+
+        // Below AdaptiveLayoutProfile.CompactMaximumWidth, which is where a phone lands.
+        var window = new Window { Width = 420, Height = 860, Content = view };
+
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            // A mode's content pane measured with unlimited width leaves nothing inside it able
+            // to fit the window: WrapPanels such as the programmer bit grid stop wrapping and run
+            // off in one line, and star-sized keypad columns stretch to the widest label in the
+            // pane, so keys sit off-screen and the shell has to be panned to reach them.
+            //
+            // This deliberately reads the panes off the tabs rather than collecting every
+            // ScrollViewer in the shell. A TextBox carries a ScrollViewer inside its own
+            // template, and that one should keep scrolling a long expression sideways.
+            var contentPanes = view.GetVisualDescendants()
+                .OfType<TabItem>()
+                .Select(tab => tab.Content)
+                .OfType<ScrollViewer>()
+                .ToArray();
+
+            Assert.NotEmpty(contentPanes);
+            Assert.All(
+                contentPanes,
+                pane => Assert.Equal(ScrollBarVisibility.Disabled, pane.HorizontalScrollBarVisibility));
+
+            // Only the selected mode is laid out, so only that pane reports a real viewport.
+            var laidOut = contentPanes.Where(pane => pane.Viewport.Width > 0).ToArray();
+            Assert.NotEmpty(laidOut);
+            Assert.All(
+                laidOut,
+                pane => Assert.True(
+                    pane.Extent.Width <= pane.Viewport.Width + 0.5,
+                    $"A mode content pane measured {pane.Extent.Width} wide "
+                        + $"inside a {pane.Viewport.Width} wide viewport."));
         }
         finally
         {

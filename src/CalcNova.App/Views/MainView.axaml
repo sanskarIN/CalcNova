@@ -17,7 +17,7 @@
 
     <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedModeIndex, Mode=TwoWay}">
       <TabItem Header="Calc">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding Calculator}" x:DataType="vm:CalculatorViewModel" Margin="6" Spacing="8">
             <Grid ColumnDefinitions="*,Auto">
               <StackPanel>
@@ -94,7 +94,7 @@
       </TabItem>
 
       <TabItem Header="Prog">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding Programmer}" x:DataType="vm:ProgrammerViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Programmer Calculator" FontSize="21" FontWeight="SemiBold" />
             <TextBox Text="{Binding Input, Mode=TwoWay}" PlaceholderText="Primary value" />
@@ -181,7 +181,7 @@
       </TabItem>
 
       <TabItem Header="Code">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding CodePoint}" x:DataType="vm:CodePointViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Unicode Code Points" FontSize="21" FontWeight="SemiBold" />
             <TextBlock Text="Inspect Unicode scalars without splitting supplementary characters into UTF-16 units." Opacity="0.62" TextWrapping="Wrap" />
@@ -205,7 +205,7 @@
       </TabItem>
 
       <TabItem Header="Convert">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding Converter}" x:DataType="vm:ConverterViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Offline Unit Converter" FontSize="21" FontWeight="SemiBold" />
             <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
@@ -260,7 +260,7 @@
       </TabItem>
 
       <TabItem Header="Stats">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding Statistics}" x:DataType="vm:StatisticsViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Statistics" FontSize="21" FontWeight="SemiBold" />
             <TextBox Text="{Binding DatasetText, Mode=TwoWay}" AcceptsReturn="True" MinHeight="130" TextWrapping="Wrap" />
@@ -276,7 +276,7 @@
       </TabItem>
 
       <TabItem Header="Eq">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding Equations}" x:DataType="vm:EquationsViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Equation Solver" FontSize="21" FontWeight="SemiBold" />
             <TextBlock Text="Solve ax² + bx + c = 0" Opacity="0.62" />
@@ -291,7 +291,7 @@
       </TabItem>
 
       <TabItem Header="Matrix">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding Matrices}" x:DataType="vm:MatricesViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Matrix Utilities" FontSize="21" FontWeight="SemiBold" />
             <TextBox Text="{Binding MatrixText, Mode=TwoWay}" AcceptsReturn="True" MinHeight="130" />
@@ -311,7 +311,7 @@
       </TabItem>
 
       <TabItem Header="Graph">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding Graphing}" x:DataType="vm:GraphingViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Graphing" FontSize="21" FontWeight="SemiBold" />
             <TextBlock Text="Single expression" FontWeight="SemiBold" />
@@ -371,7 +371,7 @@
       </TabItem>
 
       <TabItem Header="Date">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding DateTime}" x:DataType="vm:DateTimeViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Date &amp; Duration Utilities" FontSize="21" FontWeight="SemiBold" />
             <TextBlock Text="Dates use yyyy-MM-dd. Calendar arithmetic is timezone-free." Opacity="0.62" TextWrapping="Wrap" />
@@ -403,7 +403,7 @@
       </TabItem>
 
       <TabItem Header="FX">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding Currency}" x:DataType="vm:CurrencyViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Currency Converter" FontSize="21" FontWeight="SemiBold" />
             <TextBlock Text="Optional network-enhanced module. CalcNova never embeds API keys; cached rates remain usable offline." Opacity="0.62" TextWrapping="Wrap" />
@@ -459,7 +459,7 @@
       </TabItem>
 
       <TabItem Header="Settings">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding Settings}" x:DataType="vm:SettingsViewModel" Margin="8" Spacing="10">
             <TextBlock Text="Settings" FontSize="21" FontWeight="SemiBold" />
             <TextBlock Text="Theme" /><ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme, Mode=TwoWay}" />
@@ -483,7 +483,7 @@
       </TabItem>
 
       <TabItem Header="About">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel DataContext="{Binding About}" x:DataType="vm:AboutViewModel" Margin="8" Spacing="10">
             <TextBlock Text="{Binding ProjectName}" FontSize="26" FontWeight="SemiBold" />
             <TextBlock Text="{Binding Tagline}" Opacity="0.68" />

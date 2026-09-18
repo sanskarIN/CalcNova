@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
-  <style name="CalcNovaTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+  <!-- The parent must stay a Theme.AppCompat descendant. Avalonia hosts the shell on
+       AvaloniaMainActivity, which derives from androidx.appcompat.app.AppCompatActivity, and
+       AppCompat asserts its own theme attributes are present the moment it inflates its
+       decor. Under a framework theme such as android:Theme.Material it throws
+       "You need to use a Theme.AppCompat theme (or descendant) with this activity" from
+       onCreate, so every launch fails before any CalcNova code runs. -->
+  <style name="CalcNovaTheme" parent="Theme.AppCompat.Light.NoActionBar">
     <item name="android:fontFamily">sans</item>
     <item name="android:windowActionModeOverlay">true</item>
     <item name="android:windowNoTitle">true</item>

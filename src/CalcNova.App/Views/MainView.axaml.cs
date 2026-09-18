@@ -685,13 +685,26 @@ public partial class MainView : UserControl
             shell.Margin = new Thickness(profile.ShellMargin);
         }
 
-        var horizontalVisibility = profile.AllowHorizontalModeScrolling
-            ? ScrollBarVisibility.Auto
-            : ScrollBarVisibility.Disabled;
-
+        // Only the strip that holds the mode tabs follows the profile's horizontal allowance.
+        // Every other ScrollViewer is left as declared: a mode's content pane is already fixed
+        // to Disabled in MainView.axaml, because a pane measured with unlimited width leaves
+        // nothing inside it able to fit the window - WrapPanels such as the programmer bit grid
+        // stop wrapping and run off in one line, and star-sized keypad columns stretch to the
+        // widest label in the pane, so the shell has to be panned to reach a key.
+        //
+        // Writing to the rest from here reached further than it looked. A TextBox carries a
+        // ScrollViewer inside its own template, and forcing that to Disabled stops a long
+        // expression scrolling within its box. It only reached the templates that happened to be
+        // applied by the time this ran, so which text boxes were affected varied.
         foreach (var scrollViewer in this.GetVisualDescendants().OfType<ScrollViewer>())
         {
-            scrollViewer.HorizontalScrollBarVisibility = horizontalVisibility;
+            if (scrollViewer.GetVisualDescendants().OfType<TabItem>().Any())
+            {
+                scrollViewer.HorizontalScrollBarVisibility = profile.AllowHorizontalModeScrolling
+                    ? ScrollBarVisibility.Auto
+                    : ScrollBarVisibility.Disabled;
+            }
+
             scrollViewer.BringIntoViewOnFocusChange = true;
         }
     }

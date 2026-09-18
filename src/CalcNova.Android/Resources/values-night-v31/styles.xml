@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
-  <style name="CalcNovaTheme" parent="android:style/Theme.Material.NoActionBar">
+  <!-- Android 12 and later in dark mode: the theme from values-night/styles.xml plus the
+       splash-screen attributes that only exist from API 31. The AppCompat parent
+       requirement described in values/styles.xml applies here too. -->
+  <style name="CalcNovaTheme" parent="Theme.AppCompat.NoActionBar">
     <item name="android:fontFamily">sans</item>
     <item name="android:windowActionModeOverlay">true</item>
     <item name="android:windowNoTitle">true</item>

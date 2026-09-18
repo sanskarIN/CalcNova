@@ -40,7 +40,7 @@ dotnet workload list
 | Linux desktop | .NET 10 SDK; representative Linux runtime verification is recommended |
 | macOS desktop | .NET 10 SDK; macOS is required for macOS runtime, signing, and notarization verification |
 | Browser/WebAssembly | .NET 10 SDK + `wasm-tools` workload |
-| Android | .NET 10 SDK + Android workload + JDK 17 + Android SDK/toolchain |
+| Android | .NET 10 SDK + Android workload + a JDK from 17 to 21 + Android SDK/toolchain |
 | iOS | supported macOS/Xcode environment + .NET 10 SDK + iOS workload |
 
 The current project metadata sets:
@@ -282,6 +282,23 @@ Current identity and platform metadata:
 - numeric build code: `10000`;
 - minimum Android API: 23;
 - JDK used by CI: Temurin 17.
+
+The Android workload accepts a JDK from 17 up to 21 and refuses anything newer, so a machine
+whose default `java` is 22 or later fails the Android build before compiling. Point `JAVA_HOME`
+at a supported JDK for the build rather than changing the system default:
+
+```bash
+# Linux/macOS
+JAVA_HOME=/path/to/jdk-21 dotnet publish src/CalcNova.Android/CalcNova.Android.csproj -c Release
+```
+
+```powershell
+# Windows PowerShell; Android Studio installs a suitable JDK at this path
+$env:JAVA_HOME = "C:\Program Files (x86)\Android\openjdk\jdk-21.0.8"
+dotnet publish src/CalcNova.Android/CalcNova.Android.csproj -c Release
+```
+
+`java -version` reports the JDK that is currently selected.
 
 Install the workload:
 

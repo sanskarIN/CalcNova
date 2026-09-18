@@ -74,11 +74,10 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
         "JsonCurrencyRateCache",
     ),
     "src/CalcNova.Android/Properties/AndroidManifest.xml": (
-        # Haptics are a declared product feature, so the permission that makes them possible and
-        # the feature declaration that keeps CalcNova installable without a vibrator are both
-        # part of the Android contract.
+        # Haptics are a declared product feature, so the permission that makes them possible is
+        # part of the Android contract. No vibrator <uses-feature> accompanies it: see
+        # FORBIDDEN_FILE_MARKERS below.
         'android:name="android.permission.VIBRATE"',
-        'android:name="android.hardware.vibrate" android:required="false"',
         # CalcNova ships English and Hindi; localeConfig is what surfaces that in the Android 13+
         # per-app language picker.
         'android:localeConfig="@xml/locales_config"',
@@ -88,6 +87,24 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
         'android:dataExtractionRules="@xml/data_extraction_rules"',
         'android:enableOnBackInvokedCallback="true"',
         'android:usesCleartextTraffic="false"',
+    ),
+    # Avalonia hosts the shell on AvaloniaMainActivity, which derives from
+    # androidx.appcompat.app.AppCompatActivity. AppCompat requires its own theme attributes
+    # and throws "You need to use a Theme.AppCompat theme (or descendant) with this activity"
+    # from onCreate under a framework theme such as android:Theme.Material, which aborts every
+    # launch before any CalcNova code runs. Packaging cannot catch that, so the parent of each
+    # theme variant is checked here.
+    "src/CalcNova.Android/Resources/values/styles.xml": (
+        '<style name="CalcNovaTheme" parent="Theme.AppCompat.Light.NoActionBar">',
+    ),
+    "src/CalcNova.Android/Resources/values-v31/styles.xml": (
+        '<style name="CalcNovaTheme" parent="Theme.AppCompat.Light.NoActionBar">',
+    ),
+    "src/CalcNova.Android/Resources/values-night/styles.xml": (
+        '<style name="CalcNovaTheme" parent="Theme.AppCompat.NoActionBar">',
+    ),
+    "src/CalcNova.Android/Resources/values-night-v31/styles.xml": (
+        '<style name="CalcNovaTheme" parent="Theme.AppCompat.NoActionBar">',
     ),
     "src/CalcNova.Android/Services/AndroidHapticFeedbackService.cs": (
         "IHapticFeedbackService",
@@ -126,6 +143,20 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
     "src/CalcNova.Platform/CalcNova.Platform.csproj": (
         "<TargetFramework>net10.0</TargetFramework>",
         '<ProjectReference Include="../CalcNova.Core/CalcNova.Core.csproj" />',
+    ),
+}
+
+# Substrings that must NOT appear. A contract that only checks for presence cannot stop a
+# plausible-looking line from being reintroduced, and this one looked plausible for a release.
+FORBIDDEN_FILE_MARKERS: dict[str, tuple[tuple[str, str], ...]] = {
+    "src/CalcNova.Android/Properties/AndroidManifest.xml": (
+        (
+            '<uses-feature android:name="android.hardware.vibrate"',
+            "Android has no vibrator feature constant, so this declares a feature that does not "
+            "exist and nothing reads. VIBRATE also implies no feature requirement on Google "
+            "Play, so it never kept CalcNova installable on a device without a vibrator - "
+            "AndroidHapticFeedbackService's HasVibrator check does that.",
+        ),
     ),
 }
 
@@ -179,6 +210,18 @@ def validate(root: Path) -> list[str]:
             if version_marker not in source:
                 failures.append(
                     f"{relative_path} is missing current mobile build marker: {version_marker}"
+                )
+
+    for relative_path, forbidden_markers in FORBIDDEN_FILE_MARKERS.items():
+        path = root / relative_path
+        if not path.is_file():
+            continue
+
+        source = path.read_text(encoding="utf-8")
+        for marker, reason in forbidden_markers:
+            if marker in source:
+                failures.append(
+                    f"{relative_path} contains a retired cross-platform marker: {marker} - {reason}"
                 )
 
     for relative_path in REQUIRED_FILES:

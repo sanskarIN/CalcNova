@@ -2,6 +2,44 @@
 
 All notable CalcNova changes are recorded here.
 
+## Maintenance since 1.0.0
+
+### Fixed
+
+- **Android: the app crashed on every launch.** `CalcNovaTheme` inherited from the framework
+  theme `android:Theme.Material`, but Avalonia hosts the shell on `AvaloniaMainActivity`, which
+  derives from `androidx.appcompat.app.AppCompatActivity`. AppCompat rejects a non-AppCompat
+  theme while inflating its decor, so `onCreate` threw `IllegalStateException: You need to use a
+  Theme.AppCompat theme (or descendant) with this activity` before any CalcNova code ran. All
+  four theme variants now inherit from `Theme.AppCompat`, and `validate_platform_support.py`
+  checks each parent so the regression cannot return unnoticed.
+- **Compact layouts panned sideways instead of fitting the window.** The adaptive layout gave
+  every ScrollViewer in the shell — not only the mode strip — an unconstrained horizontal
+  measure at compact width. Nothing inside a mode could then size itself to the window:
+  WrapPanels such as the programmer bit grid laid out in one unwrapped line, and star-sized
+  keypad columns stretched to the widest label in the pane, so keys sat off-screen and had to be
+  panned to. Mode content panes are now horizontally constrained in every profile, as
+  `docs/ADAPTIVE_LAYOUT.md` already specified, and the profile's horizontal-scrolling allowance
+  applies to the mode strip alone. This was only reachable below 600 DIPs, which is every phone.
+
+### Changed
+
+- Removed the `android.hardware.vibrate` `uses-feature` declaration from the Android manifest.
+  Android has no vibrator feature constant — the name is absent from the platform's own
+  features list — so the entry declared a feature that does not exist and nothing reads, and
+  `aapt2 dump badging` only echoed it back. `VIBRATE` is not one of the permissions Google Play
+  maps to an implied feature requirement either, so the declaration never kept CalcNova
+  installable on a device without a vibrator; `AndroidHapticFeedbackService`'s `HasVibrator`
+  check is what actually does that. Because it was declared `android:required="false"`,
+  removing it changes no install or store-filtering behaviour. `validate_platform_support.py`
+  now fails if the line returns.
+
+### Documentation
+
+- `docs/BUILDING.md` now states that the Android workload accepts a JDK from 17 to 21 and
+  refuses anything newer, and shows how to point `JAVA_HOME` at a supported JDK. A machine whose
+  default `java` is 22 or later previously failed the Android build with no explanation of why.
+
 ## [1.0.0] - 2026-09-17
 
 **Status: Complete**
@@ -32,7 +70,7 @@ Mobile build code: `10000`
 ### Android
 
 - Implemented haptic feedback. The Haptics setting had been persisted, validated, localized and shown as a checkbox since before this release without any head implementing it; calculator input now asks the device for a short confirmation, with distinct patterns for an accepted key, a completed calculation and a rejected one.
-- Added the `VIBRATE` permission and declared the vibrator feature as not required, so CalcNova still installs on devices without one.
+- Added the `VIBRATE` permission, alongside an `android.hardware.vibrate` `uses-feature` declaration that was later found to be inert and removed (see Maintenance above). Devices without a vibrator are handled by the service's `HasVibrator` check.
 - Added night-mode resources so a dark-themed device no longer flashes a light splash screen before the app paints.
 - Declared a locale configuration for English and Hindi, which surfaces CalcNova in the Android 13+ per-app language picker.
 - Added backup and data-extraction rules for both the pre-12 and 12+ APIs: history and settings restore onto a new device, and the reconstructible currency-rate cache does not.
