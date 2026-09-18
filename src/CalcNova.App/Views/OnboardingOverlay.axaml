@@ -5,82 +5,97 @@
              x:DataType="vm:MainViewModel"
              IsVisible="{Binding Settings.ShouldShowOnboarding}">
   <Border Background="#CC000000" Padding="16">
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                  VerticalScrollBarVisibility="Auto"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch">
-      <Border MaxWidth="640"
-              Margin="0,24"
-              Padding="24"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              Background="#FFF8FAFD"
-              BorderBrush="#FF596780"
-              BorderThickness="1"
-              CornerRadius="18">
-        <StackPanel Spacing="14">
-          <TextBlock Text="Welcome to CalcNova"
-                     FontSize="28"
-                     FontWeight="SemiBold"
-                     Foreground="#FF111827"
-                     TextWrapping="Wrap" />
-          <TextBlock Text="Fast. Precise. Private. Everywhere."
-                     FontSize="17"
-                     Foreground="#FF334155"
-                     TextWrapping="Wrap" />
+    <!-- The card stretches rather than centring, so it can never be taller than the space it
+         has. A card that centres inside a ScrollViewer is measured against the viewport and
+         clipped instead of scrolled, and on a short phone that cut off the bottom of the card -
+         which is where Skip and Start calculating used to live, leaving no way out of
+         onboarding at all.
 
-          <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
-            <StackPanel Spacing="8">
-              <TextBlock Text="Calculate your way"
-                         FontSize="18"
-                         FontWeight="SemiBold"
-                         Foreground="#FF111827" />
-              <TextBlock Text="Use standard and scientific calculation, Programmer, Converter, Statistics, Equations, Matrices, Graphing, Date &amp; Duration, Currency, and History from one shared workspace."
-                         Foreground="#FF334155"
-                         TextWrapping="Wrap" />
-            </StackPanel>
-          </Border>
+         Skip and Start calculating are now outside the ScrollViewer, in their own Auto row, so
+         the grid gives them their height first and the prose takes whatever is left. They stay
+         on screen at any height, however little room the text has. -->
+    <Border MaxWidth="640"
+            MaxHeight="760"
+            Padding="24"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch"
+            Background="#FFF8FAFD"
+            BorderBrush="#FF596780"
+            BorderThickness="1"
+            CornerRadius="18">
+      <Grid RowDefinitions="*,Auto">
+        <ScrollViewer Grid.Row="0"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+          <StackPanel Spacing="14">
+            <TextBlock Text="Welcome to CalcNova"
+                       FontSize="28"
+                       FontWeight="SemiBold"
+                       Foreground="#FF111827"
+                       TextWrapping="Wrap" />
+            <TextBlock Text="Fast. Precise. Private. Everywhere."
+                       FontSize="17"
+                       Foreground="#FF334155"
+                       TextWrapping="Wrap" />
 
-          <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
-            <StackPanel Spacing="8">
-              <TextBlock Text="Keyboard and touch friendly"
-                         FontSize="18"
-                         FontWeight="SemiBold"
-                         Foreground="#FF111827" />
-              <TextBlock Text="On keyboard targets, Ctrl+PageUp and Ctrl+PageDown cycle through modes; Ctrl+Home and Ctrl+End jump to the first and last modes. Calculator number-pad input is supported when you are not editing a text field."
-                         Foreground="#FF334155"
-                         TextWrapping="Wrap" />
-            </StackPanel>
-          </Border>
+            <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Calculate your way"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#FF111827"
+                           TextWrapping="Wrap" />
+                <TextBlock Text="Use standard and scientific calculation, Programmer, Converter, Statistics, Equations, Matrices, Graphing, Date &amp; Duration, Currency, and History from one shared workspace."
+                           Foreground="#FF334155"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
 
-          <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
-            <StackPanel Spacing="8">
-              <TextBlock Text="Local-first by default"
-                         FontSize="18"
-                         FontWeight="SemiBold"
-                         Foreground="#FF111827" />
-              <TextBlock Text="Calculation history and preferences stay in local app storage. Physical unit conversion is offline. Currency rates are the optional network-enhanced feature and can use cached data when available."
-                         Foreground="#FF334155"
-                         TextWrapping="Wrap" />
-            </StackPanel>
-          </Border>
+            <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
+              <StackPanel Spacing="8">
+                <!-- These headings wrap because they are longer than a narrow phone card is
+                     wide; without it the end of the heading is simply cut off. -->
+                <TextBlock Text="Keyboard and touch friendly"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#FF111827"
+                           TextWrapping="Wrap" />
+                <TextBlock Text="On keyboard targets, Ctrl+PageUp and Ctrl+PageDown cycle through modes; Ctrl+Home and Ctrl+End jump to the first and last modes. Calculator number-pad input is supported when you are not editing a text field."
+                           Foreground="#FF334155"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
 
-          <TextBlock Text="No account is required for core CalcNova features. You can skip this introduction immediately."
-                     Foreground="#FF475569"
-                     TextWrapping="Wrap" />
+            <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Local-first by default"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#FF111827"
+                           TextWrapping="Wrap" />
+                <TextBlock Text="Calculation history and preferences stay in local app storage. Physical unit conversion is offline. Currency rates are the optional network-enhanced feature and can use cached data when available."
+                           Foreground="#FF334155"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
 
-          <WrapPanel HorizontalAlignment="Right">
-            <Button Content="Skip"
-                    Command="{Binding Settings.SkipOnboardingCommand}"
-                    AutomationProperties.Name="Skip CalcNova introduction"
-                    Margin="0,0,8,8" />
-            <Button Content="Start calculating"
-                    Command="{Binding Settings.CompleteOnboardingCommand}"
-                    AutomationProperties.Name="Complete CalcNova introduction and start calculating"
-                    Margin="0,0,0,8" />
-          </WrapPanel>
-        </StackPanel>
-      </Border>
-    </ScrollViewer>
+            <TextBlock Text="No account is required for core CalcNova features. You can skip this introduction immediately."
+                       Foreground="#FF475569"
+                       TextWrapping="Wrap" />
+          </StackPanel>
+        </ScrollViewer>
+
+        <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="0,14,0,0">
+          <Button Content="Skip"
+                  Command="{Binding Settings.SkipOnboardingCommand}"
+                  AutomationProperties.Name="Skip CalcNova introduction"
+                  Margin="0,0,8,0" />
+          <Button Content="Start calculating"
+                  Command="{Binding Settings.CompleteOnboardingCommand}"
+                  AutomationProperties.Name="Complete CalcNova introduction and start calculating"
+                  Margin="0,0,0,0" />
+        </WrapPanel>
+      </Grid>
+    </Border>
   </Border>
 </UserControl>

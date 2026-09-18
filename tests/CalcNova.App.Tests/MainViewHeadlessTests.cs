@@ -1,3 +1,5 @@
+using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
@@ -317,6 +319,65 @@ public sealed class MainViewHeadlessTests
                     pane.Extent.Width <= pane.Viewport.Width + 0.5,
                     $"A mode content pane measured {pane.Extent.Width} wide "
                         + $"inside a {pane.Viewport.Width} wide viewport."));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task OnboardingActions_StayOnScreenOnAShortPhone()
+    {
+        var viewModel = new MainViewModel();
+        await viewModel.InitializeAsync();
+        var view = new MainView { DataContext = viewModel };
+
+        // A 360x800 DIP phone, which is where the overlay ran out of room: the card was taller
+        // than the screen, and Skip and Start calculating sat at the bottom of the scrolled
+        // content, so onboarding could not be dismissed and the app could not be reached.
+        var window = new Window { Width = 360, Height = 800, Content = view };
+
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            var overlay = view.GetVisualDescendants().OfType<OnboardingOverlay>().Single();
+            Assert.True(overlay.IsVisible);
+
+            foreach (var name in new[]
+                     {
+                         "Skip CalcNova introduction",
+                         "Complete CalcNova introduction and start calculating",
+                     })
+            {
+                var button = overlay.GetVisualDescendants()
+                    .OfType<Button>()
+                    .Single(candidate => string.Equals(
+                        AutomationProperties.GetName(candidate),
+                        name,
+                        StringComparison.Ordinal));
+
+                Assert.True(button.IsVisible);
+                Assert.True(button.Bounds.Width > 0 && button.Bounds.Height > 0, $"'{name}' has no size.");
+
+                // Bounds are parent-relative, so the corners have to be translated into the
+                // window before they mean anything.
+                var topLeft = button.TranslatePoint(new Point(0, 0), window);
+                var bottomRight = button.TranslatePoint(
+                    new Point(button.Bounds.Width, button.Bounds.Height),
+                    window);
+
+                Assert.NotNull(topLeft);
+                Assert.NotNull(bottomRight);
+                Assert.True(
+                    topLeft!.Value.Y >= 0 && bottomRight!.Value.Y <= window.Height,
+                    $"'{name}' spans {topLeft.Value.Y} to {bottomRight!.Value.Y} in an {window.Height} tall window.");
+                Assert.True(
+                    topLeft.Value.X >= 0 && bottomRight.Value.X <= window.Width,
+                    $"'{name}' spans {topLeft.Value.X} to {bottomRight.Value.X} in a {window.Width} wide window.");
+            }
         }
         finally
         {
