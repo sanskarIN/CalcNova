@@ -13,6 +13,16 @@ All notable CalcNova changes are recorded here.
   Theme.AppCompat theme (or descendant) with this activity` before any CalcNova code ran. All
   four theme variants now inherit from `Theme.AppCompat`, and `validate_platform_support.py`
   checks each parent so the regression cannot return unnoticed.
+- **First-run onboarding could not be dismissed on a short phone.** On a 360x800 device the
+  overlay card was taller than the screen, and `Skip` and `Start calculating` were the last
+  children of the card's scrolled content, so the only way out of onboarding was cut off and the
+  app could not be reached at all. The card set `VerticalAlignment="Center"` inside the very
+  ScrollViewer meant to scroll it, and content aligned inside a scroll viewport is measured
+  against the viewport rather than the extent, so it clipped instead of scrolling. The card now
+  stretches, so it can never exceed the space it has, and both buttons sit in their own row
+  outside the scroll region where they keep their place however little room the prose has. The
+  section headings also gained `TextWrapping`, since "Keyboard and touch friendly" is wider than
+  a narrow phone card and was being cut off mid-heading.
 - **Compact layouts panned sideways instead of fitting the window.** The adaptive layout gave
   every ScrollViewer in the shell — not only the mode strip — an unconstrained horizontal
   measure at compact width. Nothing inside a mode could then size itself to the window:
