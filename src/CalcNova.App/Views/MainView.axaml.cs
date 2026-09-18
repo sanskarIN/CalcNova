@@ -685,13 +685,21 @@ public partial class MainView : UserControl
             shell.Margin = new Thickness(profile.ShellMargin);
         }
 
-        var horizontalVisibility = profile.AllowHorizontalModeScrolling
-            ? ScrollBarVisibility.Auto
-            : ScrollBarVisibility.Disabled;
-
+        // Horizontal scrolling belongs to the mode strip and nowhere else. A mode's content
+        // pane that is allowed to scroll sideways is measured with unlimited width, and then
+        // nothing inside it fits the window: WrapPanels such as the programmer bit grid stop
+        // wrapping and run off in one line, star-sized keypad columns stretch to the widest
+        // label in the pane, and the shell has to be panned to reach a key. ADAPTIVE_LAYOUT.md
+        // asks for the opposite - the strip may scroll, the page may not pan - so only the
+        // ScrollViewer that actually holds the mode tabs follows the profile.
         foreach (var scrollViewer in this.GetVisualDescendants().OfType<ScrollViewer>())
         {
-            scrollViewer.HorizontalScrollBarVisibility = horizontalVisibility;
+            var scrollsModeStrip = scrollViewer.GetVisualDescendants().OfType<TabItem>().Any();
+
+            scrollViewer.HorizontalScrollBarVisibility =
+                scrollsModeStrip && profile.AllowHorizontalModeScrolling
+                    ? ScrollBarVisibility.Auto
+                    : ScrollBarVisibility.Disabled;
             scrollViewer.BringIntoViewOnFocusChange = true;
         }
     }
