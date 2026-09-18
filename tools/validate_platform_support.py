@@ -89,6 +89,24 @@ FILE_MARKERS: dict[str, tuple[str, ...]] = {
         'android:enableOnBackInvokedCallback="true"',
         'android:usesCleartextTraffic="false"',
     ),
+    # Avalonia hosts the shell on AvaloniaMainActivity, which derives from
+    # androidx.appcompat.app.AppCompatActivity. AppCompat requires its own theme attributes
+    # and throws "You need to use a Theme.AppCompat theme (or descendant) with this activity"
+    # from onCreate under a framework theme such as android:Theme.Material, which aborts every
+    # launch before any CalcNova code runs. Packaging cannot catch that, so the parent of each
+    # theme variant is checked here.
+    "src/CalcNova.Android/Resources/values/styles.xml": (
+        '<style name="CalcNovaTheme" parent="Theme.AppCompat.Light.NoActionBar">',
+    ),
+    "src/CalcNova.Android/Resources/values-v31/styles.xml": (
+        '<style name="CalcNovaTheme" parent="Theme.AppCompat.Light.NoActionBar">',
+    ),
+    "src/CalcNova.Android/Resources/values-night/styles.xml": (
+        '<style name="CalcNovaTheme" parent="Theme.AppCompat.NoActionBar">',
+    ),
+    "src/CalcNova.Android/Resources/values-night-v31/styles.xml": (
+        '<style name="CalcNovaTheme" parent="Theme.AppCompat.NoActionBar">',
+    ),
     "src/CalcNova.Android/Services/AndroidHapticFeedbackService.cs": (
         "IHapticFeedbackService",
         # The vibrator API moved at API 26 and again at API 31; each path has to stay present
