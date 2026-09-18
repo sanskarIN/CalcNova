@@ -326,17 +326,22 @@ public sealed class MainViewHeadlessTests
         }
     }
 
-    [AvaloniaFact]
-    public async Task OnboardingActions_StayOnScreenOnAShortPhone()
+    // 360x800 is the phone the overlay was reported unusable on. 360x640 is a shorter phone
+    // still, and 800x360 is that phone in landscape, where the card has least height of all.
+    [AvaloniaTheory]
+    [InlineData(360, 800)]
+    [InlineData(360, 640)]
+    [InlineData(800, 360)]
+    public async Task OnboardingActions_StayOnScreen(double width, double height)
     {
         var viewModel = new MainViewModel();
         await viewModel.InitializeAsync();
         var view = new MainView { DataContext = viewModel };
 
-        // A 360x800 DIP phone, which is where the overlay ran out of room: the card was taller
-        // than the screen, and Skip and Start calculating sat at the bottom of the scrolled
-        // content, so onboarding could not be dismissed and the app could not be reached.
-        var window = new Window { Width = 360, Height = 800, Content = view };
+        // Where the overlay ran out of room: the card was taller than the screen, and Skip and
+        // Start calculating sat at the bottom of the scrolled content, so onboarding could not
+        // be dismissed and the app could not be reached.
+        var window = new Window { Width = width, Height = height, Content = view };
 
         window.Show();
         try
