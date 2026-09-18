@@ -2,6 +2,32 @@
 
 All notable CalcNova changes are recorded here.
 
+## Maintenance since 1.0.0
+
+### Fixed
+
+- **Android: the app crashed on every launch.** `CalcNovaTheme` inherited from the framework
+  theme `android:Theme.Material`, but Avalonia hosts the shell on `AvaloniaMainActivity`, which
+  derives from `androidx.appcompat.app.AppCompatActivity`. AppCompat rejects a non-AppCompat
+  theme while inflating its decor, so `onCreate` threw `IllegalStateException: You need to use a
+  Theme.AppCompat theme (or descendant) with this activity` before any CalcNova code ran. All
+  four theme variants now inherit from `Theme.AppCompat`, and `validate_platform_support.py`
+  checks each parent so the regression cannot return unnoticed.
+- **Compact layouts panned sideways instead of fitting the window.** The adaptive layout gave
+  every ScrollViewer in the shell — not only the mode strip — an unconstrained horizontal
+  measure at compact width. Nothing inside a mode could then size itself to the window:
+  WrapPanels such as the programmer bit grid laid out in one unwrapped line, and star-sized
+  keypad columns stretched to the widest label in the pane, so keys sat off-screen and had to be
+  panned to. Mode content panes are now horizontally constrained in every profile, as
+  `docs/ADAPTIVE_LAYOUT.md` already specified, and the profile's horizontal-scrolling allowance
+  applies to the mode strip alone. This was only reachable below 600 DIPs, which is every phone.
+
+### Documentation
+
+- `docs/BUILDING.md` now states that the Android workload accepts a JDK from 17 to 21 and
+  refuses anything newer, and shows how to point `JAVA_HOME` at a supported JDK. A machine whose
+  default `java` is 22 or later previously failed the Android build with no explanation of why.
+
 ## [1.0.0] - 2026-09-17
 
 **Status: Complete**
