@@ -289,13 +289,18 @@ public sealed class MainViewHeadlessTests
         {
             Dispatcher.UIThread.RunJobs();
 
-            // A mode's content pane that scrolls horizontally is measured with unlimited width,
-            // and then nothing inside it sizes itself to the window: WrapPanels stop wrapping and
-            // star-sized keypad columns stretch past the edge, so the shell has to be panned to
-            // reach a key. Only the strip that holds the mode tabs may scroll sideways.
+            // A mode's content pane measured with unlimited width leaves nothing inside it able
+            // to fit the window: WrapPanels such as the programmer bit grid stop wrapping and run
+            // off in one line, and star-sized keypad columns stretch to the widest label in the
+            // pane, so keys sit off-screen and the shell has to be panned to reach them.
+            //
+            // This deliberately reads the panes off the tabs rather than collecting every
+            // ScrollViewer in the shell. A TextBox carries a ScrollViewer inside its own
+            // template, and that one should keep scrolling a long expression sideways.
             var contentPanes = view.GetVisualDescendants()
+                .OfType<TabItem>()
+                .Select(tab => tab.Content)
                 .OfType<ScrollViewer>()
-                .Where(scrollViewer => !scrollViewer.GetVisualDescendants().OfType<TabItem>().Any())
                 .ToArray();
 
             Assert.NotEmpty(contentPanes);
@@ -303,9 +308,11 @@ public sealed class MainViewHeadlessTests
                 contentPanes,
                 pane => Assert.Equal(ScrollBarVisibility.Disabled, pane.HorizontalScrollBarVisibility));
 
-            // The contract above is what stops a pane overflowing; this is the overflow itself.
+            // Only the selected mode is laid out, so only that pane reports a real viewport.
+            var laidOut = contentPanes.Where(pane => pane.Viewport.Width > 0).ToArray();
+            Assert.NotEmpty(laidOut);
             Assert.All(
-                contentPanes,
+                laidOut,
                 pane => Assert.True(
                     pane.Extent.Width <= pane.Viewport.Width + 0.5,
                     $"A mode content pane measured {pane.Extent.Width} wide "
