@@ -1,5 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
@@ -388,6 +390,100 @@ public sealed class MainViewHeadlessTests
         {
             window.Close();
         }
+    }
+
+    // The card paints a fixed light surface. Buttons that follow the app's theme variant instead
+    // render near-white text on it in dark mode - present and tappable, but invisible, which is
+    // indistinguishable from onboarding having no way out.
+    [AvaloniaTheory]
+    [InlineData("Dark")]
+    [InlineData("Light")]
+    public async Task OnboardingActions_StayLegibleAgainstTheCard(string variantName)
+    {
+        var application = Application.Current;
+        Assert.NotNull(application);
+        var previousVariant = application!.RequestedThemeVariant;
+        application.RequestedThemeVariant =
+            string.Equals(variantName, "Dark", StringComparison.Ordinal) ? ThemeVariant.Dark : ThemeVariant.Light;
+
+        var viewModel = new MainViewModel();
+        await viewModel.InitializeAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 360, Height = 800, Content = view };
+
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            var overlay = view.GetVisualDescendants().OfType<OnboardingOverlay>().Single();
+
+            foreach (var name in new[]
+                     {
+                         "Skip CalcNova introduction",
+                         "Complete CalcNova introduction and start calculating",
+                     })
+            {
+                var button = overlay.GetVisualDescendants()
+                    .OfType<Button>()
+                    .Single(candidate => string.Equals(
+                        AutomationProperties.GetName(candidate),
+                        name,
+                        StringComparison.Ordinal));
+
+                var foreground = Assert.IsAssignableFrom<ISolidColorBrush>(button.Foreground).Color;
+                var behind = NearestOpaqueBackground(button);
+
+                var contrast = ContrastRatio(foreground, behind);
+                Assert.True(
+                    contrast >= 4.5,
+                    $"'{name}' in {variantName}: {foreground} on {behind} is only {contrast:F2}:1.");
+            }
+        }
+        finally
+        {
+            window.Close();
+            application.RequestedThemeVariant = previousVariant;
+        }
+    }
+
+    /// <summary>The colour actually behind a control: its own button face, else the card.</summary>
+    private static Color NearestOpaqueBackground(Button button)
+    {
+        if (button.Background is ISolidColorBrush { Color.A: 255 } own)
+        {
+            return own.Color;
+        }
+
+        foreach (var ancestor in button.GetVisualAncestors().OfType<Border>())
+        {
+            if (ancestor.Background is ISolidColorBrush { Color.A: 255 } solid)
+            {
+                return solid.Color;
+            }
+        }
+
+        throw new InvalidOperationException("No opaque surface was found behind the button.");
+    }
+
+    private static double ContrastRatio(Color first, Color second)
+    {
+        var a = RelativeLuminance(first);
+        var b = RelativeLuminance(second);
+        var lighter = Math.Max(a, b);
+        var darker = Math.Min(a, b);
+        return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    private static double RelativeLuminance(Color color)
+    {
+        static double Channel(byte value)
+        {
+            var c = value / 255d;
+            return c <= 0.03928d ? c / 12.92d : Math.Pow((c + 0.055d) / 1.055d, 2.4d);
+        }
+
+        return (0.2126d * Channel(color.R)) + (0.7152d * Channel(color.G)) + (0.0722d * Channel(color.B));
     }
 
     private static async Task<MainViewModel> CreateReadyViewModelAsync()

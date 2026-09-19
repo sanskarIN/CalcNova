@@ -4,6 +4,42 @@
              x:Class="CalcNova.App.Views.OnboardingOverlay"
              x:DataType="vm:MainViewModel"
              IsVisible="{Binding Settings.ShouldShowOnboarding}">
+  <!-- The card paints its own fixed light surface, so its two actions have to carry their own
+       colours as well. Left to the theme they follow the app's variant, and on a device in dark
+       mode that puts near-white button text on this near-white card: the actions are still there
+       and still tappable, but invisible, which reads exactly like onboarding having no way out.
+
+       BorderThickness is deliberately not set here, so the focus indicator in App.axaml still
+       thickens the border when the button is focused. -->
+  <UserControl.Styles>
+    <Style Selector="Button.onboarding-action">
+      <Setter Property="Background" Value="#FFE2E8F0" />
+      <Setter Property="Foreground" Value="#FF111827" />
+      <Setter Property="BorderBrush" Value="#FF94A3B8" />
+    </Style>
+    <Style Selector="Button.onboarding-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#FFCBD5E1" />
+      <Setter Property="TextBlock.Foreground" Value="#FF111827" />
+    </Style>
+    <Style Selector="Button.onboarding-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#FFB4C0D0" />
+      <Setter Property="TextBlock.Foreground" Value="#FF111827" />
+    </Style>
+
+    <Style Selector="Button.onboarding-primary">
+      <Setter Property="Background" Value="#FF1D4ED8" />
+      <Setter Property="Foreground" Value="#FFFFFFFF" />
+      <Setter Property="BorderBrush" Value="#FF1D4ED8" />
+    </Style>
+    <Style Selector="Button.onboarding-primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#FF1A43B8" />
+      <Setter Property="TextBlock.Foreground" Value="#FFFFFFFF" />
+    </Style>
+    <Style Selector="Button.onboarding-primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#FF16389B" />
+      <Setter Property="TextBlock.Foreground" Value="#FFFFFFFF" />
+    </Style>
+  </UserControl.Styles>
   <Border Background="#CC000000" Padding="16">
     <!-- The card stretches rather than centring, so it can never be taller than the space it
          has. A card that centres inside a ScrollViewer is measured against the viewport and
@@ -87,10 +123,12 @@
 
         <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="0,14,0,0">
           <Button Content="Skip"
+                  Classes="onboarding-action"
                   Command="{Binding Settings.SkipOnboardingCommand}"
                   AutomationProperties.Name="Skip CalcNova introduction"
                   Margin="0,0,8,0" />
           <Button Content="Start calculating"
+                  Classes="onboarding-action onboarding-primary"
                   Command="{Binding Settings.CompleteOnboardingCommand}"
                   AutomationProperties.Name="Complete CalcNova introduction and start calculating"
                   Margin="0,0,0,0" />
