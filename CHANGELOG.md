@@ -34,6 +34,20 @@ All notable CalcNova changes are recorded here.
 
 ### Changed
 
+- **The shell has a calculator's visual language.** It had no colour design of its own — every
+  surface took the framework's defaults, so a calculator with thirteen modes read as a generic
+  settings form. There is now one palette defined per theme variant, and every surface draws from
+  it. The keypad is readable at a glance: digits stay quiet, operators carry a tint, equals is the
+  one filled key and clear the one warning-coloured key. Keys fill their grid cell instead of
+  being sized to their label and left-aligned in a column several times wider. The display is a
+  panel reading expression, then answer in the largest type on screen, then the engine's message.
+  The selected mode is a filled pill rather than an underline, which survives the strip wrapping
+  on a phone. The onboarding overlay follows the palette instead of forcing a light card, so a
+  device in dark mode no longer gets a white sheet across the screen.
+- **Onboarding actions no longer depend on the theme.** They carry their own colours, because a
+  hardcoded light card with theme-coloured buttons on it rendered them white-on-white in dark
+  mode at a contrast ratio of 1.05:1 — present and tappable, but invisible.
+
 - Removed the `android.hardware.vibrate` `uses-feature` declaration from the Android manifest.
   Android has no vibrator feature constant — the name is absent from the platform's own
   features list — so the entry declared a feature that does not exist and nothing reads, and
