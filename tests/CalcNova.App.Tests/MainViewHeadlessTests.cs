@@ -447,6 +447,54 @@ public sealed class MainViewHeadlessTests
         }
     }
 
+    // The keypad's meaning is carried by colour - quiet digits, tinted operators, a filled
+    // equals, a warning-coloured clear. That only works if every one of them stays readable in
+    // both variants, and a palette is easy to extend on one side and forget on the other.
+    [AvaloniaTheory]
+    [InlineData("Dark")]
+    [InlineData("Light")]
+    public async Task Keypad_StaysLegibleInBothThemes(string variantName)
+    {
+        var application = Application.Current;
+        Assert.NotNull(application);
+        var previousVariant = application!.RequestedThemeVariant;
+        application.RequestedThemeVariant =
+            string.Equals(variantName, "Dark", StringComparison.Ordinal) ? ThemeVariant.Dark : ThemeVariant.Light;
+
+        var viewModel = await CreateReadyViewModelAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 980, Height = 860, Content = view };
+
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            var keys = view.GetVisualDescendants()
+                .OfType<Button>()
+                .Where(button => button.Classes.Contains("calc-key") || button.Classes.Contains("function-key"))
+                .ToArray();
+
+            Assert.NotEmpty(keys);
+
+            foreach (var key in keys)
+            {
+                var foreground = Assert.IsAssignableFrom<ISolidColorBrush>(key.Foreground).Color;
+                var behind = NearestOpaqueBackground(key);
+                var contrast = ContrastRatio(foreground, behind);
+
+                Assert.True(
+                    contrast >= 4.5,
+                    $"Key '{key.Content}' in {variantName}: {foreground} on {behind} is only {contrast:F2}:1.");
+            }
+        }
+        finally
+        {
+            window.Close();
+            application.RequestedThemeVariant = previousVariant;
+        }
+    }
+
     /// <summary>The colour actually behind a control: its own button face, else the card.</summary>
     private static Color NearestOpaqueBackground(Button button)
     {
