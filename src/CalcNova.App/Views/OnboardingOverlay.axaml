@@ -4,40 +4,41 @@
              x:Class="CalcNova.App.Views.OnboardingOverlay"
              x:DataType="vm:MainViewModel"
              IsVisible="{Binding Settings.ShouldShowOnboarding}">
-  <!-- The card paints its own fixed light surface, so its two actions have to carry their own
-       colours as well. Left to the theme they follow the app's variant, and on a device in dark
-       mode that puts near-white button text on this near-white card: the actions are still there
-       and still tappable, but invisible, which reads exactly like onboarding having no way out.
+  <!-- Card, text and actions all come from the shared palette, so the overlay follows the
+       light/dark choice as one piece. The actions still name their own colours rather than
+       inheriting the theme's button brushes: left to those, they rendered near-white text on
+       this card in dark mode - present and tappable, but invisible, which reads exactly like
+       onboarding having no way out.
 
        BorderThickness is deliberately not set here, so the focus indicator in App.axaml still
        thickens the border when the button is focused. -->
   <UserControl.Styles>
     <Style Selector="Button.onboarding-action">
-      <Setter Property="Background" Value="#FFE2E8F0" />
-      <Setter Property="Foreground" Value="#FF111827" />
-      <Setter Property="BorderBrush" Value="#FF94A3B8" />
+      <Setter Property="Background" Value="{DynamicResource CalcKeyFunctionBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource CalcKeyFunctionForeground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CalcPanelBorder}" />
     </Style>
     <Style Selector="Button.onboarding-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="#FFCBD5E1" />
-      <Setter Property="TextBlock.Foreground" Value="#FF111827" />
+      <Setter Property="Background" Value="{DynamicResource CalcKeyFunctionHover}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyFunctionForeground}" />
     </Style>
     <Style Selector="Button.onboarding-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="#FFB4C0D0" />
-      <Setter Property="TextBlock.Foreground" Value="#FF111827" />
+      <Setter Property="Background" Value="{DynamicResource CalcKeyFunctionPressed}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyFunctionForeground}" />
     </Style>
 
     <Style Selector="Button.onboarding-primary">
-      <Setter Property="Background" Value="#FF1D4ED8" />
-      <Setter Property="Foreground" Value="#FFFFFFFF" />
-      <Setter Property="BorderBrush" Value="#FF1D4ED8" />
+      <Setter Property="Background" Value="{DynamicResource CalcKeyAccentBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource CalcKeyAccentForeground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CalcKeyAccentBackground}" />
     </Style>
     <Style Selector="Button.onboarding-primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="#FF1A43B8" />
-      <Setter Property="TextBlock.Foreground" Value="#FFFFFFFF" />
+      <Setter Property="Background" Value="{DynamicResource CalcKeyAccentHover}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyAccentForeground}" />
     </Style>
     <Style Selector="Button.onboarding-primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="#FF16389B" />
-      <Setter Property="TextBlock.Foreground" Value="#FFFFFFFF" />
+      <Setter Property="Background" Value="{DynamicResource CalcKeyAccentPressed}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyAccentForeground}" />
     </Style>
   </UserControl.Styles>
   <Border Background="#CC000000" Padding="16">
@@ -55,8 +56,8 @@
             Padding="24"
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch"
-            Background="#FFF8FAFD"
-            BorderBrush="#FF596780"
+            Background="{DynamicResource CalcPanelBackground}"
+            BorderBrush="{DynamicResource CalcPanelBorder}"
             BorderThickness="1"
             CornerRadius="18">
       <Grid RowDefinitions="*,Auto">
@@ -67,56 +68,56 @@
             <TextBlock Text="Welcome to CalcNova"
                        FontSize="28"
                        FontWeight="SemiBold"
-                       Foreground="#FF111827"
+                       Foreground="{DynamicResource CalcTextPrimary}"
                        TextWrapping="Wrap" />
             <TextBlock Text="Fast. Precise. Private. Everywhere."
                        FontSize="17"
-                       Foreground="#FF334155"
+                       Foreground="{DynamicResource CalcTextSecondary}"
                        TextWrapping="Wrap" />
 
-            <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
+            <Border Background="{DynamicResource CalcSubtleBackground}" Padding="14" CornerRadius="12">
               <StackPanel Spacing="8">
                 <TextBlock Text="Calculate your way"
                            FontSize="18"
                            FontWeight="SemiBold"
-                           Foreground="#FF111827"
+                           Foreground="{DynamicResource CalcTextPrimary}"
                            TextWrapping="Wrap" />
                 <TextBlock Text="Use standard and scientific calculation, Programmer, Converter, Statistics, Equations, Matrices, Graphing, Date &amp; Duration, Currency, and History from one shared workspace."
-                           Foreground="#FF334155"
+                           Foreground="{DynamicResource CalcTextSecondary}"
                            TextWrapping="Wrap" />
               </StackPanel>
             </Border>
 
-            <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
+            <Border Background="{DynamicResource CalcSubtleBackground}" Padding="14" CornerRadius="12">
               <StackPanel Spacing="8">
                 <!-- These headings wrap because they are longer than a narrow phone card is
                      wide; without it the end of the heading is simply cut off. -->
                 <TextBlock Text="Keyboard and touch friendly"
                            FontSize="18"
                            FontWeight="SemiBold"
-                           Foreground="#FF111827"
+                           Foreground="{DynamicResource CalcTextPrimary}"
                            TextWrapping="Wrap" />
                 <TextBlock Text="On keyboard targets, Ctrl+PageUp and Ctrl+PageDown cycle through modes; Ctrl+Home and Ctrl+End jump to the first and last modes. Calculator number-pad input is supported when you are not editing a text field."
-                           Foreground="#FF334155"
+                           Foreground="{DynamicResource CalcTextSecondary}"
                            TextWrapping="Wrap" />
               </StackPanel>
             </Border>
 
-            <Border Background="#FFE8EEF7" Padding="14" CornerRadius="12">
+            <Border Background="{DynamicResource CalcSubtleBackground}" Padding="14" CornerRadius="12">
               <StackPanel Spacing="8">
                 <TextBlock Text="Local-first by default"
                            FontSize="18"
                            FontWeight="SemiBold"
-                           Foreground="#FF111827"
+                           Foreground="{DynamicResource CalcTextPrimary}"
                            TextWrapping="Wrap" />
                 <TextBlock Text="Calculation history and preferences stay in local app storage. Physical unit conversion is offline. Currency rates are the optional network-enhanced feature and can use cached data when available."
-                           Foreground="#FF334155"
+                           Foreground="{DynamicResource CalcTextSecondary}"
                            TextWrapping="Wrap" />
               </StackPanel>
             </Border>
 
             <TextBlock Text="No account is required for core CalcNova features. You can skip this introduction immediately."
-                       Foreground="#FF475569"
+                       Foreground="{DynamicResource CalcTextSecondary}"
                        TextWrapping="Wrap" />
           </StackPanel>
         </ScrollViewer>
