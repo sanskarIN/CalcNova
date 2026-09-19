@@ -13,6 +13,16 @@ All notable CalcNova changes are recorded here.
   Theme.AppCompat theme (or descendant) with this activity` before any CalcNova code ran. All
   four theme variants now inherit from `Theme.AppCompat`, and `validate_platform_support.py`
   checks each parent so the regression cannot return unnoticed.
+- **First-run onboarding could not be dismissed on a short phone.** On a 360x800 device the
+  overlay card was taller than the screen, and `Skip` and `Start calculating` were the last
+  children of the card's scrolled content, so the only way out of onboarding was cut off and the
+  app could not be reached at all. The card set `VerticalAlignment="Center"` inside the very
+  ScrollViewer meant to scroll it, and content aligned inside a scroll viewport is measured
+  against the viewport rather than the extent, so it clipped instead of scrolling. The card now
+  stretches, so it can never exceed the space it has, and both buttons sit in their own row
+  outside the scroll region where they keep their place however little room the prose has. The
+  section headings also gained `TextWrapping`, since "Keyboard and touch friendly" is wider than
+  a narrow phone card and was being cut off mid-heading.
 - **Compact layouts panned sideways instead of fitting the window.** The adaptive layout gave
   every ScrollViewer in the shell — not only the mode strip — an unconstrained horizontal
   measure at compact width. Nothing inside a mode could then size itself to the window:
@@ -23,6 +33,20 @@ All notable CalcNova changes are recorded here.
   applies to the mode strip alone. This was only reachable below 600 DIPs, which is every phone.
 
 ### Changed
+
+- **The shell has a calculator's visual language.** It had no colour design of its own — every
+  surface took the framework's defaults, so a calculator with thirteen modes read as a generic
+  settings form. There is now one palette defined per theme variant, and every surface draws from
+  it. The keypad is readable at a glance: digits stay quiet, operators carry a tint, equals is the
+  one filled key and clear the one warning-coloured key. Keys fill their grid cell instead of
+  being sized to their label and left-aligned in a column several times wider. The display is a
+  panel reading expression, then answer in the largest type on screen, then the engine's message.
+  The selected mode is a filled pill rather than an underline, which survives the strip wrapping
+  on a phone. The onboarding overlay follows the palette instead of forcing a light card, so a
+  device in dark mode no longer gets a white sheet across the screen.
+- **Onboarding actions no longer depend on the theme.** They carry their own colours, because a
+  hardcoded light card with theme-coloured buttons on it rendered them white-on-white in dark
+  mode at a contrast ratio of 1.05:1 — present and tappable, but invisible.
 
 - Removed the `android.hardware.vibrate` `uses-feature` declaration from the Android manifest.
   Android has no vibrator feature constant — the name is absent from the platform's own

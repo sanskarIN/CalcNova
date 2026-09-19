@@ -2,18 +2,111 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CalcNova.App.App"
              RequestedThemeVariant="Default">
+  <Application.Resources>
+    <!-- One palette, defined per theme variant, so every surface in the shell follows the
+         light/dark choice from one place. Anything that paints its own colour instead of
+         reaching for these ends up inverted on half of the devices that run it. -->
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="CalcShellBackground" Color="#FFF2F4F8" />
+          <SolidColorBrush x:Key="CalcPanelBackground" Color="#FFFFFFFF" />
+          <SolidColorBrush x:Key="CalcPanelBorder" Color="#FFDCE2EB" />
+          <SolidColorBrush x:Key="CalcDisplayBackground" Color="#FFFFFFFF" />
+          <SolidColorBrush x:Key="CalcTextPrimary" Color="#FF0F172A" />
+          <SolidColorBrush x:Key="CalcTextSecondary" Color="#FF5B6676" />
+          <SolidColorBrush x:Key="CalcAccent" Color="#FF2563EB" />
+
+          <SolidColorBrush x:Key="CalcKeyDigitBackground" Color="#FFFFFFFF" />
+          <SolidColorBrush x:Key="CalcKeyDigitForeground" Color="#FF0F172A" />
+          <SolidColorBrush x:Key="CalcKeyDigitBorder" Color="#FFDCE2EB" />
+          <SolidColorBrush x:Key="CalcKeyDigitHover" Color="#FFEDF1F7" />
+          <SolidColorBrush x:Key="CalcKeyDigitPressed" Color="#FFDDE4EE" />
+
+          <SolidColorBrush x:Key="CalcKeyFunctionBackground" Color="#FFE9EDF4" />
+          <SolidColorBrush x:Key="CalcKeyFunctionForeground" Color="#FF29354A" />
+          <SolidColorBrush x:Key="CalcKeyFunctionHover" Color="#FFDCE3ED" />
+          <SolidColorBrush x:Key="CalcKeyFunctionPressed" Color="#FFCBD5E1" />
+
+          <SolidColorBrush x:Key="CalcKeyOperatorBackground" Color="#FFDDE7FE" />
+          <SolidColorBrush x:Key="CalcKeyOperatorForeground" Color="#FF14337A" />
+          <SolidColorBrush x:Key="CalcKeyOperatorHover" Color="#FFCBD9FC" />
+          <SolidColorBrush x:Key="CalcKeyOperatorPressed" Color="#FFB6C9FA" />
+
+          <SolidColorBrush x:Key="CalcKeyAccentBackground" Color="#FF2563EB" />
+          <SolidColorBrush x:Key="CalcKeyAccentForeground" Color="#FFFFFFFF" />
+          <SolidColorBrush x:Key="CalcKeyAccentHover" Color="#FF1D4FC4" />
+          <SolidColorBrush x:Key="CalcKeyAccentPressed" Color="#FF183FA0" />
+
+          <SolidColorBrush x:Key="CalcKeyClearBackground" Color="#FFFBE0E0" />
+          <SolidColorBrush x:Key="CalcKeyClearForeground" Color="#FF8E1B1B" />
+          <SolidColorBrush x:Key="CalcKeyClearHover" Color="#FFF6CDCD" />
+          <SolidColorBrush x:Key="CalcKeyClearPressed" Color="#FFEFB6B6" />
+
+          <SolidColorBrush x:Key="CalcSubtleBackground" Color="#FFEDF1F8" />
+          <SolidColorBrush x:Key="CalcTabSelectedBackground" Color="#FF2563EB" />
+          <SolidColorBrush x:Key="CalcTabSelectedForeground" Color="#FFFFFFFF" />
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="CalcShellBackground" Color="#FF0B111B" />
+          <SolidColorBrush x:Key="CalcPanelBackground" Color="#FF151D2A" />
+          <SolidColorBrush x:Key="CalcPanelBorder" Color="#FF27313F" />
+          <SolidColorBrush x:Key="CalcDisplayBackground" Color="#FF111826" />
+          <SolidColorBrush x:Key="CalcTextPrimary" Color="#FFF3F6FA" />
+          <SolidColorBrush x:Key="CalcTextSecondary" Color="#FFA3AFC0" />
+          <SolidColorBrush x:Key="CalcAccent" Color="#FF6C9BFF" />
+
+          <SolidColorBrush x:Key="CalcKeyDigitBackground" Color="#FF1D2736" />
+          <SolidColorBrush x:Key="CalcKeyDigitForeground" Color="#FFF3F6FA" />
+          <SolidColorBrush x:Key="CalcKeyDigitBorder" Color="#FF2E3949" />
+          <SolidColorBrush x:Key="CalcKeyDigitHover" Color="#FF273347" />
+          <SolidColorBrush x:Key="CalcKeyDigitPressed" Color="#FF32405A" />
+
+          <SolidColorBrush x:Key="CalcKeyFunctionBackground" Color="#FF19212F" />
+          <SolidColorBrush x:Key="CalcKeyFunctionForeground" Color="#FFD3DCE8" />
+          <SolidColorBrush x:Key="CalcKeyFunctionHover" Color="#FF222C3D" />
+          <SolidColorBrush x:Key="CalcKeyFunctionPressed" Color="#FF2B364A" />
+
+          <SolidColorBrush x:Key="CalcKeyOperatorBackground" Color="#FF1F3050" />
+          <SolidColorBrush x:Key="CalcKeyOperatorForeground" Color="#FFAECBFF" />
+          <SolidColorBrush x:Key="CalcKeyOperatorHover" Color="#FF273B63" />
+          <SolidColorBrush x:Key="CalcKeyOperatorPressed" Color="#FF304877" />
+
+          <SolidColorBrush x:Key="CalcKeyAccentBackground" Color="#FF2F6BF0" />
+          <SolidColorBrush x:Key="CalcKeyAccentForeground" Color="#FFFFFFFF" />
+          <SolidColorBrush x:Key="CalcKeyAccentHover" Color="#FF3C78FA" />
+          <SolidColorBrush x:Key="CalcKeyAccentPressed" Color="#FF2559CC" />
+
+          <SolidColorBrush x:Key="CalcKeyClearBackground" Color="#FF3A1D20" />
+          <SolidColorBrush x:Key="CalcKeyClearForeground" Color="#FFFFB4B4" />
+          <SolidColorBrush x:Key="CalcKeyClearHover" Color="#FF4A2428" />
+          <SolidColorBrush x:Key="CalcKeyClearPressed" Color="#FF5A2C31" />
+
+          <SolidColorBrush x:Key="CalcSubtleBackground" Color="#FF1A2333" />
+          <SolidColorBrush x:Key="CalcTabSelectedBackground" Color="#FF2F6BF0" />
+          <SolidColorBrush x:Key="CalcTabSelectedForeground" Color="#FFFFFFFF" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
   <Application.Styles>
     <FluentTheme />
 
+    <!-- 44 DIPs is the minimum interaction target for every shared control type. -->
     <Style Selector="Button">
       <Setter Property="MinHeight" Value="44" />
       <Setter Property="Padding" Value="12,8" />
+      <Setter Property="CornerRadius" Value="10" />
     </Style>
     <Style Selector="TextBox">
       <Setter Property="MinHeight" Value="44" />
+      <Setter Property="CornerRadius" Value="10" />
     </Style>
     <Style Selector="ComboBox">
       <Setter Property="MinHeight" Value="44" />
+      <Setter Property="CornerRadius" Value="10" />
     </Style>
     <Style Selector="CheckBox">
       <Setter Property="MinHeight" Value="44" />
@@ -46,16 +139,143 @@
       <Setter Property="BorderThickness" Value="3" />
     </Style>
 
+    <!-- Shell surfaces -->
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{DynamicResource CalcShellBackground}" />
+    </Style>
+    <Style Selector="UserControl.calcnova-shell">
+      <Setter Property="Background" Value="{DynamicResource CalcShellBackground}" />
+    </Style>
+    <Style Selector="Border.calc-panel">
+      <Setter Property="Background" Value="{DynamicResource CalcPanelBackground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CalcPanelBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="16" />
+    </Style>
+    <Style Selector="Border.calc-display">
+      <Setter Property="Background" Value="{DynamicResource CalcDisplayBackground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CalcPanelBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="16" />
+    </Style>
+    <Style Selector="TextBlock.calc-title">
+      <Setter Property="Foreground" Value="{DynamicResource CalcTextPrimary}" />
+    </Style>
+    <Style Selector="TextBlock.calc-caption">
+      <Setter Property="Foreground" Value="{DynamicResource CalcTextSecondary}" />
+    </Style>
+    <Style Selector="TextBlock.calc-result">
+      <Setter Property="Foreground" Value="{DynamicResource CalcTextPrimary}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- Keypad. Digits stay quiet, the operators carry a tint, equals is the one filled key
+         and clear is the one warning-coloured key, so the keypad can be read at a glance
+         rather than word by word. -->
     <Style Selector="Button.calc-key">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="MinHeight" Value="54" />
       <Setter Property="FontSize" Value="18" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="Margin" Value="3" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Background" Value="{DynamicResource CalcKeyDigitBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource CalcKeyDigitForeground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CalcKeyDigitBorder}" />
     </Style>
+    <Style Selector="Button.calc-key:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyDigitHover}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyDigitForeground}" />
+    </Style>
+    <Style Selector="Button.calc-key:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyDigitPressed}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyDigitForeground}" />
+    </Style>
+
+    <Style Selector="Button.calc-key.operator-key">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyOperatorBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource CalcKeyOperatorForeground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CalcKeyOperatorBackground}" />
+      <Setter Property="FontSize" Value="20" />
+    </Style>
+    <Style Selector="Button.calc-key.operator-key:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyOperatorHover}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyOperatorForeground}" />
+    </Style>
+    <Style Selector="Button.calc-key.operator-key:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyOperatorPressed}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyOperatorForeground}" />
+    </Style>
+
+    <Style Selector="Button.calc-key.accent-key">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyAccentBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource CalcKeyAccentForeground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CalcKeyAccentBackground}" />
+      <Setter Property="FontSize" Value="22" />
+    </Style>
+    <Style Selector="Button.calc-key.accent-key:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyAccentHover}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyAccentForeground}" />
+    </Style>
+    <Style Selector="Button.calc-key.accent-key:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyAccentPressed}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyAccentForeground}" />
+    </Style>
+
+    <Style Selector="Button.calc-key.clear-key">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyClearBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource CalcKeyClearForeground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CalcKeyClearBackground}" />
+    </Style>
+    <Style Selector="Button.calc-key.clear-key:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyClearHover}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyClearForeground}" />
+    </Style>
+    <Style Selector="Button.calc-key.clear-key:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyClearPressed}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyClearForeground}" />
+    </Style>
+
     <Style Selector="Button.function-key">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="MinHeight" Value="44" />
       <Setter Property="Margin" Value="3" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Background" Value="{DynamicResource CalcKeyFunctionBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource CalcKeyFunctionForeground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CalcKeyFunctionBackground}" />
+    </Style>
+    <Style Selector="Button.function-key:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyFunctionHover}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyFunctionForeground}" />
+    </Style>
+    <Style Selector="Button.function-key:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CalcKeyFunctionPressed}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcKeyFunctionForeground}" />
+    </Style>
+
+    <!-- Mode strip: the selected mode is filled rather than underlined, so which mode is
+         showing survives the strip wrapping onto several rows on a phone. -->
+    <Style Selector="TabItem">
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Margin" Value="0,0,6,6" />
+      <Setter Property="Foreground" Value="{DynamicResource CalcTextSecondary}" />
+    </Style>
+    <Style Selector="TabItem:selected">
+      <Setter Property="Background" Value="{DynamicResource CalcTabSelectedBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource CalcTabSelectedForeground}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{DynamicResource CalcTabSelectedBackground}" />
+      <Setter Property="CornerRadius" Value="10" />
+    </Style>
+    <Style Selector="TabItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource CalcTabSelectedForeground}" />
     </Style>
 
     <Style Selector="UserControl.compact Button">

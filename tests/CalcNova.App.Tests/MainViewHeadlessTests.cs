@@ -1,3 +1,7 @@
+using Avalonia;
+using Avalonia.Automation;
+using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
@@ -322,6 +326,212 @@ public sealed class MainViewHeadlessTests
         {
             window.Close();
         }
+    }
+
+    // 360x800 is the phone the overlay was reported unusable on. 360x640 is a shorter phone
+    // still, and 800x360 is that phone in landscape, where the card has least height of all.
+    [AvaloniaTheory]
+    [InlineData(360, 800)]
+    [InlineData(360, 640)]
+    [InlineData(800, 360)]
+    public async Task OnboardingActions_StayOnScreen(double width, double height)
+    {
+        var viewModel = new MainViewModel();
+        await viewModel.InitializeAsync();
+        var view = new MainView { DataContext = viewModel };
+
+        // Where the overlay ran out of room: the card was taller than the screen, and Skip and
+        // Start calculating sat at the bottom of the scrolled content, so onboarding could not
+        // be dismissed and the app could not be reached.
+        var window = new Window { Width = width, Height = height, Content = view };
+
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            var overlay = view.GetVisualDescendants().OfType<OnboardingOverlay>().Single();
+            Assert.True(overlay.IsVisible);
+
+            foreach (var name in new[]
+                     {
+                         "Skip CalcNova introduction",
+                         "Complete CalcNova introduction and start calculating",
+                     })
+            {
+                var button = overlay.GetVisualDescendants()
+                    .OfType<Button>()
+                    .Single(candidate => string.Equals(
+                        AutomationProperties.GetName(candidate),
+                        name,
+                        StringComparison.Ordinal));
+
+                Assert.True(button.IsVisible);
+                Assert.True(button.Bounds.Width > 0 && button.Bounds.Height > 0, $"'{name}' has no size.");
+
+                // Bounds are parent-relative, so the corners have to be translated into the
+                // window before they mean anything.
+                var topLeft = button.TranslatePoint(new Point(0, 0), window);
+                var bottomRight = button.TranslatePoint(
+                    new Point(button.Bounds.Width, button.Bounds.Height),
+                    window);
+
+                Assert.NotNull(topLeft);
+                Assert.NotNull(bottomRight);
+                Assert.True(
+                    topLeft!.Value.Y >= 0 && bottomRight!.Value.Y <= window.Height,
+                    $"'{name}' spans {topLeft.Value.Y} to {bottomRight!.Value.Y} in an {window.Height} tall window.");
+                Assert.True(
+                    topLeft.Value.X >= 0 && bottomRight.Value.X <= window.Width,
+                    $"'{name}' spans {topLeft.Value.X} to {bottomRight.Value.X} in a {window.Width} wide window.");
+            }
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    // The card paints a fixed light surface. Buttons that follow the app's theme variant instead
+    // render near-white text on it in dark mode - present and tappable, but invisible, which is
+    // indistinguishable from onboarding having no way out.
+    [AvaloniaTheory]
+    [InlineData("Dark")]
+    [InlineData("Light")]
+    public async Task OnboardingActions_StayLegibleAgainstTheCard(string variantName)
+    {
+        var application = Application.Current;
+        Assert.NotNull(application);
+        var previousVariant = application!.RequestedThemeVariant;
+        application.RequestedThemeVariant =
+            string.Equals(variantName, "Dark", StringComparison.Ordinal) ? ThemeVariant.Dark : ThemeVariant.Light;
+
+        var viewModel = new MainViewModel();
+        await viewModel.InitializeAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 360, Height = 800, Content = view };
+
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            var overlay = view.GetVisualDescendants().OfType<OnboardingOverlay>().Single();
+
+            foreach (var name in new[]
+                     {
+                         "Skip CalcNova introduction",
+                         "Complete CalcNova introduction and start calculating",
+                     })
+            {
+                var button = overlay.GetVisualDescendants()
+                    .OfType<Button>()
+                    .Single(candidate => string.Equals(
+                        AutomationProperties.GetName(candidate),
+                        name,
+                        StringComparison.Ordinal));
+
+                var foreground = Assert.IsAssignableFrom<ISolidColorBrush>(button.Foreground).Color;
+                var behind = NearestOpaqueBackground(button);
+
+                var contrast = ContrastRatio(foreground, behind);
+                Assert.True(
+                    contrast >= 4.5,
+                    $"'{name}' in {variantName}: {foreground} on {behind} is only {contrast:F2}:1.");
+            }
+        }
+        finally
+        {
+            window.Close();
+            application.RequestedThemeVariant = previousVariant;
+        }
+    }
+
+    // The keypad's meaning is carried by colour - quiet digits, tinted operators, a filled
+    // equals, a warning-coloured clear. That only works if every one of them stays readable in
+    // both variants, and a palette is easy to extend on one side and forget on the other.
+    [AvaloniaTheory]
+    [InlineData("Dark")]
+    [InlineData("Light")]
+    public async Task Keypad_StaysLegibleInBothThemes(string variantName)
+    {
+        var application = Application.Current;
+        Assert.NotNull(application);
+        var previousVariant = application!.RequestedThemeVariant;
+        application.RequestedThemeVariant =
+            string.Equals(variantName, "Dark", StringComparison.Ordinal) ? ThemeVariant.Dark : ThemeVariant.Light;
+
+        var viewModel = await CreateReadyViewModelAsync();
+        var view = new MainView { DataContext = viewModel };
+        var window = new Window { Width = 980, Height = 860, Content = view };
+
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            var keys = view.GetVisualDescendants()
+                .OfType<Button>()
+                .Where(button => button.Classes.Contains("calc-key") || button.Classes.Contains("function-key"))
+                .ToArray();
+
+            Assert.NotEmpty(keys);
+
+            foreach (var key in keys)
+            {
+                var foreground = Assert.IsAssignableFrom<ISolidColorBrush>(key.Foreground).Color;
+                var behind = NearestOpaqueBackground(key);
+                var contrast = ContrastRatio(foreground, behind);
+
+                Assert.True(
+                    contrast >= 4.5,
+                    $"Key '{key.Content}' in {variantName}: {foreground} on {behind} is only {contrast:F2}:1.");
+            }
+        }
+        finally
+        {
+            window.Close();
+            application.RequestedThemeVariant = previousVariant;
+        }
+    }
+
+    /// <summary>The colour actually behind a control: its own button face, else the card.</summary>
+    private static Color NearestOpaqueBackground(Button button)
+    {
+        if (button.Background is ISolidColorBrush { Color.A: 255 } own)
+        {
+            return own.Color;
+        }
+
+        foreach (var ancestor in button.GetVisualAncestors().OfType<Border>())
+        {
+            if (ancestor.Background is ISolidColorBrush { Color.A: 255 } solid)
+            {
+                return solid.Color;
+            }
+        }
+
+        throw new InvalidOperationException("No opaque surface was found behind the button.");
+    }
+
+    private static double ContrastRatio(Color first, Color second)
+    {
+        var a = RelativeLuminance(first);
+        var b = RelativeLuminance(second);
+        var lighter = Math.Max(a, b);
+        var darker = Math.Min(a, b);
+        return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    private static double RelativeLuminance(Color color)
+    {
+        static double Channel(byte value)
+        {
+            var c = value / 255d;
+            return c <= 0.03928d ? c / 12.92d : Math.Pow((c + 0.055d) / 1.055d, 2.4d);
+        }
+
+        return (0.2126d * Channel(color.R)) + (0.7152d * Channel(color.G)) + (0.0722d * Channel(color.B));
     }
 
     private static async Task<MainViewModel> CreateReadyViewModelAsync()
