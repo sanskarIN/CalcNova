@@ -69,6 +69,7 @@ The integrated preflight is intentionally broader than any one focused workflow.
 - versioned settings schema/shared codec/shared validation;
 - onboarding persistence/visual/focus behavior;
 - cross-platform packaging metadata;
+- Android adaptive launcher-icon geometry against Android's displayed window and mask-safe circle;
 - Desktop/Browser/Android/iOS build-workflow contracts;
 - cross-platform source composition, Browser/PWA resources, and mobile architecture contracts;
 - CodeQL/dependency-review/focused-security workflow contracts;

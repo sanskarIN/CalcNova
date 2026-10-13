@@ -6,6 +6,15 @@ All notable CalcNova changes are recorded here.
 
 ### Fixed
 
+- **The Android launcher icon was clipped on every device.** An adaptive icon's foreground is a
+  108dp canvas of which Android only ever displays the centre 72dp; the outer ring exists so the
+  launcher can animate the layers. The spark reached `(93, 26)`, outside that window, so its top
+  and right points were cut off everywhere. Of the artwork that was displayed, all five paths
+  also extended past the centre 66dp circle Android guarantees, so a circular launcher mask
+  cropped the calculator body edge to edge and reduced the spark to a torn-looking fragment. The
+  artwork is redrawn inside the safe circle, and `tools/validate_android_icon.py` now flattens
+  every path, samples along its curves, and fails the preflight if any point leaves either
+  boundary.
 - **Android: the app crashed on every launch.** `CalcNovaTheme` inherited from the framework
   theme `android:Theme.Material`, but Avalonia hosts the shell on `AvaloniaMainActivity`, which
   derives from `androidx.appcompat.app.AppCompatActivity`. AppCompat rejects a non-AppCompat

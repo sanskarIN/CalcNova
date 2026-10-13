@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- Adaptive-icon foreground. Android shows only the centre 72dp of this 108dp canvas, and
+     guarantees only the centre 66dp circle because each launcher picks its own mask shape.
+     Every element is therefore kept within 33dp of (54,54): a calculator body at 33..69 x
+     32..78, its display and keypad inset inside that, and the spark straddling the top-right
+     edge. The body sits slightly left so the spark balances it optically rather than
+     geometrically. tools/validate_android_icon.py holds this geometry. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
         android:width="108dp"
         android:height="108dp"
@@ -6,17 +12,17 @@
         android:viewportHeight="108">
   <path
       android:fillColor="#FFFFFF"
-      android:pathData="M28,18 L72,18 Q82,18 82,28 L82,80 Q82,90 72,90 L28,90 Q18,90 18,80 L18,28 Q18,18 28,18 Z" />
+      android:pathData="M39,32 L63,32 Q69,32 69,38 L69,72 Q69,78 63,78 L39,78 Q33,78 33,72 L33,38 Q33,32 39,32 Z" />
   <path
       android:fillColor="#182033"
-      android:pathData="M29,29 L71,29 L71,42 L29,42 Z" />
+      android:pathData="M37,37 L65,37 L65,48 L37,48 Z" />
   <path
       android:fillColor="#182033"
-      android:pathData="M29,52 L39,52 L39,62 L29,62 Z M46,52 L56,52 L56,62 L46,62 Z M63,52 L73,52 L73,62 L63,62 Z M29,69 L39,69 L39,79 L29,79 Z M46,69 L56,69 L56,79 L46,79 Z" />
+      android:pathData="M37,52 L45,52 L45,61 L37,61 Z M47,52 L55,52 L55,61 L47,61 Z M57,52 L65,52 L65,61 L57,61 Z M37,64 L45,64 L45,73 L37,73 Z M47,64 L55,64 L55,73 L47,73 Z" />
   <path
       android:fillColor="#FFCE4B"
-      android:pathData="M79,12 L83,22 L93,26 L83,30 L79,40 L75,30 L65,26 L75,22 Z" />
+      android:pathData="M59.5,64 L62.5,64 L62.5,67 L65,67 L65,70 L62.5,70 L62.5,73 L59.5,73 L59.5,70 L57,70 L57,67 L59.5,67 Z" />
   <path
       android:fillColor="#FFCE4B"
-      android:pathData="M66,69 L70,69 L70,74 L75,74 L75,78 L70,78 L70,83 L66,83 L66,78 L61,78 L61,74 L66,74 Z" />
+      android:pathData="M70,27 L72.5,31.5 L77,34 L72.5,36.5 L70,41 L67.5,36.5 L63,34 L67.5,31.5 Z" />
 </vector>
